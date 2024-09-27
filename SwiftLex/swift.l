@@ -1,12 +1,13 @@
 %option noyywrap
 %option never-interactive
 
-	/* STATES */
 %x MULTILINE_COMMENT
+%x STRING_MULTILINE
 
 %{
 #include <stdio.h>
 #include <iostream>
+#include <string>
 using namespace std;
 %}
 
@@ -17,6 +18,13 @@ using namespace std;
 	std::string str = "";
 	int lineNumber = 1;  
 	int multilineNumberBegin = 0;
+%}
+
+	/* CODE SECTION */
+
+%{
+    string stringMultiline;
+	
 %}
 
 	/* KEYWORDS */
@@ -237,6 +245,10 @@ Float80
 Double
 	*/
 
+	/* COMMENTS */
+
+\/\/.* { cout << "Found inline comment: " << yytext << endl; }
+
 	/* MULTILINE COMMENTS */
 \/\* {str = yytext; multilineNumberBegin = lineNumber; BEGIN(MULTILINE_COMMENT); }
 <MULTILINE_COMMENT>\*\/ { str += yytext; std::cout << "MULTILINE_COMMENT\n" << str << "\n"; BEGIN(INITIAL); }
@@ -246,6 +258,20 @@ Double
 
 	/* LINE COUNTER */
 \n {lineNumber++;}
+
+	/* STRINGS */
+
+\"\"\" { stringMultiline.clear(); BEGIN(STRING_MULTILINE); }
+<STRING_MULTILINE>[^\n\r] { stringMultiline += yytext; }
+<STRING_MULTILINE>\n { stringMultiline += yytext; }
+<STRING_MULTILINE>\\\\ { stringMultiline += "\\"; }
+<STRING_MULTILINE>\\\" { stringMultiline += "\""; }
+<STRING_MULTILINE>\\\' { stringMultiline += "\'"; }
+<STRING_MULTILINE>\"{1,2} { stringMultiline += yytext; }
+	/* TODO THIS MAY NOT WORK ALL THE TIME */
+<STRING_MULTILINE>\\\n\s*\"\"\" { cout << "ERROR: Escaped newline at the last line is not allowed" << endl; BEGIN(INITIAL); }
+<STRING_MULTILINE>\s*\"\"\" { cout << "Found multiline string: " << stringMultiline << endl; BEGIN(INITIAL); }
+<STRING_MULTILINE><<EOF>> { cout << "ERROR: Multiline string is not closed" << endl; BEGIN(INITIAL); }
 
 	/* TODO: DELETE THIS WHEN EVERYTHING IS DONE*/
 .|[^.] {}
