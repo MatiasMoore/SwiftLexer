@@ -396,3 +396,6 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# Flex generated code
+SwiftLex/swift.flex.cpp
