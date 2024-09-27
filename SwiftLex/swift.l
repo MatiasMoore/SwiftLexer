@@ -1,6 +1,9 @@
 %option noyywrap
 %option never-interactive
 
+	/* STATES */
+%x MULTILINE_COMMENT
+
 %{
 #include <stdio.h>
 #include <iostream>
@@ -8,6 +11,13 @@ using namespace std;
 %}
 
 %%
+	/* CODE SECTION */
+%{
+	// VARIABLES
+	std::string str = "";
+	int lineNumber = 1;  
+	int multilineNumberBegin = 0;
+%}
 
 	/* KEYWORDS */
 
@@ -226,6 +236,16 @@ Float
 Float80
 Double
 	*/
+
+	/* MULTILINE COMMENTS */
+\/\* {str = yytext; multilineNumberBegin = lineNumber; BEGIN(MULTILINE_COMMENT); }
+<MULTILINE_COMMENT>\*\/ { str += yytext; std::cout << "MULTILINE_COMMENT\n" << str << "\n"; BEGIN(INITIAL); }
+<MULTILINE_COMMENT>\n { str += yytext; lineNumber++; }
+<MULTILINE_COMMENT>. { str += yytext;}
+<MULTILINE_COMMENT><<EOF>> {std::cout << "MULTILINE_COMMENT ERROR in line " << multilineNumberBegin << ": comment are not closed"; BEGIN(INITIAL); }
+
+	/* LINE COUNTER */
+\n {lineNumber++;}
 
 	/* TODO: DELETE THIS WHEN EVERYTHING IS DONE*/
 .|[^.] {}
