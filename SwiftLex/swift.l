@@ -258,6 +258,8 @@ Double
 
 \"\"\" { stringMultiline.clear(); BEGIN(STRING_MULTILINE); }
 <STRING_MULTILINE>[^\n\r] { stringMultiline += yytext; }
+	/* TODO MAYBE WE SHOULD IGNORE ALL TABS COMPLETELY */
+<STRING_MULTILINE>\\\n\t* { stringMultiline += ""; }
 <STRING_MULTILINE>\n { stringMultiline += yytext; }
 <STRING_MULTILINE>\\\\ { stringMultiline += "\\"; }
 <STRING_MULTILINE>\\\" { stringMultiline += "\""; }
