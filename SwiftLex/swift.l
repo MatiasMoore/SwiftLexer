@@ -18,13 +18,8 @@ using namespace std;
 	std::string str = "";
 	int lineNumber = 1;  
 	int multilineNumberBegin = 0;
-%}
 
-	/* CODE SECTION */
-
-%{
-    string stringMultiline;
-	
+	string stringMultiline;
 %}
 
 	/* KEYWORDS */
