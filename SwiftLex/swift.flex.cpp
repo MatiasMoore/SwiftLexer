@@ -355,8 +355,8 @@ static void yynoreturn yy_fatal_error ( const char* msg  );
 	(yy_hold_char) = *yy_cp; \
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
-#define YY_NUM_RULES 2
-#define YY_END_OF_BUFFER 3
+#define YY_NUM_RULES 21
+#define YY_END_OF_BUFFER 22
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -364,27 +364,32 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static const flex_int16_t yy_accept[8] =
+static const flex_int16_t yy_accept[58] =
     {   0,
-        0,    0,    3,    2,    1,    1,    0
+        0,    0,   22,   20,   20,   20,   13,   14,    4,   20,
+       20,   11,    5,   10,   20,   15,   16,   20,   20,   17,
+       18,    0,    6,   12,    0,    7,    0,    0,    0,    0,
+        8,    9,    0,    0,    0,    0,   19,    0,    0,    0,
+        0,    2,    0,    0,    0,    0,    0,    0,    0,    0,
+        3,    0,    0,    0,    0,    1,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
     {   0,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    2,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    3,    1,    1,    1,    1,    4,
+        5,    1,    6,    1,    7,    8,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    9,    1,   10,
+       11,   12,   13,    1,    1,   14,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    2,    2,    2,
-        2,    2,    2,    2,    2,    2,    2,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+       15,    1,   16,    1,    1,    1,   17,   18,   19,   20,
 
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+       21,    1,    1,    1,   22,    1,    1,   23,    1,    1,
+       24,   25,    1,    1,   26,   27,    1,   28,    1,    1,
+       29,    1,   30,    1,   31,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -401,29 +406,62 @@ static const YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    1
     } ;
 
-static const YY_CHAR yy_meta[3] =
+static const YY_CHAR yy_meta[32] =
     {   0,
-        1,    2
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1
     } ;
 
-static const flex_int16_t yy_base[9] =
+static const flex_int16_t yy_base[58] =
     {   0,
-        0,    0,    4,    5,    0,    0,    5,    1
+        0,    0,   67,   68,   68,   49,   68,   68,   54,   52,
+       55,   68,   68,   49,   37,   68,   68,   34,   36,   68,
+       68,   30,   68,   68,   24,   68,   33,   30,   38,   37,
+       68,   68,   30,   28,   25,   28,   68,   30,   22,   24,
+       24,   68,   28,   27,   25,   15,   18,   19,   18,   18,
+       68,   10,    7,   10,   12,   68,   68
     } ;
 
-static const flex_int16_t yy_def[9] =
+static const flex_int16_t yy_def[58] =
     {   0,
-        7,    1,    7,    7,    8,    8,    0,    7
+       57,    1,   57,   57,   57,   57,   57,   57,   57,   57,
+       57,   57,   57,   57,   57,   57,   57,   57,   57,   57,
+       57,   57,   57,   57,   57,   57,   57,   57,   57,   57,
+       57,   57,   57,   57,   57,   57,   57,   57,   57,   57,
+       57,   57,   57,   57,   57,   57,   57,   57,   57,   57,
+       57,   57,   57,   57,   57,   57,    0
     } ;
 
-static const flex_int16_t yy_nxt[8] =
+static const flex_int16_t yy_nxt[100] =
     {   0,
-        4,    5,    6,    7,    3,    7,    7
+        4,    5,    6,    7,    8,    9,   10,   11,   12,    4,
+       13,    4,   14,   15,   16,   17,   18,    4,   19,    4,
+        4,    4,    4,    4,    4,    4,    4,    4,    4,   20,
+       21,   31,   56,   32,   55,   54,   53,   52,   51,   50,
+       49,   48,   47,   46,   45,   44,   43,   42,   41,   40,
+       39,   38,   37,   36,   35,   34,   33,   30,   29,   28,
+       27,   26,   25,   24,   23,   22,   57,    3,   57,   57,
+       57,   57,   57,   57,   57,   57,   57,   57,   57,   57,
+       57,   57,   57,   57,   57,   57,   57,   57,   57,   57,
+       57,   57,   57,   57,   57,   57,   57,   57,   57
+
     } ;
 
-static const flex_int16_t yy_chk[8] =
+static const flex_int16_t yy_chk[100] =
     {   0,
-        1,    1,    8,    3,    7,    7,    7
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,   25,   55,   25,   54,   53,   52,   50,   49,   48,
+       47,   46,   45,   44,   43,   41,   40,   39,   38,   36,
+       35,   34,   33,   30,   29,   28,   27,   22,   19,   18,
+       15,   14,   11,   10,    9,    6,    3,   57,   57,   57,
+       57,   57,   57,   57,   57,   57,   57,   57,   57,   57,
+       57,   57,   57,   57,   57,   57,   57,   57,   57,   57,
+       57,   57,   57,   57,   57,   57,   57,   57,   57
+
     } ;
 
 static yy_state_type yy_last_accepting_state;
@@ -444,9 +482,9 @@ char *yytext;
 #line 5 "swift.l"
 #include <stdio.h>
 #include <iostream>
-
-#line 448 "swift.flex.cpp"
-#line 449 "swift.flex.cpp"
+using namespace std;
+#line 486 "swift.flex.cpp"
+#line 487 "swift.flex.cpp"
 
 #define INITIAL 0
 
@@ -663,7 +701,10 @@ YY_DECL
 #line 10 "swift.l"
 
 
-#line 666 "swift.flex.cpp"
+#line 13 "swift.l"
+	/* KEYWORDS */
+
+#line 707 "swift.flex.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -690,13 +731,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 8 )
+				if ( yy_current_state >= 58 )
 					yy_c = yy_meta[yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 			++yy_cp;
 			}
-		while ( yy_current_state != 7 );
+		while ( yy_current_state != 57 );
 		yy_cp = (yy_last_accepting_cpos);
 		yy_current_state = (yy_last_accepting_state);
 
@@ -718,15 +759,285 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 12 "swift.l"
-{std::cout << "Found number " << yytext << std::endl; }
+#line 15 "swift.l"
+{cout << "Keyword associatedtype: " << yytext << endl;} 
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 14 "swift.l"
+#line 16 "swift.l"
+{cout << "Keyword class: " << yytext << endl;}
+	YY_BREAK
+/* 
+deinit
+enum 
+	*/
+/* 
+extension
+fileprivate
+import
+init
+inout
+internal
+let
+open
+operator
+private
+precedencegroup
+protocol
+public
+rethrows
+static
+struct
+subscript
+typealias
+func
+var 
+	*/
+/* KEYWORDS FOR LOOPS */
+/* 
+break
+case
+catch
+continue
+default
+defer
+do
+else
+fallthrough
+for
+guard
+if
+in
+repeat
+return
+throw
+switch
+where
+while 
+	*/
+/* 
+Any
+as
+false
+is
+nil
+self
+Self
+super
+throws
+true
+try 
+	*/
+/* 
+associativity
+convenience
+didSet
+dynamic
+final
+get
+indirect
+infix
+lazy
+left
+mutating
+none
+nonmutating
+optional
+override
+postfix
+precedence
+prefix
+Protocol
+required
+right
+set
+some
+Type
+unowned
+weak
+willSet 
+	*/
+/* KEYWORDS WITH HASHTAG */
+case 3:
+YY_RULE_SETUP
+#line 115 "swift.l"
+{cout << "Keyword #available: " << yytext << endl;}
+	YY_BREAK
+/* 
+\#colorLiteral
+\#column
+\#dsohandle
+\#elseif
+\#else
+\#endif
+\#error
+\#fileID
+\#fileLiteral
+\#filePath
+\#file
+\#function
+\#if
+\#imageLiteral
+\#keyPath
+\#line
+\#selector
+\#sourceLocation
+\#warning 
+	*/
+/* OPERATORS */
+case 4:
+YY_RULE_SETUP
+#line 140 "swift.l"
+{ cout << "Operator plus: " << yytext << endl; }
+	YY_BREAK
+/* 
+\-
+\/
+\*
+\% 
+	*/
+case 5:
+YY_RULE_SETUP
+#line 148 "swift.l"
+{ cout << "Operator assignment: " << yytext << endl; }
+	YY_BREAK
+case 6:
+YY_RULE_SETUP
+#line 149 "swift.l"
+{ cout << "Operator plus assignment: " << yytext << endl; }
+	YY_BREAK
+/* 
+\-\=
+\/\=
+\*=
+\%\= 
+	*/
+/* 
+\<\<
+\>\>
+\&
+\|
+\^
+\~ 
+	*/
+/* 
+\<
+\>
+\=\=
+\<\=
+\>\=
+\!\= 
+	*/
+/* 
+\&\&
+\|\|
+\! 
+	*/
+case 7:
+YY_RULE_SETUP
+#line 183 "swift.l"
+{ cout << "Operator nil coalescing: " << yytext << endl; }
+	YY_BREAK
+/* 
+\+\+
+\-\- 
+	*/
+/* 
+\.
+, 
+	*/
+case 8:
+YY_RULE_SETUP
+#line 194 "swift.l"
+{ cout << "Operator closed range: " << yytext << endl; }
+	YY_BREAK
+case 9:
+YY_RULE_SETUP
+#line 195 "swift.l"
+{ cout << "Operator half open range: " << yytext << endl; } 
+	YY_BREAK
+case 10:
+YY_RULE_SETUP
+#line 197 "swift.l"
+{ cout << "Operator ternary: " << yytext << endl;}
+	YY_BREAK
+case 11:
+YY_RULE_SETUP
+#line 198 "swift.l"
+{ cout << "Operator colon: " << yytext << endl; }
+	YY_BREAK
+case 12:
+YY_RULE_SETUP
+#line 199 "swift.l"
+{ cout << "Operator function return type: " << yytext << endl; }
+	YY_BREAK
+/* BRACKETS */
+case 13:
+YY_RULE_SETUP
+#line 203 "swift.l"
+{ cout << "Left round bracket: " << yytext << endl; }
+	YY_BREAK
+case 14:
+YY_RULE_SETUP
+#line 204 "swift.l"
+{ cout << "Right round bracket: " << yytext << endl; }
+	YY_BREAK
+case 15:
+YY_RULE_SETUP
+#line 205 "swift.l"
+{ cout << "Left square bracket: " << yytext << endl; }
+	YY_BREAK
+case 16:
+YY_RULE_SETUP
+#line 206 "swift.l"
+{ cout << "Right square bracket: " << yytext << endl; }
+	YY_BREAK
+case 17:
+YY_RULE_SETUP
+#line 207 "swift.l"
+{ cout << "Left curly bracket: " << yytext << endl; }
+	YY_BREAK
+case 18:
+YY_RULE_SETUP
+#line 208 "swift.l"
+{ cout << "Left right bracket: " << yytext << endl; }
+	YY_BREAK
+/* TYPES */
+case 19:
+YY_RULE_SETUP
+#line 212 "swift.l"
+{ cout << "Type bool: " << yytext << endl; }
+	YY_BREAK
+/* 
+String
+Character
+Int8
+Int16
+Int32
+Int64
+Int
+UInt8
+UInt16
+UInt32
+UInt64
+UInt
+Float
+Float80
+Double
+	*/
+/* TODO: DELETE THIS WHEN EVERYTHING IS DONE*/
+case 20:
+/* rule 20 can match eol */
+YY_RULE_SETUP
+#line 232 "swift.l"
+{}
+	YY_BREAK
+case 21:
+YY_RULE_SETUP
+#line 233 "swift.l"
 ECHO;
 	YY_BREAK
-#line 729 "swift.flex.cpp"
+#line 1040 "swift.flex.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1024,7 +1335,7 @@ static int yy_get_next_buffer (void)
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 8 )
+			if ( yy_current_state >= 58 )
 				yy_c = yy_meta[yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
@@ -1052,11 +1363,11 @@ static int yy_get_next_buffer (void)
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 8 )
+		if ( yy_current_state >= 58 )
 			yy_c = yy_meta[yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
-	yy_is_jam = (yy_current_state == 7);
+	yy_is_jam = (yy_current_state == 57);
 
 		return yy_is_jam ? 0 : yy_current_state;
 }
@@ -1732,5 +2043,5 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 14 "swift.l"
+#line 233 "swift.l"
 
