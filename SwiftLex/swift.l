@@ -320,11 +320,11 @@ Double
 
 	/* NUMBERS BINARY */
 
-0b[01]+[_01]* {str = yytext; removeChar(str, '_'); cout << "NUMBER_INTEGER_BINARY: " << stoi(str.substr(2), nullptr, 2) << endl;}
+0b[01][_01]* {str = yytext; removeChar(str, '_'); cout << "NUMBER_INTEGER_BINARY: " << stoi(str.substr(2), nullptr, 2) << endl;}
 
 	/* NUMBERS OCTAL */
 
-0o[0-7]+[_0-7]* {str = yytext; removeChar(str, '_'); cout << "NUMBER_INTEGER_OCTAL: " << stoi(str.substr(2), nullptr, 8) << endl;}
+0o[0-7][_0-7]* {str = yytext; removeChar(str, '_'); cout << "NUMBER_INTEGER_OCTAL: " << stoi(str.substr(2), nullptr, 8) << endl;}
 
 	/* NUMBERS DECIMAL */
 
@@ -338,7 +338,7 @@ Double
 
 	/* NUMBERS HEX */
 
-0x[0-9a-fA-F]+[_0-9a-fA-F]* {str = yytext; removeChar(str, '_'); cout << "NUMBER_INTEGER_HEX: " << stoi(str.substr(2), nullptr, 16) << endl;}
+0x[0-9a-fA-F][_0-9a-fA-F]* {str = yytext; removeChar(str, '_'); cout << "NUMBER_INTEGER_HEX: " << stoi(str.substr(2), nullptr, 16) << endl;}
 
 [-+]?0x[0-9a-fA-F][_0-9a-fA-F]*\.[0-9a-fA-F][_0-9a-fA-F]*([pP][-+]?[0-9a-fA-F][_0-9a-fA-F]*)?|[0-9a-fA-F][_0-9a-fA-F]*[pP][+-]?[0-9][_0-9]* {
 	str = yytext;
