@@ -252,7 +252,7 @@ Double
 <MULTILINE_COMMENT>\*\/ { str += yytext; std::cout << "MULTILINE_COMMENT\n" << str << "\n"; BEGIN(INITIAL); }
 <MULTILINE_COMMENT>\n { str += yytext; lineNumber++; }
 <MULTILINE_COMMENT>. { str += yytext;}
-<MULTILINE_COMMENT><<EOF>> {std::cout << "MULTILINE_COMMENT ERROR in line " << multilineNumberBegin << ": comment are not closed"; BEGIN(INITIAL); }
+<MULTILINE_COMMENT><<EOF>> {std::cout << "ERROR: MULTILINE_COMMENT in line " << multilineNumberBegin << ": comment are not closed"; BEGIN(INITIAL); }
 
 	/* LINE COUNTER */
 \n {lineNumber++;}
