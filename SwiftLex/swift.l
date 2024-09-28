@@ -237,12 +237,12 @@ Double { cout << "Type Double: " << yytext << endl; }
 <STRING_MULTILINE>\\\n\t* { stringMultiline += ""; }
 <STRING_MULTILINE>\n { stringMultiline += yytext; lineNumber++;}
 <STRING_MULTILINE>\\\\ { stringMultiline += "\\"; }
-<STRING_MULTILINE>\\n  { stringMultiline += "\n"; }
+<STRING_MULTILINE>\\n { stringMultiline += "\n"; }
 <STRING_MULTILINE>\\b { stringMultiline += "\b"; }
-<STRING_MULTILINE>\\0  { stringMultiline += "\0"; }
+<STRING_MULTILINE>\\0 { stringMultiline += "\0"; }
 <STRING_MULTILINE>\\f { stringMultiline += "\f"; }
-<STRING_MULTILINE>\\r  { stringMultiline += "\r"; }
-<STRING_MULTILINE>\\t  { stringMultiline += "\t"; }
+<STRING_MULTILINE>\\r { stringMultiline += "\r"; }
+<STRING_MULTILINE>\\t { stringMultiline += "\t"; }
 <STRING_MULTILINE>\\v { stringMultiline += "\v"; }
 <STRING_MULTILINE>\\\' { stringMultiline += "\'"; }
 <STRING_MULTILINE>\\\" { stringMultiline += "\""; }
@@ -263,12 +263,12 @@ Double { cout << "Type Double: " << yytext << endl; }
 <STRING>[^\\\"\n]+ { stringOneLine += yytext; }
 <STRING>\n { cout << "ERROR: unterminated string in line " << lineNumber; BEGIN(ERROR);}
 <STRING>\\\\ { stringOneLine += "\\"; }
-<STRING>\\n  { stringOneLine += "\n"; }
+<STRING>\\n { stringOneLine += "\n"; }
 <STRING>\\b { stringOneLine += "\b"; }
-<STRING>\\0  { stringOneLine += "\0"; }
+<STRING>\\0 { stringOneLine += "\0"; }
 <STRING>\\f { stringOneLine += "\f"; }
-<STRING>\\r  { stringOneLine += "\r"; }
-<STRING>\\t  { stringOneLine += "\t"; }
+<STRING>\\r { stringOneLine += "\r"; }
+<STRING>\\t { stringOneLine += "\t"; }
 <STRING>\\v { stringOneLine += "\v"; }
 <STRING>\\\' { stringOneLine += "\'"; }
 <STRING>\\\" { stringOneLine += "\""; }
