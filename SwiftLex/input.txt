@@ -180,11 +180,7 @@ var red, green, blue: Double
 		comment
 		""" */
 
-		print("HELLO, 
-
-
-
-world") 
+		print("HELLO, world") 
 
 var b = 0b+ 0b1 + 0ba + 0b_1 + 0b12
 var x = 0x+ 0x_1 + 0xvv + 0x7x + 0xf
@@ -192,11 +188,14 @@ var o = 0o+ 0o1 + 0ov + 0o_1 + 0o78
 
 // "Строка с интерполяицей \\(((x)))"
 // "Строка с интерполяицей \(x)"
-// var emoji = "\u{1}"
-// var emoji = "\u{1F}"
-// var emoji = "\u{1F6}"
-// var emoji = "\u{1F60}"
-// var emoji = "\u{1F601}"
+var unicodeStr1 = "\u{1}"
+var unicodeStr2 = "\u{1F}"
+var unicodeStr3 = "\u{00001F}"
+var unicodeStr4 = "\u{1F6}"
+var unicodeStr5 = "\u{1F60}"
+var unicodeStr6 = "\u{1F601}"
+
+//These two are errors
 // var emoji = "\u{U+1F601}"
 // var emoji = "\u{+1F601}"
 
