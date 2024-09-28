@@ -249,10 +249,10 @@ Double
 
 	/* MULTILINE COMMENTS */
 \/\* {str = yytext; multilineNumberBegin = lineNumber; BEGIN(MULTILINE_COMMENT); }
-<MULTILINE_COMMENT>\*\/ { str += yytext; std::cout << "MULTILINE_COMMENT\n" << str << "\n"; BEGIN(INITIAL); }
+<MULTILINE_COMMENT>\*\/ { str += yytext; cout << "MULTILINE_COMMENT\n" << str << "\n"; BEGIN(INITIAL); }
 <MULTILINE_COMMENT>\n { str += yytext; lineNumber++; }
 <MULTILINE_COMMENT>. { str += yytext;}
-<MULTILINE_COMMENT><<EOF>> {std::cout << "ERROR: MULTILINE_COMMENT in line " << multilineNumberBegin << ": comment are not closed"; BEGIN(INITIAL); }
+<MULTILINE_COMMENT><<EOF>> {cout << "ERROR: MULTILINE_COMMENT in line " << multilineNumberBegin << ": comment are not closed"; BEGIN(INITIAL); }
 
 	/* LINE COUNTER */
 \n {lineNumber++;}
