@@ -279,10 +279,10 @@ Double
 \" { stringOneLine.clear(); BEGIN(STRING); }
 <STRING>[^\\\"\n]+ { stringOneLine += yytext; }
 <STRING>\n { cout << "ERROR: unterminated string in line " << lineNumber; BEGIN(ERROR);}
+<STRING>\\\\ { stringOneLine += "\\"; }
 <STRING>\\n  { stringOneLine += "\n"; }
 <STRING>\\b { stringOneLine += "\b"; }
 <STRING>\\0  { stringOneLine += "\0"; }
-<STRING>\\ { stringOneLine += "\\"; }
 <STRING>\\f { stringOneLine += "\f"; }
 <STRING>\\r  { stringOneLine += "\r"; }
 <STRING>\\t  { stringOneLine += "\t"; }
