@@ -285,7 +285,10 @@ Double
 
 [0-9][_0-9]* {str = yytext; removeChar(str, '_'); cout << "NUMBER_INTEGER_DECIMAL: " << stoi(str) << endl;}
 
+	/* NUMBERS HEX */
 
+0x[0-9a-fA-F]+[_0-9a-fA-F]* {str = yytext; removeChar(str, '_'); cout << "NUMBER_INTEGER_HEX: " << stoi(str.substr(2), nullptr, 16) << endl;}
+	
 	/* TODO: DELETE THIS WHEN EVERYTHING IS DONE*/
 .|[^.] {}
 %%
