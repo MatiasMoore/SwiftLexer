@@ -14,6 +14,9 @@ using namespace std;
 %%
 	/* CODE SECTION */
 %{
+	// FUNCTIONS
+	void removeChar(std::string& str, char charToRemove);
+
 	// VARIABLES
 	std::string str = "";
 	int lineNumber = 1;  
@@ -270,6 +273,18 @@ Double
 <STRING_MULTILINE>\s*\"\"\" { cout << "Found multiline string: " << stringMultiline << endl; BEGIN(INITIAL); }
 <STRING_MULTILINE><<EOF>> { cout << "ERROR: Multiline string is not closed" << endl; BEGIN(INITIAL); }
 
+
+	/* NUMBERS DECIMAL */
+
+[0-9][_0-9]* {str = yytext; removeChar(str, '_'); cout << "NUMBER_INTEGER_DECIMAL: " << stoi(str) << endl;}
+
+
 	/* TODO: DELETE THIS WHEN EVERYTHING IS DONE*/
 .|[^.] {}
 %%
+
+	/* FUNCTIONS */
+void removeChar(string& str, char charToRemove) 
+{
+    str.erase(remove(str.begin(), str.end(), charToRemove), str.end());
+}
