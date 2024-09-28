@@ -277,6 +277,10 @@ Double
 
 0b[01]+[_01]* {str = yytext; removeChar(str, '_'); cout << "NUMBER_INTEGER_BINARY: " << stoi(str.substr(2), nullptr, 2) << endl;}
 
+	/* NUMBERS OCTAL */
+
+0o[0-7]+[_0-7]* {str = yytext; removeChar(str, '_'); cout << "NUMBER_INTEGER_OCTAL: " << stoi(str.substr(2), nullptr, 8) << endl;}
+
 	/* NUMBERS DECIMAL */
 
 [0-9][_0-9]* {str = yytext; removeChar(str, '_'); cout << "NUMBER_INTEGER_DECIMAL: " << stoi(str) << endl;}
