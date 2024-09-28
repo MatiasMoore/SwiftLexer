@@ -1,7 +1,7 @@
 %option noyywrap
 %option never-interactive
 
-%x MULTILINE_COMMENT
+%x COMMENT_MULTILINE
 %x STRING_MULTILINE
 
 %{
@@ -247,12 +247,12 @@ Double
 
 \/\/.* { cout << "Found inline comment: " << yytext << endl; }
 
-	/* MULTILINE COMMENTS */
-\/\* {str = yytext; multilineNumberBegin = lineNumber; BEGIN(MULTILINE_COMMENT); }
-<MULTILINE_COMMENT>\*\/ { str += yytext; cout << "MULTILINE_COMMENT\n" << str << "\n"; BEGIN(INITIAL); }
-<MULTILINE_COMMENT>\n { str += yytext; lineNumber++; }
-<MULTILINE_COMMENT>. { str += yytext;}
-<MULTILINE_COMMENT><<EOF>> {cout << "ERROR: MULTILINE_COMMENT in line " << multilineNumberBegin << ": comment are not closed"; BEGIN(INITIAL); }
+	/* COMMENTS MULTILINE */
+\/\* {str = yytext; multilineNumberBegin = lineNumber; BEGIN(COMMENT_MULTILINE); }
+<COMMENT_MULTILINE>\*\/ { str += yytext; cout << "COMMENT_MULTILINE\n" << str << "\n"; BEGIN(INITIAL); }
+<COMMENT_MULTILINE>\n { str += yytext; lineNumber++; }
+<COMMENT_MULTILINE>. { str += yytext;}
+<COMMENT_MULTILINE><<EOF>> {cout << "ERROR: COMMENT_MULTILINE in line " << multilineNumberBegin << ": comment are not closed"; BEGIN(INITIAL); }
 
 	/* LINE COUNTER */
 \n {lineNumber++;}
