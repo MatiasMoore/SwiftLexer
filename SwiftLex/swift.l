@@ -226,7 +226,7 @@ Double { cout << "Type Double: " << yytext << endl; }
 <COMMENT_MULTILINE>\*\/ { str += yytext; cout << "COMMENT_MULTILINE\n" << str << "\n"; BEGIN(INITIAL); }
 <COMMENT_MULTILINE>\n { str += yytext; lineNumber++; }
 <COMMENT_MULTILINE>. { str += yytext;}
-<COMMENT_MULTILINE><<EOF>> {cout << "ERROR: COMMENT_MULTILINE in line " << multilineNumberBegin << ": comment are not closed"; BEGIN(INITIAL); }
+<COMMENT_MULTILINE><<EOF>> {cout << "ERROR: COMMENT_MULTILINE in line " << multilineNumberBegin << ": comment are not closed"; BEGIN(ERROR); }
 
 	/* LINE COUNTER */
 \n {lineNumber++;}
