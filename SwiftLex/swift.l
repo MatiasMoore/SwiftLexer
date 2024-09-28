@@ -273,7 +273,7 @@ Double
 <STRING_MULTILINE>\"{1,2} { stringMultiline += yytext; }
 	/* TODO THIS MAY NOT WORK ALL THE TIME */
 <STRING_MULTILINE>\\\n\s*\"\"\" { cout << "ERROR: Escaped newline at the last line is not allowed" << endl; BEGIN(ERROR); }
-<STRING_MULTILINE>\s*\"\"\" { cout << "Found multiline string: " << stringMultiline << endl; BEGIN(INITIAL); }
+<STRING_MULTILINE>\s*\"\"\" { cout << "Multiline string: " << stringMultiline << endl; BEGIN(INITIAL); }
 <STRING_MULTILINE><<EOF>> { cout << "ERROR: Multiline string is not closed" << endl; BEGIN(ERROR); }
 
 \" { stringOneLine.clear(); BEGIN(STRING); }
@@ -297,8 +297,8 @@ Double
 	stringOneLine += char(strtoll(unicodeHexBuffer.c_str(), NULL, 16));
  }
 <STRING>\\u { cout << "ERROR: incorrect unicode char format at line " << lineNumber << endl; BEGIN(ERROR);}
-<STRING>\" { std::cout << "STRING: " << stringOneLine << std::endl; BEGIN(INITIAL); }
-<STRING><<EOF>> { printf("ERROR in %d:  no closing quotation mark\n", lineNumber); BEGIN(ERROR); }
+<STRING>\" { std::cout << "Oneline string: " << stringOneLine << std::endl; BEGIN(INITIAL); }
+<STRING><<EOF>> { cout << "ERROR: string in not closed at the end of file at line" << lineNumber << endl; BEGIN(ERROR); }
 
 	/* TODO: DELETE THIS WHEN EVERYTHING IS DONE*/
 .|[^.] {}
