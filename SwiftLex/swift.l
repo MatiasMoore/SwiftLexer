@@ -313,6 +313,8 @@ Double { cout << "Type Double: " << yytext << endl; }
 	cout << "HEX_FLOATINGPOINT_NUMBER: " << stod(str) << endl;
 }
 	
+[_a-zA-Z][_a-zA-Z0-9]* { printf("Found IDENTIFIER: %s\n", yytext); }
+
 	/* TODO: DELETE THIS WHEN EVERYTHING IS DONE*/
 .|[^.] {}
 <ERROR>.|[^.] {}
