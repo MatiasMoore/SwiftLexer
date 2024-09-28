@@ -23,6 +23,7 @@ using namespace std;
 	int lineNumber = 1;  
 	int multilineNumberBegin = 0;
 
+	int multilineStringLineNumber = 1;
 	string stringMultiline;
 	string stringOneLine;
 	string unicodeHexBuffer;
@@ -262,19 +263,33 @@ Double
 
 	/* STRINGS */
 
-\"\"\" { stringMultiline.clear(); BEGIN(STRING_MULTILINE); }
+\"\"\" { stringMultiline.clear(); multilineStringLineNumber = lineNumber; BEGIN(STRING_MULTILINE); }
 <STRING_MULTILINE>[^\n\r] { stringMultiline += yytext; }
 	/* TODO MAYBE WE SHOULD IGNORE ALL TABS COMPLETELY */
 <STRING_MULTILINE>\\\n\t* { stringMultiline += ""; }
-<STRING_MULTILINE>\n { stringMultiline += yytext; }
+<STRING_MULTILINE>\n { stringMultiline += yytext; lineNumber++;}
 <STRING_MULTILINE>\\\\ { stringMultiline += "\\"; }
-<STRING_MULTILINE>\\\" { stringMultiline += "\""; }
+<STRING_MULTILINE>\\n  { stringMultiline += "\n"; }
+<STRING_MULTILINE>\\b { stringMultiline += "\b"; }
+<STRING_MULTILINE>\\0  { stringMultiline += "\0"; }
+<STRING_MULTILINE>\\f { stringMultiline += "\f"; }
+<STRING_MULTILINE>\\r  { stringMultiline += "\r"; }
+<STRING_MULTILINE>\\t  { stringMultiline += "\t"; }
+<STRING_MULTILINE>\\v { stringMultiline += "\v"; }
 <STRING_MULTILINE>\\\' { stringMultiline += "\'"; }
+<STRING_MULTILINE>\\\" { stringMultiline += "\""; }
+<STRING_MULTILINE>\\u\{0*({HEX_DIGIT}){1,8}\} {
+	//Remove \u{ from yytext
+	unicodeHexBuffer = (yytext + 3);
+	//Remove } from yytext
+	unicodeHexBuffer.pop_back();
+	stringMultiline += char(strtoll(unicodeHexBuffer.c_str(), NULL, 16));
+ }
 <STRING_MULTILINE>\"{1,2} { stringMultiline += yytext; }
 	/* TODO THIS MAY NOT WORK ALL THE TIME */
-<STRING_MULTILINE>\\\n\s*\"\"\" { cout << "ERROR: Escaped newline at the last line is not allowed" << endl; BEGIN(ERROR); }
+<STRING_MULTILINE>\\\n\s*\"\"\" { cout << "ERROR: Escaped newline at the last line of multiline string is not allowed at line " << multilineStringLineNumber << endl; BEGIN(ERROR); }
 <STRING_MULTILINE>\s*\"\"\" { cout << "Multiline string: " << stringMultiline << endl; BEGIN(INITIAL); }
-<STRING_MULTILINE><<EOF>> { cout << "ERROR: Multiline string is not closed" << endl; BEGIN(ERROR); }
+<STRING_MULTILINE><<EOF>> { cout << "ERROR: Multiline string is not closed at line " << multilineStringLineNumber << endl; BEGIN(ERROR); }
 
 \" { stringOneLine.clear(); BEGIN(STRING); }
 <STRING>[^\\\"\n]+ { stringOneLine += yytext; }
