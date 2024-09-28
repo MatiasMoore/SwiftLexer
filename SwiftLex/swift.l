@@ -33,7 +33,6 @@ using namespace std;
 %}
 
 	/* KEYWORDS */
-
 	
 associatedtype {cout << "Keyword associatedtype: " << yytext << endl;} 
 class {cout << "Keyword class: " << yytext << endl;}
@@ -215,7 +214,6 @@ UInt { cout << "Type UInt: " << yytext << endl; }
 Float { cout << "Type Float: " << yytext << endl; }
 Float80 { cout << "Type Float80: " << yytext << endl; }
 Double { cout << "Type Double: " << yytext << endl; }
-	
 
 	/* COMMENTS */
 
