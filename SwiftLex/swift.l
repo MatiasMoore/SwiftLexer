@@ -3,6 +3,10 @@
 
 %x MULTILINE_COMMENT
 %x STRING_MULTILINE
+%x STRING
+%x ERROR
+
+HEX_DIGIT [0-9A-Fa-f]
 
 %{
 #include <stdio.h>
@@ -20,6 +24,8 @@ using namespace std;
 	int multilineNumberBegin = 0;
 
 	string stringMultiline;
+	string stringOneLine;
+	string unicodeHexBuffer;
 %}
 
 	/* KEYWORDS */
@@ -249,7 +255,7 @@ Double
 <MULTILINE_COMMENT>\*\/ { str += yytext; std::cout << "MULTILINE_COMMENT\n" << str << "\n"; BEGIN(INITIAL); }
 <MULTILINE_COMMENT>\n { str += yytext; lineNumber++; }
 <MULTILINE_COMMENT>. { str += yytext;}
-<MULTILINE_COMMENT><<EOF>> {std::cout << "MULTILINE_COMMENT ERROR in line " << multilineNumberBegin << ": comment are not closed"; BEGIN(INITIAL); }
+<MULTILINE_COMMENT><<EOF>> {std::cout << "MULTILINE_COMMENT ERROR in line " << multilineNumberBegin << ": comment are not closed"; BEGIN(ERROR); }
 
 	/* LINE COUNTER */
 \n {lineNumber++;}
@@ -266,10 +272,35 @@ Double
 <STRING_MULTILINE>\\\' { stringMultiline += "\'"; }
 <STRING_MULTILINE>\"{1,2} { stringMultiline += yytext; }
 	/* TODO THIS MAY NOT WORK ALL THE TIME */
-<STRING_MULTILINE>\\\n\s*\"\"\" { cout << "ERROR: Escaped newline at the last line is not allowed" << endl; BEGIN(INITIAL); }
+<STRING_MULTILINE>\\\n\s*\"\"\" { cout << "ERROR: Escaped newline at the last line is not allowed" << endl; BEGIN(ERROR); }
 <STRING_MULTILINE>\s*\"\"\" { cout << "Found multiline string: " << stringMultiline << endl; BEGIN(INITIAL); }
-<STRING_MULTILINE><<EOF>> { cout << "ERROR: Multiline string is not closed" << endl; BEGIN(INITIAL); }
+<STRING_MULTILINE><<EOF>> { cout << "ERROR: Multiline string is not closed" << endl; BEGIN(ERROR); }
+
+\" { stringOneLine.clear(); BEGIN(STRING); }
+<STRING>[^\\\"\n]+ { stringOneLine += yytext; }
+<STRING>\n { cout << "ERROR: unterminated string in line " << lineNumber; BEGIN(ERROR);}
+<STRING>\\n  { stringOneLine += "\n"; }
+<STRING>\\b { stringOneLine += "\b"; }
+<STRING>\\0  { stringOneLine += "\0"; }
+<STRING>\\ { stringOneLine += "\\"; }
+<STRING>\\f { stringOneLine += "\f"; }
+<STRING>\\r  { stringOneLine += "\r"; }
+<STRING>\\t  { stringOneLine += "\t"; }
+<STRING>\\v { stringOneLine += "\v"; }
+<STRING>\\\' { stringOneLine += "\'"; }
+<STRING>\\\" { stringOneLine += "\""; }
+<STRING>\\u\{0*({HEX_DIGIT}){1,8}\} {
+	//Remove \u{ from yytext
+	unicodeHexBuffer = (yytext + 3);
+	//Remove } from yytext
+	unicodeHexBuffer.pop_back();
+	stringOneLine += char(strtoll(unicodeHexBuffer.c_str(), NULL, 16));
+ }
+<STRING>\\u { cout << "ERROR: incorrect unicode char format at line " << lineNumber << endl; BEGIN(ERROR);}
+<STRING>\" { std::cout << "STRING: " << stringOneLine << std::endl; BEGIN(INITIAL); }
+<STRING><<EOF>> { printf("ERROR in %d:  no closing quotation mark\n", lineNumber); BEGIN(ERROR); }
 
 	/* TODO: DELETE THIS WHEN EVERYTHING IS DONE*/
 .|[^.] {}
+<ERROR>.|[^.] {}
 %%
