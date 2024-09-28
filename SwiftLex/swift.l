@@ -249,7 +249,7 @@ Double
 
 	/* COMMENTS */
 
-\/\/.* { cout << "Found inline comment: " << yytext << endl; }
+\/\/.* { cout << "Inline comment: " << yytext << endl; }
 
 	/* MULTILINE COMMENTS */
 \/\* {str = yytext; multilineNumberBegin = lineNumber; BEGIN(MULTILINE_COMMENT); }
