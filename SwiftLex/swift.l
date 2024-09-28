@@ -34,185 +34,153 @@ using namespace std;
 
 	/* KEYWORDS */
 
+	
 associatedtype {cout << "Keyword associatedtype: " << yytext << endl;} 
 class {cout << "Keyword class: " << yytext << endl;}
-	/* 
-deinit
-enum 
-	*/
-
-	/* 
-extension
-fileprivate
-import
-init
-inout
-internal
-let
-open
-operator
-private
-precedencegroup
-protocol
-public
-rethrows
-static
-struct
-subscript
-typealias
-func
-var 
-	*/
-
+deinit { cout << "Keyword deinit: " << yytext << endl; }
+enum { cout << "Keyword enum: " << yytext << endl; } 
+extension {cout << "Keyword extension: " << yytext << endl;}
+fileprivate {cout << "Keyword fileprivate: " <<yytext << endl;}
+import {cout << "Keyword import: " << yytext << endl;}
+init {cout << "Keyword init: " << yytext << endl;}
+inout {cout << "Keyword inout: " << yytext << endl;}
+internal {cout << "Keyword internal: " << yytext << endl;}
+let {cout << "Keyword let: " << yytext << endl;}
+open {cout << "Keyword open: " << yytext << endl;}
+operator {cout << "Keyword operator: " << yytext << endl;}
+private {cout << "Keyword private: " << yytext << endl;}
+precedencegroup {cout << "Keyword precedencegroup: " << yytext << endl;}
+protocol {cout << "Keyword protocol: " << yytext << endl;}
+public {cout << "Keyword public: " << yytext << endl;}
+rethrows {cout << "Keyword rethrows: " << yytext << endl;}
+static {cout << "Keyword static: " << yytext << endl;}
+struct {cout << "Keyword struct: " << yytext << endl;}
+subscript {cout << "Keyword subscript: " << yytext << endl;}
+typealias {cout << "Keyword typealias: " << yytext << endl;}
+func {cout << "Keyword func: " << yytext << endl;}
+var {cout << "Keyword var: " << yytext << endl;}
+	
 	/* KEYWORDS FOR LOOPS */
 
-	/* 
-break
-case
-catch
-continue
-default
-defer
-do
-else
-fallthrough
-for
-guard
-if
-in
-repeat
-return
-throw
-switch
-where
-while 
-	*/
+break {cout << "Keyword break: " << yytext << endl;}
+case {cout << "Keyword case: " << yytext << endl;}
+catch {cout << "Keyword catch: " << yytext << endl;}
+continue {cout << "Keyword continue: " << yytext << endl;}
+default {cout << "Keyword default: " << yytext << endl;}
+defer {cout << "Keyword defer: " << yytext << endl;}
+do {cout << "Keyword do: " << yytext << endl;}
+else {cout << "Keyword else: " << yytext << endl;}
+fallthrough {cout << "Keyword fallthrough: " << yytext << endl;}
+for {cout << "Keyword for: " << yytext << endl;}
+guard {cout << "Keyword guard: " << yytext << endl;}
+if {cout << "Keyword if: " << yytext << endl;}
+in {cout << "Keyword in: " << yytext << endl;}
+repeat {cout << "Keyword repeat: " << yytext << endl;}
+return {cout << "Keyword return: " << yytext << endl;}
+throw {cout << "Keyword throw: " << yytext << endl;}
+switch {cout << "Keyword switch: " << yytext << endl;}
+where {cout << "Keyword where: " << yytext << endl;}
+while {cout << "Keyword while: " << yytext << endl;}
 
-	/* 
-Any
-as
-false
-is
-nil
-self
-Self
-super
-throws
-true
-try 
-	*/
-
-	/* 
-associativity
-convenience
-didSet
-dynamic
-final
-get
-indirect
-infix
-lazy
-left
-mutating
-none
-nonmutating
-optional
-override
-postfix
-precedence
-prefix
-Protocol
-required
-right
-set
-some
-Type
-unowned
-weak
-willSet 
-	*/
-
-	/* KEYWORDS WITH HASHTAG */
-
+Any {cout << "Keyword any: " << yytext << endl;}
+as {cout << "Keyword as: " << yytext << endl;}
+false {cout << "Keyword false: " << yytext << endl;}
+is {cout << "Keyword is: " << yytext << endl;}
+nil {cout << "Keyword nil: " << yytext << endl;}
+self {cout << "Keyword self: " << yytext << endl;}
+Self {cout << "Keyword Self: " << yytext << endl;}
+super {cout << "Keyword super: " << yytext << endl;}
+throws {cout << "Keyword throws: " << yytext << endl;}
+true {cout << "Keyword true: " << yytext << endl;}
+try {cout << "Keyword try: " << yytext << endl;}
+	
+associativity {cout << "Keyword associativity: " << yytext << endl;}
+convenience {cout << "Keyword convenience: " << yytext << endl;}
+didSet {cout << "Keyword didSet: " << yytext << endl;}
+dynamic {cout << "Keyword dynamic: " << yytext << endl;}
+final {cout << "Keyword final: " << yytext << endl;}
+get {cout << "Keyword get: " << yytext << endl;}
+indirect {cout << "Keyword indirect: " << yytext << endl;}
+infix {cout << "Keyword infix: " << yytext << endl;}
+lazy {cout << "Keyword lazy: " << yytext << endl;}
+left {cout << "Keyword left: " << yytext << endl;}
+mutating {cout << "Keyword mutating: " << yytext << endl;}
+none {cout << "Keyword none: " << yytext << endl;}
+nonmutating {cout << "Keyword nonmutating: " << yytext << endl;}
+optional {cout << "Keyword optional: " << yytext << endl;}
+override {cout << "Keyword override: " << yytext << endl;}
+postfix {cout << "Keyword postfix: " << yytext << endl;}
+precedence {cout << "Keyword precedence: " << yytext << endl;}
+prefix {cout << "Keyword prefix: " << yytext << endl;}
+Protocol {cout << "Keyword protocol: " << yytext << endl;}
+required {cout << "Keyword requierd: " << yytext << endl;}
+right {cout << "Keyword right: " << yytext << endl;}
+set {cout << "Keyword set: " << yytext << endl;}
+some {cout << "Keyword some: " << yytext << endl;}
+Type {cout << "Keyword Type: " << yytext << endl;}
+unowned {cout << "Keyword unowned: " << yytext << endl;}
+weak {cout << "Keyword weak: " << yytext << endl;}
+willSet {cout << "Keyword willSet: " << yytext << endl;}
+	
 \#available {cout << "Keyword #available: " << yytext << endl;}
-	/* 
-\#colorLiteral
-\#column
-\#dsohandle
-\#elseif
-\#else
-\#endif
-\#error
-\#fileID
-\#fileLiteral
-\#filePath
-\#file
-\#function
-\#if
-\#imageLiteral
-\#keyPath
-\#line
-\#selector
-\#sourceLocation
-\#warning 
-	*/
-
-	/* OPERATORS */
+\#colorLiteral {cout << "Keyword #colorLiteral: " << yytext << endl;}
+\#column {cout << "Keyword #column: " << yytext << endl;}
+\#dsohandle {cout << "Keyword #dsohandle: " << yytext << endl;}
+\#elseif {cout << "Keyword #elsif: " << yytext << endl;}
+\#else {cout << "Keyword #import: " << yytext << endl;}
+\#endif {cout << "Keyword #endif: " << yytext << endl;}
+\#error {cout << "Keyword #error: " << yytext << endl;}
+\#fileID {cout << "Keyword #fileID: " << yytext << endl;}
+\#fileLiteral {cout << "Keyword #fileLiteral: " << yytext << endl;}
+\#filePath {cout << "Keyword #filepath: " << yytext << endl;}
+\#file {cout << "Keyword #file: " << yytext << endl;}
+\#function {cout << "Keyword #function: " << yytext << endl;}
+\#if {cout << "Keyword #if: " << yytext << endl;}
+\#imageLiteral {cout << "Keyword #imageLiteral: " << yytext << endl;}
+\#keyPath {cout << "Keyword #keypath: " << yytext << endl;}
+\#line {cout << "Keyword #line: " << yytext << endl;}
+\#selector {cout << "Keyword #selector: " << yytext << endl;}
+\#sourceLocation {cout << "Keyword #sourceLocation: " << yytext << endl;}
+\#warning {cout << "Keyword #warning: " << yytext << endl;}
 
 \+ { cout << "Operator plus: " << yytext << endl; }
-	/* 
-\-
-\/
-\*
-\% 
-	*/
+\- {cout << "Operator subtraction: " << yytext << endl;}
+\/ {cout << "Operator division: " << yytext << endl;}
+\* {cout << "Operator multiplication: " << yytext << endl;}
+\% {cout << "Operator modulus: " << yytext << endl;}
 
 \= { cout << "Operator assignment: " << yytext << endl; }
-\+\= { cout << "Operator plus assignment: " << yytext << endl; }
-	/* 
-\-\=
-\/\=
-\*=
-\%\= 
-	*/
-
-	/* 
-\<\<
-\>\>
-\&
-\|
-\^
-\~ 
-	*/
-
-	/* 
-\<
-\>
-\=\=
-\<\=
-\>\=
-\!\= 
-	*/
-
-
-	/* 
-\&\&
-\|\|
-\! 
-	*/
-
-
+\+\= { cout << "Operator adition assignment: " << yytext << endl; }
+\-\= { cout << "Operator subtraction assignment: " << yytext << endl; }
+\/\= { cout << "Operator division assignment: " << yytext << endl; }
+\*= { cout << "Operator multiplication assignment: " << yytext << endl; }
+\%\= { cout << "Operator modulus assignment: " << yytext << endl; }
+	
+\<\< { cout << "Operator bitwise left shift : " << yytext << endl; }
+\>\> { cout << "Operator bitwise right shift : " << yytext << endl; }
+\& { cout << "Operator bitwise AND : " << yytext << endl; }
+\| { cout << "Operator bitwise OR : " << yytext << endl; }
+\^ { cout << "Operator bitwise XOR : " << yytext << endl; }
+\~ { cout << "Operator bitwise NOT : " << yytext << endl; }
+	 
+\< { cout << "Operator Less than : " << yytext << endl; }
+\> { cout << "Operator greater than : " << yytext << endl; }
+\=\= { cout << "Operator equal to : " << yytext << endl; }
+\<\= { cout << "Operator less than or equal to : " << yytext << endl; }
+\>\= { cout << "Operator greater than or equal to : " << yytext << endl; }
+\!\= { cout << "Operator not equal to : " << yytext << endl; }
+		 
+\&\& { cout << "Operator logical and : " << yytext << endl; }
+\|\| { cout << "Operator logical or : " << yytext << endl; }
+\! { cout << "Operator logical not : " << yytext << endl; }
+	
 \?\? { cout << "Operator nil coalescing: " << yytext << endl; }
-	/* 
-\+\+
-\-\- 
-	*/
-
-
-	/* 
-\.
-, 
-	*/
+\+\+ { cout << "Operator increment : " << yytext << endl; }
+\-\- { cout << "Operator decerment : " << yytext << endl; }
+	
+\. { cout << "Operator dot(member access) : " << yytext << endl; }
+, { cout << "Operator comma : " << yytext << endl; } 
+	
 \.\.\. { cout << "Operator closed range: " << yytext << endl; }
 \.\.\< { cout << "Operator half open range: " << yytext << endl; } 
 
@@ -228,27 +196,26 @@ willSet
 \] { cout << "Right square bracket: " << yytext << endl; }
 \{ { cout << "Left curly bracket: " << yytext << endl; }
 \} { cout << "Left right bracket: " << yytext << endl; }
-
+	
 	/* TYPES */
-
+	
 Bool { cout << "Type bool: " << yytext << endl; }
-	/* 
-String
-Character
-Int8
-Int16
-Int32
-Int64
-Int
-UInt8
-UInt16
-UInt32
-UInt64
-UInt
-Float
-Float80
-Double
-	*/
+String { cout << "Type String: " << yytext << endl; }
+Character { cout << "Type Character: " << yytext << endl; }
+Int8 { cout << "Type Int8: " << yytext << endl; }
+Int16 { cout << "Type Int16: " << yytext << endl; }
+Int32 { cout << "Type Int32: " << yytext << endl; }
+Int64 { cout << "Type Int64: " << yytext << endl; }
+Int { cout << "Type Int: " << yytext << endl; }
+UInt8 { cout << "Type UInt8: " << yytext << endl; }
+UInt16 { cout << "Type UInt16: " << yytext << endl; }
+UInt32 { cout << "Type UInt32: " << yytext << endl; }
+UInt64 { cout << "Type UInt64: " << yytext << endl; }
+UInt { cout << "Type UInt: " << yytext << endl; }
+Float { cout << "Type Float: " << yytext << endl; }
+Float80 { cout << "Type Float80: " << yytext << endl; }
+Double { cout << "Type Double: " << yytext << endl; }
+	
 
 	/* COMMENTS */
 
