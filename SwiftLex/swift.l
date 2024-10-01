@@ -155,30 +155,30 @@ willSet {cout << "Keyword willSet: " << yytext << endl;}
 \*= { cout << "Operator multiplication assignment: " << yytext << endl; }
 \%\= { cout << "Operator modulus assignment: " << yytext << endl; }
 	
-\<\< { cout << "Operator bitwise left shift : " << yytext << endl; }
-\>\> { cout << "Operator bitwise right shift : " << yytext << endl; }
-\& { cout << "Operator bitwise AND : " << yytext << endl; }
-\| { cout << "Operator bitwise OR : " << yytext << endl; }
-\^ { cout << "Operator bitwise XOR : " << yytext << endl; }
-\~ { cout << "Operator bitwise NOT : " << yytext << endl; }
+\<\< { cout << "Operator bitwise left shift: " << yytext << endl; }
+\>\> { cout << "Operator bitwise right shift: " << yytext << endl; }
+\& { cout << "Operator bitwise AND: " << yytext << endl; }
+\| { cout << "Operator bitwise OR: " << yytext << endl; }
+\^ { cout << "Operator bitwise XOR: " << yytext << endl; }
+\~ { cout << "Operator bitwise NOT: " << yytext << endl; }
 	 
-\< { cout << "Operator Less than : " << yytext << endl; }
-\> { cout << "Operator greater than : " << yytext << endl; }
-\=\= { cout << "Operator equal to : " << yytext << endl; }
-\<\= { cout << "Operator less than or equal to : " << yytext << endl; }
-\>\= { cout << "Operator greater than or equal to : " << yytext << endl; }
-\!\= { cout << "Operator not equal to : " << yytext << endl; }
+\< { cout << "Operator Less than: " << yytext << endl; }
+\> { cout << "Operator greater than: " << yytext << endl; }
+\=\= { cout << "Operator equal to: " << yytext << endl; }
+\<\= { cout << "Operator less than or equal to: " << yytext << endl; }
+\>\= { cout << "Operator greater than or equal to: " << yytext << endl; }
+\!\= { cout << "Operator not equal to: " << yytext << endl; }
 		 
-\&\& { cout << "Operator logical and : " << yytext << endl; }
-\|\| { cout << "Operator logical or : " << yytext << endl; }
-\! { cout << "Operator logical not : " << yytext << endl; }
+\&\& { cout << "Operator logical and: " << yytext << endl; }
+\|\| { cout << "Operator logical or: " << yytext << endl; }
+\! { cout << "Operator logical not: " << yytext << endl; }
 	
 \?\? { cout << "Operator nil coalescing: " << yytext << endl; }
-\+\+ { cout << "Operator increment : " << yytext << endl; }
-\-\- { cout << "Operator decerment : " << yytext << endl; }
+\+\+ { cout << "Operator increment: " << yytext << endl; }
+\-\- { cout << "Operator decerment: " << yytext << endl; }
 	
-\. { cout << "Operator dot(member access) : " << yytext << endl; }
-, { cout << "Operator comma : " << yytext << endl; } 
+\. { cout << "Operator dot(member access): " << yytext << endl; }
+, { cout << "Operator comma: " << yytext << endl; } 
 	
 \.\.\. { cout << "Operator closed range: " << yytext << endl; }
 \.\.\< { cout << "Operator half open range: " << yytext << endl; } 
@@ -221,10 +221,10 @@ Double { cout << "Type Double: " << yytext << endl; }
 
 	/* COMMENTS MULTILINE */
 \/\* {str = yytext; multilineNumberBegin = lineNumber; BEGIN(COMMENT_MULTILINE); }
-<COMMENT_MULTILINE>\*\/ { str += yytext; cout << "COMMENT_MULTILINE\n" << str << "\n"; BEGIN(INITIAL); }
+<COMMENT_MULTILINE>\*\/ { str += yytext; cout << "Multiline comment: \n" << str << "\n"; BEGIN(INITIAL); }
 <COMMENT_MULTILINE>\n { str += yytext; lineNumber++; }
 <COMMENT_MULTILINE>. { str += yytext;}
-<COMMENT_MULTILINE><<EOF>> {cout << "ERROR: COMMENT_MULTILINE in line " << multilineNumberBegin << ": comment are not closed"; BEGIN(ERROR); }
+<COMMENT_MULTILINE><<EOF>> {cout << "ERROR: Multiline comment at line " << multilineNumberBegin << ": is not closed"; BEGIN(ERROR); }
 
 	/* LINE COUNTER */
 \n {lineNumber++;}
@@ -261,7 +261,7 @@ Double { cout << "Type Double: " << yytext << endl; }
 
 \" { stringOneLine.clear(); BEGIN(STRING); }
 <STRING>[^\\\"\n]+ { stringOneLine += yytext; }
-<STRING>\n { cout << "ERROR: unterminated string in line " << lineNumber; BEGIN(ERROR);}
+<STRING>\n { cout << "ERROR: unterminated string at line " << lineNumber; BEGIN(ERROR);}
 <STRING>\\\\ { stringOneLine += "\\"; }
 <STRING>\\n { stringOneLine += "\n"; }
 <STRING>\\b { stringOneLine += "\b"; }
@@ -285,33 +285,33 @@ Double { cout << "Type Double: " << yytext << endl; }
 
 	/* NUMBERS BINARY */
 
-0b[01][_01]* {str = yytext; removeChar(str, '_'); cout << "NUMBER_INTEGER_BINARY: " << stoi(str.substr(2), nullptr, 2) << endl;}
+0b[01][_01]* {str = yytext; removeChar(str, '_'); cout << "Binary integer: " << stoi(str.substr(2), nullptr, 2) << endl;}
 
 	/* NUMBERS OCTAL */
 
-0o[0-7][_0-7]* {str = yytext; removeChar(str, '_'); cout << "NUMBER_INTEGER_OCTAL: " << stoi(str.substr(2), nullptr, 8) << endl;}
+0o[0-7][_0-7]* {str = yytext; removeChar(str, '_'); cout << "Octal integer: " << stoi(str.substr(2), nullptr, 8) << endl;}
 
 	/* NUMBERS DECIMAL */
 
-[0-9][_0-9]* {str = yytext; removeChar(str, '_'); cout << "NUMBER_INTEGER_DECIMAL: " << stoi(str) << endl;}
+[0-9][_0-9]* {str = yytext; removeChar(str, '_'); cout << "Decimal integer: " << stoi(str) << endl;}
 
 [-+]?[0-9][_0-9]*\.[0-9][_0-9]*([eE][-+]?[0-9][_0-9]*)?|[0-9][_0-9]*[eE][+-]?[0-9][_0-9]* { 
 	str = yytext;
 	removeChar(str, '_');
-    cout << "DECIMAL_FLOATINGPOINT_NUMBER: " << stod(str) << endl;
+    cout << "Decimal floatingpoint number: " << stod(str) << endl;
 }
 
 	/* NUMBERS HEX */
 
-0x[0-9a-fA-F][_0-9a-fA-F]* {str = yytext; removeChar(str, '_'); cout << "NUMBER_INTEGER_HEX: " << stoi(str.substr(2), nullptr, 16) << endl;}
+0x[0-9a-fA-F][_0-9a-fA-F]* {str = yytext; removeChar(str, '_'); cout << "Hexadecimal integer: " << stoi(str.substr(2), nullptr, 16) << endl;}
 
 [-+]?0x[0-9a-fA-F][_0-9a-fA-F]*\.[0-9a-fA-F][_0-9a-fA-F]*([pP][-+]?[0-9a-fA-F][_0-9a-fA-F]*)?|[0-9a-fA-F][_0-9a-fA-F]*[pP][+-]?[0-9][_0-9]* {
 	str = yytext;
 	removeChar(str, '_');
-	cout << "HEX_FLOATINGPOINT_NUMBER: " << stod(str) << endl;
+	cout << "Hexadecimal floatingpoint number: " << stod(str) << endl;
 }
 	
-[_a-zA-Z][_a-zA-Z0-9]* { printf("Found IDENTIFIER: %s\n", yytext); }
+[_a-zA-Z][_a-zA-Z0-9]* { cout << "Identifier: " << yytext << endl; }
 
 	/* TODO: DELETE THIS WHEN EVERYTHING IS DONE*/
 .|[^.] {}
