@@ -314,7 +314,7 @@ Double { cout << "Type Double: " << yytext << endl; }
 [_a-zA-Z][_a-zA-Z0-9]* { printf("Found IDENTIFIER: %s\n", yytext); }
 
 	/* TODO: DELETE THIS WHEN EVERYTHING IS DONE*/
-.|[^.] {cout << "UNKNOWN ELEMENT: " << yytext << endl;}
+.|[^.] {}
 <ERROR>.|[^.] {}
 %%
 
