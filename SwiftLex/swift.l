@@ -12,14 +12,14 @@ HEX_DIGIT [0-9A-Fa-f]
 #include <iostream>
 #include <string>
 using namespace std;
+
+	// FUNCTIONS
+void removeChar(std::string& str, char charToRemove);
 %}
 
 %%
 	/* CODE SECTION */
 %{
-	// FUNCTIONS
-	void removeChar(std::string& str, char charToRemove);
-
 	// VARIABLES
 	std::string str = "";
 	int lineNumber = 1;  
