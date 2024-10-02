@@ -5,6 +5,7 @@
 %x STRING_MULTILINE
 %x STRING
 
+FLOAT_HEX [-+]?0x[0-9a-fA-F][_0-9a-fA-F]*\.[0-9a-fA-F][_0-9a-fA-F]*([pP][-+]?[0-9a-fA-F][_0-9]*)|[0-9a-fA-F][_0-9a-fA-F]*p[+-]?[0-9][_0-9]*
 HEX_DIGIT [0-9A-Fa-f]
 FLOAT_DEC [0-9][_0-9]*e[+-]?[0-9][_0-9]*|[-+]?[0-9][_0-9]*\.[0-9][_0-9]*(e[-+]?[0-9][_0-9]*)?
 DELIM [^	() \[\]{};\-=+<>&|~!\^%\*\/\.,:\?\n]
@@ -329,10 +330,20 @@ Double { cout << "Type Double: " << yytext << endl; }
 0x[0-9a-fA-F][_0-9a-fA-F]*{DELIM} {cout << "ERROR: Invalid character \"" <<  (yytext + strlen(yytext) - 1) << "\" in hexadecimal integer at line " << lineNumber << endl;}
 0x[^0-9a-fA-F] {cout << "ERROR: Invalid hexadecimal integer at line " << lineNumber << endl;}
 
-[-+]?0x[0-9a-fA-F][_0-9a-fA-F]*\.[0-9a-fA-F][_0-9a-fA-F]*([pP][-+]?[0-9a-fA-F][_0-9a-fA-F]*)?|[0-9a-fA-F][_0-9a-fA-F]*[pP][+-]?[0-9][_0-9]* {
+{FLOAT_HEX} {
 	str = yytext;
 	removeChar(str, '_');
 	cout << "Hexadecimal floatingpoint number: " << stod(str) << endl;
+}
+
+	/* TODO EXPERIMENTAL */
+
+[-+]?0x[0-9a-fA-F][_0-9a-fA-F]*\.[0-9a-fA-F][_0-9a-fA-F]* {cout << "ERROR: Hexadecimal floatingpoint number at line " << lineNumber << " must end with an exponent: " << yytext << endl;}
+
+[-+]?0x[0-9a-fA-F][_0-9a-fA-F]*\.[0-9a-fA-F][_0-9a-fA-F]*p {cout << "ERROR: Hexadecimal floatingpoint number at line" << lineNumber << " exponent must end with a number: " << yytext << endl;}
+
+{FLOAT_HEX}{DELIM} {
+	cout << "ERROR: Invalid character \"" <<  (yytext + strlen(yytext) - 1) << "\" in hexadecimal floatingpoint at line " << lineNumber << endl;
 }
 	
 [_a-zA-Z][_a-zA-Z0-9]* { cout << "Identifier: " << yytext << endl; }
