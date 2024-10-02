@@ -6,6 +6,7 @@
 %x STRING
 
 HEX_DIGIT [0-9A-Fa-f]
+DELIM [^	() \[\]{};\-=+<>&|~!\^%\*\/\.,:\?\n]
 
 %{
 #include <stdio.h>
@@ -285,6 +286,11 @@ Double { cout << "Type Double: " << yytext << endl; }
 	/* NUMBERS BINARY */
 
 0b[01][_01]* {str = yytext; removeChar(str, '_'); cout << "Binary integer: " << stoi(str.substr(2), nullptr, 2) << endl;}
+
+	/* TODO EXPERIMENTAL */
+
+0b[01][_01]*{DELIM} {cout << "ERROR: Invalid character \"" <<  (yytext + strlen(yytext) - 1) << "\" in binary integer at line " << lineNumber << endl;}
+0b[^01] {cout << "ERROR: Invalid binary integer at line " << lineNumber << endl;}
 
 	/* NUMBERS OCTAL */
 
