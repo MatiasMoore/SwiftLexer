@@ -8,6 +8,10 @@
 FLOAT_HEX [-+]?0x[0-9a-fA-F][_0-9a-fA-F]*\.[0-9a-fA-F][_0-9a-fA-F]*([pP][-+]?[0-9a-fA-F][_0-9]*)|[0-9a-fA-F][_0-9a-fA-F]*p[+-]?[0-9][_0-9]*
 HEX_DIGIT [0-9A-Fa-f]
 FLOAT_DEC [0-9][_0-9]*e[+-]?[0-9][_0-9]*|[-+]?[0-9][_0-9]*\.[0-9][_0-9]*(e[-+]?[0-9][_0-9]*)?
+INT_BINARY 0b[01][_01]*
+INT_OCTAL 0o[0-7][_0-7]*
+INT_DECIMAL [0-9][_0-9]*
+INT_HEXADECIMAL 0x[0-9a-fA-F][_0-9a-fA-F]*
 DELIM [^	() \[\]{};\-=+<>&|~!\^%\*\/\.,:\?\n]
 
 %{
@@ -287,29 +291,29 @@ Double { cout << "Type Double: " << yytext << endl; }
 
 	/* NUMBERS BINARY */
 
-0b[01][_01]* {str = yytext; removeChar(str, '_'); cout << "Binary integer: " << stoi(str.substr(2), nullptr, 2) << endl;}
+{INT_BINARY} {str = yytext; removeChar(str, '_'); cout << "Binary integer: " << stoi(str.substr(2), nullptr, 2) << endl;}
 
 	/* TODO EXPERIMENTAL */
 
-0b[01][_01]*{DELIM} {cout << "ERROR: Invalid character \"" <<  (yytext + strlen(yytext) - 1) << "\" in binary integer at line " << lineNumber << endl;}
+{INT_BINARY}{DELIM} {cout << "ERROR: Invalid character \"" <<  (yytext + strlen(yytext) - 1) << "\" in binary integer at line " << lineNumber << endl;}
 0b[^01] {cout << "ERROR: Invalid binary integer at line " << lineNumber << endl;}
 
 	/* NUMBERS OCTAL */
 
-0o[0-7][_0-7]* {str = yytext; removeChar(str, '_'); cout << "Octal integer: " << stoi(str.substr(2), nullptr, 8) << endl;}
+{INT_OCTAL} {str = yytext; removeChar(str, '_'); cout << "Octal integer: " << stoi(str.substr(2), nullptr, 8) << endl;}
 
 	/* TODO EXPERIMENTAL */
 
-0o[0-7][_0-7]*{DELIM} {cout << "ERROR: Invalid character \"" <<  (yytext + strlen(yytext) - 1) << "\" in octal integer at line " << lineNumber << endl;}
+{INT_OCTAL}{DELIM} {cout << "ERROR: Invalid character \"" <<  (yytext + strlen(yytext) - 1) << "\" in octal integer at line " << lineNumber << endl;}
 0o[^0-7] {cout << "ERROR: Invalid octal integer at line " << lineNumber << endl;}
 
 	/* NUMBERS DECIMAL */
 
-[0-9][_0-9]* {str = yytext; removeChar(str, '_'); cout << "Decimal integer: " << stoi(str) << endl;}
+{INT_DECIMAL} {str = yytext; removeChar(str, '_'); cout << "Decimal integer: " << stoi(str) << endl;}
 
 	/* TODO EXPERIMENTAL */
 
-[0-9][_0-9]*{DELIM} {cout << "ERROR: Invalid character \"" <<  (yytext + strlen(yytext) - 1) << "\" in decimal integer at line " << lineNumber << endl;}
+{INT_DECIMAL}{DELIM} {cout << "ERROR: Invalid character \"" <<  (yytext + strlen(yytext) - 1) << "\" in decimal integer at line " << lineNumber << endl;}
 
 {FLOAT_DEC} { 
 	str = yytext;
@@ -323,11 +327,11 @@ Double { cout << "Type Double: " << yytext << endl; }
 
 	/* NUMBERS HEX */
 
-0x[0-9a-fA-F][_0-9a-fA-F]* {str = yytext; removeChar(str, '_'); cout << "Hexadecimal integer: " << stoi(str.substr(2), nullptr, 16) << endl;}
+{INT_HEXADECIMAL} {str = yytext; removeChar(str, '_'); cout << "Hexadecimal integer: " << stoi(str.substr(2), nullptr, 16) << endl;}
 
 	/* TODO EXPERIMENTAL */
 
-0x[0-9a-fA-F][_0-9a-fA-F]*{DELIM} {cout << "ERROR: Invalid character \"" <<  (yytext + strlen(yytext) - 1) << "\" in hexadecimal integer at line " << lineNumber << endl;}
+{INT_HEXADECIMAL}{DELIM} {cout << "ERROR: Invalid character \"" <<  (yytext + strlen(yytext) - 1) << "\" in hexadecimal integer at line " << lineNumber << endl;}
 0x[^0-9a-fA-F] {cout << "ERROR: Invalid hexadecimal integer at line " << lineNumber << endl;}
 
 {FLOAT_HEX} {
