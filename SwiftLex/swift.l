@@ -6,13 +6,12 @@
 %x STRING
 
 FLOAT_HEX [-+]?0x[0-9a-fA-F][_0-9a-fA-F]*\.[0-9a-fA-F][_0-9a-fA-F]*([pP][-+]?[0-9a-fA-F][_0-9]*)|[0-9a-fA-F][_0-9a-fA-F]*p[+-]?[0-9][_0-9]*
-HEX_DIGIT [0-9A-Fa-f]
 FLOAT_DEC [0-9][_0-9]*e[+-]?[0-9][_0-9]*|[-+]?[0-9][_0-9]*\.[0-9][_0-9]*(e[-+]?[0-9][_0-9]*)?
 INT_BINARY 0b[01][_01]*
 INT_OCTAL 0o[0-7][_0-7]*
 INT_DECIMAL [0-9][_0-9]*
 INT_HEXADECIMAL 0x[0-9a-fA-F][_0-9a-fA-F]*
-DELIM [^	() \[\]{};\-=+<>&|~!\^%\*\/\.,:\?\n]
+ANTI_DELIM [^	() \[\]{};\-=+<>&|~!\^%\*\/\.,:\?\n]
 
 %{
 #include <stdio.h>
@@ -252,7 +251,7 @@ Double { cout << "Type Double: " << yytext << endl; }
 <STRING_MULTILINE>\\v { stringMultiline += "\v"; }
 <STRING_MULTILINE>\\\' { stringMultiline += "\'"; }
 <STRING_MULTILINE>\\\" { stringMultiline += "\""; }
-<STRING_MULTILINE>\\u\{0*({HEX_DIGIT}){1,8}\} {
+<STRING_MULTILINE>\\u\{0*([0-9A-Fa-f]){1,8}\} {
 	//Remove \u{ from yytext
 	unicodeHexBuffer = (yytext + 3);
 	//Remove } from yytext
@@ -278,7 +277,7 @@ Double { cout << "Type Double: " << yytext << endl; }
 <STRING>\\v { stringOneLine += "\v"; }
 <STRING>\\\' { stringOneLine += "\'"; }
 <STRING>\\\" { stringOneLine += "\""; }
-<STRING>\\u\{0*({HEX_DIGIT}){1,8}\} {
+<STRING>\\u\{0*([0-9A-Fa-f]){1,8}\} {
 	//Remove \u{ from yytext
 	unicodeHexBuffer = (yytext + 3);
 	//Remove } from yytext
@@ -295,7 +294,7 @@ Double { cout << "Type Double: " << yytext << endl; }
 
 	/* TODO EXPERIMENTAL */
 
-{INT_BINARY}{DELIM} {cout << "ERROR: Invalid character \"" <<  (yytext + strlen(yytext) - 1) << "\" in binary integer at line " << lineNumber << endl;}
+{INT_BINARY}{ANTI_DELIM} {cout << "ERROR: Invalid character \"" <<  (yytext + strlen(yytext) - 1) << "\" in binary integer at line " << lineNumber << endl;}
 0b[^01] {cout << "ERROR: Invalid binary integer at line " << lineNumber << endl;}
 
 	/* NUMBERS OCTAL */
@@ -304,7 +303,7 @@ Double { cout << "Type Double: " << yytext << endl; }
 
 	/* TODO EXPERIMENTAL */
 
-{INT_OCTAL}{DELIM} {cout << "ERROR: Invalid character \"" <<  (yytext + strlen(yytext) - 1) << "\" in octal integer at line " << lineNumber << endl;}
+{INT_OCTAL}{ANTI_DELIM} {cout << "ERROR: Invalid character \"" <<  (yytext + strlen(yytext) - 1) << "\" in octal integer at line " << lineNumber << endl;}
 0o[^0-7] {cout << "ERROR: Invalid octal integer at line " << lineNumber << endl;}
 
 	/* NUMBERS DECIMAL */
@@ -313,7 +312,7 @@ Double { cout << "Type Double: " << yytext << endl; }
 
 	/* TODO EXPERIMENTAL */
 
-{INT_DECIMAL}{DELIM} {cout << "ERROR: Invalid character \"" <<  (yytext + strlen(yytext) - 1) << "\" in decimal integer at line " << lineNumber << endl;}
+{INT_DECIMAL}{ANTI_DELIM} {cout << "ERROR: Invalid character \"" <<  (yytext + strlen(yytext) - 1) << "\" in decimal integer at line " << lineNumber << endl;}
 
 {FLOAT_DEC} { 
 	str = yytext;
@@ -323,7 +322,7 @@ Double { cout << "Type Double: " << yytext << endl; }
 
 	/* TODO EXPERIMENTAL */
 
-{FLOAT_DEC}{DELIM} {cout << "ERROR: Invalid character \"" <<  (yytext + strlen(yytext) - 1) << "\" in decimal floatingpoint at line " << lineNumber << endl;}
+{FLOAT_DEC}{ANTI_DELIM} {cout << "ERROR: Invalid character \"" <<  (yytext + strlen(yytext) - 1) << "\" in decimal floatingpoint at line " << lineNumber << endl;}
 
 	/* NUMBERS HEX */
 
@@ -331,7 +330,7 @@ Double { cout << "Type Double: " << yytext << endl; }
 
 	/* TODO EXPERIMENTAL */
 
-{INT_HEXADECIMAL}{DELIM} {cout << "ERROR: Invalid character \"" <<  (yytext + strlen(yytext) - 1) << "\" in hexadecimal integer at line " << lineNumber << endl;}
+{INT_HEXADECIMAL}{ANTI_DELIM} {cout << "ERROR: Invalid character \"" <<  (yytext + strlen(yytext) - 1) << "\" in hexadecimal integer at line " << lineNumber << endl;}
 0x[^0-9a-fA-F] {cout << "ERROR: Invalid hexadecimal integer at line " << lineNumber << endl;}
 
 {FLOAT_HEX} {
@@ -346,7 +345,7 @@ Double { cout << "Type Double: " << yytext << endl; }
 
 [-+]?0x[0-9a-fA-F][_0-9a-fA-F]*\.[0-9a-fA-F][_0-9a-fA-F]*p {cout << "ERROR: Hexadecimal floatingpoint number at line" << lineNumber << " exponent must end with a number: " << yytext << endl;}
 
-{FLOAT_HEX}{DELIM} {
+{FLOAT_HEX}{ANTI_DELIM} {
 	cout << "ERROR: Invalid character \"" <<  (yytext + strlen(yytext) - 1) << "\" in hexadecimal floatingpoint at line " << lineNumber << endl;
 }
 	
