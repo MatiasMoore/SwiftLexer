@@ -4,7 +4,6 @@
 %x COMMENT_MULTILINE
 %x STRING_MULTILINE
 %x STRING
-%x ERROR
 
 HEX_DIGIT [0-9A-Fa-f]
 
@@ -224,7 +223,7 @@ Double { cout << "Type Double: " << yytext << endl; }
 <COMMENT_MULTILINE>\*\/ { str += yytext; cout << "Multiline comment: \n" << str << "\n"; BEGIN(INITIAL); }
 <COMMENT_MULTILINE>\n { str += yytext; lineNumber++; }
 <COMMENT_MULTILINE>. { str += yytext;}
-<COMMENT_MULTILINE><<EOF>> {cout << "ERROR: Multiline comment at line " << multilineNumberBegin << ": is not closed"; BEGIN(ERROR); }
+<COMMENT_MULTILINE><<EOF>> {cout << "ERROR: Multiline comment at line " << multilineNumberBegin << ": is not closed" << endl; BEGIN(INITIAL); }
 
 	/* LINE COUNTER */
 \n {lineNumber++;}
@@ -255,13 +254,13 @@ Double { cout << "Type Double: " << yytext << endl; }
  }
 <STRING_MULTILINE>\"{1,2} { stringMultiline += yytext; }
 	/* TODO THIS MAY NOT WORK ALL THE TIME */
-<STRING_MULTILINE>\\\n\s*\"\"\" { cout << "ERROR: Escaped newline at the last line of multiline string is not allowed at line " << multilineStringLineNumber << endl; BEGIN(ERROR); }
+<STRING_MULTILINE>\\\n\s*\"\"\" { cout << "ERROR: Escaped newline at the last line of multiline string is not allowed at line " << multilineStringLineNumber << endl; BEGIN(INITIAL); }
 <STRING_MULTILINE>\s*\"\"\" { cout << "Multiline string: " << stringMultiline << endl; BEGIN(INITIAL); }
-<STRING_MULTILINE><<EOF>> { cout << "ERROR: Multiline string is not closed at line " << multilineStringLineNumber << endl; BEGIN(ERROR); }
+<STRING_MULTILINE><<EOF>> { cout << "ERROR: Multiline string is not closed at line " << multilineStringLineNumber << endl; BEGIN(INITIAL); }
 
 \" { stringOneLine.clear(); BEGIN(STRING); }
 <STRING>[^\\\"\n]+ { stringOneLine += yytext; }
-<STRING>\n { cout << "ERROR: unterminated string at line " << lineNumber; BEGIN(ERROR);}
+<STRING>\n { cout << "ERROR: unterminated string at line " << lineNumber << endl; BEGIN(INITIAL);}
 <STRING>\\\\ { stringOneLine += "\\"; }
 <STRING>\\n { stringOneLine += "\n"; }
 <STRING>\\b { stringOneLine += "\b"; }
@@ -279,9 +278,9 @@ Double { cout << "Type Double: " << yytext << endl; }
 	unicodeHexBuffer.pop_back();
 	stringOneLine += char(strtoll(unicodeHexBuffer.c_str(), NULL, 16));
  }
-<STRING>\\u { cout << "ERROR: incorrect unicode char format at line " << lineNumber << endl; BEGIN(ERROR);}
-<STRING>\" { std::cout << "Oneline string: " << stringOneLine << std::endl; BEGIN(INITIAL); }
-<STRING><<EOF>> { cout << "ERROR: string in not closed at the end of file at line" << lineNumber << endl; BEGIN(ERROR); }
+<STRING>\\u { cout << "ERROR: incorrect unicode char format at line " << lineNumber << endl; BEGIN(INITIAL);}
+<STRING>\" { cout << "Oneline string: " << stringOneLine << endl; BEGIN(INITIAL); }
+<STRING><<EOF>> { cout << "ERROR: string in not closed at the end of file at line " << lineNumber << endl; BEGIN(INITIAL); }
 
 	/* NUMBERS BINARY */
 
@@ -315,7 +314,6 @@ Double { cout << "Type Double: " << yytext << endl; }
 
 	/* TODO: DELETE THIS WHEN EVERYTHING IS DONE*/
 .|[^.] {}
-<ERROR>.|[^.] {}
 %%
 
 	/* FUNCTIONS */
