@@ -6,6 +6,7 @@
 %x STRING
 
 HEX_DIGIT [0-9A-Fa-f]
+FLOAT_DEC [0-9][_0-9]*e[+-]?[0-9][_0-9]*|[-+]?[0-9][_0-9]*\.[0-9][_0-9]*(e[-+]?[0-9][_0-9]*)?
 DELIM [^	() \[\]{};\-=+<>&|~!\^%\*\/\.,:\?\n]
 
 %{
@@ -309,11 +310,15 @@ Double { cout << "Type Double: " << yytext << endl; }
 
 [0-9][_0-9]*{DELIM} {cout << "ERROR: Invalid character \"" <<  (yytext + strlen(yytext) - 1) << "\" in decimal integer at line " << lineNumber << endl;}
 
-[-+]?[0-9][_0-9]*\.[0-9][_0-9]*([eE][-+]?[0-9][_0-9]*)?|[0-9][_0-9]*[eE][+-]?[0-9][_0-9]* { 
+{FLOAT_DEC} { 
 	str = yytext;
 	removeChar(str, '_');
     cout << "Decimal floatingpoint number: " << stod(str) << endl;
 }
+
+	/* TODO EXPERIMENTAL */
+
+{FLOAT_DEC}{DELIM} {cout << "ERROR: Invalid character \"" <<  (yytext + strlen(yytext) - 1) << "\" in decimal floatingpoint at line " << lineNumber << endl;}
 
 	/* NUMBERS HEX */
 
