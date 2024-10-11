@@ -60,7 +60,7 @@ public {cout << "Keyword public: " << yytext << endl; return PUBLIC;}
 rethrows {cout << "Keyword rethrows: " << yytext << endl; return RETHROWS;}
 static {cout << "Keyword static: " << yytext << endl; return STATIC;}
 struct {cout << "Keyword struct: " << yytext << endl; return STRUCT;}
-subscript {cout << "Keyword subscript: " << yytext << endl; return SUBCRIPT;}
+subscript {cout << "Keyword subscript: " << yytext << endl; return SUBSCRIPT;}
 typealias {cout << "Keyword typealias: " << yytext << endl; return TYPEALIAS;}
 func {cout << "Keyword func: " << yytext << endl; return FUNC;}
 var {cout << "Keyword var: " << yytext << endl; return VAR;}
@@ -117,7 +117,7 @@ override {cout << "Keyword override: " << yytext << endl; return OVERRIDE;}
 postfix {cout << "Keyword postfix: " << yytext << endl; return POSTFIX;}
 precedence {cout << "Keyword precedence: " << yytext << endl; return PRECEDENCE;}
 prefix {cout << "Keyword prefix: " << yytext << endl; return PREFIX;}
-Protocol {cout << "Keyword protocol: " << yytext << endl; return PROTOCOL;}
+Protocol {cout << "Keyword protocol: " << yytext << endl; return PROTOCOL_UPPERCASE;}
 required {cout << "Keyword required: " << yytext << endl; return REQUIRED;}
 right {cout << "Keyword right: " << yytext << endl; return RIGHT;}
 set {cout << "Keyword set: " << yytext << endl; return SET;}
