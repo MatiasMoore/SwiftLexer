@@ -36,6 +36,10 @@ void removeChar(std::string& str, char charToRemove);
 	string stringMultiline;
 	string stringOneLine;
 	string unicodeHexBuffer;
+
+	int intBuf = 0;
+	float floatBuf = 0;
+	double doubleBuf = 0;
 %}
 
 	/* KEYWORDS */
@@ -291,7 +295,13 @@ Double { cout << "Type Double: " << yytext << endl; }
 
 	/* NUMBERS BINARY */
 
-{INT_BINARY} {str = yytext; removeChar(str, '_'); cout << "Binary integer: " << stoi(str.substr(2), nullptr, 2) << endl;}
+{INT_BINARY} {
+	str = yytext; removeChar(str, '_'); 
+	intBuf = stoi(str.substr(2), nullptr, 2);
+	cout << "Binary integer: " << intBuf << endl;
+	yylval.ival = intBuf;
+	return LITERAL_INT;
+}
 
 	/* TODO EXPERIMENTAL */
 
@@ -300,7 +310,13 @@ Double { cout << "Type Double: " << yytext << endl; }
 
 	/* NUMBERS OCTAL */
 
-{INT_OCTAL} {str = yytext; removeChar(str, '_'); cout << "Octal integer: " << stoi(str.substr(2), nullptr, 8) << endl;}
+{INT_OCTAL} {
+	str = yytext; removeChar(str, '_'); 
+	intBuf = stoi(str.substr(2), nullptr, 8);
+	cout << "Octal integer: " << intBuf << endl;
+	yylval.ival = intBuf;
+	return LITERAL_INT;
+}
 
 	/* TODO EXPERIMENTAL */
 
@@ -309,7 +325,13 @@ Double { cout << "Type Double: " << yytext << endl; }
 
 	/* NUMBERS DECIMAL */
 
-{INT_DECIMAL} {str = yytext; removeChar(str, '_'); cout << "Decimal integer: " << stoi(str) << endl;}
+{INT_DECIMAL} {
+	str = yytext; removeChar(str, '_'); 
+	intBuf = stoi(str);
+	cout << "Decimal integer: " << intBuf << endl;
+	yylval.ival = intBuf;
+	return LITERAL_INT;
+}
 
 	/* TODO EXPERIMENTAL */
 
@@ -327,7 +349,13 @@ Double { cout << "Type Double: " << yytext << endl; }
 
 	/* NUMBERS HEX */
 
-{INT_HEXADECIMAL} {str = yytext; removeChar(str, '_'); cout << "Hexadecimal integer: " << stoi(str.substr(2), nullptr, 16) << endl;}
+{INT_HEXADECIMAL} {
+	str = yytext; removeChar(str, '_'); 
+	intBuf = stoi(str.substr(2), nullptr, 16);
+	cout << "Hexadecimal integer: " << intBuf << endl;
+	yylval.ival = intBuf;
+	return LITERAL_INT;
+}
 
 	/* TODO EXPERIMENTAL */
 

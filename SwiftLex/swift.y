@@ -7,6 +7,12 @@
 
 %}
 
+%union {
+	int ival;
+	float fval;
+	double dval;
+}
+
 %token HI BYE ASSOCIATED_TYPE CLASS DEINIT 
 ENUM EXTENSION FILEPRIVATE 
 IMPORT INIT INOUT
@@ -18,6 +24,7 @@ TYPEALIAS FUNC VAR
 BREAK CASE CATCH
 CONTINUE DEFAULT DEFER
 
+%token<ival> LITERAL_INT
 
 %%
 

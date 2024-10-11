@@ -85,14 +85,27 @@ extern int yydebug;
     CATCH = 286,                   /* CATCH  */
     CONTINUE = 287,                /* CONTINUE  */
     DEFAULT = 288,                 /* DEFAULT  */
-    DEFER = 289                    /* DEFER  */
+    DEFER = 289,                   /* DEFER  */
+    LITERAL_FLOAT = 290,           /* LITERAL_FLOAT  */
+    LITERAL_INT = 291              /* LITERAL_INT  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
+union YYSTYPE
+{
+#line 10 "swift.y"
+
+	int ival;
+	float fval;
+	double dval;
+
+#line 106 "swift.tab.h"
+
+};
+typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif
