@@ -109,10 +109,40 @@ enum yysymbol_kind_t
   YYSYMBOL_YYUNDEF = 2,                    /* "invalid token"  */
   YYSYMBOL_HI = 3,                         /* HI  */
   YYSYMBOL_BYE = 4,                        /* BYE  */
-  YYSYMBOL_YYACCEPT = 5,                   /* $accept  */
-  YYSYMBOL_program = 6,                    /* program  */
-  YYSYMBOL_hi = 7,                         /* hi  */
-  YYSYMBOL_bye = 8                         /* bye  */
+  YYSYMBOL_ASSOCIATED_TYPE = 5,            /* ASSOCIATED_TYPE  */
+  YYSYMBOL_CLASS = 6,                      /* CLASS  */
+  YYSYMBOL_DEINIT = 7,                     /* DEINIT  */
+  YYSYMBOL_ENUM = 8,                       /* ENUM  */
+  YYSYMBOL_EXTENSION = 9,                  /* EXTENSION  */
+  YYSYMBOL_FILEPRIVATE = 10,               /* FILEPRIVATE  */
+  YYSYMBOL_IMPORT = 11,                    /* IMPORT  */
+  YYSYMBOL_INIT = 12,                      /* INIT  */
+  YYSYMBOL_INOUT = 13,                     /* INOUT  */
+  YYSYMBOL_INTERNAL = 14,                  /* INTERNAL  */
+  YYSYMBOL_LET = 15,                       /* LET  */
+  YYSYMBOL_OPEN = 16,                      /* OPEN  */
+  YYSYMBOL_OPERATOR = 17,                  /* OPERATOR  */
+  YYSYMBOL_PRIVATE = 18,                   /* PRIVATE  */
+  YYSYMBOL_PRECEDENCEGROUP = 19,           /* PRECEDENCEGROUP  */
+  YYSYMBOL_PROTOCOL = 20,                  /* PROTOCOL  */
+  YYSYMBOL_PUBLIC = 21,                    /* PUBLIC  */
+  YYSYMBOL_RETHROWS = 22,                  /* RETHROWS  */
+  YYSYMBOL_STATIC = 23,                    /* STATIC  */
+  YYSYMBOL_STRUCT = 24,                    /* STRUCT  */
+  YYSYMBOL_SUBCRIPT = 25,                  /* SUBCRIPT  */
+  YYSYMBOL_TYPEALIAS = 26,                 /* TYPEALIAS  */
+  YYSYMBOL_FUNC = 27,                      /* FUNC  */
+  YYSYMBOL_VAR = 28,                       /* VAR  */
+  YYSYMBOL_BREAK = 29,                     /* BREAK  */
+  YYSYMBOL_CASE = 30,                      /* CASE  */
+  YYSYMBOL_CATCH = 31,                     /* CATCH  */
+  YYSYMBOL_CONTINUE = 32,                  /* CONTINUE  */
+  YYSYMBOL_DEFAULT = 33,                   /* DEFAULT  */
+  YYSYMBOL_DEFER = 34,                     /* DEFER  */
+  YYSYMBOL_YYACCEPT = 35,                  /* $accept  */
+  YYSYMBOL_program = 36,                   /* program  */
+  YYSYMBOL_hi = 37,                        /* hi  */
+  YYSYMBOL_bye = 38                        /* bye  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -443,7 +473,7 @@ union yyalloc
 #define YYLAST   2
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  5
+#define YYNTOKENS  35
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  4
 /* YYNRULES -- Number of rules.  */
@@ -452,7 +482,7 @@ union yyalloc
 #define YYNSTATES  7
 
 /* YYMAXUTOK -- Last valid token kind.  */
-#define YYMAXUTOK   259
+#define YYMAXUTOK   289
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
@@ -491,14 +521,17 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     1,     2,     3,     4
+       2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
+       5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
+      15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
+      25,    26,    27,    28,    29,    30,    31,    32,    33,    34
 };
 
 #if YYDEBUG
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    15,    15,    19,    22
+       0,    25,    25,    29,    32
 };
 #endif
 
@@ -514,8 +547,13 @@ static const char *yysymbol_name (yysymbol_kind_t yysymbol) YY_ATTRIBUTE_UNUSED;
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-  "\"end of file\"", "error", "\"invalid token\"", "HI", "BYE", "$accept",
-  "program", "hi", "bye", YY_NULLPTR
+  "\"end of file\"", "error", "\"invalid token\"", "HI", "BYE",
+  "ASSOCIATED_TYPE", "CLASS", "DEINIT", "ENUM", "EXTENSION", "FILEPRIVATE",
+  "IMPORT", "INIT", "INOUT", "INTERNAL", "LET", "OPEN", "OPERATOR",
+  "PRIVATE", "PRECEDENCEGROUP", "PROTOCOL", "PUBLIC", "RETHROWS", "STATIC",
+  "STRUCT", "SUBCRIPT", "TYPEALIAS", "FUNC", "VAR", "BREAK", "CASE",
+  "CATCH", "CONTINUE", "DEFAULT", "DEFER", "$accept", "program", "hi",
+  "bye", YY_NULLPTR
 };
 
 static const char *
@@ -579,13 +617,13 @@ static const yytype_int8 yycheck[] =
    state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     3,     6,     7,     0,     4,     8
+       0,     3,    36,    37,     0,     4,    38
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr1[] =
 {
-       0,     5,     6,     7,     8
+       0,    35,    36,    37,    38
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
@@ -1055,19 +1093,19 @@ yyreduce:
   switch (yyn)
     {
   case 3: /* hi: HI  */
-#line 19 "swift.y"
+#line 29 "swift.y"
                { printf("Hello World\n");   }
-#line 1061 "swift.tab.cpp"
+#line 1099 "swift.tab.cpp"
     break;
 
   case 4: /* bye: BYE  */
-#line 22 "swift.y"
+#line 32 "swift.y"
                { printf("Bye World\n"); exit(0); }
-#line 1067 "swift.tab.cpp"
+#line 1105 "swift.tab.cpp"
     break;
 
 
-#line 1071 "swift.tab.cpp"
+#line 1109 "swift.tab.cpp"
 
       default: break;
     }
@@ -1260,7 +1298,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 25 "swift.y"
+#line 35 "swift.y"
 
 
 int yyerror(const char *errormsg)

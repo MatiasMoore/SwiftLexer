@@ -40,39 +40,39 @@ void removeChar(std::string& str, char charToRemove);
 
 	/* KEYWORDS */
 	
-associatedtype {cout << "Keyword associatedtype: " << yytext << endl;} 
-class {cout << "Keyword class: " << yytext << endl;}
-deinit { cout << "Keyword deinit: " << yytext << endl; }
-enum { cout << "Keyword enum: " << yytext << endl; } 
-extension {cout << "Keyword extension: " << yytext << endl;}
-fileprivate {cout << "Keyword fileprivate: " <<yytext << endl;}
-import {cout << "Keyword import: " << yytext << endl;}
-init {cout << "Keyword init: " << yytext << endl;}
-inout {cout << "Keyword inout: " << yytext << endl;}
-internal {cout << "Keyword internal: " << yytext << endl;}
-let {cout << "Keyword let: " << yytext << endl;}
-open {cout << "Keyword open: " << yytext << endl;}
-operator {cout << "Keyword operator: " << yytext << endl;}
-private {cout << "Keyword private: " << yytext << endl;}
-precedencegroup {cout << "Keyword precedencegroup: " << yytext << endl;}
-protocol {cout << "Keyword protocol: " << yytext << endl;}
-public {cout << "Keyword public: " << yytext << endl;}
-rethrows {cout << "Keyword rethrows: " << yytext << endl;}
-static {cout << "Keyword static: " << yytext << endl;}
-struct {cout << "Keyword struct: " << yytext << endl;}
-subscript {cout << "Keyword subscript: " << yytext << endl;}
-typealias {cout << "Keyword typealias: " << yytext << endl;}
-func {cout << "Keyword func: " << yytext << endl;}
-var {cout << "Keyword var: " << yytext << endl;}
+associatedtype {cout << "Keyword associatedtype: " << yytext << endl; return ASSOCIATED_TYPE;} 
+class {cout << "Keyword class: " << yytext << endl; return CLASS;}
+deinit { cout << "Keyword deinit: " << yytext << endl; return DEINIT;}
+enum { cout << "Keyword enum: " << yytext << endl; return ENUM;} 
+extension {cout << "Keyword extension: " << yytext << endl; return EXTENSION;}
+fileprivate {cout << "Keyword fileprivate: " <<yytext << endl; return FILEPRIVATE;}
+import {cout << "Keyword import: " << yytext << endl; return IMPORT;}
+init {cout << "Keyword init: " << yytext << endl; return INIT;}
+inout {cout << "Keyword inout: " << yytext << endl; return INOUT;}
+internal {cout << "Keyword internal: " << yytext << endl; return INTERNAL;}
+let {cout << "Keyword let: " << yytext << endl; return LET;}
+open {cout << "Keyword open: " << yytext << endl; return OPEN;}
+operator {cout << "Keyword operator: " << yytext << endl; return OPERATOR;}
+private {cout << "Keyword private: " << yytext << endl; return PRIVATE;}
+precedencegroup {cout << "Keyword precedencegroup: " << yytext << endl; return PRECEDENCEGROUP;}
+protocol {cout << "Keyword protocol: " << yytext << endl; return PROTOCOL;}
+public {cout << "Keyword public: " << yytext << endl; return PUBLIC;}
+rethrows {cout << "Keyword rethrows: " << yytext << endl; return RETHROWS;}
+static {cout << "Keyword static: " << yytext << endl; return STATIC;}
+struct {cout << "Keyword struct: " << yytext << endl; return STRUCT;}
+subscript {cout << "Keyword subscript: " << yytext << endl; return SUBCRIPT;}
+typealias {cout << "Keyword typealias: " << yytext << endl; return TYPEALIAS;}
+func {cout << "Keyword func: " << yytext << endl; return FUNC;}
+var {cout << "Keyword var: " << yytext << endl; return VAR;}
 	
 	/* KEYWORDS FOR LOOPS */
 
-break {cout << "Keyword break: " << yytext << endl;}
-case {cout << "Keyword case: " << yytext << endl;}
-catch {cout << "Keyword catch: " << yytext << endl;}
-continue {cout << "Keyword continue: " << yytext << endl;}
-default {cout << "Keyword default: " << yytext << endl;}
-defer {cout << "Keyword defer: " << yytext << endl;}
+break {cout << "Keyword break: " << yytext << endl; return BREAK;}
+case {cout << "Keyword case: " << yytext << endl; return CASE;}
+catch {cout << "Keyword catch: " << yytext << endl; return CATCH;}
+continue {cout << "Keyword continue: " << yytext << endl; return CONTINUE;}
+default {cout << "Keyword default: " << yytext << endl; return DEFAULT;}
+defer {cout << "Keyword defer: " << yytext << endl; return DEFER;}
 do {cout << "Keyword do: " << yytext << endl;}
 else {cout << "Keyword else: " << yytext << endl;}
 fallthrough {cout << "Keyword fallthrough: " << yytext << endl;}

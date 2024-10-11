@@ -55,7 +55,37 @@ extern int yydebug;
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
     HI = 258,                      /* HI  */
-    BYE = 259                      /* BYE  */
+    BYE = 259,                     /* BYE  */
+    ASSOCIATED_TYPE = 260,         /* ASSOCIATED_TYPE  */
+    CLASS = 261,                   /* CLASS  */
+    DEINIT = 262,                  /* DEINIT  */
+    ENUM = 263,                    /* ENUM  */
+    EXTENSION = 264,               /* EXTENSION  */
+    FILEPRIVATE = 265,             /* FILEPRIVATE  */
+    IMPORT = 266,                  /* IMPORT  */
+    INIT = 267,                    /* INIT  */
+    INOUT = 268,                   /* INOUT  */
+    INTERNAL = 269,                /* INTERNAL  */
+    LET = 270,                     /* LET  */
+    OPEN = 271,                    /* OPEN  */
+    OPERATOR = 272,                /* OPERATOR  */
+    PRIVATE = 273,                 /* PRIVATE  */
+    PRECEDENCEGROUP = 274,         /* PRECEDENCEGROUP  */
+    PROTOCOL = 275,                /* PROTOCOL  */
+    PUBLIC = 276,                  /* PUBLIC  */
+    RETHROWS = 277,                /* RETHROWS  */
+    STATIC = 278,                  /* STATIC  */
+    STRUCT = 279,                  /* STRUCT  */
+    SUBCRIPT = 280,                /* SUBCRIPT  */
+    TYPEALIAS = 281,               /* TYPEALIAS  */
+    FUNC = 282,                    /* FUNC  */
+    VAR = 283,                     /* VAR  */
+    BREAK = 284,                   /* BREAK  */
+    CASE = 285,                    /* CASE  */
+    CATCH = 286,                   /* CATCH  */
+    CONTINUE = 287,                /* CONTINUE  */
+    DEFAULT = 288,                 /* DEFAULT  */
+    DEFER = 289                    /* DEFER  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
