@@ -1,5 +1,5 @@
+/**
 #include <iostream>
-//#include "swift.tab.h"
 
 extern int yylex();
 extern int yyparse();
@@ -29,3 +29,4 @@ int main(int argc, const char* argv[])
 		yyparse();
 	} while (!feof(yyin));
 }
+/**/

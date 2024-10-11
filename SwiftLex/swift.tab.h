@@ -54,33 +54,15 @@ extern int yydebug;
     YYEOF = 0,                     /* "end of file"  */
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
-    T_INT = 258,                   /* T_INT  */
-    T_FLOAT = 259,                 /* T_FLOAT  */
-    T_PLUS = 260,                  /* T_PLUS  */
-    T_MINUS = 261,                 /* T_MINUS  */
-    T_MULTIPLY = 262,              /* T_MULTIPLY  */
-    T_DIVIDE = 263,                /* T_DIVIDE  */
-    T_LEFT = 264,                  /* T_LEFT  */
-    T_RIGHT = 265,                 /* T_RIGHT  */
-    T_NEWLINE = 266,               /* T_NEWLINE  */
-    T_QUIT = 267                   /* T_QUIT  */
+    HI = 258,                      /* HI  */
+    BYE = 259                      /* BYE  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-union YYSTYPE
-{
-#line 13 "swift.y"
-
-	int ival;
-	float fval;
-
-#line 81 "swift.tab.h"
-
-};
-typedef union YYSTYPE YYSTYPE;
+typedef int YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif

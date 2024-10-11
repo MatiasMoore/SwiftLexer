@@ -70,16 +70,13 @@
 #line 1 "swift.y"
 
 
-#include <stdio.h>
-#include <stdlib.h>
+  #include <stdio.h>
+  #include <stdlib.h>
+  int yylex(void);
+  int yyerror(const char *s);
 
-extern int yylex();
-extern int yyparse();
-extern FILE* yyin;
 
-void yyerror(const char* s);
-
-#line 83 "swift.tab.cpp"
+#line 80 "swift.tab.cpp"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -110,21 +107,12 @@ enum yysymbol_kind_t
   YYSYMBOL_YYEOF = 0,                      /* "end of file"  */
   YYSYMBOL_YYerror = 1,                    /* error  */
   YYSYMBOL_YYUNDEF = 2,                    /* "invalid token"  */
-  YYSYMBOL_T_INT = 3,                      /* T_INT  */
-  YYSYMBOL_T_FLOAT = 4,                    /* T_FLOAT  */
-  YYSYMBOL_T_PLUS = 5,                     /* T_PLUS  */
-  YYSYMBOL_T_MINUS = 6,                    /* T_MINUS  */
-  YYSYMBOL_T_MULTIPLY = 7,                 /* T_MULTIPLY  */
-  YYSYMBOL_T_DIVIDE = 8,                   /* T_DIVIDE  */
-  YYSYMBOL_T_LEFT = 9,                     /* T_LEFT  */
-  YYSYMBOL_T_RIGHT = 10,                   /* T_RIGHT  */
-  YYSYMBOL_T_NEWLINE = 11,                 /* T_NEWLINE  */
-  YYSYMBOL_T_QUIT = 12,                    /* T_QUIT  */
-  YYSYMBOL_YYACCEPT = 13,                  /* $accept  */
-  YYSYMBOL_calculation = 14,               /* calculation  */
-  YYSYMBOL_line = 15,                      /* line  */
-  YYSYMBOL_mixed_expression = 16,          /* mixed_expression  */
-  YYSYMBOL_expression = 17                 /* expression  */
+  YYSYMBOL_HI = 3,                         /* HI  */
+  YYSYMBOL_BYE = 4,                        /* BYE  */
+  YYSYMBOL_YYACCEPT = 5,                   /* $accept  */
+  YYSYMBOL_program = 6,                    /* program  */
+  YYSYMBOL_hi = 7,                         /* hi  */
+  YYSYMBOL_bye = 8                         /* bye  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -450,21 +438,21 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  2
+#define YYFINAL  4
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   62
+#define YYLAST   2
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  13
+#define YYNTOKENS  5
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  5
+#define YYNNTS  4
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  27
+#define YYNRULES  4
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  42
+#define YYNSTATES  7
 
 /* YYMAXUTOK -- Last valid token kind.  */
-#define YYMAXUTOK   267
+#define YYMAXUTOK   259
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
@@ -503,17 +491,14 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
-       5,     6,     7,     8,     9,    10,    11,    12
+       2,     2,     2,     2,     2,     2,     1,     2,     3,     4
 };
 
 #if YYDEBUG
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    32,    32,    33,    36,    37,    38,    39,    42,    43,
-      44,    45,    46,    47,    48,    49,    50,    51,    52,    53,
-      54,    55,    56,    59,    60,    61,    62,    63
+       0,    15,    15,    19,    22
 };
 #endif
 
@@ -529,10 +514,8 @@ static const char *yysymbol_name (yysymbol_kind_t yysymbol) YY_ATTRIBUTE_UNUSED;
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-  "\"end of file\"", "error", "\"invalid token\"", "T_INT", "T_FLOAT",
-  "T_PLUS", "T_MINUS", "T_MULTIPLY", "T_DIVIDE", "T_LEFT", "T_RIGHT",
-  "T_NEWLINE", "T_QUIT", "$accept", "calculation", "line",
-  "mixed_expression", "expression", YY_NULLPTR
+  "\"end of file\"", "error", "\"invalid token\"", "HI", "BYE", "$accept",
+  "program", "hi", "bye", YY_NULLPTR
 };
 
 static const char *
@@ -542,7 +525,7 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 }
 #endif
 
-#define YYPACT_NINF (-6)
+#define YYPACT_NINF (-4)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -556,11 +539,7 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      -6,    31,    -6,    -6,    -6,    17,    -6,    -3,    -6,    -4,
-      39,    46,    52,    -6,    17,    17,    17,    17,    -6,    17,
-      17,    17,    17,    -6,    -6,    -6,    -2,    11,    -2,    11,
-      -6,    -6,    -6,    -6,    -2,    11,    -2,    11,    -6,    -6,
-      -6,    -6
+      -3,    -4,     1,    -2,    -4,    -4,    -4
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -568,23 +547,19 @@ static const yytype_int8 yypact[] =
    means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       2,     0,     1,    23,     8,     0,     4,     0,     3,     0,
-       0,     0,     0,     7,     0,     0,     0,     0,     5,     0,
-       0,     0,     0,     6,    13,    27,     9,    18,    10,    19,
-      11,    20,    12,    21,    14,    24,    15,    25,    16,    26,
-      17,    22
+       0,     3,     0,     0,     1,     4,     2
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-      -6,    -6,    -6,    -5,     8
+      -4,    -4,    -4,    -4
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-       0,     1,     8,     9,    10
+       0,     2,     3,     6
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -592,51 +567,31 @@ static const yytype_int8 yydefgoto[] =
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-      11,    14,    15,    16,    17,    16,    17,    18,    13,    26,
-      28,    30,    32,    12,    34,    36,    38,    40,    21,    22,
-       3,     4,    27,    29,    31,    33,     5,    35,    37,    39,
-      41,     2,     0,     0,     3,     4,     0,     0,     0,     0,
-       5,     0,     6,     7,    19,    20,    21,    22,     0,     0,
-      23,    14,    15,    16,    17,     0,    24,    19,    20,    21,
-      22,     0,    25
+       1,     4,     5
 };
 
 static const yytype_int8 yycheck[] =
 {
-       5,     5,     6,     7,     8,     7,     8,    11,    11,    14,
-      15,    16,    17,     5,    19,    20,    21,    22,     7,     8,
-       3,     4,    14,    15,    16,    17,     9,    19,    20,    21,
-      22,     0,    -1,    -1,     3,     4,    -1,    -1,    -1,    -1,
-       9,    -1,    11,    12,     5,     6,     7,     8,    -1,    -1,
-      11,     5,     6,     7,     8,    -1,    10,     5,     6,     7,
-       8,    -1,    10
+       3,     0,     4
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
    state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,    14,     0,     3,     4,     9,    11,    12,    15,    16,
-      17,    16,    17,    11,     5,     6,     7,     8,    11,     5,
-       6,     7,     8,    11,    10,    10,    16,    17,    16,    17,
-      16,    17,    16,    17,    16,    17,    16,    17,    16,    17,
-      16,    17
+       0,     3,     6,     7,     0,     4,     8
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    13,    14,    14,    15,    15,    15,    15,    16,    16,
-      16,    16,    16,    16,    16,    16,    16,    16,    16,    16,
-      16,    16,    16,    17,    17,    17,    17,    17
+       0,     5,     6,     7,     8
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     0,     2,     1,     2,     2,     2,     1,     3,
-       3,     3,     3,     3,     3,     3,     3,     3,     3,     3,
-       3,     3,     3,     1,     3,     3,     3,     3
+       0,     2,     2,     1,     1
 };
 
 
@@ -1099,146 +1054,20 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-  case 5: /* line: mixed_expression T_NEWLINE  */
-#line 37 "swift.y"
-                                 { printf("\tResult: %f\n", (yyvsp[-1].fval));}
-#line 1106 "swift.tab.cpp"
+  case 3: /* hi: HI  */
+#line 19 "swift.y"
+               { printf("Hello World\n");   }
+#line 1061 "swift.tab.cpp"
     break;
 
-  case 6: /* line: expression T_NEWLINE  */
-#line 38 "swift.y"
-                           { printf("\tResult: %i\n", (yyvsp[-1].ival)); }
-#line 1112 "swift.tab.cpp"
-    break;
-
-  case 7: /* line: T_QUIT T_NEWLINE  */
-#line 39 "swift.y"
-                       { printf("bye!\n"); exit(0); }
-#line 1118 "swift.tab.cpp"
-    break;
-
-  case 8: /* mixed_expression: T_FLOAT  */
-#line 42 "swift.y"
-                                                         { (yyval.fval) = (yyvsp[0].fval); }
-#line 1124 "swift.tab.cpp"
-    break;
-
-  case 9: /* mixed_expression: mixed_expression T_PLUS mixed_expression  */
-#line 43 "swift.y"
-                                                         { (yyval.fval) = (yyvsp[-2].fval) + (yyvsp[0].fval); }
-#line 1130 "swift.tab.cpp"
-    break;
-
-  case 10: /* mixed_expression: mixed_expression T_MINUS mixed_expression  */
-#line 44 "swift.y"
-                                                         { (yyval.fval) = (yyvsp[-2].fval) - (yyvsp[0].fval); }
-#line 1136 "swift.tab.cpp"
-    break;
-
-  case 11: /* mixed_expression: mixed_expression T_MULTIPLY mixed_expression  */
-#line 45 "swift.y"
-                                                         { (yyval.fval) = (yyvsp[-2].fval) * (yyvsp[0].fval); }
-#line 1142 "swift.tab.cpp"
-    break;
-
-  case 12: /* mixed_expression: mixed_expression T_DIVIDE mixed_expression  */
-#line 46 "swift.y"
-                                                         { (yyval.fval) = (yyvsp[-2].fval) / (yyvsp[0].fval); }
-#line 1148 "swift.tab.cpp"
-    break;
-
-  case 13: /* mixed_expression: T_LEFT mixed_expression T_RIGHT  */
-#line 47 "swift.y"
-                                                         { (yyval.fval) = (yyvsp[-1].fval); }
-#line 1154 "swift.tab.cpp"
-    break;
-
-  case 14: /* mixed_expression: expression T_PLUS mixed_expression  */
-#line 48 "swift.y"
-                                                         { (yyval.fval) = (yyvsp[-2].ival) + (yyvsp[0].fval); }
-#line 1160 "swift.tab.cpp"
-    break;
-
-  case 15: /* mixed_expression: expression T_MINUS mixed_expression  */
-#line 49 "swift.y"
-                                                         { (yyval.fval) = (yyvsp[-2].ival) - (yyvsp[0].fval); }
-#line 1166 "swift.tab.cpp"
-    break;
-
-  case 16: /* mixed_expression: expression T_MULTIPLY mixed_expression  */
-#line 50 "swift.y"
-                                                         { (yyval.fval) = (yyvsp[-2].ival) * (yyvsp[0].fval); }
-#line 1172 "swift.tab.cpp"
-    break;
-
-  case 17: /* mixed_expression: expression T_DIVIDE mixed_expression  */
-#line 51 "swift.y"
-                                                         { (yyval.fval) = (yyvsp[-2].ival) / (yyvsp[0].fval); }
-#line 1178 "swift.tab.cpp"
-    break;
-
-  case 18: /* mixed_expression: mixed_expression T_PLUS expression  */
-#line 52 "swift.y"
-                                                         { (yyval.fval) = (yyvsp[-2].fval) + (yyvsp[0].ival); }
-#line 1184 "swift.tab.cpp"
-    break;
-
-  case 19: /* mixed_expression: mixed_expression T_MINUS expression  */
-#line 53 "swift.y"
-                                                         { (yyval.fval) = (yyvsp[-2].fval) - (yyvsp[0].ival); }
-#line 1190 "swift.tab.cpp"
-    break;
-
-  case 20: /* mixed_expression: mixed_expression T_MULTIPLY expression  */
-#line 54 "swift.y"
-                                                         { (yyval.fval) = (yyvsp[-2].fval) * (yyvsp[0].ival); }
-#line 1196 "swift.tab.cpp"
-    break;
-
-  case 21: /* mixed_expression: mixed_expression T_DIVIDE expression  */
-#line 55 "swift.y"
-                                                         { (yyval.fval) = (yyvsp[-2].fval) / (yyvsp[0].ival); }
-#line 1202 "swift.tab.cpp"
-    break;
-
-  case 22: /* mixed_expression: expression T_DIVIDE expression  */
-#line 56 "swift.y"
-                                                         { (yyval.fval) = (yyvsp[-2].ival) / (float)(yyvsp[0].ival); }
-#line 1208 "swift.tab.cpp"
-    break;
-
-  case 23: /* expression: T_INT  */
-#line 59 "swift.y"
-                                                { (yyval.ival) = (yyvsp[0].ival); }
-#line 1214 "swift.tab.cpp"
-    break;
-
-  case 24: /* expression: expression T_PLUS expression  */
-#line 60 "swift.y"
-                                                { (yyval.ival) = (yyvsp[-2].ival) + (yyvsp[0].ival); }
-#line 1220 "swift.tab.cpp"
-    break;
-
-  case 25: /* expression: expression T_MINUS expression  */
-#line 61 "swift.y"
-                                                { (yyval.ival) = (yyvsp[-2].ival) - (yyvsp[0].ival); }
-#line 1226 "swift.tab.cpp"
-    break;
-
-  case 26: /* expression: expression T_MULTIPLY expression  */
-#line 62 "swift.y"
-                                                { (yyval.ival) = (yyvsp[-2].ival) * (yyvsp[0].ival); }
-#line 1232 "swift.tab.cpp"
-    break;
-
-  case 27: /* expression: T_LEFT expression T_RIGHT  */
-#line 63 "swift.y"
-                                                { (yyval.ival) = (yyvsp[-1].ival); }
-#line 1238 "swift.tab.cpp"
+  case 4: /* bye: BYE  */
+#line 22 "swift.y"
+               { printf("Bye World\n"); exit(0); }
+#line 1067 "swift.tab.cpp"
     break;
 
 
-#line 1242 "swift.tab.cpp"
+#line 1071 "swift.tab.cpp"
 
       default: break;
     }
@@ -1431,10 +1260,3 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 66 "swift.y"
-
-
-void yyerror(const char* s) {
-	fprintf(stderr, "Parse error: %s\n", s);
-	exit(1);
-}
