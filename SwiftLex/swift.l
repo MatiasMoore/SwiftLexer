@@ -64,7 +64,7 @@ public {cout << "Keyword public: " << yytext << endl; return PUBLIC;}
 rethrows {cout << "Keyword rethrows: " << yytext << endl; return RETHROWS;}
 static {cout << "Keyword static: " << yytext << endl; return STATIC;}
 struct {cout << "Keyword struct: " << yytext << endl; return STRUCT;}
-subscript {cout << "Keyword subscript: " << yytext << endl; return SUBCRIPT;}
+subscript {cout << "Keyword subscript: " << yytext << endl; return SUBSCRIPT;}
 typealias {cout << "Keyword typealias: " << yytext << endl; return TYPEALIAS;}
 func {cout << "Keyword func: " << yytext << endl; return FUNC;}
 var {cout << "Keyword var: " << yytext << endl; return VAR;}
@@ -77,153 +77,155 @@ catch {cout << "Keyword catch: " << yytext << endl; return CATCH;}
 continue {cout << "Keyword continue: " << yytext << endl; return CONTINUE;}
 default {cout << "Keyword default: " << yytext << endl; return DEFAULT;}
 defer {cout << "Keyword defer: " << yytext << endl; return DEFER;}
-do {cout << "Keyword do: " << yytext << endl;}
-else {cout << "Keyword else: " << yytext << endl;}
-fallthrough {cout << "Keyword fallthrough: " << yytext << endl;}
-for {cout << "Keyword for: " << yytext << endl;}
-guard {cout << "Keyword guard: " << yytext << endl;}
-if {cout << "Keyword if: " << yytext << endl;}
-in {cout << "Keyword in: " << yytext << endl;}
-repeat {cout << "Keyword repeat: " << yytext << endl;}
-return {cout << "Keyword return: " << yytext << endl;}
-throw {cout << "Keyword throw: " << yytext << endl;}
-switch {cout << "Keyword switch: " << yytext << endl;}
-where {cout << "Keyword where: " << yytext << endl;}
-while {cout << "Keyword while: " << yytext << endl;}
+do {cout << "Keyword do: " << yytext << endl; return DO;}
+else {cout << "Keyword else: " << yytext << endl; return ELSE;}
+fallthrough {cout << "Keyword fallthrough: " << yytext << endl; return FALLTHROUGH;}
+for {cout << "Keyword for: " << yytext << endl; return FOR;}
+guard {cout << "Keyword guard: " << yytext << endl; return GUARD;}
+if {cout << "Keyword if: " << yytext << endl; return IF;}
+in {cout << "Keyword in: " << yytext << endl; return IN;}
+repeat {cout << "Keyword repeat: " << yytext << endl; return REPEAT;}
+return {cout << "Keyword return: " << yytext << endl; return RETURN;}
+throw {cout << "Keyword throw: " << yytext << endl; return THROW;}
+switch {cout << "Keyword switch: " << yytext << endl; return SWITCH;}
+where {cout << "Keyword where: " << yytext << endl; return WHERE;}
+while {cout << "Keyword while: " << yytext << endl; return WHILE;}
 
-Any {cout << "Keyword any: " << yytext << endl;}
-as {cout << "Keyword as: " << yytext << endl;}
-false {cout << "Keyword false: " << yytext << endl;}
-is {cout << "Keyword is: " << yytext << endl;}
-nil {cout << "Keyword nil: " << yytext << endl;}
-self {cout << "Keyword self: " << yytext << endl;}
-Self {cout << "Keyword Self: " << yytext << endl;}
-super {cout << "Keyword super: " << yytext << endl;}
-throws {cout << "Keyword throws: " << yytext << endl;}
-true {cout << "Keyword true: " << yytext << endl;}
-try {cout << "Keyword try: " << yytext << endl;}
+Any {cout << "Keyword any: " << yytext << endl; return ANY;}
+as {cout << "Keyword as: " << yytext << endl; return AS;}
+false {cout << "Keyword false: " << yytext << endl; return FALSE;}
+is {cout << "Keyword is: " << yytext << endl; return IS;}
+nil {cout << "Keyword nil: " << yytext << endl; return NIL;}
+self {cout << "Keyword self: " << yytext << endl; return SELF;}
+Self {cout << "Keyword Self: " << yytext << endl; return SELF_TYPE;}
+super {cout << "Keyword super: " << yytext << endl; return SUPER;}
+throws {cout << "Keyword throws: " << yytext << endl; return THROWS;}
+true {cout << "Keyword true: " << yytext << endl; return TRUE;}
+try {cout << "Keyword try: " << yytext << endl; return TRY;}
 	
-associativity {cout << "Keyword associativity: " << yytext << endl;}
-convenience {cout << "Keyword convenience: " << yytext << endl;}
-didSet {cout << "Keyword didSet: " << yytext << endl;}
-dynamic {cout << "Keyword dynamic: " << yytext << endl;}
-final {cout << "Keyword final: " << yytext << endl;}
-get {cout << "Keyword get: " << yytext << endl;}
-indirect {cout << "Keyword indirect: " << yytext << endl;}
-infix {cout << "Keyword infix: " << yytext << endl;}
-lazy {cout << "Keyword lazy: " << yytext << endl;}
-left {cout << "Keyword left: " << yytext << endl;}
-mutating {cout << "Keyword mutating: " << yytext << endl;}
-none {cout << "Keyword none: " << yytext << endl;}
-nonmutating {cout << "Keyword nonmutating: " << yytext << endl;}
-optional {cout << "Keyword optional: " << yytext << endl;}
-override {cout << "Keyword override: " << yytext << endl;}
-postfix {cout << "Keyword postfix: " << yytext << endl;}
-precedence {cout << "Keyword precedence: " << yytext << endl;}
-prefix {cout << "Keyword prefix: " << yytext << endl;}
-Protocol {cout << "Keyword protocol: " << yytext << endl;}
-required {cout << "Keyword requierd: " << yytext << endl;}
-right {cout << "Keyword right: " << yytext << endl;}
-set {cout << "Keyword set: " << yytext << endl;}
-some {cout << "Keyword some: " << yytext << endl;}
-Type {cout << "Keyword Type: " << yytext << endl;}
-unowned {cout << "Keyword unowned: " << yytext << endl;}
-weak {cout << "Keyword weak: " << yytext << endl;}
-willSet {cout << "Keyword willSet: " << yytext << endl;}
+associativity {cout << "Keyword associativity: " << yytext << endl; return ASSOCIATIVITY;}
+convenience {cout << "Keyword convenience: " << yytext << endl; return CONVENIENCE;}
+didSet {cout << "Keyword didSet: " << yytext << endl; return DIDSET;}
+dynamic {cout << "Keyword dynamic: " << yytext << endl; return DYNAMIC;}
+final {cout << "Keyword final: " << yytext << endl; return FINAL;}
+get {cout << "Keyword get: " << yytext << endl; return GET;}
+indirect {cout << "Keyword indirect: " << yytext << endl; return INDIRECT;}
+infix {cout << "Keyword infix: " << yytext << endl; return INFIX;}
+lazy {cout << "Keyword lazy: " << yytext << endl; return LAZY;}
+left {cout << "Keyword left: " << yytext << endl; return LEFT;}
+mutating {cout << "Keyword mutating: " << yytext << endl; return MUTATING;}
+none {cout << "Keyword none: " << yytext << endl; return NONE;}
+nonmutating {cout << "Keyword nonmutating: " << yytext << endl; return NONMUTATING;}
+optional {cout << "Keyword optional: " << yytext << endl; return OPTIONAL;}
+override {cout << "Keyword override: " << yytext << endl; return OVERRIDE;}
+postfix {cout << "Keyword postfix: " << yytext << endl; return POSTFIX;}
+precedence {cout << "Keyword precedence: " << yytext << endl; return PRECEDENCE;}
+prefix {cout << "Keyword prefix: " << yytext << endl; return PREFIX;}
+Protocol {cout << "Keyword protocol: " << yytext << endl; return PROTOCOL_UPPERCASE;}
+required {cout << "Keyword required: " << yytext << endl; return REQUIRED;}
+right {cout << "Keyword right: " << yytext << endl; return RIGHT;}
+set {cout << "Keyword set: " << yytext << endl; return SET;}
+some {cout << "Keyword some: " << yytext << endl; return SOME;}
+Type {cout << "Keyword Type: " << yytext << endl; return TYPE;}
+unowned {cout << "Keyword unowned: " << yytext << endl; return UNOWNED;}
+weak {cout << "Keyword weak: " << yytext << endl; return WEAK;}
+willSet {cout << "Keyword willSet: " << yytext << endl; return WILLSET;}
 	
-\#available {cout << "Keyword #available: " << yytext << endl;}
-\#colorLiteral {cout << "Keyword #colorLiteral: " << yytext << endl;}
-\#column {cout << "Keyword #column: " << yytext << endl;}
-\#dsohandle {cout << "Keyword #dsohandle: " << yytext << endl;}
-\#elseif {cout << "Keyword #elsif: " << yytext << endl;}
-\#else {cout << "Keyword #import: " << yytext << endl;}
-\#endif {cout << "Keyword #endif: " << yytext << endl;}
-\#error {cout << "Keyword #error: " << yytext << endl;}
-\#fileID {cout << "Keyword #fileID: " << yytext << endl;}
-\#fileLiteral {cout << "Keyword #fileLiteral: " << yytext << endl;}
-\#filePath {cout << "Keyword #filepath: " << yytext << endl;}
-\#file {cout << "Keyword #file: " << yytext << endl;}
-\#function {cout << "Keyword #function: " << yytext << endl;}
-\#if {cout << "Keyword #if: " << yytext << endl;}
-\#imageLiteral {cout << "Keyword #imageLiteral: " << yytext << endl;}
-\#keyPath {cout << "Keyword #keypath: " << yytext << endl;}
-\#line {cout << "Keyword #line: " << yytext << endl;}
-\#selector {cout << "Keyword #selector: " << yytext << endl;}
-\#sourceLocation {cout << "Keyword #sourceLocation: " << yytext << endl;}
-\#warning {cout << "Keyword #warning: " << yytext << endl;}
+\#available {cout << "Keyword #available: " << yytext << endl; return HASH_AVAILABLE;}
+\#colorLiteral {cout << "Keyword #colorLiteral: " << yytext << endl; return HASH_COLORLITERAL;}
+\#column {cout << "Keyword #column: " << yytext << endl; return HASH_COLUMN;}
+\#dsohandle {cout << "Keyword #dsohandle: " << yytext << endl; return HASH_DSOHANDLE;}
+\#elseif {cout << "Keyword #elseif: " << yytext << endl; return HASH_ELSEIF;}
+\#else {cout << "Keyword #else: " << yytext << endl; return HASH_ELSE;}
+\#endif {cout << "Keyword #endif: " << yytext << endl; return HASH_ENDIF;}
+\#error {cout << "Keyword #error: " << yytext << endl; return HASH_ERROR;}
+\#fileID {cout << "Keyword #fileID: " << yytext << endl; return HASH_FILEID;}
+\#fileLiteral {cout << "Keyword #fileLiteral: " << yytext << endl; return HASH_FILELITERAL;}
+\#filePath {cout << "Keyword #filePath: " << yytext << endl; return HASH_FILEPATH;}
+\#file {cout << "Keyword #file: " << yytext << endl; return HASH_FILE;}
+\#function {cout << "Keyword #function: " << yytext << endl; return HASH_FUNCTION;}
+\#if {cout << "Keyword #if: " << yytext << endl; return HASH_IF;}
+\#imageLiteral {cout << "Keyword #imageLiteral: " << yytext << endl; return HASH_IMAGELITERAL;}
+\#keyPath {cout << "Keyword #keyPath: " << yytext << endl; return HASH_KEYPATH;}
+\#line {cout << "Keyword #line: " << yytext << endl; return HASH_LINE;}
+\#selector {cout << "Keyword #selector: " << yytext << endl; return HASH_SELECTOR;}
+\#sourceLocation {cout << "Keyword #sourceLocation: " << yytext << endl; return HASH_SOURCELOCATION;}
+\#warning {cout << "Keyword #warning: " << yytext << endl; return HASH_WARNING;}
 
-\+ { cout << "Operator plus: " << yytext << endl; }
-\- {cout << "Operator subtraction: " << yytext << endl;}
-\/ {cout << "Operator division: " << yytext << endl;}
-\* {cout << "Operator multiplication: " << yytext << endl;}
-\% {cout << "Operator modulus: " << yytext << endl;}
+\+ {cout << "Operator plus: " << yytext << endl; return '+';}
+\- {cout << "Operator subtraction: " << yytext << endl; return '-';}
+\/ {cout << "Operator division: " << yytext << endl; return '/';}
+\* {cout << "Operator multiplication: " << yytext << endl; return '*';}
+\% {cout << "Operator modulus: " << yytext << endl; return '%';}
 
-\= { cout << "Operator assignment: " << yytext << endl; }
-\+\= { cout << "Operator adition assignment: " << yytext << endl; }
-\-\= { cout << "Operator subtraction assignment: " << yytext << endl; }
-\/\= { cout << "Operator division assignment: " << yytext << endl; }
-\*= { cout << "Operator multiplication assignment: " << yytext << endl; }
-\%\= { cout << "Operator modulus assignment: " << yytext << endl; }
+\= {cout << "Operator assignment: " << yytext << endl; return '=';}
+\+\= {cout << "Operator addition assignment: " << yytext << endl; return OP_PLUS_ASSIGN;}
+\-\= {cout << "Operator subtraction assignment: " << yytext << endl; return OP_MINUS_ASSIGN;}
+\/\= {cout << "Operator division assignment: " << yytext << endl; return OP_DIV_ASSIGN;}
+\*\= {cout << "Operator multiplication assignment: " << yytext << endl; return OP_MUL_ASSIGN;}
+\%\= {cout << "Operator modulus assignment: " << yytext << endl; return OP_MOD_ASSIGN;}
 	
-\<\< { cout << "Operator bitwise left shift: " << yytext << endl; }
-\>\> { cout << "Operator bitwise right shift: " << yytext << endl; }
-\& { cout << "Operator bitwise AND: " << yytext << endl; }
-\| { cout << "Operator bitwise OR: " << yytext << endl; }
-\^ { cout << "Operator bitwise XOR: " << yytext << endl; }
-\~ { cout << "Operator bitwise NOT: " << yytext << endl; }
+\<\< {cout << "Operator bitwise left shift: " << yytext << endl; return OP_LSHIFT;}
+\>\> {cout << "Operator bitwise right shift: " << yytext << endl; return OP_RSHIFT;}
+\& {cout << "Operator bitwise AND: " << yytext << endl; return '&';}
+\| {cout << "Operator bitwise OR: " << yytext << endl; return '|';}
+\^ {cout << "Operator bitwise XOR: " << yytext << endl; return '^';}
+\~ {cout << "Operator bitwise NOT: " << yytext << endl; return '~';}
 	 
-\< { cout << "Operator Less than: " << yytext << endl; }
-\> { cout << "Operator greater than: " << yytext << endl; }
-\=\= { cout << "Operator equal to: " << yytext << endl; }
-\<\= { cout << "Operator less than or equal to: " << yytext << endl; }
-\>\= { cout << "Operator greater than or equal to: " << yytext << endl; }
-\!\= { cout << "Operator not equal to: " << yytext << endl; }
+\< {cout << "Operator less than: " << yytext << endl; return '<';}
+\> {cout << "Operator greater than: " << yytext << endl; return '>';}
+\=\= {cout << "Operator equal to: " << yytext << endl; return OP_EQ;}
+\<\= {cout << "Operator less than or equal to: " << yytext << endl; return OP_LTE;}
+\>\= {cout << "Operator greater than or equal to: " << yytext << endl; return OP_GTE;}
+\!\= {cout << "Operator not equal to: " << yytext << endl; return OP_NEQ;}
 		 
-\&\& { cout << "Operator logical and: " << yytext << endl; }
-\|\| { cout << "Operator logical or: " << yytext << endl; }
-\! { cout << "Operator logical not: " << yytext << endl; }
+\&\& {cout << "Operator logical AND: " << yytext << endl; return OP_LOG_AND;}
+\|\| {cout << "Operator logical OR: " << yytext << endl; return OP_LOG_OR;}
+\! {cout << "Operator logical NOT: " << yytext << endl; return '!';}
 	
-\?\? { cout << "Operator nil coalescing: " << yytext << endl; }
-\+\+ { cout << "Operator increment: " << yytext << endl; }
-\-\- { cout << "Operator decerment: " << yytext << endl; }
+\?\? {cout << "Operator nil coalescing: " << yytext << endl; return OP_NIL_COALESCE;}
+\+\+ {cout << "Operator increment: " << yytext << endl; return OP_INC;}
+\-\- {cout << "Operator decrement: " << yytext << endl; return OP_DEC;}
 	
-\. { cout << "Operator dot(member access): " << yytext << endl; }
-, { cout << "Operator comma: " << yytext << endl; } 
+\. {cout << "Operator dot (member access): " << yytext << endl; return '.';}
+, {cout << "Operator comma: " << yytext << endl; return ',';} 
 	
-\.\.\. { cout << "Operator closed range: " << yytext << endl; }
-\.\.\< { cout << "Operator half open range: " << yytext << endl; } 
+\.\.\. {cout << "Operator closed range: " << yytext << endl; return OP_CLOSED_RANGE;}
+\.\.\< {cout << "Operator half open range: " << yytext << endl; return OP_HALF_OPEN_RANGE;} 
 
-\? { cout << "Operator ternary: " << yytext << endl;}
-\: { cout << "Operator colon: " << yytext << endl; }
-\-\> { cout << "Operator function return type: " << yytext << endl; }
+\? {cout << "Operator ternary: " << yytext << endl; return '?';}
+\: {cout << "Operator colon: " << yytext << endl; return ':';}
+\-\> {cout << "Operator function return type: " << yytext << endl; return OP_FUNC_RETURN;}
+
+
 
 	/* BRACKETS */
 
-\( { cout << "Left round bracket: " << yytext << endl; }
-\) { cout << "Right round bracket: " << yytext << endl; }
-\[ { cout << "Left square bracket: " << yytext << endl; }
-\] { cout << "Right square bracket: " << yytext << endl; }
-\{ { cout << "Left curly bracket: " << yytext << endl; }
-\} { cout << "Left right bracket: " << yytext << endl; }
+\( {cout << "Left round bracket: " << yytext << endl; return '(';}
+\) {cout << "Right round bracket: " << yytext << endl; return ')';}
+\[ {cout << "Left square bracket: " << yytext << endl; return '[';}
+\] {cout << "Right square bracket: " << yytext << endl; return ']';}
+\{ {cout << "Left curly bracket: " << yytext << endl; return '{';}
+\} {cout << "Right curly bracket: " << yytext << endl; return '}';}
 	
 	/* TYPES */
 	
-Bool { cout << "Type bool: " << yytext << endl; }
-String { cout << "Type String: " << yytext << endl; }
-Character { cout << "Type Character: " << yytext << endl; }
-Int8 { cout << "Type Int8: " << yytext << endl; }
-Int16 { cout << "Type Int16: " << yytext << endl; }
-Int32 { cout << "Type Int32: " << yytext << endl; }
-Int64 { cout << "Type Int64: " << yytext << endl; }
-Int { cout << "Type Int: " << yytext << endl; }
-UInt8 { cout << "Type UInt8: " << yytext << endl; }
-UInt16 { cout << "Type UInt16: " << yytext << endl; }
-UInt32 { cout << "Type UInt32: " << yytext << endl; }
-UInt64 { cout << "Type UInt64: " << yytext << endl; }
-UInt { cout << "Type UInt: " << yytext << endl; }
-Float { cout << "Type Float: " << yytext << endl; }
-Float80 { cout << "Type Float80: " << yytext << endl; }
-Double { cout << "Type Double: " << yytext << endl; }
+Bool {cout << "Type bool: " << yytext << endl; return TYPE_BOOL;}
+String {cout << "Type String: " << yytext << endl; return TYPE_STRING;}
+Character {cout << "Type Character: " << yytext << endl; return TYPE_CHARACTER;}
+Int8 {cout << "Type Int8: " << yytext << endl; return TYPE_INT8;}
+Int16 {cout << "Type Int16: " << yytext << endl; return TYPE_INT16;}
+Int32 {cout << "Type Int32: " << yytext << endl; return TYPE_INT32;}
+Int64 {cout << "Type Int64: " << yytext << endl; return TYPE_INT64;}
+Int {cout << "Type Int: " << yytext << endl; return TYPE_INT;}
+UInt8 {cout << "Type UInt8: " << yytext << endl; return TYPE_UINT8;}
+UInt16 {cout << "Type UInt16: " << yytext << endl; return TYPE_UINT16;}
+UInt32 {cout << "Type UInt32: " << yytext << endl; return TYPE_UINT32;}
+UInt64 {cout << "Type UInt64: " << yytext << endl; return TYPE_UINT64;}
+UInt {cout << "Type UInt: " << yytext << endl; return TYPE_UINT;}
+Float {cout << "Type Float: " << yytext << endl; return TYPE_FLOAT;}
+Float80 {cout << "Type Float80: " << yytext << endl; return TYPE_FLOAT80;}
+Double {cout << "Type Double: " << yytext << endl; return TYPE_DOUBLE;}
 
 	/* COMMENTS */
 
@@ -237,7 +239,10 @@ Double { cout << "Type Double: " << yytext << endl; }
 <COMMENT_MULTILINE><<EOF>> {cout << "ERROR: Multiline comment at line " << multilineNumberBegin << ": is not closed" << endl; BEGIN(INITIAL); }
 
 	/* LINE COUNTER */
-\n {lineNumber++;}
+\n {lineNumber++; return NEWLINE;}
+
+	/* STATEMENT_DELIMITER */
+\; {cout << "Statement delimiter: " << yytext << endl; return ';';}
 
 	/* STRINGS */
 
