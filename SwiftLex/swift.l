@@ -340,7 +340,10 @@ Double { cout << "Type Double: " << yytext << endl; }
 {FLOAT_DEC} { 
 	str = yytext;
 	removeChar(str, '_');
-    cout << "Decimal floatingpoint number: " << stod(str) << endl;
+	doubleBuf = stod(str);
+    cout << "Decimal floatingpoint number: " << doubleBuf << endl;
+	yylval.dval = doubleBuf;
+	return LITERAL_FLOAT;
 }
 
 	/* TODO EXPERIMENTAL */
@@ -365,7 +368,10 @@ Double { cout << "Type Double: " << yytext << endl; }
 {FLOAT_HEX} {
 	str = yytext;
 	removeChar(str, '_');
-	cout << "Hexadecimal floatingpoint number: " << stod(str) << endl;
+	doubleBuf = stod(str);
+	cout << "Hexadecimal floatingpoint number: " << doubleBuf << endl;
+	yylval.dval = doubleBuf;
+	return LITERAL_FLOAT;
 }
 
 	/* TODO EXPERIMENTAL */

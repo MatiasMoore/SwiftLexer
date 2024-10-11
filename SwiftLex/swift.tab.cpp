@@ -534,7 +534,7 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    34,    34,    38,    41
+       0,    33,    33,    37,    40
 };
 #endif
 
@@ -1096,13 +1096,13 @@ yyreduce:
   switch (yyn)
     {
   case 3: /* hi: HI  */
-#line 38 "swift.y"
+#line 37 "swift.y"
                { printf("Hello World\n");   }
 #line 1102 "swift.tab.cpp"
     break;
 
   case 4: /* bye: BYE  */
-#line 41 "swift.y"
+#line 40 "swift.y"
                { printf("Bye World\n"); exit(0); }
 #line 1108 "swift.tab.cpp"
     break;
@@ -1301,7 +1301,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 44 "swift.y"
+#line 43 "swift.y"
 
 
 int yyerror(const char *errormsg)
