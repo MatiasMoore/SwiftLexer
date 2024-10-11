@@ -87,7 +87,8 @@ extern int yydebug;
     DEFAULT = 288,                 /* DEFAULT  */
     DEFER = 289,                   /* DEFER  */
     LITERAL_FLOAT = 290,           /* LITERAL_FLOAT  */
-    LITERAL_INT = 291              /* LITERAL_INT  */
+    LITERAL_INT = 291,             /* LITERAL_INT  */
+    LITERAL_STRING = 292           /* LITERAL_STRING  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -101,8 +102,9 @@ union YYSTYPE
 	int ival;
 	float fval;
 	double dval;
+    char* strval;
 
-#line 106 "swift.tab.h"
+#line 108 "swift.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

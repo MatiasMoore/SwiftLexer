@@ -141,10 +141,11 @@ enum yysymbol_kind_t
   YYSYMBOL_DEFER = 34,                     /* DEFER  */
   YYSYMBOL_LITERAL_FLOAT = 35,             /* LITERAL_FLOAT  */
   YYSYMBOL_LITERAL_INT = 36,               /* LITERAL_INT  */
-  YYSYMBOL_YYACCEPT = 37,                  /* $accept  */
-  YYSYMBOL_program = 38,                   /* program  */
-  YYSYMBOL_hi = 39,                        /* hi  */
-  YYSYMBOL_bye = 40                        /* bye  */
+  YYSYMBOL_LITERAL_STRING = 37,            /* LITERAL_STRING  */
+  YYSYMBOL_YYACCEPT = 38,                  /* $accept  */
+  YYSYMBOL_program = 39,                   /* program  */
+  YYSYMBOL_hi = 40,                        /* hi  */
+  YYSYMBOL_bye = 41                        /* bye  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -475,7 +476,7 @@ union yyalloc
 #define YYLAST   2
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  37
+#define YYNTOKENS  38
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  4
 /* YYNRULES -- Number of rules.  */
@@ -484,7 +485,7 @@ union yyalloc
 #define YYNSTATES  7
 
 /* YYMAXUTOK -- Last valid token kind.  */
-#define YYMAXUTOK   291
+#define YYMAXUTOK   292
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
@@ -527,14 +528,14 @@ static const yytype_int8 yytranslate[] =
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
       25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
-      35,    36
+      35,    36,    37
 };
 
 #if YYDEBUG
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    33,    33,    37,    40
+       0,    34,    34,    38,    41
 };
 #endif
 
@@ -556,7 +557,7 @@ static const char *const yytname[] =
   "PRIVATE", "PRECEDENCEGROUP", "PROTOCOL", "PUBLIC", "RETHROWS", "STATIC",
   "STRUCT", "SUBCRIPT", "TYPEALIAS", "FUNC", "VAR", "BREAK", "CASE",
   "CATCH", "CONTINUE", "DEFAULT", "DEFER", "LITERAL_FLOAT", "LITERAL_INT",
-  "$accept", "program", "hi", "bye", YY_NULLPTR
+  "LITERAL_STRING", "$accept", "program", "hi", "bye", YY_NULLPTR
 };
 
 static const char *
@@ -620,13 +621,13 @@ static const yytype_int8 yycheck[] =
    state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     3,    38,    39,     0,     4,    40
+       0,     3,    39,    40,     0,     4,    41
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    37,    38,    39,    40
+       0,    38,    39,    40,    41
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
@@ -1096,19 +1097,19 @@ yyreduce:
   switch (yyn)
     {
   case 3: /* hi: HI  */
-#line 37 "swift.y"
+#line 38 "swift.y"
                { printf("Hello World\n");   }
-#line 1102 "swift.tab.cpp"
+#line 1103 "swift.tab.cpp"
     break;
 
   case 4: /* bye: BYE  */
-#line 40 "swift.y"
+#line 41 "swift.y"
                { printf("Bye World\n"); exit(0); }
-#line 1108 "swift.tab.cpp"
+#line 1109 "swift.tab.cpp"
     break;
 
 
-#line 1112 "swift.tab.cpp"
+#line 1113 "swift.tab.cpp"
 
       default: break;
     }
@@ -1301,7 +1302,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 43 "swift.y"
+#line 44 "swift.y"
 
 
 int yyerror(const char *errormsg)

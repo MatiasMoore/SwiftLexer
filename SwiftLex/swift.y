@@ -11,6 +11,7 @@
 	int ival;
 	float fval;
 	double dval;
+    char* strval;
 }
 
 %token HI BYE ASSOCIATED_TYPE CLASS DEINIT 
@@ -26,7 +27,7 @@ CONTINUE DEFAULT DEFER
 
 %token<dval> LITERAL_FLOAT
 %token<ival> LITERAL_INT
-
+%token<std::string> LITERAL_STRING
 %%
 
 program:

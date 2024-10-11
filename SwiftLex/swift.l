@@ -266,7 +266,13 @@ Double { cout << "Type Double: " << yytext << endl; }
 <STRING_MULTILINE>\"{1,2} { stringMultiline += yytext; }
 	/* TODO THIS MAY NOT WORK ALL THE TIME */
 <STRING_MULTILINE>\\\n\s*\"\"\" { cout << "ERROR: Escaped newline at the last line of multiline string is not allowed at line " << multilineStringLineNumber << endl; BEGIN(INITIAL); }
-<STRING_MULTILINE>\s*\"\"\" { cout << "Multiline string: " << stringMultiline << endl; BEGIN(INITIAL); }
+<STRING_MULTILINE>\s*\"\"\" { 
+	cout << "Multiline string: " << stringMultiline << endl; 
+	BEGIN(INITIAL); 
+	//This is a memory leak
+	yylval.strval = _strdup(stringMultiline.c_str());
+	return LITERAL_STRING;
+}
 <STRING_MULTILINE><<EOF>> { cout << "ERROR: Multiline string is not closed at line " << multilineStringLineNumber << endl; BEGIN(INITIAL); }
 
 \" { stringOneLine.clear(); BEGIN(STRING); }
@@ -290,7 +296,13 @@ Double { cout << "Type Double: " << yytext << endl; }
 	stringOneLine += char(strtoll(unicodeHexBuffer.c_str(), NULL, 16));
  }
 <STRING>\\u { cout << "ERROR: incorrect unicode char format at line " << lineNumber << endl; BEGIN(INITIAL);}
-<STRING>\" { cout << "Oneline string: " << stringOneLine << endl; BEGIN(INITIAL); }
+<STRING>\" { 
+	cout << "Oneline string: " << stringOneLine << endl; 
+	BEGIN(INITIAL); 
+	//This is a memory leak
+	yylval.strval = _strdup(stringOneLine.c_str());
+	return LITERAL_STRING;
+}
 <STRING><<EOF>> { cout << "ERROR: string in not closed at the end of file at line " << lineNumber << endl; BEGIN(INITIAL); }
 
 	/* NUMBERS BINARY */
