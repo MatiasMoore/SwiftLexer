@@ -1,6 +1,7 @@
 #include <iostream>
 
-int yylex();
+extern int yylex();
+extern int yyparse();
 extern FILE* yyin;
 
 int main(int argc, const char* argv[])
@@ -23,5 +24,6 @@ int main(int argc, const char* argv[])
 		std::cout << "Couldn't open file! Check the path!" << std::endl;
 		return 1;
 	}
-	yylex();
+	yyparse();
+
 }

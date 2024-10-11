@@ -17,6 +17,7 @@ ANTI_DELIM [^	() \[\]{};\-=+<>&|~!\^%\*\/\.,:\?\n]
 #include <stdio.h>
 #include <iostream>
 #include <string>
+#include "swift.tab.h"
 using namespace std;
 
 	// FUNCTIONS
@@ -354,6 +355,7 @@ Double { cout << "Type Double: " << yytext << endl; }
 	/* TODO: DELETE THIS WHEN EVERYTHING IS DONE*/
 .|[^.] {}
 %%
+
 
 	/* FUNCTIONS */
 void removeChar(string& str, char charToRemove) 

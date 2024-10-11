@@ -24,9 +24,16 @@
   <ItemGroup>
     <ClCompile Include="swift.flex.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="swift.tab.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Bison Include="swift.y" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="swift.tab.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -64,7 +71,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
-    <Import Project="win_flex_only\win_flex_custom_build.props" />
+    <Import Project="win_flex_bison\win_flex_bison_custom_build.props" />
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
@@ -146,6 +153,6 @@
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="win_flex_only\win_flex_custom_build.targets" />
+    <Import Project="win_flex_bison\win_flex_bison_custom_build.targets" />
   </ImportGroup>
 </Project>
