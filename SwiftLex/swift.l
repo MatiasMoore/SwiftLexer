@@ -237,6 +237,9 @@ Double {cout << "Type Double: " << yytext << endl; return TYPE_DOUBLE;}
 	/* LINE COUNTER */
 \n {lineNumber++; return NEWLINE;}
 
+	/* STATEMENT_DELIMITER */
+\; {cout << "Statement delimiter: " << yytext << endl; return ';';}
+
 	/* STRINGS */
 
 \"\"\" { stringMultiline.clear(); multilineStringLineNumber = lineNumber; BEGIN(STRING_MULTILINE); }
