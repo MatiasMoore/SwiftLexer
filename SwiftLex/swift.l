@@ -235,7 +235,7 @@ Double {cout << "Type Double: " << yytext << endl; return TYPE_DOUBLE;}
 <COMMENT_MULTILINE><<EOF>> {cout << "ERROR: Multiline comment at line " << multilineNumberBegin << ": is not closed" << endl; BEGIN(INITIAL); }
 
 	/* LINE COUNTER */
-\n {lineNumber++;}
+\n {lineNumber++; return NEWLINE;}
 
 	/* STRINGS */
 
