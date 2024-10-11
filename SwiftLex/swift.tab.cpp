@@ -107,45 +107,162 @@ enum yysymbol_kind_t
   YYSYMBOL_YYEOF = 0,                      /* "end of file"  */
   YYSYMBOL_YYerror = 1,                    /* error  */
   YYSYMBOL_YYUNDEF = 2,                    /* "invalid token"  */
-  YYSYMBOL_HI = 3,                         /* HI  */
-  YYSYMBOL_BYE = 4,                        /* BYE  */
-  YYSYMBOL_ASSOCIATED_TYPE = 5,            /* ASSOCIATED_TYPE  */
-  YYSYMBOL_CLASS = 6,                      /* CLASS  */
-  YYSYMBOL_DEINIT = 7,                     /* DEINIT  */
-  YYSYMBOL_ENUM = 8,                       /* ENUM  */
-  YYSYMBOL_EXTENSION = 9,                  /* EXTENSION  */
-  YYSYMBOL_FILEPRIVATE = 10,               /* FILEPRIVATE  */
-  YYSYMBOL_IMPORT = 11,                    /* IMPORT  */
-  YYSYMBOL_INIT = 12,                      /* INIT  */
-  YYSYMBOL_INOUT = 13,                     /* INOUT  */
-  YYSYMBOL_INTERNAL = 14,                  /* INTERNAL  */
-  YYSYMBOL_LET = 15,                       /* LET  */
-  YYSYMBOL_OPEN = 16,                      /* OPEN  */
-  YYSYMBOL_OPERATOR = 17,                  /* OPERATOR  */
-  YYSYMBOL_PRIVATE = 18,                   /* PRIVATE  */
-  YYSYMBOL_PRECEDENCEGROUP = 19,           /* PRECEDENCEGROUP  */
-  YYSYMBOL_PROTOCOL = 20,                  /* PROTOCOL  */
-  YYSYMBOL_PUBLIC = 21,                    /* PUBLIC  */
-  YYSYMBOL_RETHROWS = 22,                  /* RETHROWS  */
-  YYSYMBOL_STATIC = 23,                    /* STATIC  */
-  YYSYMBOL_STRUCT = 24,                    /* STRUCT  */
-  YYSYMBOL_SUBCRIPT = 25,                  /* SUBCRIPT  */
-  YYSYMBOL_TYPEALIAS = 26,                 /* TYPEALIAS  */
-  YYSYMBOL_FUNC = 27,                      /* FUNC  */
-  YYSYMBOL_VAR = 28,                       /* VAR  */
-  YYSYMBOL_BREAK = 29,                     /* BREAK  */
-  YYSYMBOL_CASE = 30,                      /* CASE  */
-  YYSYMBOL_CATCH = 31,                     /* CATCH  */
-  YYSYMBOL_CONTINUE = 32,                  /* CONTINUE  */
-  YYSYMBOL_DEFAULT = 33,                   /* DEFAULT  */
-  YYSYMBOL_DEFER = 34,                     /* DEFER  */
-  YYSYMBOL_LITERAL_FLOAT = 35,             /* LITERAL_FLOAT  */
-  YYSYMBOL_LITERAL_INT = 36,               /* LITERAL_INT  */
-  YYSYMBOL_LITERAL_STRING = 37,            /* LITERAL_STRING  */
-  YYSYMBOL_YYACCEPT = 38,                  /* $accept  */
-  YYSYMBOL_program = 39,                   /* program  */
-  YYSYMBOL_hi = 40,                        /* hi  */
-  YYSYMBOL_bye = 41                        /* bye  */
+  YYSYMBOL_LITERAL_FLOAT = 3,              /* LITERAL_FLOAT  */
+  YYSYMBOL_LITERAL_INT = 4,                /* LITERAL_INT  */
+  YYSYMBOL_LITERAL_STRING = 5,             /* LITERAL_STRING  */
+  YYSYMBOL_ID = 6,                         /* ID  */
+  YYSYMBOL_HI = 7,                         /* HI  */
+  YYSYMBOL_BYE = 8,                        /* BYE  */
+  YYSYMBOL_ASSOCIATED_TYPE = 9,            /* ASSOCIATED_TYPE  */
+  YYSYMBOL_CLASS = 10,                     /* CLASS  */
+  YYSYMBOL_DEINIT = 11,                    /* DEINIT  */
+  YYSYMBOL_ENUM = 12,                      /* ENUM  */
+  YYSYMBOL_EXTENSION = 13,                 /* EXTENSION  */
+  YYSYMBOL_FILEPRIVATE = 14,               /* FILEPRIVATE  */
+  YYSYMBOL_IMPORT = 15,                    /* IMPORT  */
+  YYSYMBOL_INIT = 16,                      /* INIT  */
+  YYSYMBOL_INOUT = 17,                     /* INOUT  */
+  YYSYMBOL_INTERNAL = 18,                  /* INTERNAL  */
+  YYSYMBOL_LET = 19,                       /* LET  */
+  YYSYMBOL_OPEN = 20,                      /* OPEN  */
+  YYSYMBOL_OPERATOR = 21,                  /* OPERATOR  */
+  YYSYMBOL_PRIVATE = 22,                   /* PRIVATE  */
+  YYSYMBOL_PRECEDENCEGROUP = 23,           /* PRECEDENCEGROUP  */
+  YYSYMBOL_PROTOCOL = 24,                  /* PROTOCOL  */
+  YYSYMBOL_PUBLIC = 25,                    /* PUBLIC  */
+  YYSYMBOL_RETHROWS = 26,                  /* RETHROWS  */
+  YYSYMBOL_STATIC = 27,                    /* STATIC  */
+  YYSYMBOL_STRUCT = 28,                    /* STRUCT  */
+  YYSYMBOL_SUBSCRIPT = 29,                 /* SUBSCRIPT  */
+  YYSYMBOL_TYPEALIAS = 30,                 /* TYPEALIAS  */
+  YYSYMBOL_FUNC = 31,                      /* FUNC  */
+  YYSYMBOL_VAR = 32,                       /* VAR  */
+  YYSYMBOL_BREAK = 33,                     /* BREAK  */
+  YYSYMBOL_CASE = 34,                      /* CASE  */
+  YYSYMBOL_CATCH = 35,                     /* CATCH  */
+  YYSYMBOL_CONTINUE = 36,                  /* CONTINUE  */
+  YYSYMBOL_DEFAULT = 37,                   /* DEFAULT  */
+  YYSYMBOL_DEFER = 38,                     /* DEFER  */
+  YYSYMBOL_DO = 39,                        /* DO  */
+  YYSYMBOL_ELSE = 40,                      /* ELSE  */
+  YYSYMBOL_FALLTHROUGH = 41,               /* FALLTHROUGH  */
+  YYSYMBOL_FOR = 42,                       /* FOR  */
+  YYSYMBOL_GUARD = 43,                     /* GUARD  */
+  YYSYMBOL_IF = 44,                        /* IF  */
+  YYSYMBOL_IN = 45,                        /* IN  */
+  YYSYMBOL_REPEAT = 46,                    /* REPEAT  */
+  YYSYMBOL_RETURN = 47,                    /* RETURN  */
+  YYSYMBOL_THROW = 48,                     /* THROW  */
+  YYSYMBOL_SWITCH = 49,                    /* SWITCH  */
+  YYSYMBOL_WHERE = 50,                     /* WHERE  */
+  YYSYMBOL_WHILE = 51,                     /* WHILE  */
+  YYSYMBOL_ANY = 52,                       /* ANY  */
+  YYSYMBOL_AS = 53,                        /* AS  */
+  YYSYMBOL_FALSE = 54,                     /* FALSE  */
+  YYSYMBOL_IS = 55,                        /* IS  */
+  YYSYMBOL_NIL = 56,                       /* NIL  */
+  YYSYMBOL_SELF = 57,                      /* SELF  */
+  YYSYMBOL_SELF_TYPE = 58,                 /* SELF_TYPE  */
+  YYSYMBOL_SUPER = 59,                     /* SUPER  */
+  YYSYMBOL_THROWS = 60,                    /* THROWS  */
+  YYSYMBOL_TRUE = 61,                      /* TRUE  */
+  YYSYMBOL_TRY = 62,                       /* TRY  */
+  YYSYMBOL_ASSOCIATIVITY = 63,             /* ASSOCIATIVITY  */
+  YYSYMBOL_CONVENIENCE = 64,               /* CONVENIENCE  */
+  YYSYMBOL_DIDSET = 65,                    /* DIDSET  */
+  YYSYMBOL_DYNAMIC = 66,                   /* DYNAMIC  */
+  YYSYMBOL_FINAL = 67,                     /* FINAL  */
+  YYSYMBOL_GET = 68,                       /* GET  */
+  YYSYMBOL_INDIRECT = 69,                  /* INDIRECT  */
+  YYSYMBOL_INFIX = 70,                     /* INFIX  */
+  YYSYMBOL_LAZY = 71,                      /* LAZY  */
+  YYSYMBOL_LEFT = 72,                      /* LEFT  */
+  YYSYMBOL_MUTATING = 73,                  /* MUTATING  */
+  YYSYMBOL_NONE = 74,                      /* NONE  */
+  YYSYMBOL_NONMUTATING = 75,               /* NONMUTATING  */
+  YYSYMBOL_OPTIONAL = 76,                  /* OPTIONAL  */
+  YYSYMBOL_OVERRIDE = 77,                  /* OVERRIDE  */
+  YYSYMBOL_POSTFIX = 78,                   /* POSTFIX  */
+  YYSYMBOL_PRECEDENCE = 79,                /* PRECEDENCE  */
+  YYSYMBOL_PREFIX = 80,                    /* PREFIX  */
+  YYSYMBOL_PROTOCOL_UPPERCASE = 81,        /* PROTOCOL_UPPERCASE  */
+  YYSYMBOL_REQUIRED = 82,                  /* REQUIRED  */
+  YYSYMBOL_RIGHT = 83,                     /* RIGHT  */
+  YYSYMBOL_SET = 84,                       /* SET  */
+  YYSYMBOL_SOME = 85,                      /* SOME  */
+  YYSYMBOL_TYPE = 86,                      /* TYPE  */
+  YYSYMBOL_UNOWNED = 87,                   /* UNOWNED  */
+  YYSYMBOL_WEAK = 88,                      /* WEAK  */
+  YYSYMBOL_WILLSET = 89,                   /* WILLSET  */
+  YYSYMBOL_HASH_AVAILABLE = 90,            /* HASH_AVAILABLE  */
+  YYSYMBOL_HASH_COLORLITERAL = 91,         /* HASH_COLORLITERAL  */
+  YYSYMBOL_HASH_COLUMN = 92,               /* HASH_COLUMN  */
+  YYSYMBOL_HASH_DSOHANDLE = 93,            /* HASH_DSOHANDLE  */
+  YYSYMBOL_HASH_ELSEIF = 94,               /* HASH_ELSEIF  */
+  YYSYMBOL_HASH_ELSE = 95,                 /* HASH_ELSE  */
+  YYSYMBOL_HASH_ENDIF = 96,                /* HASH_ENDIF  */
+  YYSYMBOL_HASH_ERROR = 97,                /* HASH_ERROR  */
+  YYSYMBOL_HASH_FILEID = 98,               /* HASH_FILEID  */
+  YYSYMBOL_HASH_FILELITERAL = 99,          /* HASH_FILELITERAL  */
+  YYSYMBOL_HASH_FILEPATH = 100,            /* HASH_FILEPATH  */
+  YYSYMBOL_HASH_FILE = 101,                /* HASH_FILE  */
+  YYSYMBOL_HASH_FUNCTION = 102,            /* HASH_FUNCTION  */
+  YYSYMBOL_HASH_IF = 103,                  /* HASH_IF  */
+  YYSYMBOL_HASH_IMAGELITERAL = 104,        /* HASH_IMAGELITERAL  */
+  YYSYMBOL_HASH_KEYPATH = 105,             /* HASH_KEYPATH  */
+  YYSYMBOL_HASH_LINE = 106,                /* HASH_LINE  */
+  YYSYMBOL_HASH_SELECTOR = 107,            /* HASH_SELECTOR  */
+  YYSYMBOL_HASH_SOURCELOCATION = 108,      /* HASH_SOURCELOCATION  */
+  YYSYMBOL_HASH_WARNING = 109,             /* HASH_WARNING  */
+  YYSYMBOL_OP_PLUS_ASSIGN = 110,           /* OP_PLUS_ASSIGN  */
+  YYSYMBOL_OP_MINUS_ASSIGN = 111,          /* OP_MINUS_ASSIGN  */
+  YYSYMBOL_OP_DIV_ASSIGN = 112,            /* OP_DIV_ASSIGN  */
+  YYSYMBOL_OP_MUL_ASSIGN = 113,            /* OP_MUL_ASSIGN  */
+  YYSYMBOL_OP_MOD_ASSIGN = 114,            /* OP_MOD_ASSIGN  */
+  YYSYMBOL_OP_LSHIFT = 115,                /* OP_LSHIFT  */
+  YYSYMBOL_OP_RSHIFT = 116,                /* OP_RSHIFT  */
+  YYSYMBOL_OP_BIT_AND = 117,               /* OP_BIT_AND  */
+  YYSYMBOL_OP_BIT_OR = 118,                /* OP_BIT_OR  */
+  YYSYMBOL_OP_BIT_XOR = 119,               /* OP_BIT_XOR  */
+  YYSYMBOL_OP_BIT_NOT = 120,               /* OP_BIT_NOT  */
+  YYSYMBOL_OP_LT = 121,                    /* OP_LT  */
+  YYSYMBOL_OP_GT = 122,                    /* OP_GT  */
+  YYSYMBOL_OP_EQ = 123,                    /* OP_EQ  */
+  YYSYMBOL_OP_LTE = 124,                   /* OP_LTE  */
+  YYSYMBOL_OP_GTE = 125,                   /* OP_GTE  */
+  YYSYMBOL_OP_NEQ = 126,                   /* OP_NEQ  */
+  YYSYMBOL_OP_LOG_AND = 127,               /* OP_LOG_AND  */
+  YYSYMBOL_OP_LOG_OR = 128,                /* OP_LOG_OR  */
+  YYSYMBOL_OP_NIL_COALESCE = 129,          /* OP_NIL_COALESCE  */
+  YYSYMBOL_OP_INC = 130,                   /* OP_INC  */
+  YYSYMBOL_OP_DEC = 131,                   /* OP_DEC  */
+  YYSYMBOL_OP_DOT = 132,                   /* OP_DOT  */
+  YYSYMBOL_OP_CLOSED_RANGE = 133,          /* OP_CLOSED_RANGE  */
+  YYSYMBOL_OP_HALF_OPEN_RANGE = 134,       /* OP_HALF_OPEN_RANGE  */
+  YYSYMBOL_OP_TERNARY = 135,               /* OP_TERNARY  */
+  YYSYMBOL_OP_COLON = 136,                 /* OP_COLON  */
+  YYSYMBOL_OP_FUNC_RETURN = 137,           /* OP_FUNC_RETURN  */
+  YYSYMBOL_TYPE_BOOL = 138,                /* TYPE_BOOL  */
+  YYSYMBOL_TYPE_STRING = 139,              /* TYPE_STRING  */
+  YYSYMBOL_TYPE_CHARACTER = 140,           /* TYPE_CHARACTER  */
+  YYSYMBOL_TYPE_INT8 = 141,                /* TYPE_INT8  */
+  YYSYMBOL_TYPE_INT16 = 142,               /* TYPE_INT16  */
+  YYSYMBOL_TYPE_INT32 = 143,               /* TYPE_INT32  */
+  YYSYMBOL_TYPE_INT64 = 144,               /* TYPE_INT64  */
+  YYSYMBOL_TYPE_INT = 145,                 /* TYPE_INT  */
+  YYSYMBOL_TYPE_UINT8 = 146,               /* TYPE_UINT8  */
+  YYSYMBOL_TYPE_UINT16 = 147,              /* TYPE_UINT16  */
+  YYSYMBOL_TYPE_UINT32 = 148,              /* TYPE_UINT32  */
+  YYSYMBOL_TYPE_UINT64 = 149,              /* TYPE_UINT64  */
+  YYSYMBOL_TYPE_UINT = 150,                /* TYPE_UINT  */
+  YYSYMBOL_TYPE_FLOAT = 151,               /* TYPE_FLOAT  */
+  YYSYMBOL_TYPE_FLOAT80 = 152,             /* TYPE_FLOAT80  */
+  YYSYMBOL_TYPE_DOUBLE = 153,              /* TYPE_DOUBLE  */
+  YYSYMBOL_NEWLINE = 154,                  /* NEWLINE  */
+  YYSYMBOL_YYACCEPT = 155,                 /* $accept  */
+  YYSYMBOL_program = 156,                  /* program  */
+  YYSYMBOL_hi = 157,                       /* hi  */
+  YYSYMBOL_bye = 158                       /* bye  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -476,7 +593,7 @@ union yyalloc
 #define YYLAST   2
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  38
+#define YYNTOKENS  155
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  4
 /* YYNRULES -- Number of rules.  */
@@ -485,7 +602,7 @@ union yyalloc
 #define YYNSTATES  7
 
 /* YYMAXUTOK -- Last valid token kind.  */
-#define YYMAXUTOK   292
+#define YYMAXUTOK   409
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
@@ -497,7 +614,7 @@ union yyalloc
 
 /* YYTRANSLATE[TOKEN-NUM] -- Symbol number corresponding to TOKEN-NUM
    as returned by yylex.  */
-static const yytype_int8 yytranslate[] =
+static const yytype_uint8 yytranslate[] =
 {
        0,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -528,14 +645,25 @@ static const yytype_int8 yytranslate[] =
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
       25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
-      35,    36,    37
+      35,    36,    37,    38,    39,    40,    41,    42,    43,    44,
+      45,    46,    47,    48,    49,    50,    51,    52,    53,    54,
+      55,    56,    57,    58,    59,    60,    61,    62,    63,    64,
+      65,    66,    67,    68,    69,    70,    71,    72,    73,    74,
+      75,    76,    77,    78,    79,    80,    81,    82,    83,    84,
+      85,    86,    87,    88,    89,    90,    91,    92,    93,    94,
+      95,    96,    97,    98,    99,   100,   101,   102,   103,   104,
+     105,   106,   107,   108,   109,   110,   111,   112,   113,   114,
+     115,   116,   117,   118,   119,   120,   121,   122,   123,   124,
+     125,   126,   127,   128,   129,   130,   131,   132,   133,   134,
+     135,   136,   137,   138,   139,   140,   141,   142,   143,   144,
+     145,   146,   147,   148,   149,   150,   151,   152,   153,   154
 };
 
 #if YYDEBUG
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    34,    34,    38,    41
+       0,    84,    84,    88,    91
 };
 #endif
 
@@ -551,13 +679,35 @@ static const char *yysymbol_name (yysymbol_kind_t yysymbol) YY_ATTRIBUTE_UNUSED;
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-  "\"end of file\"", "error", "\"invalid token\"", "HI", "BYE",
-  "ASSOCIATED_TYPE", "CLASS", "DEINIT", "ENUM", "EXTENSION", "FILEPRIVATE",
-  "IMPORT", "INIT", "INOUT", "INTERNAL", "LET", "OPEN", "OPERATOR",
-  "PRIVATE", "PRECEDENCEGROUP", "PROTOCOL", "PUBLIC", "RETHROWS", "STATIC",
-  "STRUCT", "SUBCRIPT", "TYPEALIAS", "FUNC", "VAR", "BREAK", "CASE",
-  "CATCH", "CONTINUE", "DEFAULT", "DEFER", "LITERAL_FLOAT", "LITERAL_INT",
-  "LITERAL_STRING", "$accept", "program", "hi", "bye", YY_NULLPTR
+  "\"end of file\"", "error", "\"invalid token\"", "LITERAL_FLOAT",
+  "LITERAL_INT", "LITERAL_STRING", "ID", "HI", "BYE", "ASSOCIATED_TYPE",
+  "CLASS", "DEINIT", "ENUM", "EXTENSION", "FILEPRIVATE", "IMPORT", "INIT",
+  "INOUT", "INTERNAL", "LET", "OPEN", "OPERATOR", "PRIVATE",
+  "PRECEDENCEGROUP", "PROTOCOL", "PUBLIC", "RETHROWS", "STATIC", "STRUCT",
+  "SUBSCRIPT", "TYPEALIAS", "FUNC", "VAR", "BREAK", "CASE", "CATCH",
+  "CONTINUE", "DEFAULT", "DEFER", "DO", "ELSE", "FALLTHROUGH", "FOR",
+  "GUARD", "IF", "IN", "REPEAT", "RETURN", "THROW", "SWITCH", "WHERE",
+  "WHILE", "ANY", "AS", "FALSE", "IS", "NIL", "SELF", "SELF_TYPE", "SUPER",
+  "THROWS", "TRUE", "TRY", "ASSOCIATIVITY", "CONVENIENCE", "DIDSET",
+  "DYNAMIC", "FINAL", "GET", "INDIRECT", "INFIX", "LAZY", "LEFT",
+  "MUTATING", "NONE", "NONMUTATING", "OPTIONAL", "OVERRIDE", "POSTFIX",
+  "PRECEDENCE", "PREFIX", "PROTOCOL_UPPERCASE", "REQUIRED", "RIGHT", "SET",
+  "SOME", "TYPE", "UNOWNED", "WEAK", "WILLSET", "HASH_AVAILABLE",
+  "HASH_COLORLITERAL", "HASH_COLUMN", "HASH_DSOHANDLE", "HASH_ELSEIF",
+  "HASH_ELSE", "HASH_ENDIF", "HASH_ERROR", "HASH_FILEID",
+  "HASH_FILELITERAL", "HASH_FILEPATH", "HASH_FILE", "HASH_FUNCTION",
+  "HASH_IF", "HASH_IMAGELITERAL", "HASH_KEYPATH", "HASH_LINE",
+  "HASH_SELECTOR", "HASH_SOURCELOCATION", "HASH_WARNING", "OP_PLUS_ASSIGN",
+  "OP_MINUS_ASSIGN", "OP_DIV_ASSIGN", "OP_MUL_ASSIGN", "OP_MOD_ASSIGN",
+  "OP_LSHIFT", "OP_RSHIFT", "OP_BIT_AND", "OP_BIT_OR", "OP_BIT_XOR",
+  "OP_BIT_NOT", "OP_LT", "OP_GT", "OP_EQ", "OP_LTE", "OP_GTE", "OP_NEQ",
+  "OP_LOG_AND", "OP_LOG_OR", "OP_NIL_COALESCE", "OP_INC", "OP_DEC",
+  "OP_DOT", "OP_CLOSED_RANGE", "OP_HALF_OPEN_RANGE", "OP_TERNARY",
+  "OP_COLON", "OP_FUNC_RETURN", "TYPE_BOOL", "TYPE_STRING",
+  "TYPE_CHARACTER", "TYPE_INT8", "TYPE_INT16", "TYPE_INT32", "TYPE_INT64",
+  "TYPE_INT", "TYPE_UINT8", "TYPE_UINT16", "TYPE_UINT32", "TYPE_UINT64",
+  "TYPE_UINT", "TYPE_FLOAT", "TYPE_FLOAT80", "TYPE_DOUBLE", "NEWLINE",
+  "$accept", "program", "hi", "bye", YY_NULLPTR
 };
 
 static const char *
@@ -567,7 +717,7 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 }
 #endif
 
-#define YYPACT_NINF (-4)
+#define YYPACT_NINF (-8)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -581,7 +731,7 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      -3,    -4,     1,    -2,    -4,    -4,    -4
+      -7,    -8,     1,    -6,    -8,    -8,    -8
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -595,7 +745,7 @@ static const yytype_int8 yydefact[] =
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-      -4,    -4,    -4,    -4
+      -8,    -8,    -8,    -8
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
@@ -614,20 +764,20 @@ static const yytype_int8 yytable[] =
 
 static const yytype_int8 yycheck[] =
 {
-       3,     0,     4
+       7,     0,     8
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
    state STATE-NUM.  */
-static const yytype_int8 yystos[] =
+static const yytype_uint8 yystos[] =
 {
-       0,     3,    39,    40,     0,     4,    41
+       0,     7,   156,   157,     0,     8,   158
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
-static const yytype_int8 yyr1[] =
+static const yytype_uint8 yyr1[] =
 {
-       0,    38,    39,    40,    41
+       0,   155,   156,   157,   158
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
@@ -1097,19 +1247,19 @@ yyreduce:
   switch (yyn)
     {
   case 3: /* hi: HI  */
-#line 38 "swift.y"
+#line 88 "swift.y"
                { printf("Hello World\n");   }
-#line 1103 "swift.tab.cpp"
+#line 1253 "swift.tab.cpp"
     break;
 
   case 4: /* bye: BYE  */
-#line 41 "swift.y"
+#line 91 "swift.y"
                { printf("Bye World\n"); exit(0); }
-#line 1109 "swift.tab.cpp"
+#line 1259 "swift.tab.cpp"
     break;
 
 
-#line 1113 "swift.tab.cpp"
+#line 1263 "swift.tab.cpp"
 
       default: break;
     }
@@ -1302,7 +1452,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 44 "swift.y"
+#line 94 "swift.y"
 
 
 int yyerror(const char *errormsg)

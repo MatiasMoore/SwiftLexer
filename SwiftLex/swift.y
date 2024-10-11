@@ -16,7 +16,8 @@
 
 %token<dval> LITERAL_FLOAT
 %token<ival> LITERAL_INT
-%token<std::string> LITERAL_STRING
+%token<strval> LITERAL_STRING
+%token<strval> ID
 
 %token 
 HI BYE ASSOCIATED_TYPE CLASS DEINIT 

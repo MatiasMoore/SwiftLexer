@@ -401,7 +401,11 @@ Double {cout << "Type Double: " << yytext << endl; return TYPE_DOUBLE;}
 	cout << "ERROR: Invalid character \"" <<  (yytext + strlen(yytext) - 1) << "\" in hexadecimal floatingpoint at line " << lineNumber << endl;
 }
 	
-[_a-zA-Z][_a-zA-Z0-9]* { cout << "Identifier: " << yytext << endl; }
+[_a-zA-Z][_a-zA-Z0-9]* { 
+	cout << "Identifier: " << yytext << endl; 
+	yylval.strval = _strdup(yytext);
+	return ID;
+}
 
 	/* TODO: DELETE THIS WHEN EVERYTHING IS DONE*/
 .|[^.] {}
