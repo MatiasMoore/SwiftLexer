@@ -1,0 +1,908 @@
+Terminals unused in grammar
+
+    HI
+    BYE
+    ASSOCIATED_TYPE
+    CLASS
+    DEINIT
+    ENUM
+    EXTENSION
+    FILEPRIVATE
+    IMPORT
+    INIT
+    INOUT
+    INTERNAL
+    OPEN
+    OPERATOR
+    PRIVATE
+    PRECEDENCEGROUP
+    PROTOCOL
+    PUBLIC
+    RETHROWS
+    STATIC
+    STRUCT
+    SUBSCRIPT
+    TYPEALIAS
+    FUNC
+    BREAK
+    CASE
+    CATCH
+    CONTINUE
+    DEFAULT
+    DEFER
+    DO
+    ELSE
+    FALLTHROUGH
+    FOR
+    GUARD
+    IF
+    IN
+    REPEAT
+    RETURN
+    THROW
+    SWITCH
+    WHERE
+    WHILE
+    ANY
+    AS
+    IS
+    NIL
+    SELF
+    SELF_TYPE
+    SUPER
+    THROWS
+    TRY
+    ASSOCIATIVITY
+    CONVENIENCE
+    DIDSET
+    DYNAMIC
+    FINAL
+    GET
+    INDIRECT
+    INFIX
+    LAZY
+    LEFT
+    MUTATING
+    NONE
+    NONMUTATING
+    OPTIONAL
+    OVERRIDE
+    POSTFIX
+    PRECEDENCE
+    PREFIX
+    PROTOCOL_UPPERCASE
+    REQUIRED
+    RIGHT
+    SET
+    SOME
+    TYPE
+    UNOWNED
+    WEAK
+    WILLSET
+    HASH_AVAILABLE
+    HASH_COLORLITERAL
+    HASH_COLUMN
+    HASH_DSOHANDLE
+    HASH_ELSEIF
+    HASH_ELSE
+    HASH_ENDIF
+    HASH_ERROR
+    HASH_FILEID
+    HASH_FILELITERAL
+    HASH_FILEPATH
+    HASH_FILE
+    HASH_FUNCTION
+    HASH_IF
+    HASH_IMAGELITERAL
+    HASH_KEYPATH
+    HASH_LINE
+    HASH_SELECTOR
+    HASH_SOURCELOCATION
+    HASH_WARNING
+    OP_PLUS_ASSIGN
+    OP_MINUS_ASSIGN
+    OP_DIV_ASSIGN
+    OP_MUL_ASSIGN
+    OP_MOD_ASSIGN
+    OP_LSHIFT
+    OP_RSHIFT
+    OP_EQ
+    OP_LTE
+    OP_GTE
+    OP_NEQ
+    OP_LOG_AND
+    OP_LOG_OR
+    OP_NIL_COALESCE
+    OP_INC
+    OP_DEC
+    OP_CLOSED_RANGE
+    OP_HALF_OPEN_RANGE
+    OP_FUNC_RETURN
+    NEWLINE
+
+
+State 51 conflicts: 1 shift/reduce
+State 52 conflicts: 1 shift/reduce
+State 53 conflicts: 1 shift/reduce
+State 55 conflicts: 1 shift/reduce
+
+
+Grammar
+
+    0 $accept: program $end
+
+    1 program: varDeclaration
+
+    2 type: TYPE_BOOL
+    3     | TYPE_STRING
+    4     | TYPE_CHARACTER
+    5     | TYPE_INT8
+    6     | TYPE_INT16
+    7     | TYPE_INT32
+    8     | TYPE_INT64
+    9     | TYPE_INT
+   10     | TYPE_UINT8
+   11     | TYPE_UINT16
+   12     | TYPE_UINT32
+   13     | TYPE_UINT64
+   14     | TYPE_UINT
+   15     | TYPE_FLOAT
+   16     | TYPE_FLOAT80
+   17     | TYPE_DOUBLE
+
+   18 varIdWithComma: ID ','
+
+   19 varIdWithCommaList: varIdWithComma
+   20                   | varIdWithCommaList varIdWithComma
+
+   21 varIdWithType: ID ':' type
+
+   22 varIdListWithType: varIdWithCommaList varIdWithType
+   23                  | varIdWithType
+
+   24 varList: varIdWithType '=' expr
+   25        | ID '=' expr
+   26        | varIdListWithType
+
+   27 varVarList: varList
+   28           | varVarList ',' varList
+
+   29 varDeclaration: VAR varVarList
+   30               | LET varVarList
+
+   31 expr: LITERAL_INT
+   32     | LITERAL_FLOAT
+   33     | LITERAL_STRING
+   34     | ID
+   35     | TRUE
+   36     | FALSE
+   37     | '~' expr
+   38     | '!' expr
+   39     | '-' expr
+   40     | expr '+' expr
+
+
+Terminals, with rules where they appear
+
+    $end (0) 0
+    '!' (33) 38
+    '+' (43) 40
+    ',' (44) 18 28
+    '-' (45) 39
+    ':' (58) 21
+    '=' (61) 24 25
+    '~' (126) 37
+    error (256)
+    LITERAL_FLOAT <dval> (258) 32
+    LITERAL_INT <ival> (259) 31
+    LITERAL_STRING <strval> (260) 33
+    ID <strval> (261) 18 21 25 34
+    HI (262)
+    BYE (263)
+    ASSOCIATED_TYPE (264)
+    CLASS (265)
+    DEINIT (266)
+    ENUM (267)
+    EXTENSION (268)
+    FILEPRIVATE (269)
+    IMPORT (270)
+    INIT (271)
+    INOUT (272)
+    INTERNAL (273)
+    LET (274) 30
+    OPEN (275)
+    OPERATOR (276)
+    PRIVATE (277)
+    PRECEDENCEGROUP (278)
+    PROTOCOL (279)
+    PUBLIC (280)
+    RETHROWS (281)
+    STATIC (282)
+    STRUCT (283)
+    SUBSCRIPT (284)
+    TYPEALIAS (285)
+    FUNC (286)
+    VAR (287) 29
+    BREAK (288)
+    CASE (289)
+    CATCH (290)
+    CONTINUE (291)
+    DEFAULT (292)
+    DEFER (293)
+    DO (294)
+    ELSE (295)
+    FALLTHROUGH (296)
+    FOR (297)
+    GUARD (298)
+    IF (299)
+    IN (300)
+    REPEAT (301)
+    RETURN (302)
+    THROW (303)
+    SWITCH (304)
+    WHERE (305)
+    WHILE (306)
+    ANY (307)
+    AS (308)
+    FALSE (309) 36
+    IS (310)
+    NIL (311)
+    SELF (312)
+    SELF_TYPE (313)
+    SUPER (314)
+    THROWS (315)
+    TRUE (316) 35
+    TRY (317)
+    ASSOCIATIVITY (318)
+    CONVENIENCE (319)
+    DIDSET (320)
+    DYNAMIC (321)
+    FINAL (322)
+    GET (323)
+    INDIRECT (324)
+    INFIX (325)
+    LAZY (326)
+    LEFT (327)
+    MUTATING (328)
+    NONE (329)
+    NONMUTATING (330)
+    OPTIONAL (331)
+    OVERRIDE (332)
+    POSTFIX (333)
+    PRECEDENCE (334)
+    PREFIX (335)
+    PROTOCOL_UPPERCASE (336)
+    REQUIRED (337)
+    RIGHT (338)
+    SET (339)
+    SOME (340)
+    TYPE (341)
+    UNOWNED (342)
+    WEAK (343)
+    WILLSET (344)
+    HASH_AVAILABLE (345)
+    HASH_COLORLITERAL (346)
+    HASH_COLUMN (347)
+    HASH_DSOHANDLE (348)
+    HASH_ELSEIF (349)
+    HASH_ELSE (350)
+    HASH_ENDIF (351)
+    HASH_ERROR (352)
+    HASH_FILEID (353)
+    HASH_FILELITERAL (354)
+    HASH_FILEPATH (355)
+    HASH_FILE (356)
+    HASH_FUNCTION (357)
+    HASH_IF (358)
+    HASH_IMAGELITERAL (359)
+    HASH_KEYPATH (360)
+    HASH_LINE (361)
+    HASH_SELECTOR (362)
+    HASH_SOURCELOCATION (363)
+    HASH_WARNING (364)
+    OP_PLUS_ASSIGN (365)
+    OP_MINUS_ASSIGN (366)
+    OP_DIV_ASSIGN (367)
+    OP_MUL_ASSIGN (368)
+    OP_MOD_ASSIGN (369)
+    OP_LSHIFT (370)
+    OP_RSHIFT (371)
+    OP_EQ (372)
+    OP_LTE (373)
+    OP_GTE (374)
+    OP_NEQ (375)
+    OP_LOG_AND (376)
+    OP_LOG_OR (377)
+    OP_NIL_COALESCE (378)
+    OP_INC (379)
+    OP_DEC (380)
+    OP_CLOSED_RANGE (381)
+    OP_HALF_OPEN_RANGE (382)
+    OP_FUNC_RETURN (383)
+    TYPE_BOOL (384) 2
+    TYPE_STRING (385) 3
+    TYPE_CHARACTER (386) 4
+    TYPE_INT8 (387) 5
+    TYPE_INT16 (388) 6
+    TYPE_INT32 (389) 7
+    TYPE_INT64 (390) 8
+    TYPE_INT (391) 9
+    TYPE_UINT8 (392) 10
+    TYPE_UINT16 (393) 11
+    TYPE_UINT32 (394) 12
+    TYPE_UINT64 (395) 13
+    TYPE_UINT (396) 14
+    TYPE_FLOAT (397) 15
+    TYPE_FLOAT80 (398) 16
+    TYPE_DOUBLE (399) 17
+    NEWLINE (400)
+
+
+Nonterminals, with rules where they appear
+
+    $accept (153)
+        on left: 0
+    program (154)
+        on left: 1
+        on right: 0
+    type (155)
+        on left: 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17
+        on right: 21
+    varIdWithComma (156)
+        on left: 18
+        on right: 19 20
+    varIdWithCommaList (157)
+        on left: 19 20
+        on right: 20 22
+    varIdWithType (158)
+        on left: 21
+        on right: 22 23 24
+    varIdListWithType (159)
+        on left: 22 23
+        on right: 26
+    varList (160)
+        on left: 24 25 26
+        on right: 27 28
+    varVarList (161)
+        on left: 27 28
+        on right: 28 29 30
+    varDeclaration (162)
+        on left: 29 30
+        on right: 1
+    expr (163)
+        on left: 31 32 33 34 35 36 37 38 39 40
+        on right: 24 25 37 38 39 40
+
+
+State 0
+
+    0 $accept: . program $end
+
+    LET  shift, and go to state 1
+    VAR  shift, and go to state 2
+
+    program         go to state 3
+    varDeclaration  go to state 4
+
+
+State 1
+
+   30 varDeclaration: LET . varVarList
+
+    ID  shift, and go to state 5
+
+    varIdWithComma      go to state 6
+    varIdWithCommaList  go to state 7
+    varIdWithType       go to state 8
+    varIdListWithType   go to state 9
+    varList             go to state 10
+    varVarList          go to state 11
+
+
+State 2
+
+   29 varDeclaration: VAR . varVarList
+
+    ID  shift, and go to state 5
+
+    varIdWithComma      go to state 6
+    varIdWithCommaList  go to state 7
+    varIdWithType       go to state 8
+    varIdListWithType   go to state 9
+    varList             go to state 10
+    varVarList          go to state 12
+
+
+State 3
+
+    0 $accept: program . $end
+
+    $end  shift, and go to state 13
+
+
+State 4
+
+    1 program: varDeclaration .
+
+    $default  reduce using rule 1 (program)
+
+
+State 5
+
+   18 varIdWithComma: ID . ','
+   21 varIdWithType: ID . ':' type
+   25 varList: ID . '=' expr
+
+    ','  shift, and go to state 14
+    ':'  shift, and go to state 15
+    '='  shift, and go to state 16
+
+
+State 6
+
+   19 varIdWithCommaList: varIdWithComma .
+
+    $default  reduce using rule 19 (varIdWithCommaList)
+
+
+State 7
+
+   20 varIdWithCommaList: varIdWithCommaList . varIdWithComma
+   22 varIdListWithType: varIdWithCommaList . varIdWithType
+
+    ID  shift, and go to state 17
+
+    varIdWithComma  go to state 18
+    varIdWithType   go to state 19
+
+
+State 8
+
+   23 varIdListWithType: varIdWithType .
+   24 varList: varIdWithType . '=' expr
+
+    '='  shift, and go to state 20
+
+    $default  reduce using rule 23 (varIdListWithType)
+
+
+State 9
+
+   26 varList: varIdListWithType .
+
+    $default  reduce using rule 26 (varList)
+
+
+State 10
+
+   27 varVarList: varList .
+
+    $default  reduce using rule 27 (varVarList)
+
+
+State 11
+
+   28 varVarList: varVarList . ',' varList
+   30 varDeclaration: LET varVarList .
+
+    ','  shift, and go to state 21
+
+    $default  reduce using rule 30 (varDeclaration)
+
+
+State 12
+
+   28 varVarList: varVarList . ',' varList
+   29 varDeclaration: VAR varVarList .
+
+    ','  shift, and go to state 21
+
+    $default  reduce using rule 29 (varDeclaration)
+
+
+State 13
+
+    0 $accept: program $end .
+
+    $default  accept
+
+
+State 14
+
+   18 varIdWithComma: ID ',' .
+
+    $default  reduce using rule 18 (varIdWithComma)
+
+
+State 15
+
+   21 varIdWithType: ID ':' . type
+
+    TYPE_BOOL       shift, and go to state 22
+    TYPE_STRING     shift, and go to state 23
+    TYPE_CHARACTER  shift, and go to state 24
+    TYPE_INT8       shift, and go to state 25
+    TYPE_INT16      shift, and go to state 26
+    TYPE_INT32      shift, and go to state 27
+    TYPE_INT64      shift, and go to state 28
+    TYPE_INT        shift, and go to state 29
+    TYPE_UINT8      shift, and go to state 30
+    TYPE_UINT16     shift, and go to state 31
+    TYPE_UINT32     shift, and go to state 32
+    TYPE_UINT64     shift, and go to state 33
+    TYPE_UINT       shift, and go to state 34
+    TYPE_FLOAT      shift, and go to state 35
+    TYPE_FLOAT80    shift, and go to state 36
+    TYPE_DOUBLE     shift, and go to state 37
+
+    type  go to state 38
+
+
+State 16
+
+   25 varList: ID '=' . expr
+
+    LITERAL_FLOAT   shift, and go to state 39
+    LITERAL_INT     shift, and go to state 40
+    LITERAL_STRING  shift, and go to state 41
+    ID              shift, and go to state 42
+    FALSE           shift, and go to state 43
+    TRUE            shift, and go to state 44
+    '~'             shift, and go to state 45
+    '!'             shift, and go to state 46
+    '-'             shift, and go to state 47
+
+    expr  go to state 48
+
+
+State 17
+
+   18 varIdWithComma: ID . ','
+   21 varIdWithType: ID . ':' type
+
+    ','  shift, and go to state 14
+    ':'  shift, and go to state 15
+
+
+State 18
+
+   20 varIdWithCommaList: varIdWithCommaList varIdWithComma .
+
+    $default  reduce using rule 20 (varIdWithCommaList)
+
+
+State 19
+
+   22 varIdListWithType: varIdWithCommaList varIdWithType .
+
+    $default  reduce using rule 22 (varIdListWithType)
+
+
+State 20
+
+   24 varList: varIdWithType '=' . expr
+
+    LITERAL_FLOAT   shift, and go to state 39
+    LITERAL_INT     shift, and go to state 40
+    LITERAL_STRING  shift, and go to state 41
+    ID              shift, and go to state 42
+    FALSE           shift, and go to state 43
+    TRUE            shift, and go to state 44
+    '~'             shift, and go to state 45
+    '!'             shift, and go to state 46
+    '-'             shift, and go to state 47
+
+    expr  go to state 49
+
+
+State 21
+
+   28 varVarList: varVarList ',' . varList
+
+    ID  shift, and go to state 5
+
+    varIdWithComma      go to state 6
+    varIdWithCommaList  go to state 7
+    varIdWithType       go to state 8
+    varIdListWithType   go to state 9
+    varList             go to state 50
+
+
+State 22
+
+    2 type: TYPE_BOOL .
+
+    $default  reduce using rule 2 (type)
+
+
+State 23
+
+    3 type: TYPE_STRING .
+
+    $default  reduce using rule 3 (type)
+
+
+State 24
+
+    4 type: TYPE_CHARACTER .
+
+    $default  reduce using rule 4 (type)
+
+
+State 25
+
+    5 type: TYPE_INT8 .
+
+    $default  reduce using rule 5 (type)
+
+
+State 26
+
+    6 type: TYPE_INT16 .
+
+    $default  reduce using rule 6 (type)
+
+
+State 27
+
+    7 type: TYPE_INT32 .
+
+    $default  reduce using rule 7 (type)
+
+
+State 28
+
+    8 type: TYPE_INT64 .
+
+    $default  reduce using rule 8 (type)
+
+
+State 29
+
+    9 type: TYPE_INT .
+
+    $default  reduce using rule 9 (type)
+
+
+State 30
+
+   10 type: TYPE_UINT8 .
+
+    $default  reduce using rule 10 (type)
+
+
+State 31
+
+   11 type: TYPE_UINT16 .
+
+    $default  reduce using rule 11 (type)
+
+
+State 32
+
+   12 type: TYPE_UINT32 .
+
+    $default  reduce using rule 12 (type)
+
+
+State 33
+
+   13 type: TYPE_UINT64 .
+
+    $default  reduce using rule 13 (type)
+
+
+State 34
+
+   14 type: TYPE_UINT .
+
+    $default  reduce using rule 14 (type)
+
+
+State 35
+
+   15 type: TYPE_FLOAT .
+
+    $default  reduce using rule 15 (type)
+
+
+State 36
+
+   16 type: TYPE_FLOAT80 .
+
+    $default  reduce using rule 16 (type)
+
+
+State 37
+
+   17 type: TYPE_DOUBLE .
+
+    $default  reduce using rule 17 (type)
+
+
+State 38
+
+   21 varIdWithType: ID ':' type .
+
+    $default  reduce using rule 21 (varIdWithType)
+
+
+State 39
+
+   32 expr: LITERAL_FLOAT .
+
+    $default  reduce using rule 32 (expr)
+
+
+State 40
+
+   31 expr: LITERAL_INT .
+
+    $default  reduce using rule 31 (expr)
+
+
+State 41
+
+   33 expr: LITERAL_STRING .
+
+    $default  reduce using rule 33 (expr)
+
+
+State 42
+
+   34 expr: ID .
+
+    $default  reduce using rule 34 (expr)
+
+
+State 43
+
+   36 expr: FALSE .
+
+    $default  reduce using rule 36 (expr)
+
+
+State 44
+
+   35 expr: TRUE .
+
+    $default  reduce using rule 35 (expr)
+
+
+State 45
+
+   37 expr: '~' . expr
+
+    LITERAL_FLOAT   shift, and go to state 39
+    LITERAL_INT     shift, and go to state 40
+    LITERAL_STRING  shift, and go to state 41
+    ID              shift, and go to state 42
+    FALSE           shift, and go to state 43
+    TRUE            shift, and go to state 44
+    '~'             shift, and go to state 45
+    '!'             shift, and go to state 46
+    '-'             shift, and go to state 47
+
+    expr  go to state 51
+
+
+State 46
+
+   38 expr: '!' . expr
+
+    LITERAL_FLOAT   shift, and go to state 39
+    LITERAL_INT     shift, and go to state 40
+    LITERAL_STRING  shift, and go to state 41
+    ID              shift, and go to state 42
+    FALSE           shift, and go to state 43
+    TRUE            shift, and go to state 44
+    '~'             shift, and go to state 45
+    '!'             shift, and go to state 46
+    '-'             shift, and go to state 47
+
+    expr  go to state 52
+
+
+State 47
+
+   39 expr: '-' . expr
+
+    LITERAL_FLOAT   shift, and go to state 39
+    LITERAL_INT     shift, and go to state 40
+    LITERAL_STRING  shift, and go to state 41
+    ID              shift, and go to state 42
+    FALSE           shift, and go to state 43
+    TRUE            shift, and go to state 44
+    '~'             shift, and go to state 45
+    '!'             shift, and go to state 46
+    '-'             shift, and go to state 47
+
+    expr  go to state 53
+
+
+State 48
+
+   25 varList: ID '=' expr .
+   40 expr: expr . '+' expr
+
+    '+'  shift, and go to state 54
+
+    $default  reduce using rule 25 (varList)
+
+
+State 49
+
+   24 varList: varIdWithType '=' expr .
+   40 expr: expr . '+' expr
+
+    '+'  shift, and go to state 54
+
+    $default  reduce using rule 24 (varList)
+
+
+State 50
+
+   28 varVarList: varVarList ',' varList .
+
+    $default  reduce using rule 28 (varVarList)
+
+
+State 51
+
+   37 expr: '~' expr .
+   40     | expr . '+' expr
+
+    '+'  shift, and go to state 54
+
+    '+'       [reduce using rule 37 (expr)]
+    $default  reduce using rule 37 (expr)
+
+
+State 52
+
+   38 expr: '!' expr .
+   40     | expr . '+' expr
+
+    '+'  shift, and go to state 54
+
+    '+'       [reduce using rule 38 (expr)]
+    $default  reduce using rule 38 (expr)
+
+
+State 53
+
+   39 expr: '-' expr .
+   40     | expr . '+' expr
+
+    '+'  shift, and go to state 54
+
+    '+'       [reduce using rule 39 (expr)]
+    $default  reduce using rule 39 (expr)
+
+
+State 54
+
+   40 expr: expr '+' . expr
+
+    LITERAL_FLOAT   shift, and go to state 39
+    LITERAL_INT     shift, and go to state 40
+    LITERAL_STRING  shift, and go to state 41
+    ID              shift, and go to state 42
+    FALSE           shift, and go to state 43
+    TRUE            shift, and go to state 44
+    '~'             shift, and go to state 45
+    '!'             shift, and go to state 46
+    '-'             shift, and go to state 47
+
+    expr  go to state 55
+
+
+State 55
+
+   40 expr: expr . '+' expr
+   40     | expr '+' expr .
+
+    '+'  shift, and go to state 54
+
+    '+'       [reduce using rule 40 (expr)]
+    $default  reduce using rule 40 (expr)

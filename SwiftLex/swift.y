@@ -61,14 +61,11 @@ HASH_SOURCELOCATION HASH_WARNING
 
 OP_PLUS_ASSIGN OP_MINUS_ASSIGN OP_DIV_ASSIGN  
 OP_MUL_ASSIGN OP_MOD_ASSIGN OP_LSHIFT  
-OP_RSHIFT OP_BIT_AND OP_BIT_OR  
-OP_BIT_XOR OP_BIT_NOT OP_LT  
-OP_GT OP_EQ OP_LTE  
+OP_RSHIFT OP_EQ OP_LTE  
 OP_GTE OP_NEQ OP_LOG_AND  
 OP_LOG_OR OP_NIL_COALESCE OP_INC  
-OP_DEC OP_DOT OP_CLOSED_RANGE  
-OP_HALF_OPEN_RANGE OP_TERNARY OP_COLON  
-OP_FUNC_RETURN
+OP_DEC OP_CLOSED_RANGE  
+OP_HALF_OPEN_RANGE OP_FUNC_RETURN
 
 TYPE_BOOL TYPE_STRING TYPE_CHARACTER  
 TYPE_INT8 TYPE_INT16 TYPE_INT32  
@@ -79,19 +76,125 @@ TYPE_DOUBLE
 
 NEWLINE
 
+%start program
+
 %%
 
-program:
-         hi bye
-        ;
+program: varDeclaration
+    ;
 
-hi:
-        HI     { printf("Hello World\n");   }
-        ;
-bye:
-        BYE    { printf("Bye World\n"); exit(0); }
-         ;
 
+type: TYPE_BOOL
+    | TYPE_STRING
+    | TYPE_CHARACTER
+    | TYPE_INT8
+    | TYPE_INT16
+    | TYPE_INT32
+    | TYPE_INT64
+    | TYPE_INT
+    | TYPE_UINT8
+    | TYPE_UINT16
+    | TYPE_UINT32
+    | TYPE_UINT64
+    | TYPE_UINT
+    | TYPE_FLOAT
+    | TYPE_FLOAT80
+    | TYPE_DOUBLE
+    ;
+
+    /*
+Grammar of a statement
+
+statement -> expression ;?
+statement -> declaration ;?
+statement -> loop-statement ;?
+statement -> branch-statement ;?
+statement -> labeled-statement ;?
+statement -> control-transfer-statement ;?
+statement -> defer-statement ;?
+statement -> do-statement ;?
+statement -> compiler-control-statement
+statements -> statement statements?
+    */
+    /*
+newLineE: NEWLINE {printf("P: newLineE actual new line\n");}
+    | %empty {printf("P: newLineE just empty\n");}
+    ;
+
+newLineEList: newLineE {printf("P: newLineEList\n");}
+    | newLineEList newLineE {printf("P: newLineEList\n");}
+    ;
+    */
+varIdWithComma: ID ',' {printf("P: varIdWithComma\n");}
+    ;
+
+varIdWithCommaList: varIdWithComma
+    | varIdWithCommaList varIdWithComma
+    ;
+
+varIdWithType: ID ':' type {printf("P: varIdWithType\n");}
+    ;
+       
+varIdListWithType: varIdWithCommaList varIdWithType {printf("P: varIdListWithType\n");}
+    | varIdWithType {printf("P: varIdListWithType\n");}
+    ;
+            
+varList: varIdWithType '=' expr {printf("P: varList\n");}
+    | ID '=' expr {printf("P: varList\n");}
+    | varIdListWithType {printf("P: varList\n");}
+    ;
+
+varVarList: varList
+    | varVarList ',' varList
+    ;
+        
+varDeclaration: VAR varVarList {printf("P: varDeclaration\n");}
+    | LET varVarList {printf("P: varDeclaration\n");}
+    ;
+
+expr: LITERAL_INT
+    | LITERAL_FLOAT
+    | LITERAL_STRING
+    | ID
+    | TRUE
+    | FALSE
+    | '~' expr
+    | '!' expr
+    | '-' expr
+    | expr '+' expr
+    /*
+    | expr '-' expr
+    | expr '/' expr
+    | expr '*' expr
+    | expr '%' expr
+    | expr '<' expr
+    | expr '>' expr
+    | expr OP_EQ expr
+    | expr OP_NEQ expr
+    | expr '&' expr
+    | expr '|' expr
+    | expr '^' expr
+    | expr '<' expr
+    | expr '>' expr
+    | expr OP_LTE expr
+    | expr OP_LOG_AND expr
+    | expr OP_LOG_OR expr
+    | expr OP_LSHIFT expr
+    | expr OP_RSHIFT expr
+    | expr OP_CLOSED_RANGE expr
+    | expr OP_HALF_OPEN_RANGE expr
+    | expr OP_NIL_COALESCE expr
+    | expr IS type
+    | expr AS type
+    | expr AS '?' type
+    | expr AS '!' type
+    | expr '?' expr ':' expr
+    | '(' expr ')'
+    */
+    //function call result
+    //field access using dot
+    //array access
+    ;
 %%
 
 int yyerror(const char *errormsg)

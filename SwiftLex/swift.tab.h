@@ -168,44 +168,35 @@ extern int yydebug;
     OP_MOD_ASSIGN = 369,           /* OP_MOD_ASSIGN  */
     OP_LSHIFT = 370,               /* OP_LSHIFT  */
     OP_RSHIFT = 371,               /* OP_RSHIFT  */
-    OP_BIT_AND = 372,              /* OP_BIT_AND  */
-    OP_BIT_OR = 373,               /* OP_BIT_OR  */
-    OP_BIT_XOR = 374,              /* OP_BIT_XOR  */
-    OP_BIT_NOT = 375,              /* OP_BIT_NOT  */
-    OP_LT = 376,                   /* OP_LT  */
-    OP_GT = 377,                   /* OP_GT  */
-    OP_EQ = 378,                   /* OP_EQ  */
-    OP_LTE = 379,                  /* OP_LTE  */
-    OP_GTE = 380,                  /* OP_GTE  */
-    OP_NEQ = 381,                  /* OP_NEQ  */
-    OP_LOG_AND = 382,              /* OP_LOG_AND  */
-    OP_LOG_OR = 383,               /* OP_LOG_OR  */
-    OP_NIL_COALESCE = 384,         /* OP_NIL_COALESCE  */
-    OP_INC = 385,                  /* OP_INC  */
-    OP_DEC = 386,                  /* OP_DEC  */
-    OP_DOT = 387,                  /* OP_DOT  */
-    OP_CLOSED_RANGE = 388,         /* OP_CLOSED_RANGE  */
-    OP_HALF_OPEN_RANGE = 389,      /* OP_HALF_OPEN_RANGE  */
-    OP_TERNARY = 390,              /* OP_TERNARY  */
-    OP_COLON = 391,                /* OP_COLON  */
-    OP_FUNC_RETURN = 392,          /* OP_FUNC_RETURN  */
-    TYPE_BOOL = 393,               /* TYPE_BOOL  */
-    TYPE_STRING = 394,             /* TYPE_STRING  */
-    TYPE_CHARACTER = 395,          /* TYPE_CHARACTER  */
-    TYPE_INT8 = 396,               /* TYPE_INT8  */
-    TYPE_INT16 = 397,              /* TYPE_INT16  */
-    TYPE_INT32 = 398,              /* TYPE_INT32  */
-    TYPE_INT64 = 399,              /* TYPE_INT64  */
-    TYPE_INT = 400,                /* TYPE_INT  */
-    TYPE_UINT8 = 401,              /* TYPE_UINT8  */
-    TYPE_UINT16 = 402,             /* TYPE_UINT16  */
-    TYPE_UINT32 = 403,             /* TYPE_UINT32  */
-    TYPE_UINT64 = 404,             /* TYPE_UINT64  */
-    TYPE_UINT = 405,               /* TYPE_UINT  */
-    TYPE_FLOAT = 406,              /* TYPE_FLOAT  */
-    TYPE_FLOAT80 = 407,            /* TYPE_FLOAT80  */
-    TYPE_DOUBLE = 408,             /* TYPE_DOUBLE  */
-    NEWLINE = 409                  /* NEWLINE  */
+    OP_EQ = 372,                   /* OP_EQ  */
+    OP_LTE = 373,                  /* OP_LTE  */
+    OP_GTE = 374,                  /* OP_GTE  */
+    OP_NEQ = 375,                  /* OP_NEQ  */
+    OP_LOG_AND = 376,              /* OP_LOG_AND  */
+    OP_LOG_OR = 377,               /* OP_LOG_OR  */
+    OP_NIL_COALESCE = 378,         /* OP_NIL_COALESCE  */
+    OP_INC = 379,                  /* OP_INC  */
+    OP_DEC = 380,                  /* OP_DEC  */
+    OP_CLOSED_RANGE = 381,         /* OP_CLOSED_RANGE  */
+    OP_HALF_OPEN_RANGE = 382,      /* OP_HALF_OPEN_RANGE  */
+    OP_FUNC_RETURN = 383,          /* OP_FUNC_RETURN  */
+    TYPE_BOOL = 384,               /* TYPE_BOOL  */
+    TYPE_STRING = 385,             /* TYPE_STRING  */
+    TYPE_CHARACTER = 386,          /* TYPE_CHARACTER  */
+    TYPE_INT8 = 387,               /* TYPE_INT8  */
+    TYPE_INT16 = 388,              /* TYPE_INT16  */
+    TYPE_INT32 = 389,              /* TYPE_INT32  */
+    TYPE_INT64 = 390,              /* TYPE_INT64  */
+    TYPE_INT = 391,                /* TYPE_INT  */
+    TYPE_UINT8 = 392,              /* TYPE_UINT8  */
+    TYPE_UINT16 = 393,             /* TYPE_UINT16  */
+    TYPE_UINT32 = 394,             /* TYPE_UINT32  */
+    TYPE_UINT64 = 395,             /* TYPE_UINT64  */
+    TYPE_UINT = 396,               /* TYPE_UINT  */
+    TYPE_FLOAT = 397,              /* TYPE_FLOAT  */
+    TYPE_FLOAT80 = 398,            /* TYPE_FLOAT80  */
+    TYPE_DOUBLE = 399,             /* TYPE_DOUBLE  */
+    NEWLINE = 400                  /* NEWLINE  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -214,14 +205,14 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 10 "swift.y"
+#line 11 "swift.y"
 
 	int ival;
 	float fval;
 	double dval;
     char* strval;
 
-#line 225 "swift.tab.h"
+#line 216 "swift.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

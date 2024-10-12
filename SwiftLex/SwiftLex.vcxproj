@@ -135,6 +135,9 @@
     <PostBuildEvent>
       <Command>copy /b main.cpp +,,</Command>
     </PostBuildEvent>
+    <Bison>
+      <Verbose>true</Verbose>
+    </Bison>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
