@@ -76,11 +76,27 @@ TYPE_DOUBLE
 
 NEWLINE
 
+%right '?' ':' 
+%right OP_NIL_COALESCE
+%left OP_LOG_OR
+%left OP_LOG_AND
+%left '|'
+%left '^'
+%left '&'
+%nonassoc OP_EQ OP_NEQ 
+%nonassoc '<' '>' OP_LTE OP_GTE OP_RSHIFT OP_LSHIFT
+%left OP_CLOSED_RANGE OP_HALF_OPEN_RANGE
+%left '+' '-'
+%left '*' '/' '%'
+%right '~' '!'
+%nonassoc IS AS
+%right '(' ')'
+
 %start program
 
 %%
 
-program: varDeclaration
+program: expr
     ;
 
 
@@ -162,21 +178,19 @@ expr: LITERAL_INT
     | '!' expr
     | '-' expr
     | expr '+' expr
-    /*
     | expr '-' expr
     | expr '/' expr
     | expr '*' expr
     | expr '%' expr
     | expr '<' expr
     | expr '>' expr
+    | expr OP_GTE expr
+    | expr OP_LTE expr
     | expr OP_EQ expr
     | expr OP_NEQ expr
     | expr '&' expr
     | expr '|' expr
     | expr '^' expr
-    | expr '<' expr
-    | expr '>' expr
-    | expr OP_LTE expr
     | expr OP_LOG_AND expr
     | expr OP_LOG_OR expr
     | expr OP_LSHIFT expr
@@ -190,7 +204,6 @@ expr: LITERAL_INT
     | expr AS '!' type
     | expr '?' expr ':' expr
     | '(' expr ')'
-    */
     //function call result
     //field access using dot
     //array access
