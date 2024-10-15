@@ -241,7 +241,7 @@ Double {cout << "Type Double: " << yytext << endl; return TYPE_DOUBLE;}
 <COMMENT_MULTILINE><<EOF>> {cout << "ERROR: Multiline comment at line " << multilineNumberBegin << ": is not closed" << endl; BEGIN(INITIAL); }
 
 	/* LINE COUNTER */
-\n {lineNumber++; return NEWLINE;}
+\n {lineNumber++;}
 
 	/* STATEMENT_DELIMITER */
 \; {cout << "Statement delimiter: " << yytext << endl; return ';';}

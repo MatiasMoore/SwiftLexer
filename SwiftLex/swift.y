@@ -75,8 +75,6 @@ TYPE_UINT16 TYPE_UINT32 TYPE_UINT64
 TYPE_UINT TYPE_FLOAT TYPE_FLOAT80  
 TYPE_DOUBLE
 
-NEWLINE
-
 %right '?' ':' 
 %right OP_NIL_COALESCE
 %left OP_LOG_OR
@@ -97,7 +95,7 @@ NEWLINE
 
 %%
 
-program: expr
+program: stmtList {printf("P: program");}
     ;
 
 
@@ -119,6 +117,20 @@ type: TYPE_BOOL
     | TYPE_DOUBLE
     ;
 
+stmt : varDeclaration {printf("P: stmt\n");}
+	;
+
+stmtList : stmt {printf("P: stmtList\n");}
+	| stmtList stmt {
+        if (@1.last_line == @2.first_line){
+            yyerror("Syntax error: two statements in one line must separated with a ';'");
+        }
+        else {
+			printf("P: stmtList\n");
+		}
+    }
+    | stmtList ';' stmt {printf("P: stmtList\n");}
+	;
     /*
 Grammar of a statement
 
@@ -133,15 +145,7 @@ statement -> do-statement ;?
 statement -> compiler-control-statement
 statements -> statement statements?
     */
-    /*
-newLineE: NEWLINE {printf("P: newLineE actual new line\n");}
-    | %empty {printf("P: newLineE just empty\n");}
-    ;
 
-newLineEList: newLineE {printf("P: newLineEList\n");}
-    | newLineEList newLineE {printf("P: newLineEList\n");}
-    ;
-    */
 varIdWithComma: ID ',' {printf("P: varIdWithComma\n");}
     ;
 
