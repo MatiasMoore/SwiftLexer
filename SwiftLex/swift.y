@@ -116,6 +116,9 @@ type: TYPE_BOOL
     | TYPE_DOUBLE
     ;
 
+stmt : varDeclaration {printf("P: stmt\n");}
+	;
+
     /*
 Grammar of a statement
 
