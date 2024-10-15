@@ -123,7 +123,7 @@ stmt : varDeclaration {printf("P: stmt\n");}
 stmtList : stmt {printf("P: stmtList\n");}
 	| stmtList stmt {
         if (@1.last_line == @2.first_line){
-            yyerror("Syntax error: two statements in one line must separated with a ';'");
+            yyerror("Syntax error: two statements in one line must be separated with a ';'");
         }
         else {
 			printf("P: stmtList\n");
