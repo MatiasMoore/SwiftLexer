@@ -94,7 +94,7 @@ TYPE_DOUBLE
 
 %%
 
-program: expr
+program: stmtList {printf("P: program");}
     ;
 
 
@@ -119,6 +119,17 @@ type: TYPE_BOOL
 stmt : varDeclaration {printf("P: stmt\n");}
 	;
 
+stmtList : stmt {printf("P: stmtList\n");}
+	| stmtList stmt {
+        if (@1.last_line == @2.first_line){
+            yyerror("Syntax error: two statements in one line must separated with a ';'");
+        }
+        else {
+			printf("P: stmtList\n");
+		}
+    }
+    | stmtList ';' stmt {printf("P: stmtList\n");}
+	;
     /*
 Grammar of a statement
 
