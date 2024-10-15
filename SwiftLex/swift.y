@@ -74,8 +74,6 @@ TYPE_UINT16 TYPE_UINT32 TYPE_UINT64
 TYPE_UINT TYPE_FLOAT TYPE_FLOAT80  
 TYPE_DOUBLE
 
-NEWLINE
-
 %right '?' ':' 
 %right OP_NIL_COALESCE
 %left OP_LOG_OR
@@ -132,15 +130,7 @@ statement -> do-statement ;?
 statement -> compiler-control-statement
 statements -> statement statements?
     */
-    /*
-newLineE: NEWLINE {printf("P: newLineE actual new line\n");}
-    | %empty {printf("P: newLineE just empty\n");}
-    ;
 
-newLineEList: newLineE {printf("P: newLineEList\n");}
-    | newLineEList newLineE {printf("P: newLineEList\n");}
-    ;
-    */
 varIdWithComma: ID ',' {printf("P: varIdWithComma\n");}
     ;
 
