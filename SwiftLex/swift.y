@@ -14,6 +14,7 @@
 	double dval;
     char* strval;
 }
+%locations
 
 %token<dval> LITERAL_FLOAT
 %token<ival> LITERAL_INT

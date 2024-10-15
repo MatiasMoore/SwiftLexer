@@ -1,5 +1,6 @@
 %option noyywrap
 %option never-interactive
+%option yylineno
 
 %x COMMENT_MULTILINE
 %x STRING_MULTILINE
@@ -22,6 +23,7 @@ using namespace std;
 
 	// FUNCTIONS
 void removeChar(std::string& str, char charToRemove);
+#define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno;
 %}
 
 %%
