@@ -118,10 +118,11 @@ type: TYPE_BOOL
     | ID
     ;
 
-stmt : varDeclaration {printf("P: stmt\n");}
+stmt: varDeclaration {printf("P: stmt\n");}
+    | funcDeclaration {printf("P: stmt\n");}
 	;
 
-stmtList : stmt {printf("P: stmtList\n");}
+stmtList: stmt {printf("P: stmtList\n");}
 	| stmtList stmt {
         if (@1.last_line == @2.first_line){
             yyerror("Syntax error: two statements in one line must be separated with a ';'");
@@ -132,6 +133,11 @@ stmtList : stmt {printf("P: stmtList\n");}
     }
     | stmtList ';' stmt {printf("P: stmtList\n");}
 	;
+
+stmtListE: %empty
+    | stmtList
+    ;
+
     /*
 Grammar of a statement
 
@@ -146,6 +152,27 @@ statement -> do-statement ;?
 statement -> compiler-control-statement
 statements -> statement statements?
     */
+
+exprReturn: RETURN expr
+    ;
+
+funcArg: ID ':' type
+    ;
+
+funcArgList: funcArg
+    | funcArgList ',' funcArg
+    ;
+
+funcArgListE: %empty
+    | funcArgList
+    ;
+
+funcReturnType: OP_FUNC_RETURN type
+    ;
+
+funcDeclaration: FUNC ID '(' funcArgListE ')' funcReturnType '{' stmtListE exprReturn'}' {printf("P: func declaration with return\n");}
+    | FUNC ID '(' funcArgListE ')' '{' stmtListE '}' {printf("P: func declaration without return\n");}
+    ;
 
 varIdWithComma: ID ',' {printf("P: varIdWithComma\n");}
     ;
