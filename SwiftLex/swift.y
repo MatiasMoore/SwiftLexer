@@ -77,6 +77,7 @@ TYPE_UINT16 TYPE_UINT32 TYPE_UINT64
 TYPE_UINT TYPE_FLOAT TYPE_FLOAT80  
 TYPE_DOUBLE
 
+%left '='
 %right '?' ':' 
 %right OP_NIL_COALESCE
 %left OP_LOG_OR
@@ -87,10 +88,11 @@ TYPE_DOUBLE
 %nonassoc OP_EQ OP_NEQ 
 %nonassoc '<' '>' OP_LTE OP_GTE OP_RSHIFT OP_LSHIFT
 %left OP_CLOSED_RANGE OP_HALF_OPEN_RANGE
-%left '+' '-'
+%left BINARY_PLUS BINARY_MINUS
 %left '*' '/' '%'
 %right '~' '!'
 %nonassoc IS AS
+%left UNARY_PLUS UNARY_MINUS
 %right '(' ')'
 
 %start program
@@ -120,8 +122,14 @@ type: TYPE_BOOL
     | ID
     ;
 
-stmt: varDeclaration {printf("P: stmt\n");}
-    | funcDeclaration {printf("P: stmt\n");}
+semicolonE: %empty
+    | ';'
+    ;
+
+stmt: varDeclaration {printf("P: stmt varDec\n");}
+    | funcDeclaration {printf("P: stmt funcDec\n");}
+    | assignment {printf("P: stmt assignment\n");}
+    | expr {printf("P: stmt expr\n");}
 	;
 
 stmtList: stmt {printf("P: stmtList\n");}
@@ -176,6 +184,9 @@ funcDeclaration: FUNC ID '(' funcArgListE ')' funcReturnType '{' stmtListE exprR
     | FUNC ID '(' funcArgListE ')' '{' stmtListE '}' {printf("P: func declaration without return\n");}
     ;
 
+assignment: expr '=' expr {printf("P: assignment\n");}
+    ;
+
 varIdWithComma: ID ',' {printf("P: varIdWithComma\n");}
     ;
 
@@ -203,42 +214,43 @@ varDeclaration: VAR varVarList {printf("P: varDeclaration\n");}
     | LET varVarList {printf("P: varDeclaration\n");}
     ;
 
-expr: LITERAL_INT
-    | LITERAL_FLOAT
-    | LITERAL_STRING
-    | ID
-    | TRUE
-    | FALSE
-    | '~' expr
-    | '!' expr
-    | '-' expr
-    | expr '+' expr
-    | expr '-' expr
-    | expr '/' expr
-    | expr '*' expr
-    | expr '%' expr
-    | expr '<' expr
-    | expr '>' expr
-    | expr OP_GTE expr
-    | expr OP_LTE expr
-    | expr OP_EQ expr
-    | expr OP_NEQ expr
-    | expr '&' expr
-    | expr '|' expr
-    | expr '^' expr
-    | expr OP_LOG_AND expr
-    | expr OP_LOG_OR expr
-    | expr OP_LSHIFT expr
-    | expr OP_RSHIFT expr
-    | expr OP_CLOSED_RANGE expr
-    | expr OP_HALF_OPEN_RANGE expr
-    | expr OP_NIL_COALESCE expr
-    | expr IS type
-    | expr AS type
-    | expr AS '?' type
-    | expr AS '!' type
-    | expr '?' expr ':' expr
-    | '(' expr ')'
+expr: LITERAL_INT {printf("P: expr int\n");}
+    | LITERAL_FLOAT {printf("P: expr float\n");}
+    | LITERAL_STRING {printf("P: expr string\n");}
+    | ID {printf("P: expr ID\n");}
+    | TRUE {printf("P: expr TRUE\n");}
+    | FALSE {printf("P: expr FALSE\n");}
+    | '~' expr {printf("P: expr ~\n");}
+    | '!' expr {printf("P: expr !\n");}
+    | UNARY_MINUS expr {printf("P: expr unary -\n");}
+    | UNARY_PLUS expr {printf("P: expr unary -\n");}
+    | expr BINARY_PLUS expr {printf("P: expr +\n");}
+    | expr BINARY_MINUS expr {printf("P: expr -\n");}
+    | expr '/' expr {printf("P: expr /\n");}
+    | expr '*' expr {printf("P: expr *\n");}
+    | expr '%' expr {printf("P: expr %\n");}
+    | expr '<' expr {printf("P: expr <\n");}
+    | expr '>' expr {printf("P: expr >\n");}
+    | expr OP_GTE expr {printf("P: expr >=\n");}
+    | expr OP_LTE expr {printf("P: expr <=\n");}
+    | expr OP_EQ expr {printf("P: expr ==\n");}
+    | expr OP_NEQ expr {printf("P: expr !=\n");}
+    | expr '&' expr {printf("P: expr &\n");}
+    | expr '|' expr {printf("P: expr |\n");}
+    | expr '^' expr {printf("P: expr ^\n");}
+    | expr OP_LOG_AND expr {printf("P: expr &&\n");}
+    | expr OP_LOG_OR expr {printf("P: expr ||\n");}
+    | expr OP_LSHIFT expr {printf("P: expr <<\n");}
+    | expr OP_RSHIFT expr {printf("P: expr >>\n");}
+    | expr OP_CLOSED_RANGE expr {printf("P: expr ...\n");}
+    | expr OP_HALF_OPEN_RANGE expr {printf("P: expr ..<\n");}
+    | expr OP_NIL_COALESCE expr {printf("P: expr ??\n");}
+    | expr IS type {printf("P: expr is\n");}
+    | expr AS type {printf("P: expr as\n");}
+    | expr AS '?' type {printf("P: expr as ?\n");}
+    | expr AS '!' type {printf("P: expr as !\n");}
+    | expr '?' expr ':' expr {printf("P: expr ternary ? :\n");}
+    | '(' expr ')' {printf("P: expr brackets\n");}
     //function call result
     //field access using dot
     //array access
