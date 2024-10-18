@@ -95,7 +95,7 @@ TYPE_DOUBLE
 
 %%
 
-program: stmtList {printf("P: program");}
+program: stmtList {printf("P: program\n");}
     ;
 
 
