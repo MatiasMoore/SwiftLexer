@@ -13,6 +13,7 @@ INT_OCTAL 0o[0-7][_0-7]*
 INT_DECIMAL [0-9][_0-9]*
 INT_HEXADECIMAL 0x[0-9a-fA-F][_0-9a-fA-F]*
 ANTI_DELIM [^	() \[\]{};\-=+<>&|~!\^%\*\/\.,:\?\n]
+WHITESPACES [ \n	]
 
 %{
 #include <stdio.h>
@@ -154,9 +155,21 @@ willSet {cout << "Keyword willSet: " << yytext << endl; return WILLSET;}
 \#sourceLocation {cout << "Keyword #sourceLocation: " << yytext << endl; return HASH_SOURCELOCATION;}
 \#warning {cout << "Keyword #warning: " << yytext << endl; return HASH_WARNING;}
 
-\+ {cout << "Operator plus: " << yytext << endl; return '+';}
-\- {cout << "Operator subtraction: " << yytext << endl; return '-';}
-\/ {cout << "Operator division: " << yytext << endl; return '/';}
+{WHITESPACES}+\+ {cout << "Unary Operator plus: " << yytext << endl; return UNARY_PLUS;}
+\+{WHITESPACES}+ {cout << "ERROR: \'+\' is not a postfix unary operator: " << yytext << endl;}
+{WHITESPACES}+\+{WHITESPACES}+ {cout << "Binary whitespaces Operator plus: " << yytext << endl; return BINARY_PLUS;}
+\+ {cout << "Binary no whitespaces Operator plus: " << yytext << endl; return BINARY_PLUS;}
+
+{WHITESPACES}+\- {cout << "Unary Operator minus: " << yytext << endl; return UNARY_MINUS;}
+\-{WHITESPACES}+ {cout << "ERROR: \'-\' is not a postfix unary operator: " << yytext << endl;}
+{WHITESPACES}+\-{WHITESPACES}+ {cout << "Binary whitespaces Operator minus: " << yytext << endl; return BINARY_MINUS;}
+\- {cout << "Binary no whitespaces Operator minus: " << yytext << endl; return BINARY_MINUS;}
+
+{WHITESPACES}+\/ {cout << "ERROR: \'/\' is not a prefix unary operator: " << yytext << endl;}
+\/{WHITESPACES}+ {cout << "ERROR: \'/\' is not a postfix unary operator: " << yytext << endl;}
+{WHITESPACES}+\/{WHITESPACES}+ {cout << "Binary whitespaces Operator division: " << yytext << endl; return '/';}
+\/ {cout << "Binary no whitespaces Operator division: " << yytext << endl; return '/';}
+
 \* {cout << "Operator multiplication: " << yytext << endl; return '*';}
 \% {cout << "Operator modulus: " << yytext << endl; return '%';}
 
