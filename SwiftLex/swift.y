@@ -77,7 +77,7 @@ TYPE_UINT16 TYPE_UINT32 TYPE_UINT64
 TYPE_UINT TYPE_FLOAT TYPE_FLOAT80  
 TYPE_DOUBLE
 
-%left '='
+%left '=' ID
 %right '?' ':' 
 %right OP_NIL_COALESCE
 %left OP_LOG_OR
@@ -130,6 +130,7 @@ stmt: varDeclaration semicolonE {printf("P: stmt varDec\n");}
     | funcDeclaration semicolonE {printf("P: stmt funcDec\n");}
     | assignment semicolonE {printf("P: stmt assignment\n");}
     | expr semicolonE {printf("P: stmt expr\n");}
+    | funcCall semicolonE {printf("P: stmt funcCall\n");}
 	;
 
 stmtList: stmt {printf("P: stmtList\n");}
@@ -162,25 +163,49 @@ statement -> compiler-control-statement
 statements -> statement statements?
     */
 
-exprReturn: RETURN expr
+exprReturn: RETURN expr {printf("P: return\n");}
     ;
 
-funcArg: ID ':' type
+funcDeclArg: ID ':' type {printf("P: func arg with value\n");}
+    | ID ':' type '=' expr {printf("P: func arg with value\n");}
     ;
 
-funcArgList: funcArg
-    | funcArgList ',' funcArg
+funcDeclArgList: funcDeclArg {printf("P: funcDeclArgList\n");}
+    | funcDeclArgList ',' funcDeclArg {printf("P: funcDeclArgList\n");}
     ;
 
-funcArgListE: %empty
-    | funcArgList
+funcDeclArgListE: %empty
+    | funcDeclArgList
     ;
 
 funcReturnType: OP_FUNC_RETURN type
     ;
 
-funcDeclaration: FUNC ID '(' funcArgListE ')' funcReturnType '{' stmtListE exprReturn'}' {printf("P: func declaration with return\n");}
-    | FUNC ID '(' funcArgListE ')' '{' stmtListE '}' {printf("P: func declaration without return\n");}
+funcDeclaration: FUNC ID '(' funcDeclArgListE ')' funcReturnType '{' stmtListE exprReturn'}' {printf("P: func declaration with return\n");}
+    | FUNC ID '(' funcDeclArgListE ')' '{' stmtListE '}' {printf("P: func declaration without return\n");}
+    ;
+
+funcCallArg: ID ':' expr {printf("P: funcCallArg\n");}
+    ;
+
+funcCallArgList: funcCallArg {printf("P: funcCallArgList\n");}
+    | funcCallArgList ',' funcCallArg {printf("P: funcCallArgList\n");}
+    ;
+
+funcCallArgListE: %empty
+    | funcCallArgList
+    ;
+    
+exprList: expr {printf("P: exprList\n");}
+    | exprList ',' expr {printf("P: exprList\n");}
+    ;
+
+exprListE: %empty
+    | exprList
+    ;
+
+funcCall: ID '(' exprListE ')' {printf("P: funcCall exprList\n");}
+    | ID '(' funcCallArgList ')' {printf("P: funcCall labelArgs\n");}
     ;
 
 assignment: expr '=' expr {printf("P: assignment\n");}
