@@ -137,6 +137,7 @@
     </PostBuildEvent>
     <Bison>
       <Verbose>true</Verbose>
+      <AdditionalOptions>-Wcounterexamples %(AdditionalOptions)</AdditionalOptions>
     </Bison>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
