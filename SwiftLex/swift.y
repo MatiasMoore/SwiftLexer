@@ -126,10 +126,10 @@ semicolonE: %empty
     | ';'
     ;
 
-stmt: varDeclaration {printf("P: stmt varDec\n");}
-    | funcDeclaration {printf("P: stmt funcDec\n");}
-    | assignment {printf("P: stmt assignment\n");}
-    | expr {printf("P: stmt expr\n");}
+stmt: varDeclaration semicolonE {printf("P: stmt varDec\n");}
+    | funcDeclaration semicolonE {printf("P: stmt funcDec\n");}
+    | assignment semicolonE {printf("P: stmt assignment\n");}
+    | expr semicolonE {printf("P: stmt expr\n");}
 	;
 
 stmtList: stmt {printf("P: stmtList\n");}
@@ -141,7 +141,6 @@ stmtList: stmt {printf("P: stmtList\n");}
 			printf("P: stmtList\n");
 		}
     }
-    | stmtList ';' stmt {printf("P: stmtList\n");}
 	;
 
 stmtListE: %empty
