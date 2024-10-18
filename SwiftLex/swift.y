@@ -115,6 +115,7 @@ type: TYPE_BOOL
     | TYPE_FLOAT
     | TYPE_FLOAT80
     | TYPE_DOUBLE
+    | ID
     ;
 
 stmt : varDeclaration {printf("P: stmt\n");}
