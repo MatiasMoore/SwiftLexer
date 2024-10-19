@@ -60,7 +60,7 @@ HASH_FUNCTION HASH_IF HASH_IMAGELITERAL
 HASH_KEYPATH HASH_LINE HASH_SELECTOR  
 HASH_SOURCELOCATION HASH_WARNING
 
-BINARY_PLUS UNARY_PLUS BINARY_MINUS
+BINARY_MINUS
 UNARY_MINUS
 OP_PLUS_ASSIGN OP_MINUS_ASSIGN OP_DIV_ASSIGN  
 OP_MUL_ASSIGN OP_MOD_ASSIGN OP_LSHIFT  
@@ -88,7 +88,7 @@ TYPE_DOUBLE
 %nonassoc OP_EQ OP_NEQ 
 %nonassoc '<' '>' OP_LTE OP_GTE OP_RSHIFT OP_LSHIFT
 %left OP_CLOSED_RANGE OP_HALF_OPEN_RANGE
-%left BINARY_PLUS BINARY_MINUS
+%left BINARY_MINUS
 %left '*' '/' '%'
 %right '~' '!'
 %nonassoc IS AS
@@ -247,8 +247,7 @@ expr: LITERAL_INT {printf("P: expr int\n");}
     | '~' expr {printf("P: expr ~\n");}
     | '!' expr {printf("P: expr !\n");}
     | UNARY_MINUS expr {printf("P: expr unary -\n");}
-    | UNARY_PLUS expr {printf("P: expr unary -\n");}
-    | expr BINARY_PLUS expr {printf("P: expr +\n");}
+    | expr '+' expr {printf("P: expr +\n");}
     | expr BINARY_MINUS expr {printf("P: expr -\n");}
     | expr '/' expr {printf("P: expr /\n");}
     | expr '*' expr {printf("P: expr *\n");}

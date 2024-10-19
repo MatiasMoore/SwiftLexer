@@ -155,10 +155,7 @@ willSet {cout << "Keyword willSet: " << yytext << endl; return WILLSET;}
 \#sourceLocation {cout << "Keyword #sourceLocation: " << yytext << endl; return HASH_SOURCELOCATION;}
 \#warning {cout << "Keyword #warning: " << yytext << endl; return HASH_WARNING;}
 
-{WHITESPACES}+\+ {cout << "Unary Operator plus: " << yytext << endl; return UNARY_PLUS;}
-\+{WHITESPACES}+ {cout << "ERROR: \'+\' is not a postfix unary operator: " << yytext << endl;}
-{WHITESPACES}+\+{WHITESPACES}+ {cout << "Binary whitespaces Operator plus: " << yytext << endl; return BINARY_PLUS;}
-\+ {cout << "Binary no whitespaces Operator plus: " << yytext << endl; return BINARY_PLUS;}
+\+ {cout << "Binary Operator plus: " << yytext << endl; return '+';}
 
 ^{WHITESPACES}*\-{WHITESPACES} {cout << "ERROR: unary operator cannot be separated from its operand: " << yytext << endl;}
 ^\- {cout << "Unary Operator minus: " << yytext << endl; return UNARY_MINUS;}
@@ -167,10 +164,7 @@ willSet {cout << "Keyword willSet: " << yytext << endl; return WILLSET;}
 \-/{WHITESPACES} {cout << "ERROR: \'-\' is not a postfix unary operator: " << yytext << endl;}
 \- {cout << "Binary no whitespaces Operator minus: " << yytext << endl; return BINARY_MINUS;}
 
-{WHITESPACES}+\/ {cout << "ERROR: \'/\' is not a prefix unary operator: " << yytext << endl;}
-\/{WHITESPACES}+ {cout << "ERROR: \'/\' is not a postfix unary operator: " << yytext << endl;}
-{WHITESPACES}+\/{WHITESPACES}+ {cout << "Binary whitespaces Operator division: " << yytext << endl; return '/';}
-\/ {cout << "Binary no whitespaces Operator division: " << yytext << endl; return '/';}
+\/ {cout << "Binary Operator division: " << yytext << endl; return '/';}
 
 \* {cout << "Operator multiplication: " << yytext << endl; return '*';}
 \% {cout << "Operator modulus: " << yytext << endl; return '%';}
