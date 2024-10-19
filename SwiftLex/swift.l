@@ -160,9 +160,11 @@ willSet {cout << "Keyword willSet: " << yytext << endl; return WILLSET;}
 {WHITESPACES}+\+{WHITESPACES}+ {cout << "Binary whitespaces Operator plus: " << yytext << endl; return BINARY_PLUS;}
 \+ {cout << "Binary no whitespaces Operator plus: " << yytext << endl; return BINARY_PLUS;}
 
-{WHITESPACES}+\- {cout << "Unary Operator minus: " << yytext << endl; return UNARY_MINUS;}
-\-{WHITESPACES}+ {cout << "ERROR: \'-\' is not a postfix unary operator: " << yytext << endl;}
-{WHITESPACES}+\-{WHITESPACES}+ {cout << "Binary whitespaces Operator minus: " << yytext << endl; return BINARY_MINUS;}
+^{WHITESPACES}*\-{WHITESPACES} {cout << "ERROR: unary operator cannot be separated from its operand: " << yytext << endl;}
+^\- {cout << "Unary Operator minus: " << yytext << endl; return UNARY_MINUS;}
+{WHITESPACES}\-/{WHITESPACES} {cout << "Binary whitespaces Operator minus: " << yytext << endl; return BINARY_MINUS;}
+{WHITESPACES}\-/[^>=-] {cout << "Unary Operator minus: " << yytext << endl; return UNARY_MINUS;}
+\-/{WHITESPACES} {cout << "ERROR: \'-\' is not a postfix unary operator: " << yytext << endl;}
 \- {cout << "Binary no whitespaces Operator minus: " << yytext << endl; return BINARY_MINUS;}
 
 {WHITESPACES}+\/ {cout << "ERROR: \'/\' is not a prefix unary operator: " << yytext << endl;}
