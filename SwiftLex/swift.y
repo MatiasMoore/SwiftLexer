@@ -93,6 +93,7 @@ TYPE_DOUBLE
 %right '~' '!'
 %nonassoc IS AS
 %left UNARY_PLUS UNARY_MINUS
+%left '[' ']'
 %right '(' ')'
 
 %start program
@@ -120,6 +121,7 @@ type: TYPE_BOOL
     | TYPE_FLOAT80
     | TYPE_DOUBLE
     | ID
+    | '[' type ']'
     ;
 
 semicolonE: %empty
@@ -357,10 +359,17 @@ expr: LITERAL_INT {printf("P: expr int\n");}
     | expr '?' expr ':' expr {printf("P: expr ternary ? :\n");}
     | '(' expr ')' {printf("P: expr brackets\n");}
     | funcCall {printf("P: expr funcCall\n");}
-    | expr '.' ID {printf("P: expr fieldAccess\n");}
+    | expr '.' funcCall {printf("P: expr func access\n");}
+    | SELF '.' funcCall {printf("P: expr self func access\n");}
+    | expr '.' ID {printf("P: expr field access\n");}
     | SELF '.' ID {printf("P: expr self fieldAccess\n");}
-    //array access
+    // WARNING THIS CAUSES 2 CONFLICTS 
+    // BUT THEY ARE RESOLVED CORRECTLY BY DEFAULT
+    // TODO: RESOLVE CONFLICT EXPLICITLY
+    | '[' exprList ']' {printf("P: expr array\n");}
+    | expr '[' expr ']' {printf("P: expr array indexing\n");}
     ;
+
 %%
 
 int yyerror(const char *errormsg)
