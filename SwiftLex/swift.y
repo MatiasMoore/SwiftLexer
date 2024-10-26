@@ -200,6 +200,9 @@ funcDecIncomplete: FUNC ID '(' funcDeclArgListE ')' funcReturnTypeE '{' stmtList
 funcDeclaration: accessModifier STATIC funcDecIncomplete {printf("P: func declaration static with modifier\n");}
     | STATIC accessModifier funcDecIncomplete {printf("P: func declaration static with modifier\n");}
     | STATIC funcDecIncomplete {printf("P: func declaration static\n");}
+    | accessModifier FINAL funcDecIncomplete {printf("P: func declaration final with modifier\n");}
+    | FINAL accessModifier funcDecIncomplete {printf("P: func declaration final with modifier\n");}
+    | FINAL funcDecIncomplete {printf("P: func declaration final\n");}
     | accessModifier funcDecIncomplete {printf("P: func declaration with modifier\n");}
     | funcDecIncomplete {printf("P: func declaration default\n");}
     ;
