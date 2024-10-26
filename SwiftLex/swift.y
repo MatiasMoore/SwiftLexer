@@ -137,6 +137,7 @@ stmt: varDeclaration semicolonE {printf("P: stmt varDec\n");}
     | assignment semicolonE {printf("P: stmt assignment\n");}
     | expr semicolonE {printf("P: stmt expr\n");}
     | enumDeclaration semicolonE {printf("P: stmt enum\n");}
+    | ifElse semicolonE {printf("P: stmt ifElse\n");}
 	;
 
 stmtList: stmt {printf("P: stmtList\n");}
@@ -350,6 +351,11 @@ enumDefinitionList: enumDefinition {printf("P: enum: enumDefinitionList \n");}
     ;
 
 enumDeclaration: ENUM ID '{' enumDefinitionList '}'  {printf("P: enumDeclaration\n");}
+    ;
+
+ifElse: IF exprList '{' stmtList '}' {printf("P: ifElse\n");}
+    | IF exprList '{' stmtList '}' ELSE '{' stmtList '}' {printf("P: ifElse with else\n");}
+    | IF exprList '{' stmtList '}' ELSE ifElse {printf("P: ifElse else if\n");}
     ;
 
 expr: LITERAL_INT {printf("P: expr int\n");}
