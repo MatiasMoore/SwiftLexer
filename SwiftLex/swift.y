@@ -88,7 +88,7 @@ TYPE_DOUBLE
 %nonassoc OP_EQ OP_NEQ 
 %nonassoc '<' '>' OP_LTE OP_GTE OP_RSHIFT OP_LSHIFT
 %left OP_CLOSED_RANGE OP_HALF_OPEN_RANGE
-%left BINARY_MINUS
+%left BINARY_MINUS '+'
 %left '*' '/' '%'
 %right '~' '!'
 %nonassoc IS AS
