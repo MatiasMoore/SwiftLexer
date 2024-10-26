@@ -89,7 +89,7 @@ TYPE_DOUBLE
 %nonassoc '<' '>' OP_LTE OP_GTE OP_RSHIFT OP_LSHIFT
 %left OP_CLOSED_RANGE OP_HALF_OPEN_RANGE
 %left BINARY_MINUS '+'
-%left '*' '/' '%'
+%left '*' '/' '%' '.'
 %right '~' '!'
 %nonassoc IS AS
 %left UNARY_PLUS UNARY_MINUS
@@ -128,9 +128,11 @@ semicolonE: %empty
 
 stmt: varDeclaration semicolonE {printf("P: stmt varDec\n");}
     | funcDeclaration semicolonE {printf("P: stmt funcDec\n");}
+    | staticFuncDeclaration semicolonE {printf("P: stmt static funcDec\n");}
+    | constructorDeclaration semicolonE {printf("P: stmt constructorDecl\n");}
+    | classDeclaration semicolonE {printf("P: stmt classDec\n");}
     | assignment semicolonE {printf("P: stmt assignment\n");}
     | expr semicolonE {printf("P: stmt expr\n");}
-    | funcCall semicolonE {printf("P: stmt funcCall\n");}
 	;
 
 stmtList: stmt {printf("P: stmtList\n");}
@@ -185,6 +187,12 @@ funcDeclaration: FUNC ID '(' funcDeclArgListE ')' funcReturnType '{' stmtListE e
     | FUNC ID '(' funcDeclArgListE ')' '{' stmtListE '}' {printf("P: func declaration without return\n");}
     ;
 
+staticFuncDeclaration: CLASS funcDeclaration {printf("P: static func declaration\n");}
+    ;
+
+constructorDeclaration: INIT '(' funcDeclArgListE ')' '{' stmtListE '}' {printf("P: constructor declaration\n");}
+    ;
+
 funcCallArg: ID ':' expr {printf("P: funcCallArg\n");}
     ;
 
@@ -196,6 +204,10 @@ funcCallArgListE: %empty
     | funcCallArgList
     ;
     
+classDeclaration: CLASS ID '{' stmtListE '}' {printf("P: classDeclaration\n");}
+    | CLASS ID ':' ID '{' stmtListE '}' {printf("P: classDeclaration with inheritance\n");}
+    ;
+
 exprList: expr {printf("P: exprList\n");}
     | exprList ',' expr {printf("P: exprList\n");}
     ;
@@ -274,8 +286,9 @@ expr: LITERAL_INT {printf("P: expr int\n");}
     | expr AS '!' type {printf("P: expr as !\n");}
     | expr '?' expr ':' expr {printf("P: expr ternary ? :\n");}
     | '(' expr ')' {printf("P: expr brackets\n");}
-    //function call result
-    //field access using dot
+    | funcCall {printf("P: expr funcCall\n");}
+    | expr '.' ID {printf("P: expr fieldAccess\n");}
+    | SELF '.' ID {printf("P: expr self fieldAccess\n");}
     //array access
     ;
 %%
