@@ -129,6 +129,7 @@ semicolonE: %empty
 stmt: varDeclaration semicolonE {printf("P: stmt varDec\n");}
     | funcDeclaration semicolonE {printf("P: stmt funcDec\n");}
     | constructorDeclaration semicolonE {printf("P: stmt constructorDecl\n");}
+    | destructorDeclaration semicolonE {printf("P: stmt destructorDecl\n");}
     | exprReturn semicolonE {printf("P: stmt return\n");}
     | classDeclaration semicolonE {printf("P: stmt classDec\n");}
     | assignment semicolonE {printf("P: stmt assignment\n");}
@@ -209,6 +210,9 @@ funcDeclaration: accessModifier STATIC funcDecIncomplete {printf("P: func declar
     ;
 
 constructorDeclaration: INIT '(' funcDeclArgListE ')' '{' stmtListE '}' {printf("P: constructor declaration\n");}
+    ;
+
+destructorDeclaration: DEINIT '{' stmtListE '}' {printf("P: destructor declaration\n");}
     ;
 
 funcCallArg: ID ':' expr {printf("P: funcCallArg\n");}
