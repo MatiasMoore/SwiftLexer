@@ -136,6 +136,7 @@ stmt: varDeclaration semicolonE {printf("P: stmt varDec\n");}
     | classDeclaration semicolonE {printf("P: stmt classDec\n");}
     | assignment semicolonE {printf("P: stmt assignment\n");}
     | expr semicolonE {printf("P: stmt expr\n");}
+    | enumDeclaration semicolonE {printf("P: stmt enum\n");}
 	;
 
 stmtList: stmt {printf("P: stmtList\n");}
@@ -320,6 +321,35 @@ varDeclIncommplete: VAR varVarList {printf("P: varDeclIncommplete\n");}
 
 varDeclaration:varPrefix varDeclIncommplete {printf("P: variable declaration with prefix\n");}
     | varDeclIncommplete {printf("P: variable declaration default\n");}
+    ;
+
+typeList: type {printf("P: enum: typeList \n");}
+    | typeList ',' type {printf("P: enum: typeList \n");}
+    ;
+
+enumId: ID '(' typeList ')' {printf("P: enum: enumId \n");}
+    | ID {printf("P: enum: enumId \n");}
+    ;
+
+enumIdList: enumId {printf("P: enum: enumIdList \n");}
+    | enumIdList ',' enumId {printf("P: enum: enumIdList \n");}
+    ;
+
+enumDefinition: CASE enumIdList {printf("P: enum: enumDefinition \n");}
+    ;
+
+enumDefinitionList: enumDefinition {printf("P: enum: enumDefinitionList \n");}
+    | enumDefinitionList ';' enumDefinition  {printf("P: enum: enumDefinitionList \n");}
+    | enumDefinitionList enumDefinition  {
+        if (@1.last_line == @2.first_line){
+            yyerror("Syntax error: consecutive declarations on a line must be separated by ';'");
+        } else {
+        {printf("P: enum: enumDefinitionList \n");}
+        }
+    }
+    ;
+
+enumDeclaration: ENUM ID '{' enumDefinitionList '}'  {printf("P: enumDeclaration\n");}
     ;
 
 expr: LITERAL_INT {printf("P: expr int\n");}
