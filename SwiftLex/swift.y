@@ -195,18 +195,62 @@ accessModifier: OPEN
     | PRIVATE
     ;
 
-accessModifierE: %empty
-    | accessModifier
-    ;
-
 funcDecIncomplete: FUNC ID '(' funcDeclArgListE ')' funcReturnTypeE '{' stmtListE '}' {printf("P: func declIncomplete\n");}
     ;
 
-funcDeclaration: accessModifier STATIC funcDecIncomplete {printf("P: func declaration static with modifier\n");}
-    | STATIC accessModifier funcDecIncomplete {printf("P: func declaration static with modifier\n");}
-    | STATIC funcDecIncomplete {printf("P: func declaration static\n");}
-    | accessModifier funcDecIncomplete {printf("P: func declaration with modifier\n");}
+funcDeclaration: funcPrefix funcDecIncomplete {printf("P: func declaration prefix\n");}
     | funcDecIncomplete {printf("P: func declaration default\n");}
+    ;
+
+funcPrefix: accessModifier STATIC 
+    | STATIC accessModifier 
+    | STATIC 
+    | accessModifier FINAL 
+    | FINAL accessModifier 
+    | FINAL 
+    | accessModifier 
+
+    | OVERRIDE accessModifier STATIC 
+    | accessModifier OVERRIDE STATIC 
+    | accessModifier STATIC OVERRIDE 
+
+    | OVERRIDE STATIC accessModifier 
+    | STATIC OVERRIDE accessModifier 
+    | STATIC accessModifier OVERRIDE 
+
+    | OVERRIDE STATIC 
+    | STATIC OVERRIDE 
+
+    | OVERRIDE accessModifier FINAL
+    | accessModifier OVERRIDE FINAL
+    | accessModifier FINAL OVERRIDE
+
+    | OVERRIDE FINAL accessModifier
+    | FINAL OVERRIDE accessModifier
+    | FINAL accessModifier OVERRIDE
+
+    | OVERRIDE FINAL 
+    | FINAL OVERRIDE 
+
+    | OVERRIDE accessModifier 
+    | accessModifier OVERRIDE 
+
+    | OVERRIDE 
+    ;
+
+varPrefix: accessModifier STATIC 
+    | STATIC accessModifier 
+    | STATIC 
+    | accessModifier FINAL 
+    | FINAL accessModifier 
+    | FINAL 
+    | accessModifier
+    ;
+
+classPrefix: accessModifier FINAL 
+    | FINAL accessModifier 
+    | FINAL 
+    | accessModifier 
     ;
 
 constructorDeclaration: INIT '(' funcDeclArgListE ')' '{' stmtListE '}' {printf("P: constructor declaration\n");}
@@ -221,16 +265,12 @@ funcCallArg: ID ':' expr {printf("P: funcCallArg\n");}
 funcCallArgList: funcCallArg {printf("P: funcCallArgList\n");}
     | funcCallArgList ',' funcCallArg {printf("P: funcCallArgList\n");}
     ;
-
-funcCallArgListE: %empty
-    | funcCallArgList
-    ;
     
 classDeclIncomplete: CLASS ID '{' stmtListE '}' {printf("P: classDeclIncomplete\n");}
     | CLASS ID ':' ID '{' stmtListE '}' {printf("P: classDeclIncomplete\n");}
     ;
 
-classDeclaration: accessModifier classDeclIncomplete {printf("P: class declaration with modifier\n");}
+classDeclaration: classPrefix classDeclIncomplete {printf("P: class declaration with prefix\n");}
     | classDeclIncomplete {printf("P: class declaration default\n");}
     ;
 
@@ -276,10 +316,7 @@ varDeclIncommplete: VAR varVarList {printf("P: varDeclIncommplete\n");}
     | LET varVarList {printf("P: varDeclIncommplete\n");}
     ;
 
-varDeclaration: accessModifier STATIC varDeclIncommplete {printf("P: variable declaration static with modifier\n");}
-    | STATIC accessModifier varDeclIncommplete {printf("P: variable declaration static with modifier\n");}
-    | STATIC varDeclIncommplete {printf("P: variable declaration static\n");}
-    | accessModifier varDeclIncommplete {printf("P: variable declaration with modifier\n");}
+varDeclaration:varPrefix varDeclIncommplete {printf("P: variable declaration with prefix\n");}
     | varDeclIncommplete {printf("P: variable declaration default\n");}
     ;
 
