@@ -218,8 +218,12 @@ funcCallArgListE: %empty
     | funcCallArgList
     ;
     
-classDeclaration: CLASS ID '{' stmtListE '}' {printf("P: classDeclaration\n");}
-    | CLASS ID ':' ID '{' stmtListE '}' {printf("P: classDeclaration with inheritance\n");}
+classDeclIncomplete: CLASS ID '{' stmtListE '}' {printf("P: classDeclIncomplete\n");}
+    | CLASS ID ':' ID '{' stmtListE '}' {printf("P: classDeclIncomplete\n");}
+    ;
+
+classDeclaration: accessModifier classDeclIncomplete {printf("P: class declaration with modifier\n");}
+    | classDeclIncomplete {printf("P: class declaration default\n");}
     ;
 
 exprList: expr {printf("P: exprList\n");}
