@@ -194,6 +194,10 @@ accessModifier: OPEN
     | PRIVATE
     ;
 
+accessModifierE: %empty
+    | accessModifier
+    ;
+
 funcDecIncomplete: FUNC ID '(' funcDeclArgListE ')' funcReturnTypeE '{' stmtListE '}' {printf("P: func declIncomplete\n");}
     ;
 
@@ -264,8 +268,15 @@ varVarList: varList
     | varVarList ',' varList
     ;
         
-varDeclaration: VAR varVarList {printf("P: varDeclaration\n");}
-    | LET varVarList {printf("P: varDeclaration\n");}
+varDeclIncommplete: VAR varVarList {printf("P: varDeclIncommplete\n");}
+    | LET varVarList {printf("P: varDeclIncommplete\n");}
+    ;
+
+varDeclaration: accessModifier STATIC varDeclIncommplete {printf("P: variable declaration static with modifier\n");}
+    | STATIC accessModifier varDeclIncommplete {printf("P: variable declaration static with modifier\n");}
+    | STATIC varDeclIncommplete {printf("P: variable declaration static\n");}
+    | accessModifier varDeclIncommplete {printf("P: variable declaration with modifier\n");}
+    | varDeclIncommplete {printf("P: variable declaration default\n");}
     ;
 
 expr: LITERAL_INT {printf("P: expr int\n");}
