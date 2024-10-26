@@ -128,8 +128,8 @@ semicolonE: %empty
 
 stmt: varDeclaration semicolonE {printf("P: stmt varDec\n");}
     | funcDeclaration semicolonE {printf("P: stmt funcDec\n");}
-    | staticFuncDeclaration semicolonE {printf("P: stmt static funcDec\n");}
     | constructorDeclaration semicolonE {printf("P: stmt constructorDecl\n");}
+    | exprReturn semicolonE {printf("P: stmt return\n");}
     | classDeclaration semicolonE {printf("P: stmt classDec\n");}
     | assignment semicolonE {printf("P: stmt assignment\n");}
     | expr semicolonE {printf("P: stmt expr\n");}
@@ -183,11 +183,25 @@ funcDeclArgListE: %empty
 funcReturnType: OP_FUNC_RETURN type
     ;
 
-funcDeclaration: FUNC ID '(' funcDeclArgListE ')' funcReturnType '{' stmtListE exprReturn'}' {printf("P: func declaration with return\n");}
-    | FUNC ID '(' funcDeclArgListE ')' '{' stmtListE '}' {printf("P: func declaration without return\n");}
+funcReturnTypeE: %empty
+    | funcReturnType
     ;
 
-staticFuncDeclaration: CLASS funcDeclaration {printf("P: static func declaration\n");}
+accessModifier: OPEN
+    | PUBLIC
+    | INTERNAL
+    | FILEPRIVATE
+    | PRIVATE
+    ;
+
+funcDecIncomplete: FUNC ID '(' funcDeclArgListE ')' funcReturnTypeE '{' stmtListE '}' {printf("P: func declIncomplete\n");}
+    ;
+
+funcDeclaration: accessModifier STATIC funcDecIncomplete {printf("P: func declaration static with modifier\n");}
+    | STATIC accessModifier funcDecIncomplete {printf("P: func declaration static with modifier\n");}
+    | STATIC funcDecIncomplete {printf("P: func declaration static\n");}
+    | accessModifier funcDecIncomplete {printf("P: func declaration with modifier\n");}
+    | funcDecIncomplete {printf("P: func declaration default\n");}
     ;
 
 constructorDeclaration: INIT '(' funcDeclArgListE ')' '{' stmtListE '}' {printf("P: constructor declaration\n");}
