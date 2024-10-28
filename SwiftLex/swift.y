@@ -431,6 +431,7 @@ expr: LITERAL_INT {printf("P: expr int\n");}
     // TODO: RESOLVE CONFLICT EXPLICITLY
     | '[' exprList ']' {printf("P: expr array\n");}
     | expr '[' expr ']' {printf("P: expr array indexing\n");}
+    | '.' ID {printf("P: expr enum field access\n");} 
     ;
 
 %%
