@@ -197,70 +197,60 @@ funcReturnTypeE: %empty
     | funcReturnType
     ;
 
-accessModifier: OPEN
+funcDecIncomplete: FUNC ID '(' funcDeclArgListE ')' funcReturnTypeE '{' stmtListE '}' {printf("P: func declIncomplete\n");}
+    ;
+
+    
+overloadableOperators: '+'
+    | BINARY_MINUS
+    | UNARY_MINUS
+    | '*'
+    | '/'
+    | '%'
+    | '<'
+    | '>'
+    | OP_GTE
+    | OP_LTE
+    | OP_EQ
+    | OP_NEQ
+    | '&'
+    | '|'
+    | '^'
+    | OP_LOG_AND
+    | OP_LOG_OR
+    | OP_LSHIFT
+    | OP_RSHIFT
+    | OP_CLOSED_RANGE
+    | OP_HALF_OPEN_RANGE
+    | OP_NIL_COALESCE
+    ;
+
+funcOverloadOperatorIncomplete: FUNC overloadableOperators '(' funcDeclArgListE ')' funcReturnTypeE '{' stmtListE '}' {printf("P: func overload Operator Incomplete\n");}
+	;
+
+funcDeclaration: modifiersWordsList funcDecIncomplete {printf("P: func declaration prefix\n");}
+    | funcDecIncomplete {printf("P: func declaration default\n");}
+    
+    // operator overloading
+    | funcOverloadOperatorIncomplete {printf("P: func overload Operator\n");}
+    | modifiersWordsList funcOverloadOperatorIncomplete {printf("P: func overload Operator with prefix\n");}
+    ;
+
+modifiersWords: STATIC 
+	| FINAL 
+	| OVERRIDE 
+	| OPEN
     | PUBLIC
     | INTERNAL
     | FILEPRIVATE
     | PRIVATE
-    ;
+    | PREFIX
+	| POSTFIX
+	;
 
-funcDecIncomplete: FUNC ID '(' funcDeclArgListE ')' funcReturnTypeE '{' stmtListE '}' {printf("P: func declIncomplete\n");}
-    ;
-
-funcDeclaration: funcPrefix funcDecIncomplete {printf("P: func declaration prefix\n");}
-    | funcDecIncomplete {printf("P: func declaration default\n");}
-    ;
-
-funcPrefix: accessModifier STATIC 
-    | STATIC accessModifier 
-    | STATIC 
-    | accessModifier FINAL 
-    | FINAL accessModifier 
-    | FINAL 
-    | accessModifier 
-
-    | OVERRIDE accessModifier STATIC 
-    | accessModifier OVERRIDE STATIC 
-    | accessModifier STATIC OVERRIDE 
-
-    | OVERRIDE STATIC accessModifier 
-    | STATIC OVERRIDE accessModifier 
-    | STATIC accessModifier OVERRIDE 
-
-    | OVERRIDE STATIC 
-    | STATIC OVERRIDE 
-
-    | OVERRIDE accessModifier FINAL
-    | accessModifier OVERRIDE FINAL
-    | accessModifier FINAL OVERRIDE
-
-    | OVERRIDE FINAL accessModifier
-    | FINAL OVERRIDE accessModifier
-    | FINAL accessModifier OVERRIDE
-
-    | OVERRIDE FINAL 
-    | FINAL OVERRIDE 
-
-    | OVERRIDE accessModifier 
-    | accessModifier OVERRIDE 
-
-    | OVERRIDE 
-    ;
-
-varPrefix: accessModifier STATIC 
-    | STATIC accessModifier 
-    | STATIC 
-    | accessModifier FINAL 
-    | FINAL accessModifier 
-    | FINAL 
-    | accessModifier
-    ;
-
-classPrefix: accessModifier FINAL 
-    | FINAL accessModifier 
-    | FINAL 
-    | accessModifier 
-    ;
+modifiersWordsList: modifiersWords {printf("P: modifiersWordsList\n");}
+	| modifiersWordsList modifiersWords {printf("P: modifiersWordsList\n");}
+	;
 
 constructorDeclaration: INIT '(' funcDeclArgListE ')' '{' stmtListE '}' {printf("P: constructor declaration\n");}
     ;
@@ -279,7 +269,7 @@ classDeclIncomplete: CLASS ID '{' stmtListE '}' {printf("P: classDeclIncomplete\
     | CLASS ID ':' ID '{' stmtListE '}' {printf("P: classDeclIncomplete\n");}
     ;
 
-classDeclaration: classPrefix classDeclIncomplete {printf("P: class declaration with prefix\n");}
+classDeclaration: modifiersWordsList classDeclIncomplete {printf("P: class declaration with prefix\n");}
     | classDeclIncomplete {printf("P: class declaration default\n");}
     ;
 
@@ -325,7 +315,7 @@ varDeclIncommplete: VAR varVarList {printf("P: varDeclIncommplete\n");}
     | LET varVarList {printf("P: varDeclIncommplete\n");}
     ;
 
-varDeclaration:varPrefix varDeclIncommplete {printf("P: variable declaration with prefix\n");}
+varDeclaration:modifiersWordsList varDeclIncommplete {printf("P: variable declaration with prefix\n");}
     | varDeclIncommplete {printf("P: variable declaration default\n");}
     ;
 
@@ -355,8 +345,12 @@ enumDefinitionList: enumDefinition {printf("P: enum: enumDefinitionList \n");}
     }
     ;
 
-enumDeclaration: ENUM ID '{' enumDefinitionList '}'  {printf("P: enumDeclaration\n");}
+enumDeclarationIncomplete: ENUM ID '{' enumDefinitionList '}'  {printf("P: enumDeclaration\n");}
     ;
+
+enumDeclaration: modifiersWordsList enumDeclarationIncomplete {printf("P: enumDeclaration\n");}
+    | enumDeclarationIncomplete {printf("P: enumDeclaration\n");}
+	;
 
 whileLoop: WHILE exprList '{' stmtList '}' {printf("P: whileLoop\n");}
     | WHILE exprList '{' '}' {printf("P: whileLoop\n");}
