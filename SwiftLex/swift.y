@@ -400,6 +400,7 @@ expr: LITERAL_INT {printf("P: expr int\n");}
     | expr '?' expr ':' expr {printf("P: expr ternary ? :\n");}
     | '(' expr ')' {printf("P: expr brackets\n");}
     | funcCall {printf("P: expr funcCall\n");}
+    | SUPER '.' funcCall {printf("P: expr super funcCall\n");}
     | expr '.' funcCall {printf("P: expr func access\n");}
     | SELF '.' funcCall {printf("P: expr self func access\n");}
     | expr '.' ID {printf("P: expr field access\n");}
