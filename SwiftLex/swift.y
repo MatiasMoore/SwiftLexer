@@ -138,6 +138,7 @@ stmt: varDeclaration semicolonE {printf("P: stmt varDec\n");}
     | expr semicolonE {printf("P: stmt expr\n");}
     | enumDeclaration semicolonE {printf("P: stmt enum\n");}
     | ifElse semicolonE {printf("P: stmt ifElse\n");}
+    | switchCase semicolonE {printf("P: stmt switch\n");}
 	;
 
 stmtList: stmt {printf("P: stmtList\n");}
@@ -362,6 +363,27 @@ ifElse: IF exprList '{' stmtList '}' {printf("P: ifElse\n");}
     | IF exprList '{' stmtList '}' ELSE ifElse {printf("P: ifElse else if\n");}
     | IF exprList '{' '}' ELSE ifElse {printf("P: ifElse else if\n");}
     ;
+
+switchCase: SWITCH expr '{'caseList defaultCase '}' {printf("P: switch\n");}
+    | SWITCH expr '{'defaultCase '}' {printf("P: switch\n");}
+    | SWITCH expr '{'caseList'}' {printf("P: switch\n");}
+	;
+
+caseElement: CASE caseElementExpr ':' stmtList {printf("P: case\n");}
+    ;
+
+caseElementExpr: exprList
+    | exprList WHERE expr {printf("P: case where\n");}
+    | LET ID WHERE expr {printf("P: case let\n");}
+    // TODO: add exprlist in round brackets
+    ;
+
+caseList: caseElement {printf("P: caseList\n");}
+	| caseList caseElement {printf("P: caseList\n");}
+	;
+
+defaultCase: DEFAULT ':' stmtList {printf("P: defaultCase\n");}
+	;
 
 expr: LITERAL_INT {printf("P: expr int\n");}
     | LITERAL_FLOAT {printf("P: expr float\n");}
