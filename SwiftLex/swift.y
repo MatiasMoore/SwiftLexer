@@ -354,8 +354,13 @@ enumDeclaration: ENUM ID '{' enumDefinitionList '}'  {printf("P: enumDeclaration
     ;
 
 ifElse: IF exprList '{' stmtList '}' {printf("P: ifElse\n");}
+    | IF exprList '{' '}' {printf("P: ifElse\n");}
     | IF exprList '{' stmtList '}' ELSE '{' stmtList '}' {printf("P: ifElse with else\n");}
+    | IF exprList '{' '}' ELSE '{' stmtList '}' {printf("P: ifElse with else\n");}
+    | IF exprList '{' stmtList '}' ELSE '{' '}' {printf("P: ifElse with else\n");}
+    | IF exprList '{' '}' ELSE '{' '}' {printf("P: ifElse with else\n");}
     | IF exprList '{' stmtList '}' ELSE ifElse {printf("P: ifElse else if\n");}
+    | IF exprList '{' '}' ELSE ifElse {printf("P: ifElse else if\n");}
     ;
 
 expr: LITERAL_INT {printf("P: expr int\n");}
