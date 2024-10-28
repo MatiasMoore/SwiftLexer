@@ -395,8 +395,8 @@ caseElement: CASE caseElementExpr ':' stmtList {printf("P: case\n");}
     ;
 
 caseElementExpr: exprList
-    | exprList WHERE expr {printf("P: case where\n");}
-    | LET ID WHERE expr {printf("P: case let\n");}
+    | exprList whereClause {printf("P: case where\n");}
+    | LET ID whereClause {printf("P: case let\n");}
     // TODO: add exprlist in round brackets
     ;
 
