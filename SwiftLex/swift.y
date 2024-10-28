@@ -139,6 +139,7 @@ stmt: varDeclaration semicolonE {printf("P: stmt varDec\n");}
     | enumDeclaration semicolonE {printf("P: stmt enum\n");}
     | ifElse semicolonE {printf("P: stmt ifElse\n");}
     | whileLoop semicolonE {printf("P: stmt whileLoop\n");}
+    | repeatWhileLoop semicolonE {printf("P: stmt repeatWhileLoop\n");}
 	;
 
 stmtList: stmt {printf("P: stmtList\n");}
@@ -356,6 +357,10 @@ enumDeclaration: ENUM ID '{' enumDefinitionList '}'  {printf("P: enumDeclaration
 
 whileLoop: WHILE exprList '{' stmtList '}' {printf("P: whileLoop\n");}
     | WHILE exprList '{' '}' {printf("P: whileLoop\n");}
+    ;
+
+repeatWhileLoop: REPEAT '{' stmtList '}' WHILE exprList {printf("P: repeatWhileLoop\n");}
+    | REPEAT '{' '}' WHILE exprList {printf("P: repeatWhileLoop\n");}
     ;
 
 ifElse: IF exprList '{' stmtList '}' {printf("P: ifElse\n");}
