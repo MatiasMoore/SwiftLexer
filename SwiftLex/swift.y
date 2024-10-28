@@ -140,6 +140,7 @@ stmt: varDeclaration semicolonE {printf("P: stmt varDec\n");}
     | ifElse semicolonE {printf("P: stmt ifElse\n");}
     | whileLoop semicolonE {printf("P: stmt whileLoop\n");}
     | repeatWhileLoop semicolonE {printf("P: stmt repeatWhileLoop\n");}
+    | forInLoop semicolonE {printf("P: stmt forInLoop\n");}
 	;
 
 stmtList: stmt {printf("P: stmtList\n");}
@@ -361,6 +362,16 @@ whileLoop: WHILE exprList '{' stmtList '}' {printf("P: whileLoop\n");}
 
 repeatWhileLoop: REPEAT '{' stmtList '}' WHILE exprList {printf("P: repeatWhileLoop\n");}
     | REPEAT '{' '}' WHILE exprList {printf("P: repeatWhileLoop\n");}
+    ;
+
+whereClause: WHERE expr
+    ;
+
+forInLoop: FOR expr IN expr whereClause '{' stmtList '}' {printf("P: forInLoop\n");}
+    | FOR expr IN expr '{' stmtList '}' {printf("P: forInLoop\n");}
+
+    | FOR expr IN expr whereClause '{' '}' {printf("P: forInLoop\n");}
+    | FOR expr IN expr '{' '}' {printf("P: forInLoop\n");}
     ;
 
 ifElse: IF exprList '{' stmtList '}' {printf("P: ifElse\n");}
