@@ -124,10 +124,6 @@ type: TYPE_BOOL
     | '[' type ']'
     ;
 
-semicolonE: %empty
-    | ';'
-    ;
-
 stmt: varDeclaration {printf("P: stmt varDec\n");}
     | funcDeclaration {printf("P: stmt funcDec\n");}
     | constructorDeclaration {printf("P: stmt constructorDecl\n");}
