@@ -128,24 +128,28 @@ semicolonE: %empty
     | ';'
     ;
 
-stmt: varDeclaration semicolonE {printf("P: stmt varDec\n");}
-    | funcDeclaration semicolonE {printf("P: stmt funcDec\n");}
-    | constructorDeclaration semicolonE {printf("P: stmt constructorDecl\n");}
-    | destructorDeclaration semicolonE {printf("P: stmt destructorDecl\n");}
-    | exprReturn semicolonE {printf("P: stmt return\n");}
-    | classDeclaration semicolonE {printf("P: stmt classDec\n");}
-    | assignment semicolonE {printf("P: stmt assignment\n");}
-    | expr semicolonE {printf("P: stmt expr\n");}
-    | enumDeclaration semicolonE {printf("P: stmt enum\n");}
-    | ifElse semicolonE {printf("P: stmt ifElse\n");}
-    | whileLoop semicolonE {printf("P: stmt whileLoop\n");}
-    | repeatWhileLoop semicolonE {printf("P: stmt repeatWhileLoop\n");}
-    | forInLoop semicolonE {printf("P: stmt forInLoop\n");}
-    | switchCase semicolonE {printf("P: stmt switch\n");}
+stmt: varDeclaration {printf("P: stmt varDec\n");}
+    | funcDeclaration {printf("P: stmt funcDec\n");}
+    | constructorDeclaration {printf("P: stmt constructorDecl\n");}
+    | destructorDeclaration {printf("P: stmt destructorDecl\n");}
+    | exprReturn {printf("P: stmt return\n");}
+    | classDeclaration {printf("P: stmt classDec\n");}
+    | assignment {printf("P: stmt assignment\n");}
+    | expr {printf("P: stmt expr\n");}
+    | enumDeclaration {printf("P: stmt enum\n");}
+    | ifElse {printf("P: stmt ifElse\n");}
+    | whileLoop {printf("P: stmt whileLoop\n");}
+    | repeatWhileLoop {printf("P: stmt repeatWhileLoop\n");}
+    | forInLoop {printf("P: stmt forInLoop\n");}
+    | switchCase {printf("P: stmt switch\n");}
 	;
 
-stmtList: stmt {printf("P: stmtList\n");}
-	| stmtList stmt {
+stmtSemicolon: stmt ';'
+	;
+
+stmtList: stmt {printf("P: stmtList start\n");}
+    | stmtSemicolon {printf("P: stmtSemicolonList start\n");}
+	| stmt stmtList  {
         if (@1.last_line == @2.first_line){
             yyerror("Syntax error: two statements in one line must be separated with a ';'");
         }
@@ -153,6 +157,7 @@ stmtList: stmt {printf("P: stmtList\n");}
 			printf("P: stmtList\n");
 		}
     }
+    | stmtSemicolon stmtList {printf("P: stmtSemicolonList\n");}
 	;
 
 stmtListE: %empty
