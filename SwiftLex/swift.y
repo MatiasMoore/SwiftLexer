@@ -138,6 +138,7 @@ stmt: varDeclaration {printf("P: stmt varDec\n");}
     | repeatWhileLoop {printf("P: stmt repeatWhileLoop\n");}
     | forInLoop {printf("P: stmt forInLoop\n");}
     | switchCase {printf("P: stmt switch\n");}
+    | structDeclaration {printf("P: stmt struct\n");}
 	;
 
 stmtSemicolon: stmt ';'
@@ -272,6 +273,14 @@ classDeclIncomplete: CLASS ID '{' stmtListE '}' {printf("P: classDeclIncomplete\
 classDeclaration: modifiersWordsList classDeclIncomplete {printf("P: class declaration with prefix\n");}
     | classDeclIncomplete {printf("P: class declaration default\n");}
     ;
+
+structDeclIncomplete: STRUCT ID '{' stmtListE '}' {printf("P: structDeclIncomplete\n");}
+	| STRUCT ID ':' ID '{' stmtListE '}' {printf("P: structDeclIncomplete\n");}
+	;
+
+structDeclaration: modifiersWordsList structDeclIncomplete {printf("P: struct declaration with prefix\n");}
+	| structDeclIncomplete {printf("P: struct declaration default\n");}
+	;
 
 exprList: expr {printf("P: exprList\n");}
     | exprList ',' expr {printf("P: exprList\n");}
