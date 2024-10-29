@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include "allNodes.h"
 
 extern int yylex();
@@ -27,6 +28,14 @@ int main(int argc, const char* argv[])
 		return 1;
 	}
 	yyparse();
+
+	std::ofstream myfile;
+	myfile.open("swift.dot");
+	myfile <<
+		"digraph D{"
+		"A -> {B, C, D} -> {F}"
+		"}";
+	myfile.close();
 
 	system("cd");
 	system("Graphviz\\bin\\dot.exe -Tpng swift.dot > swift.png");
