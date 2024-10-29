@@ -29,13 +29,13 @@ int main(int argc, const char* argv[])
 	}
 	yyparse();
 
-	std::ofstream myfile;
-	myfile.open("swift.dot");
-	myfile <<
+	std::ofstream dotFile;
+	dotFile.open("swift.dot");
+	dotFile <<
 		"digraph D{"
 		"A -> {B, C, D} -> {F}"
 		"}";
-	myfile.close();
+	dotFile.close();
 
 	system("cd");
 	system("Graphviz\\bin\\dot.exe -Tpng swift.dot > swift.png");
