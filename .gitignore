@@ -400,5 +400,9 @@ FodyWeavers.xsd
 # Flex generated code
 SwiftLex/swift.flex.cpp
 
-# Dont ignore graphviz files
-!SwiftLex/Graphviz/*
+SwiftLex/swift.output
+SwiftLex/swift.tab.cpp
+SwiftLex/swift.tab.h
+
+SwiftLex/swift.png
+SwiftLex/swift.dot
