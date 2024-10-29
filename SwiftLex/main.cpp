@@ -1,8 +1,10 @@
 #include <iostream>
+#include "allNodes.h"
 
 extern int yylex();
 extern int yyparse();
 extern FILE* yyin;
+extern ExprNode* _root;
 
 int main(int argc, const char* argv[])
 {

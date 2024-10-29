@@ -22,9 +22,11 @@
     <Flex Include="swift.l" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="nodes\StmtNode.cpp" />
     <ClCompile Include="swift.flex.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="swift.tab.cpp" />
+    <ClCompile Include="nodes\ExprNode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt" />
@@ -33,7 +35,11 @@
     <Bison Include="swift.y" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="globalVars.h" />
+    <ClInclude Include="nodes\StmtNode.h" />
     <ClInclude Include="swift.tab.h" />
+    <ClInclude Include="nodes\ExprNode.h" />
+    <ClInclude Include="allNodes.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

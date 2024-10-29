@@ -3,6 +3,8 @@
   #include <stdio.h>
   #include <stdlib.h>
   #include <iostream>
+  #include "allNodes.h"
+  #include "globalVars.h"
   int yylex(void);
   int yyerror(const char *s);
   using namespace std;
@@ -13,6 +15,9 @@
 	float fval;
 	double dval;
     char* strval;
+    struct ExprNode* exprNode;
+    struct StmtNode* stmtNode;
+    struct StmtListNode* stmtListNode;
 }
 %locations
 
@@ -96,11 +101,18 @@ TYPE_DOUBLE
 %left '[' ']'
 %right '(' ')'
 
+// Nodes
+%type<exprNode> expr
+%type<stmtNode> stmt
+%type<stmtListNode> stmtList
+%type<stmtListNode> program
+
+// Start
 %start program
 
 %%
 
-program: stmtList {printf("P: program\n");}
+program: stmtList {printf("P: program\n"); $$ = $1; _root = $$;}
     ;
 
 
@@ -131,7 +143,8 @@ stmt: varDeclaration {printf("P: stmt varDec\n");}
     | exprReturn {printf("P: stmt return\n");}
     | classDeclaration {printf("P: stmt classDec\n");}
     | assignment {printf("P: stmt assignment\n");}
-    | expr {printf("P: stmt expr\n");}
+    | expr {printf("P: stmt expr\n"); $$ = createStmtExpr($1);}
+    | expr ';' {printf("P: stmt expr\n"); $$ = createStmtExpr($1); $$->_hasSemicolon = true; }
     | enumDeclaration {printf("P: stmt enum\n");}
     | ifElse {printf("P: stmt ifElse\n");}
     | whileLoop {printf("P: stmt whileLoop\n");}
@@ -141,20 +154,16 @@ stmt: varDeclaration {printf("P: stmt varDec\n");}
     | structDeclaration {printf("P: stmt struct\n");}
 	;
 
-stmtSemicolon: stmt ';'
-	;
-
-stmtList: stmt {printf("P: stmtList start\n");}
-    | stmtSemicolon {printf("P: stmtSemicolonList start\n");}
-	| stmt stmtList  {
-        if (@1.last_line == @2.first_line){
+stmtList: stmt {printf("P: stmtList start\n"); $$ = createStmtList($1);}
+	| stmtList stmt {
+        if (!($1->_stmtVec.back()->_hasSemicolon) && @1.last_line == @2.first_line){
             yyerror("Syntax error: two statements in one line must be separated with a ';'");
         }
         else {
 			printf("P: stmtList\n");
+            $$ = appendStmtToStmtList($1, $2);
 		}
     }
-    | stmtSemicolon stmtList {printf("P: stmtSemicolonList\n");}
 	;
 
 stmtListE: %empty
@@ -411,8 +420,8 @@ caseList: caseElement {printf("P: caseList\n");}
 defaultCase: DEFAULT ':' stmtList {printf("P: defaultCase\n");}
 	;
 
-expr: LITERAL_INT {printf("P: expr int\n");}
-    | LITERAL_FLOAT {printf("P: expr float\n");}
+expr: LITERAL_INT {printf("P: expr int\n"); $$ = createInt($1);}
+    | LITERAL_FLOAT {printf("P: expr float\n"); $$ = createFloat($1);}
     | LITERAL_STRING {printf("P: expr string\n");}
     | ID {printf("P: expr ID\n");}
     | TRUE {printf("P: expr TRUE\n");}
@@ -420,10 +429,10 @@ expr: LITERAL_INT {printf("P: expr int\n");}
     | '~' expr {printf("P: expr ~\n");}
     | '!' expr {printf("P: expr !\n");}
     | UNARY_MINUS expr {printf("P: expr unary -\n");}
-    | expr '+' expr {printf("P: expr +\n");}
-    | expr BINARY_MINUS expr {printf("P: expr -\n");}
-    | expr '/' expr {printf("P: expr /\n");}
-    | expr '*' expr {printf("P: expr *\n");}
+    | expr '+' expr {printf("P: expr +\n"); $$ = createBinaryOp(ExprType::Sum, $1, $3);}
+    | expr BINARY_MINUS expr {printf("P: expr -\n"); $$ = createBinaryOp(ExprType::Sub, $1, $3);}
+    | expr '/' expr {printf("P: expr /\n"); $$ = createBinaryOp(ExprType::Div, $1, $3);}
+    | expr '*' expr {printf("P: expr *\n"); $$ = createBinaryOp(ExprType::Mul, $1, $3);}
     | expr '%' expr {printf("P: expr %\n");}
     | expr '<' expr {printf("P: expr <\n");}
     | expr '>' expr {printf("P: expr >\n");}
@@ -446,7 +455,7 @@ expr: LITERAL_INT {printf("P: expr int\n");}
     | expr AS '?' type {printf("P: expr as ?\n");}
     | expr AS '!' type {printf("P: expr as !\n");}
     | expr '?' expr ':' expr {printf("P: expr ternary ? :\n");}
-    | '(' expr ')' {printf("P: expr brackets\n");}
+    | '(' expr ')' {printf("P: expr brackets\n"); $$ = $2;}
     | funcCall {printf("P: expr funcCall\n");}
     | SUPER '.' funcCall {printf("P: expr super funcCall\n");}
     | expr '.' funcCall {printf("P: expr func access\n");}
