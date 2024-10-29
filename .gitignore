@@ -399,3 +399,6 @@ FodyWeavers.xsd
 
 # Flex generated code
 SwiftLex/swift.flex.cpp
+
+# Dont ignore graphviz files
+!SwiftLex/Graphviz/*

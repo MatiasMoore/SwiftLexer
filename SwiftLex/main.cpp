@@ -28,4 +28,7 @@ int main(int argc, const char* argv[])
 	}
 	yyparse();
 
+	system("cd");
+	system("Graphviz\\bin\\dot.exe -Tpng swift.dot > swift.png");
+	system("swift.png");
 }
