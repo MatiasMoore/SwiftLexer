@@ -22,6 +22,8 @@
     <Flex Include="swift.l" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="nodes\dotHelpers.cpp" />
+    <ClCompile Include="nodes\idsystem.cpp" />
     <ClCompile Include="nodes\StmtNode.cpp" />
     <ClCompile Include="swift.flex.cpp" />
     <ClCompile Include="main.cpp" />
@@ -35,7 +37,9 @@
     <Bison Include="swift.y" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="nodes\dotHelpers.h" />
     <ClInclude Include="globalVars.h" />
+    <ClInclude Include="nodes\idsystem.h" />
     <ClInclude Include="nodes\StmtNode.h" />
     <ClInclude Include="swift.tab.h" />
     <ClInclude Include="nodes\ExprNode.h" />

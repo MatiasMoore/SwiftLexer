@@ -5,7 +5,7 @@
 extern int yylex();
 extern int yyparse();
 extern FILE* yyin;
-extern ExprNode* _root;
+extern StmtListNode* _root;
 
 int main(int argc, const char* argv[])
 {
@@ -31,10 +31,11 @@ int main(int argc, const char* argv[])
 
 	std::ofstream dotFile;
 	dotFile.open("swift.dot");
-	dotFile <<
-		"digraph D{"
-		"A -> {B, C, D} -> {F}"
-		"}";
+
+	dotFile << "digraph swift {\n";
+	generateDotStmtList(dotFile, _root);
+	dotFile << "}\n";
+
 	dotFile.close();
 
 	system("cd");

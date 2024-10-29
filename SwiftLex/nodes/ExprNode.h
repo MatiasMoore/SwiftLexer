@@ -1,5 +1,7 @@
 #pragma once
 #include <iostream>
+#include "idsystem.h"
+#include "dotHelpers.h"
 
 enum ExprType
 {
@@ -14,6 +16,8 @@ enum ExprType
 struct ExprNode
 {
 public:
+	int _id = getNewId();
+
 	ExprType _type;
 
 	int _intValue;
@@ -29,5 +33,4 @@ ExprNode* createFloat(double value);
 
 ExprNode* createBinaryOp(ExprType type, ExprNode* left, ExprNode* right);
 
-
-
+void generateDotExpr(std::ofstream& file, ExprNode* node);
