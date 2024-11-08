@@ -210,7 +210,7 @@ funcReturnTypeE: %empty
     | funcReturnType
     ;
 
-funcDecIncomplete: FUNC ID '(' funcDeclArgListE ')' funcReturnTypeE '{' stmtListE '}' {printf("P: func declIncomplete\n");}
+funcDecIncomplete: FUNC ID anyRoundBracket funcDeclArgListE ')' funcReturnTypeE '{' stmtListE '}' {printf("P: func declIncomplete\n");}
     ;
 
     
@@ -238,7 +238,7 @@ overloadableOperators: '+'
     | OP_NIL_COALESCE
     ;
 
-funcOverloadOperatorIncomplete: FUNC overloadableOperators '(' funcDeclArgListE ')' funcReturnTypeE '{' stmtListE '}' {printf("P: func overload Operator Incomplete\n");}
+funcOverloadOperatorIncomplete: FUNC overloadableOperators anyRoundBracket funcDeclArgListE ')' funcReturnTypeE '{' stmtListE '}' {printf("P: func overload Operator Incomplete\n");}
 	;
 
 funcDeclaration: modifiersWordsList funcDecIncomplete {printf("P: func declaration prefix\n");}
@@ -265,7 +265,7 @@ modifiersWordsList: modifiersWords {printf("P: modifiersWordsList\n");}
 	| modifiersWordsList modifiersWords {printf("P: modifiersWordsList\n");}
 	;
 
-constructorDeclaration: INIT '(' funcDeclArgListE ')' '{' stmtListE '}' {printf("P: constructor declaration\n");}
+constructorDeclaration: INIT anyRoundBracket funcDeclArgListE ')' '{' stmtListE '}' {printf("P: constructor declaration\n");}
     ;
 
 destructorDeclaration: DEINIT '{' stmtListE '}' {printf("P: destructor declaration\n");}
@@ -344,7 +344,7 @@ typeList: type {printf("P: enum: typeList \n");}
     | typeList ',' type {printf("P: enum: typeList \n");}
     ;
 
-enumId: ID '(' typeList ')' {printf("P: enum: enumId \n");}
+enumId: ID anyRoundBracket typeList ')' {printf("P: enum: enumId \n");}
     | ID {printf("P: enum: enumId \n");}
     ;
 
@@ -458,7 +458,7 @@ expr: LITERAL_INT {printf("P: expr int\n"); switchStateToSubscript(); $$ = creat
     | expr AS '?' type {printf("P: expr as ?\n"); switchStateToSubscript();}
     | expr AS '!' type {printf("P: expr as !\n"); switchStateToSubscript();}
     | expr '?' expr ':' expr {printf("P: expr ternary ? :\n"); switchStateToSubscript();}
-    | '(' expr ')' {printf("P: expr brackets\n"); $$ = $2; switchStateToSubscript();}
+    | anyRoundBracket expr ')' {printf("P: expr brackets\n"); $$ = $2; switchStateToSubscript();}
     | funcCall {printf("P: expr funcCall\n"); switchStateToSubscript(); switchStateToSubscript();}
     | SUPER '.' funcCall {printf("P: expr super funcCall\n"); switchStateToSubscript();}
     | expr '.' funcCall {printf("P: expr func access\n"); switchStateToSubscript();}
@@ -472,6 +472,10 @@ expr: LITERAL_INT {printf("P: expr int\n"); switchStateToSubscript(); $$ = creat
     | expr SUBSCRIPT_SQUARE_BRACKET expr ']' {printf("P: expr array indexing\n"); switchStateToSubscript();}
     ;
 
+anyRoundBracket: '('
+	| SUBSCRIPT_ROUND_BRACKET
+	;
+        
 %%
 
 int yyerror(const char *errormsg)
