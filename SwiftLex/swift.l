@@ -5,6 +5,7 @@
 %x COMMENT_MULTILINE
 %x STRING_MULTILINE
 %x STRING
+%s SUBSCRIPT
 
 FLOAT_HEX [-+]?0x[0-9a-fA-F][_0-9a-fA-F]*\.[0-9a-fA-F][_0-9a-fA-F]*([pP][-+]?[0-9a-fA-F][_0-9]*)|[0-9a-fA-F][_0-9a-fA-F]*p[+-]?[0-9][_0-9]*
 FLOAT_DEC [0-9][_0-9]*e[+-]?[0-9][_0-9]*|[-+]?[0-9][_0-9]*\.[0-9][_0-9]*(e[-+]?[0-9][_0-9]*)?
@@ -24,7 +25,11 @@ using namespace std;
 
 	// FUNCTIONS
 void removeChar(std::string& str, char charToRemove);
+bool isSubsciptActive = false;
 #define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno;
+
+void switchStateToSubscript();
+
 %}
 
 %%
@@ -44,6 +49,10 @@ void removeChar(std::string& str, char charToRemove);
 	float floatBuf = 0;
 	double doubleBuf = 0;
 %}
+
+<SUBSCRIPT>\[ { cout << "Subscript left square bracket: " << yytext << endl; isSubsciptActive = false; return SUBSCRIPT_SQUARE_BRACKET; BEGIN(INITIAL);}
+<SUBSCRIPT>\( { cout << "Subscript left round bracket: " << yytext << endl; isSubsciptActive = false; return SUBSCRIPT_ROUND_BRACKET; BEGIN(INITIAL);}
+<SUBSCRIPT>[^	]|[^ ] { cout << "Subscript end" << endl;  yyless(0); isSubsciptActive = false; BEGIN(INITIAL);}
 
 	/* KEYWORDS */
 	
@@ -240,14 +249,14 @@ Double {cout << "Type Double: " << yytext << endl; return TYPE_DOUBLE;}
 
 	/* COMMENTS */
 
-\/\/.* { cout << "Inline comment: " << yytext << endl; }
+<INITIAL,SUBSCRIPT>\/\/.* { cout << "Inline comment: " << yytext << endl; }
 
 	/* COMMENTS MULTILINE */
 \/\* {str = yytext; multilineNumberBegin = lineNumber; BEGIN(COMMENT_MULTILINE); }
-<COMMENT_MULTILINE>\*\/ { str += yytext; cout << "Multiline comment: \n" << str << "\n"; BEGIN(INITIAL); }
-<COMMENT_MULTILINE>\n { str += yytext; lineNumber++; }
+<COMMENT_MULTILINE>\*\/ { str += yytext; cout << "Multiline comment: \n" << str << "\n"; isSubsciptActive ? BEGIN(SUBSCRIPT) : BEGIN(INITIAL); }
+<COMMENT_MULTILINE>\n { str += yytext; lineNumber++;  isSubsciptActive = false;}
 <COMMENT_MULTILINE>. { str += yytext;}
-<COMMENT_MULTILINE><<EOF>> {cout << "ERROR: Multiline comment at line " << multilineNumberBegin << ": is not closed" << endl; BEGIN(INITIAL); }
+<COMMENT_MULTILINE><<EOF>> {cout << "ERROR: Multiline comment at line " << multilineNumberBegin << ": is not closed" << endl; isSubsciptActive = false; isSubsciptActive ? BEGIN(SUBSCRIPT) : BEGIN(INITIAL); }
 
 	/* LINE COUNTER */
 \n {lineNumber++;}
@@ -261,7 +270,7 @@ Double {cout << "Type Double: " << yytext << endl; return TYPE_DOUBLE;}
 <STRING_MULTILINE>[^\n\r] { stringMultiline += yytext; }
 	/* TODO MAYBE WE SHOULD IGNORE ALL TABS COMPLETELY */
 <STRING_MULTILINE>\\\n\t* { stringMultiline += ""; }
-<STRING_MULTILINE>\n { stringMultiline += yytext; lineNumber++;}
+<STRING_MULTILINE>\n { stringMultiline += yytext; lineNumber++; }
 <STRING_MULTILINE>\\\\ { stringMultiline += "\\"; }
 <STRING_MULTILINE>\\n { stringMultiline += "\n"; }
 <STRING_MULTILINE>\\b { stringMultiline += "\b"; }
@@ -281,19 +290,19 @@ Double {cout << "Type Double: " << yytext << endl; return TYPE_DOUBLE;}
  }
 <STRING_MULTILINE>\"{1,2} { stringMultiline += yytext; }
 	/* TODO THIS MAY NOT WORK ALL THE TIME */
-<STRING_MULTILINE>\\\n\s*\"\"\" { cout << "ERROR: Escaped newline at the last line of multiline string is not allowed at line " << multilineStringLineNumber << endl; BEGIN(INITIAL); }
+<STRING_MULTILINE>\\\n\s*\"\"\" { cout << "ERROR: Escaped newline at the last line of multiline string is not allowed at line " << multilineStringLineNumber << endl; isSubsciptActive = false; BEGIN(INITIAL); }
 <STRING_MULTILINE>\s*\"\"\" { 
 	cout << "Multiline string: " << stringMultiline << endl; 
-	BEGIN(INITIAL); 
+	isSubsciptActive ? BEGIN(SUBSCRIPT) : BEGIN(INITIAL); 
 	//This is a memory leak
 	yylval.strval = _strdup(stringMultiline.c_str());
 	return LITERAL_STRING;
 }
-<STRING_MULTILINE><<EOF>> { cout << "ERROR: Multiline string is not closed at line " << multilineStringLineNumber << endl; BEGIN(INITIAL); }
+<STRING_MULTILINE><<EOF>> { cout << "ERROR: Multiline string is not closed at line " << multilineStringLineNumber << endl; isSubsciptActive ? BEGIN(SUBSCRIPT) : BEGIN(INITIAL); }
 
 \" { stringOneLine.clear(); BEGIN(STRING); }
 <STRING>[^\\\"\n]+ { stringOneLine += yytext; }
-<STRING>\n { cout << "ERROR: unterminated string at line " << lineNumber << endl; BEGIN(INITIAL);}
+<STRING>\n { cout << "ERROR: unterminated string at line " << lineNumber << endl; isSubsciptActive ? BEGIN(SUBSCRIPT) : BEGIN(INITIAL);}
 <STRING>\\\\ { stringOneLine += "\\"; }
 <STRING>\\n { stringOneLine += "\n"; }
 <STRING>\\b { stringOneLine += "\b"; }
@@ -311,15 +320,15 @@ Double {cout << "Type Double: " << yytext << endl; return TYPE_DOUBLE;}
 	unicodeHexBuffer.pop_back();
 	stringOneLine += char(strtoll(unicodeHexBuffer.c_str(), NULL, 16));
  }
-<STRING>\\u { cout << "ERROR: incorrect unicode char format at line " << lineNumber << endl; BEGIN(INITIAL);}
+<STRING>\\u { cout << "ERROR: incorrect unicode char format at line " << lineNumber << endl; isSubsciptActive ? BEGIN(SUBSCRIPT) : BEGIN(INITIAL);}
 <STRING>\" { 
 	cout << "Oneline string: " << stringOneLine << endl; 
-	BEGIN(INITIAL); 
+	isSubsciptActive ? BEGIN(SUBSCRIPT) : BEGIN(INITIAL);
 	//This is a memory leak
 	yylval.strval = _strdup(stringOneLine.c_str());
 	return LITERAL_STRING;
 }
-<STRING><<EOF>> { cout << "ERROR: string in not closed at the end of file at line " << lineNumber << endl; BEGIN(INITIAL); }
+<STRING><<EOF>> { cout << "ERROR: string in not closed at the end of file at line " << lineNumber << endl; isSubsciptActive ? BEGIN(SUBSCRIPT) : BEGIN(INITIAL); }
 
 	/* NUMBERS BINARY */
 
@@ -415,6 +424,7 @@ Double {cout << "Type Double: " << yytext << endl; return TYPE_DOUBLE;}
 [_a-zA-Z][_a-zA-Z0-9]* { 
 	cout << "Identifier: " << yytext << endl; 
 	yylval.strval = _strdup(yytext);
+	switchStateToSubscript();
 	return ID;
 }
 
@@ -427,4 +437,10 @@ Double {cout << "Type Double: " << yytext << endl; return TYPE_DOUBLE;}
 void removeChar(string& str, char charToRemove) 
 {
     str.erase(remove(str.begin(), str.end(), charToRemove), str.end());
+}
+
+void switchStateToSubscript(){
+	cout << "Switched to subscript state" << endl;
+	isSubsciptActive = true;
+	BEGIN(SUBSCRIPT);
 }

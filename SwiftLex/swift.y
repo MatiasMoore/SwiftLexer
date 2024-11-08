@@ -8,6 +8,7 @@
   int yylex(void);
   int yyerror(const char *s);
   using namespace std;
+  void switchStateToSubscript();
 %}
 
 %union {
@@ -82,6 +83,8 @@ TYPE_UINT16 TYPE_UINT32 TYPE_UINT64
 TYPE_UINT TYPE_FLOAT TYPE_FLOAT80  
 TYPE_DOUBLE
 
+SUBSCRIPT_SQUARE_BRACKET SUBSCRIPT_ROUND_BRACKET
+
 %left '=' ID
 %right '?' ':' 
 %right OP_NIL_COALESCE
@@ -98,8 +101,8 @@ TYPE_DOUBLE
 %right '~' '!'
 %nonassoc IS AS
 %left UNARY_PLUS UNARY_MINUS
-%left '[' ']'
-%right '(' ')'
+%left '[' ']' SUBSCRIPT_SQUARE_BRACKET
+%right '(' ')' SUBSCRIPT_ROUND_BRACKET
 
 // Nodes
 %type<exprNode> expr
@@ -299,8 +302,8 @@ exprListE: %empty
     | exprList
     ;
 
-funcCall: ID '(' exprListE ')' {printf("P: funcCall exprList\n");}
-    | ID '(' funcCallArgList ')' {printf("P: funcCall labelArgs\n");}
+funcCall: ID SUBSCRIPT_ROUND_BRACKET exprListE ')' {printf("P: funcCall exprList\n");}
+    | ID SUBSCRIPT_ROUND_BRACKET funcCallArgList ')' {printf("P: funcCall labelArgs\n");}
     ;
 
 assignment: expr '=' expr {printf("P: assignment\n");}
@@ -420,54 +423,54 @@ caseList: caseElement {printf("P: caseList\n");}
 defaultCase: DEFAULT ':' stmtList {printf("P: defaultCase\n");}
 	;
 
-expr: LITERAL_INT {printf("P: expr int\n"); $$ = createInt($1);}
-    | LITERAL_FLOAT {printf("P: expr float\n"); $$ = createFloat($1);}
-    | LITERAL_STRING {printf("P: expr string\n");}
-    | ID {printf("P: expr ID\n");}
-    | TRUE {printf("P: expr TRUE\n");}
-    | FALSE {printf("P: expr FALSE\n");}
-    | '~' expr {printf("P: expr ~\n");}
-    | '!' expr {printf("P: expr !\n");}
-    | UNARY_MINUS expr {printf("P: expr unary -\n");}
-    | expr '+' expr {printf("P: expr +\n"); $$ = createBinaryOp(ExprType::Sum, $1, $3);}
-    | expr BINARY_MINUS expr {printf("P: expr -\n"); $$ = createBinaryOp(ExprType::Sub, $1, $3);}
-    | expr '/' expr {printf("P: expr /\n"); $$ = createBinaryOp(ExprType::Div, $1, $3);}
-    | expr '*' expr {printf("P: expr *\n"); $$ = createBinaryOp(ExprType::Mul, $1, $3);}
-    | expr '%' expr {printf("P: expr %\n");}
-    | expr '<' expr {printf("P: expr <\n");}
-    | expr '>' expr {printf("P: expr >\n");}
-    | expr OP_GTE expr {printf("P: expr >=\n");}
-    | expr OP_LTE expr {printf("P: expr <=\n");}
-    | expr OP_EQ expr {printf("P: expr ==\n");}
-    | expr OP_NEQ expr {printf("P: expr !=\n");}
-    | expr '&' expr {printf("P: expr &\n");}
-    | expr '|' expr {printf("P: expr |\n");}
-    | expr '^' expr {printf("P: expr ^\n");}
-    | expr OP_LOG_AND expr {printf("P: expr &&\n");}
-    | expr OP_LOG_OR expr {printf("P: expr ||\n");}
-    | expr OP_LSHIFT expr {printf("P: expr <<\n");}
-    | expr OP_RSHIFT expr {printf("P: expr >>\n");}
-    | expr OP_CLOSED_RANGE expr {printf("P: expr ...\n");}
-    | expr OP_HALF_OPEN_RANGE expr {printf("P: expr ..<\n");}
-    | expr OP_NIL_COALESCE expr {printf("P: expr ??\n");}
-    | expr IS type {printf("P: expr is\n");}
-    | expr AS type {printf("P: expr as\n");}
-    | expr AS '?' type {printf("P: expr as ?\n");}
-    | expr AS '!' type {printf("P: expr as !\n");}
-    | expr '?' expr ':' expr {printf("P: expr ternary ? :\n");}
-    | '(' expr ')' {printf("P: expr brackets\n"); $$ = $2;}
-    | funcCall {printf("P: expr funcCall\n");}
-    | SUPER '.' funcCall {printf("P: expr super funcCall\n");}
-    | expr '.' funcCall {printf("P: expr func access\n");}
-    | SELF '.' funcCall {printf("P: expr self func access\n");}
-    | expr '.' ID {printf("P: expr field access\n");}
-    | SELF '.' ID {printf("P: expr self fieldAccess\n");}
+expr: LITERAL_INT {printf("P: expr int\n"); switchStateToSubscript(); $$ = createInt($1);}
+    | LITERAL_FLOAT {printf("P: expr float\n"); switchStateToSubscript(); $$ = createFloat($1);}
+    | LITERAL_STRING {printf("P: expr string\n"); switchStateToSubscript();}
+    | ID {printf("P: expr ID\n"); switchStateToSubscript();}
+    | TRUE {printf("P: expr TRUE\n"); switchStateToSubscript();}
+    | FALSE {printf("P: expr FALSE\n"); switchStateToSubscript();}
+    | '~' expr {printf("P: expr ~\n"); switchStateToSubscript();}
+    | '!' expr {printf("P: expr !\n"); switchStateToSubscript();}
+    | UNARY_MINUS expr {printf("P: expr unary -\n"); switchStateToSubscript();}
+    | expr '+' expr {printf("P: expr +\n"); switchStateToSubscript(); $$ = createBinaryOp(ExprType::Sum, $1, $3);}
+    | expr BINARY_MINUS expr {printf("P: expr -\n"); switchStateToSubscript(); $$ = createBinaryOp(ExprType::Sub, $1, $3);}
+    | expr '/' expr {printf("P: expr /\n"); switchStateToSubscript(); $$ = createBinaryOp(ExprType::Div, $1, $3);}
+    | expr '*' expr {printf("P: expr *\n"); switchStateToSubscript(); $$ = createBinaryOp(ExprType::Mul, $1, $3);}
+    | expr '%' expr {printf("P: expr %\n"); switchStateToSubscript();}
+    | expr '<' expr {printf("P: expr <\n"); switchStateToSubscript();}
+    | expr '>' expr {printf("P: expr >\n"); switchStateToSubscript();}
+    | expr OP_GTE expr {printf("P: expr >=\n"); switchStateToSubscript();}
+    | expr OP_LTE expr {printf("P: expr <=\n"); switchStateToSubscript();}
+    | expr OP_EQ expr {printf("P: expr ==\n"); switchStateToSubscript();}
+    | expr OP_NEQ expr {printf("P: expr !=\n"); switchStateToSubscript();}
+    | expr '&' expr {printf("P: expr &\n"); switchStateToSubscript();}
+    | expr '|' expr {printf("P: expr |\n"); switchStateToSubscript();}
+    | expr '^' expr {printf("P: expr ^\n"); switchStateToSubscript();}
+    | expr OP_LOG_AND expr {printf("P: expr &&\n"); switchStateToSubscript();}
+    | expr OP_LOG_OR expr {printf("P: expr ||\n"); switchStateToSubscript();}
+    | expr OP_LSHIFT expr {printf("P: expr <<\n"); switchStateToSubscript();}
+    | expr OP_RSHIFT expr {printf("P: expr >>\n"); switchStateToSubscript();}
+    | expr OP_CLOSED_RANGE expr {printf("P: expr ...\n"); switchStateToSubscript();}
+    | expr OP_HALF_OPEN_RANGE expr {printf("P: expr ..<\n"); switchStateToSubscript();}
+    | expr OP_NIL_COALESCE expr {printf("P: expr ??\n"); switchStateToSubscript();}
+    | expr IS type {printf("P: expr is\n"); switchStateToSubscript();}
+    | expr AS type {printf("P: expr as\n"); switchStateToSubscript();}
+    | expr AS '?' type {printf("P: expr as ?\n"); switchStateToSubscript();}
+    | expr AS '!' type {printf("P: expr as !\n"); switchStateToSubscript();}
+    | expr '?' expr ':' expr {printf("P: expr ternary ? :\n"); switchStateToSubscript();}
+    | '(' expr ')' {printf("P: expr brackets\n"); $$ = $2; switchStateToSubscript();}
+    | funcCall {printf("P: expr funcCall\n"); switchStateToSubscript(); switchStateToSubscript();}
+    | SUPER '.' funcCall {printf("P: expr super funcCall\n"); switchStateToSubscript();}
+    | expr '.' funcCall {printf("P: expr func access\n"); switchStateToSubscript();}
+    | SELF '.' funcCall {printf("P: expr self func access\n"); switchStateToSubscript();}
+    | expr '.' ID {printf("P: expr field access\n"); switchStateToSubscript();}
+    | SELF '.' ID {printf("P: expr self fieldAccess\n"); switchStateToSubscript();}
     // WARNING THIS CAUSES 2 CONFLICTS 
     // BUT THEY ARE RESOLVED CORRECTLY BY DEFAULT
     // TODO: RESOLVE CONFLICT EXPLICITLY
-    | '[' exprList ']' {printf("P: expr array\n");}
-    | expr '[' expr ']' {printf("P: expr array indexing\n");}
-    | '.' ID {printf("P: expr enum field access\n");} 
+    | '[' exprList ']' {printf("P: expr array\n"); switchStateToSubscript();}
+    | expr SUBSCRIPT_SQUARE_BRACKET expr ']' {printf("P: expr array indexing\n"); switchStateToSubscript();}
+    | '.' ID {printf("P: expr enum field access\n"); switchStateToSubscript();} 
     ;
 
 %%
