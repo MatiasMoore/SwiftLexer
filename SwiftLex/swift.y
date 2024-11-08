@@ -470,7 +470,6 @@ expr: LITERAL_INT {printf("P: expr int\n"); switchStateToSubscript(); $$ = creat
     // TODO: RESOLVE CONFLICT EXPLICITLY
     | '[' exprList ']' {printf("P: expr array\n"); switchStateToSubscript();}
     | expr SUBSCRIPT_SQUARE_BRACKET expr ']' {printf("P: expr array indexing\n"); switchStateToSubscript();}
-    | '.' ID {printf("P: expr enum field access\n"); switchStateToSubscript();} 
     ;
 
 %%
