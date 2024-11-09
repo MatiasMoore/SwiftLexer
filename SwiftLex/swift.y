@@ -442,7 +442,7 @@ expr: LITERAL_INT {printf("P: expr int\n"); switchStateToSubscript(); $$ = ExprN
     | expr OP_GTE expr {printf("P: expr >=\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::GTE, $1, $3);}
     | expr OP_LTE expr {printf("P: expr <=\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::LTE, $1, $3);}
     | expr OP_EQ expr {printf("P: expr ==\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::EQ, $1, $3);}
-    | expr OP_NEQ expr {printf("P: expr !=\n"); switchStateToSubscript();}
+    | expr OP_NEQ expr {printf("P: expr !=\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::NEQ, $1, $3);}
     | expr '&' expr {printf("P: expr &\n"); switchStateToSubscript();}
     | expr '|' expr {printf("P: expr |\n"); switchStateToSubscript();}
     | expr '^' expr {printf("P: expr ^\n"); switchStateToSubscript();}

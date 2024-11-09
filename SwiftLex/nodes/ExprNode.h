@@ -17,7 +17,8 @@ enum ExprType
 	GT,
 	GTE,
 	LTE,
-	EQ
+	EQ,
+	NEQ
 };
 
 class ExprNode : public Dottable
