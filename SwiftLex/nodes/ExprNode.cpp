@@ -134,6 +134,9 @@ std::string ExprNode::getName()
 	case ExprType::HalfOpenRange:
 		return "HalfOpenRange ..<";
 		break;
+	case ExprType::NilCoalesce:
+		return "NilCoalesce ??";
+		break;
 	default:
 		throw std::runtime_error("Unknown type!");
 		break;
@@ -179,6 +182,7 @@ void ExprNode::generateDot(std::ofstream& file)
 	case ExprType::Rshift:
 	case ExprType::ClosedRange:
 	case ExprType::HalfOpenRange:
+	case ExprType::NilCoalesce:
 		file << dotLabel(this->_id, this->getName());
 		file << dotConnection(this->_id, this->_left->_id);
 		file << dotConnection(this->_id, this->_right->_id);

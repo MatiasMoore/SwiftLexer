@@ -27,7 +27,8 @@ enum ExprType
 	Lshift,
 	Rshift,
 	ClosedRange,
-	HalfOpenRange
+	HalfOpenRange,
+	NilCoalesce
 };
 
 class ExprNode : public Dottable
