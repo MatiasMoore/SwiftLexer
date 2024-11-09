@@ -101,6 +101,9 @@ std::string ExprNode::getName()
 	case ExprType::LTE:
 		return "LTE <=";
 		break;
+	case ExprType::EQ:
+		return "EQ ==";
+		break;
 	default:
 		throw std::runtime_error("Unknown type!");
 		break;
@@ -135,6 +138,7 @@ void ExprNode::generateDot(std::ofstream& file)
 	case ExprType::GT:
 	case ExprType::GTE:
 	case ExprType::LTE:
+	case ExprType::EQ:
 		file << dotLabel(this->_id, this->getName());
 		file << dotConnection(this->_id, this->_left->_id);
 		file << dotConnection(this->_id, this->_right->_id);
