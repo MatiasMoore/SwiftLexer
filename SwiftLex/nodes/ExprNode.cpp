@@ -181,6 +181,9 @@ std::string ExprNode::getName()
 	case ExprType::Array:
 		return "Array";
 		break;
+	case ExprType::Subscript:
+		return "Subscript []";
+		break;
 	default:
 		throw std::runtime_error("Unknown type!");
 		break;
@@ -251,6 +254,13 @@ void ExprNode::generateDot(std::ofstream& file)
 		file << dotLabel(this->_id, this->getName());
 		file << dotConnection(this->_id, this->_left->_id);
 		file << dotConnection(this->_id, this->_right->_id);
+		this->_left->generateDot(file);
+		this->_right->generateDot(file);
+		break;
+	case ExprType::Subscript:
+		file << dotLabel(this->_id, this->getName());
+		file << dotConnectionWithLabel(this->_id, this->_left->_id, "array");
+		file << dotConnectionWithLabel(this->_id, this->_right->_id, "index");
 		this->_left->generateDot(file);
 		this->_right->generateDot(file);
 		break;

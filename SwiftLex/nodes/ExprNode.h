@@ -34,7 +34,8 @@ enum ExprType
 	LogNot,
 	UnaryMinus,
 	Ternary,
-	Array
+	Array,
+	Subscript
 };
 
 //Forward declaration for list
