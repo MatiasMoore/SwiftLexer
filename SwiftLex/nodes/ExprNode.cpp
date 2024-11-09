@@ -75,6 +75,15 @@ ExprNode* ExprNode::createTernary(ExprNode* condition, ExprNode* ifTrue, ExprNod
 	return node;
 }
 
+ExprNode* ExprNode::createArray(ExprListNode* list)
+{
+	auto node = new ExprNode();
+	node->_type = ExprType::Array;
+	node->_arrayExprList = list;
+	printf("N: array %d\n", (int)node->_type);
+	return node;
+}
+
 std::string ExprNode::getName()
 {
 	switch (this->_type)
@@ -169,6 +178,9 @@ std::string ExprNode::getName()
 	case ExprType::Ternary:
 		return "Ternary ? :";
 		break;
+	case ExprType::Array:
+		return "Array";
+		break;
 	default:
 		throw std::runtime_error("Unknown type!");
 		break;
@@ -202,6 +214,11 @@ void ExprNode::generateDot(std::ofstream& file)
 		this->_ternaryCondition->generateDot(file);
 		this->_ternaryIfTrue->generateDot(file);
 		this->_ternaryIfFalse->generateDot(file);
+		break;
+	case ExprType::Array:
+		file << dotLabel(this->_id, this->getName());
+		file << dotConnection(this->_id, this->_arrayExprList->_id);
+		this->_arrayExprList->generateDot(file);
 		break;
 	case ExprType::BitNot:
 	case ExprType::LogNot:
@@ -243,3 +260,7 @@ void ExprNode::generateDot(std::ofstream& file)
 	}
 }
 
+std::string ExprListNode::getName()
+{
+	return "ExprList";
+}

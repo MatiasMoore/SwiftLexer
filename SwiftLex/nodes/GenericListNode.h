@@ -7,9 +7,11 @@ class GenericListNode : public Dottable {
 public:
 	std::vector<ListElem*> _vec = {};
 
+	virtual std::string getName() = 0;
+
 	static List* createListNode(ListElem* node)
 	{
-		auto list = new GenericListNode();
+		auto list = new List();
 		list->_vec.push_back(node);
 		return (List*)list;
 	}
@@ -22,7 +24,7 @@ public:
 
 	void generateDot(std::ofstream& file) override
 	{
-		file << dotLabel(this->_id, "Stmt list");
+		file << dotLabel(this->_id, this->getName());
 		for (auto& child : this->_vec)
 		{
 			file << dotConnection(this->_id, child->_id);

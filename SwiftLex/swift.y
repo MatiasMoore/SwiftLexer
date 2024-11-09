@@ -19,6 +19,7 @@
     class ExprNode* exprNode;
     class StmtNode* stmtNode;
     class StmtListNode* stmtListNode;
+    class ExprListNode* exprListNode;
 }
 %locations
 
@@ -106,6 +107,7 @@ SUBSCRIPT_SQUARE_BRACKET SUBSCRIPT_ROUND_BRACKET
 
 // Nodes
 %type<exprNode> expr
+%type<exprListNode> exprList
 %type<stmtNode> stmt
 %type<stmtListNode> stmtList
 %type<stmtListNode> program
@@ -294,8 +296,8 @@ structDeclaration: modifiersWordsList structDeclIncomplete {printf("P: struct de
 	| structDeclIncomplete {printf("P: struct declaration default\n");}
 	;
 
-exprList: expr {printf("P: exprList\n");}
-    | exprList ',' expr {printf("P: exprList\n");}
+exprList: expr {printf("P: exprList\n"); $$ = ExprListNode::createListNode($1);}
+    | exprList ',' expr {printf("P: exprList\n"); $$ = $$->appendNode($3);}
     ;
 
 exprListE: %empty
@@ -468,7 +470,7 @@ expr: LITERAL_INT {printf("P: expr int\n"); switchStateToSubscript(); $$ = ExprN
     // WARNING THIS CAUSES 2 CONFLICTS 
     // BUT THEY ARE RESOLVED CORRECTLY BY DEFAULT
     // TODO: RESOLVE CONFLICT EXPLICITLY
-    | '[' exprList ']' {printf("P: expr array\n"); switchStateToSubscript();}
+    | '[' exprList ']' {printf("P: expr array\n"); switchStateToSubscript(); $$ = ExprNode::createArray($2);}
     | expr SUBSCRIPT_SQUARE_BRACKET expr ']' {printf("P: expr array indexing\n"); switchStateToSubscript();}
     ;
 

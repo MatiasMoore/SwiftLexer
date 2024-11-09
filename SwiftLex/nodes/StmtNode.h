@@ -25,5 +25,6 @@ public:
 
 class StmtListNode : public GenericListNode<StmtNode, StmtListNode>
 {
-
+public:
+	std::string getName() override;
 };

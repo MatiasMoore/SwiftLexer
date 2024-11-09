@@ -1,5 +1,6 @@
 #pragma once
 #include "dottable.h"
+#include "GenericListNode.h"
 
 enum ExprType
 {
@@ -32,7 +33,17 @@ enum ExprType
 	BitNot,
 	LogNot,
 	UnaryMinus,
-	Ternary
+	Ternary,
+	Array
+};
+
+//Forward declaration for list
+class ExprNode;
+
+class ExprListNode : public GenericListNode<ExprNode, ExprListNode>
+{
+public:
+	std::string getName() override;
 };
 
 class ExprNode : public Dottable
@@ -51,6 +62,7 @@ public:
 	ExprNode* _ternaryCondition;
 	ExprNode* _ternaryIfTrue;
 	ExprNode* _ternaryIfFalse;
+	ExprListNode* _arrayExprList;
 
 	static ExprNode* createBool(bool value);
 
@@ -67,6 +79,8 @@ public:
 	static ExprNode* createUnaryOp(ExprType type, ExprNode* unary);
 
 	static ExprNode* createTernary(ExprNode* condition, ExprNode* ifTrue, ExprNode* ifFalse);
+
+	static ExprNode* createArray(ExprListNode* list);
 
 	std::string getName();
 

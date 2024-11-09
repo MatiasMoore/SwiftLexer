@@ -24,3 +24,7 @@ void StmtNode::generateDot(std::ofstream& file)
 	}
 }
 
+std::string StmtListNode::getName()
+{
+	return "StmtList";
+}
