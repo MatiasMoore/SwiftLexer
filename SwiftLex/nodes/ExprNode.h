@@ -10,7 +10,8 @@ enum ExprType
 	Mul,
 	Div,
 	String,
-	Id
+	Id,
+	Bool
 };
 
 class ExprNode : public Dottable
@@ -18,12 +19,15 @@ class ExprNode : public Dottable
 public:
 	ExprType _type;
 
+	bool _boolValue;
 	int _intValue;
 	double _floatValue;
 	std::string _stringValue;
 
 	ExprNode* _left;
 	ExprNode* _right;
+
+	static ExprNode* createBool(bool value);
 
 	static ExprNode* createInt(int value);
 

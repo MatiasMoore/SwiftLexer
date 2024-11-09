@@ -427,8 +427,8 @@ expr: LITERAL_INT {printf("P: expr int\n"); switchStateToSubscript(); $$ = ExprN
     | LITERAL_FLOAT {printf("P: expr float\n"); switchStateToSubscript(); $$ = ExprNode::createFloat($1);}
     | LITERAL_STRING {printf("P: expr string\n"); switchStateToSubscript(); $$ = ExprNode::createString($1);}
     | ID {printf("P: expr ID\n"); switchStateToSubscript(); $$ = ExprNode::createId($1);}
-    | TRUE {printf("P: expr TRUE\n"); switchStateToSubscript();}
-    | FALSE {printf("P: expr FALSE\n"); switchStateToSubscript();}
+    | TRUE {printf("P: expr TRUE\n"); switchStateToSubscript(); $$ = ExprNode::createBool(true);}
+    | FALSE {printf("P: expr FALSE\n"); switchStateToSubscript(); $$ = ExprNode::createBool(false);}
     | '~' expr {printf("P: expr ~\n"); switchStateToSubscript();}
     | '!' expr {printf("P: expr !\n"); switchStateToSubscript();}
     | UNARY_MINUS expr {printf("P: expr unary -\n"); switchStateToSubscript();}

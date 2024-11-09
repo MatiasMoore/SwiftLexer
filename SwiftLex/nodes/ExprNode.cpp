@@ -1,5 +1,14 @@
 #include "ExprNode.h"
 
+ExprNode* ExprNode::createBool(bool value)
+{
+	auto node = new ExprNode();
+	node->_type = ExprType::Bool;
+	node->_boolValue = value;
+	printf("N: bool\n");
+	return node;
+}
+
 ExprNode* ExprNode::createInt(int value)
 {
 	auto node = new ExprNode();
@@ -32,7 +41,7 @@ ExprNode* ExprNode::createId(std::string value)
 	auto node = new ExprNode();
 	node->_type = ExprType::Id;
 	node->_stringValue = value;
-	printf("N: string\n");
+	printf("N: id\n");
 	return node;
 }
 
@@ -50,6 +59,9 @@ std::string ExprNode::getName()
 {
 	switch (this->_type)
 	{
+	case ExprType::Bool:
+		return "Bool";
+		break;
 	case ExprType::Int:
 		return "Int";
 		break;
@@ -84,6 +96,9 @@ void ExprNode::generateDot(std::ofstream& file)
 {
 	switch (this->_type)
 	{
+	case ExprType::Bool:
+		file << dotLabel(this->_id, this->getName() + ": " + (this->_boolValue ? "true" : "false"));
+		break;
 	case ExprType::Int:
 		file << dotLabel(this->_id, this->getName() + ": " + std::to_string(this->_intValue));
 		break;
