@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "dottable.h"
+#include "GenericListNode.h"
 #include "ExprNode.h"
 
 enum StmtType
@@ -8,7 +9,7 @@ enum StmtType
 	Expr
 };
 
-struct StmtNode : public Dottable
+class StmtNode : public Dottable
 {
 public:
 	bool _hasSemicolon = false;
@@ -22,17 +23,7 @@ public:
 	void generateDot(std::ofstream& file) override;
 };
 
-
-struct StmtListNode : public Dottable
+class StmtListNode : public GenericListNode<StmtNode, StmtListNode>
 {
-public:
-	std::vector<StmtNode*> _stmtVec = {};
 
-	static StmtListNode* createStmtList(StmtNode* stmt);
-
-	StmtListNode* appendStmt(StmtNode* stmtToAdd);
-
-	void generateDot(std::ofstream& file) override;
 };
-
-

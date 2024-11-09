@@ -37,6 +37,7 @@
     <Bison Include="swift.y" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="nodes\GenericListNode.h" />
     <ClInclude Include="nodes\dottable.h" />
     <ClInclude Include="nodes\dotHelpers.h" />
     <ClInclude Include="globalVars.h" />

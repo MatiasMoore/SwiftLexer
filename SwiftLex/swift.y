@@ -157,14 +157,14 @@ stmt: varDeclaration {printf("P: stmt varDec\n");}
     | structDeclaration {printf("P: stmt struct\n");}
 	;
 
-stmtList: stmt {printf("P: stmtList start\n"); $$ = StmtListNode::createStmtList($1);}
+stmtList: stmt {printf("P: stmtList start\n"); $$ = StmtListNode::createListNode($1);}
 	| stmtList stmt {
-        if (!($1->_stmtVec.back()->_hasSemicolon) && @1.last_line == @2.first_line){
+        if (!($1->_vec.back()->_hasSemicolon) && @1.last_line == @2.first_line){
             yyerror("Syntax error: two statements in one line must be separated with a ';'");
         }
         else {
 			printf("P: stmtList\n");
-            $$ = $1->appendStmt($2);
+            $$ = $1->appendNode($2);
 		}
     }
 	;

@@ -24,27 +24,3 @@ void StmtNode::generateDot(std::ofstream& file)
 	}
 }
 
-StmtListNode* StmtListNode::createStmtList(StmtNode* stmt)
-{
-	auto node = new StmtListNode();
-	node->_stmtVec.push_back(stmt);
-	printf("N: new stmt list\n");
-	return node;
-}
-
-StmtListNode* StmtListNode::appendStmt(StmtNode* stmtToAdd)
-{
-	this->_stmtVec.push_back(stmtToAdd);
-	printf("N: append to stmt list\n");
-	return this;
-}
-
-void StmtListNode::generateDot(std::ofstream& file)
-{
-	file << dotLabel(this->_id, "Stmt list");
-	for (auto& child : this->_stmtVec)
-	{
-		file << dotConnection(this->_id, child->_id);
-		child->generateDot(file);
-	}
-}
