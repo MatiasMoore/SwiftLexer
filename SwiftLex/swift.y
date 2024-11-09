@@ -457,7 +457,7 @@ expr: LITERAL_INT {printf("P: expr int\n"); switchStateToSubscript(); $$ = ExprN
     | expr AS type {printf("P: expr as\n"); switchStateToSubscript();}
     | expr AS '?' type {printf("P: expr as ?\n"); switchStateToSubscript();}
     | expr AS '!' type {printf("P: expr as !\n"); switchStateToSubscript();}
-    | expr '?' expr ':' expr {printf("P: expr ternary ? :\n"); switchStateToSubscript();}
+    | expr '?' expr ':' expr {printf("P: expr ternary ? :\n"); switchStateToSubscript(); $$ = ExprNode::createTernary($1, $3, $5);}
     | anyRoundBracket expr ')' {printf("P: expr brackets\n"); $$ = $2; switchStateToSubscript();}
     | funcCall {printf("P: expr funcCall\n"); switchStateToSubscript(); switchStateToSubscript();}
     | SUPER '.' funcCall {printf("P: expr super funcCall\n"); switchStateToSubscript();}

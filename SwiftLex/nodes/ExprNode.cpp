@@ -64,6 +64,17 @@ ExprNode* ExprNode::createUnaryOp(ExprType type, ExprNode* unary)
 	return node;
 }
 
+ExprNode* ExprNode::createTernary(ExprNode* condition, ExprNode* ifTrue, ExprNode* ifFalse)
+{
+	auto node = new ExprNode();
+	node->_type = ExprType::Ternary;
+	node->_ternaryCondition = condition;
+	node->_ternaryIfTrue = ifTrue;
+	node->_ternaryIfFalse = ifFalse;
+	printf("N: ternaryOp %d\n", (int)node->_type);
+	return node;
+}
+
 std::string ExprNode::getName()
 {
 	switch (this->_type)
@@ -155,6 +166,9 @@ std::string ExprNode::getName()
 	case ExprType::UnaryMinus:
 		return "UnaryMinus -";
 		break;
+	case ExprType::Ternary:
+		return "Ternary ? :";
+		break;
 	default:
 		throw std::runtime_error("Unknown type!");
 		break;
@@ -179,6 +193,15 @@ void ExprNode::generateDot(std::ofstream& file)
 		break;
 	case ExprType::Id:
 		file << dotLabel(this->_id, this->getName() + ": " + _stringValue);
+		break;
+	case ExprType::Ternary:
+		file << dotLabel(this->_id, this->getName());
+		file << dotConnectionWithLabel(this->_id, this->_ternaryCondition->_id, "condition");
+		file << dotConnectionWithLabel(this->_id, this->_ternaryIfTrue->_id, "ifTrue");
+		file << dotConnectionWithLabel(this->_id, this->_ternaryIfFalse->_id, "ifFalse");
+		this->_ternaryCondition->generateDot(file);
+		this->_ternaryIfTrue->generateDot(file);
+		this->_ternaryIfFalse->generateDot(file);
 		break;
 	case ExprType::BitNot:
 	case ExprType::LogNot:

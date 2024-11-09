@@ -31,7 +31,8 @@ enum ExprType
 	NilCoalesce,
 	BitNot,
 	LogNot,
-	UnaryMinus
+	UnaryMinus,
+	Ternary
 };
 
 class ExprNode : public Dottable
@@ -47,6 +48,9 @@ public:
 	ExprNode* _left;
 	ExprNode* _right;
 	ExprNode* _unary;
+	ExprNode* _ternaryCondition;
+	ExprNode* _ternaryIfTrue;
+	ExprNode* _ternaryIfFalse;
 
 	static ExprNode* createBool(bool value);
 
@@ -61,6 +65,8 @@ public:
 	static ExprNode* createBinaryOp(ExprType type, ExprNode* left, ExprNode* right);
 	
 	static ExprNode* createUnaryOp(ExprType type, ExprNode* unary);
+
+	static ExprNode* createTernary(ExprNode* condition, ExprNode* ifTrue, ExprNode* ifFalse);
 
 	std::string getName();
 
