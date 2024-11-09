@@ -27,6 +27,15 @@ ExprNode* ExprNode::createString(std::string value)
 	return node;
 }
 
+ExprNode* ExprNode::createId(std::string value)
+{
+	auto node = new ExprNode();
+	node->_type = ExprType::Id;
+	node->_stringValue = value;
+	printf("N: string\n");
+	return node;
+}
+
 ExprNode* ExprNode::createBinaryOp(ExprType type, ExprNode* left, ExprNode* right)
 {
 	auto node = new ExprNode();
@@ -62,6 +71,9 @@ std::string ExprNode::getName()
 	case ExprType::String:
 		return "String";
 		break;
+	case ExprType::Id:
+		return "Id";
+		break;
 	default:
 		throw std::runtime_error("Unknown type!");
 		break;
@@ -79,6 +91,9 @@ void ExprNode::generateDot(std::ofstream& file)
 		file << dotLabel(this->_id, this->getName() + ": " + std::to_string(this->_floatValue));
 		break;
 	case ExprType::String:
+		file << dotLabel(this->_id, this->getName() + ": " + _stringValue);
+		break;
+	case ExprType::Id:
 		file << dotLabel(this->_id, this->getName() + ": " + _stringValue);
 		break;
 	case ExprType::Sum:

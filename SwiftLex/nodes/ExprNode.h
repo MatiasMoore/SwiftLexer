@@ -9,7 +9,8 @@ enum ExprType
 	Sub,
 	Mul,
 	Div,
-	String
+	String,
+	Id
 };
 
 class ExprNode : public Dottable
@@ -29,6 +30,8 @@ public:
 	static ExprNode* createFloat(double value);
 
 	static ExprNode* createString(std::string value);
+	
+	static ExprNode* createId(std::string value);
 
 	static ExprNode* createBinaryOp(ExprType type, ExprNode* left, ExprNode* right);
 

@@ -426,7 +426,7 @@ defaultCase: DEFAULT ':' stmtList {printf("P: defaultCase\n");}
 expr: LITERAL_INT {printf("P: expr int\n"); switchStateToSubscript(); $$ = ExprNode::createInt($1);}
     | LITERAL_FLOAT {printf("P: expr float\n"); switchStateToSubscript(); $$ = ExprNode::createFloat($1);}
     | LITERAL_STRING {printf("P: expr string\n"); switchStateToSubscript(); $$ = ExprNode::createString($1);}
-    | ID {printf("P: expr ID\n"); switchStateToSubscript();}
+    | ID {printf("P: expr ID\n"); switchStateToSubscript(); $$ = ExprNode::createId($1);}
     | TRUE {printf("P: expr TRUE\n"); switchStateToSubscript();}
     | FALSE {printf("P: expr FALSE\n"); switchStateToSubscript();}
     | '~' expr {printf("P: expr ~\n"); switchStateToSubscript();}
