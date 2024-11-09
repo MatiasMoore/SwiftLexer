@@ -125,6 +125,9 @@ std::string ExprNode::getName()
 	case ExprType::Lshift:
 		return "Lshift <<";
 		break;
+	case ExprType::Rshift:
+		return "Rshift >>";
+		break;
 	default:
 		throw std::runtime_error("Unknown type!");
 		break;
@@ -167,6 +170,7 @@ void ExprNode::generateDot(std::ofstream& file)
 	case ExprType::LogAnd:
 	case ExprType::LogOr:
 	case ExprType::Lshift:
+	case ExprType::Rshift:
 		file << dotLabel(this->_id, this->getName());
 		file << dotConnection(this->_id, this->_left->_id);
 		file << dotConnection(this->_id, this->_right->_id);
