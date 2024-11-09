@@ -447,7 +447,7 @@ expr: LITERAL_INT {printf("P: expr int\n"); switchStateToSubscript(); $$ = ExprN
     | expr '|' expr {printf("P: expr |\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::BitOr, $1, $3);}
     | expr '^' expr {printf("P: expr ^\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::BitXor, $1, $3);}
     | expr OP_LOG_AND expr {printf("P: expr &&\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::LogAnd, $1, $3);}
-    | expr OP_LOG_OR expr {printf("P: expr ||\n"); switchStateToSubscript();}
+    | expr OP_LOG_OR expr {printf("P: expr ||\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::LogOr, $1, $3);}
     | expr OP_LSHIFT expr {printf("P: expr <<\n"); switchStateToSubscript();}
     | expr OP_RSHIFT expr {printf("P: expr >>\n"); switchStateToSubscript();}
     | expr OP_CLOSED_RANGE expr {printf("P: expr ...\n"); switchStateToSubscript();}
