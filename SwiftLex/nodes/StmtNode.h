@@ -3,10 +3,12 @@
 #include "dottable.h"
 #include "GenericListNode.h"
 #include "ExprNode.h"
+#include "VarDeclarationNode.h"
 
 enum StmtType
 {
-	Expr
+	Expr,
+	VarDeclarationList
 };
 
 class StmtNode : public Dottable
@@ -18,7 +20,11 @@ public:
 
 	ExprNode* _expr;
 
+	VarDeclarationListNode* _varDeclList;
+
 	static StmtNode* createStmtExpr(ExprNode* expr);
+
+	static StmtNode* createStmtVarDeclaration(VarDeclarationListNode* varDeclList);
 
 	void generateDot(std::ofstream& file) override;
 };

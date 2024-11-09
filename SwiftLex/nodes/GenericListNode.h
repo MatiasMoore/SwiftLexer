@@ -22,6 +22,13 @@ public:
 		return (List*)this;
 	}
 
+	List* appendNodeList(GenericListNode* list)
+	{
+		for (auto& node : list->_vec)
+			_vec.push_back(node);
+		return (List*)this;
+	}
+
 	void generateDot(std::ofstream& file) override
 	{
 		file << dotLabel(this->_id, this->getName());

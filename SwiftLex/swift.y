@@ -21,6 +21,9 @@
     class StmtListNode* stmtListNode;
     class ExprListNode* exprListNode;
     class TypeNode* typeNode;
+    class VarDeclarationNode* varDeclNode;
+    class VarDeclarationListNode* varDeclListNode;
+    class StringList* strList;
 }
 %locations
 
@@ -114,6 +117,16 @@ SUBSCRIPT_SQUARE_BRACKET SUBSCRIPT_ROUND_BRACKET
 %type<stmtListNode> program
 %type<typeNode> type
 
+%type<varDeclNode> varIdWithType
+%type<varDeclListNode> varList
+%type<varDeclListNode> varIdListWithType
+%type<strval> varIdWithComma
+%type<strList> varIdWithCommaList
+%type<varDeclListNode> varVarList
+%type<varDeclListNode> varDeclIncommplete 
+//TODO: TEMPORARY!!!! SHOULD BE EXPANDED TO INCLUDE ACCESS MODIFIERS
+%type<varDeclListNode> varDeclaration
+
 // Start
 %start program
 
@@ -139,11 +152,12 @@ type: TYPE_BOOL {$$ = TypeNode::createType(TypeType::BoolT);}
     | TYPE_FLOAT {$$ = TypeNode::createType(TypeType::FloatT);}
     | TYPE_FLOAT80 {$$ = TypeNode::createType(TypeType::FloatT);}
     | TYPE_DOUBLE {$$ = TypeNode::createType(TypeType::FloatT);}
-    | ID {$$ = TypeNode::createType(TypeType::IdT);}
+    | ID {$$ = TypeNode::createIdType($1);}
     | '[' type ']' {$$ = TypeNode::createArrayType($2);}
     ;
 
-stmt: varDeclaration {printf("P: stmt varDec\n");}
+stmt: varDeclaration {printf("P: stmt varDec\n"); $$ = StmtNode::createStmtVarDeclaration($1);}
+    | varDeclaration ';' {printf("P: stmt varDec\n"); $$ = StmtNode::createStmtVarDeclaration($1); $$->_hasSemicolon = true;}
     | funcDeclaration {printf("P: stmt funcDec\n");}
     | constructorDeclaration {printf("P: stmt constructorDecl\n");}
     | destructorDeclaration {printf("P: stmt destructorDecl\n");}
@@ -313,35 +327,54 @@ funcCall: ID SUBSCRIPT_ROUND_BRACKET exprListE ')' {printf("P: funcCall exprList
 assignment: expr '=' expr {printf("P: assignment\n");}
     ;
 
-varIdWithComma: ID ',' {printf("P: varIdWithComma\n");}
+varIdWithComma: ID ',' {printf("P: varIdWithComma\n"); $$ = $1;}
     ;
 
-varIdWithCommaList: varIdWithComma
-    | varIdWithCommaList varIdWithComma
+varIdWithCommaList: varIdWithComma {$$ = StringList::createList($1);}
+    | varIdWithCommaList varIdWithComma {$$ = $$->appendElem($2);}
     ;
 
-varIdWithType: ID ':' type {printf("P: varIdWithType\n");}
+varIdWithType: ID ':' type {printf("P: varIdWithType\n"); $$ = VarDeclarationNode::createFromType($1, $3);}
     ;
        
-varIdListWithType: varIdWithCommaList varIdWithType {printf("P: varIdListWithType\n");}
-    | varIdWithType {printf("P: varIdListWithType\n");}
+varIdListWithType: varIdWithCommaList varIdWithType 
+{
+    printf("P: varIdListWithType\n"); 
+
+    //Type that other ids will use
+    auto type = $2->_typeNode;
+
+    //Create first element
+    $$ = VarDeclarationListNode::createListNode(VarDeclarationNode::createFromType($1->_vec[0], type));
+
+    //All other elements
+    for (int i = 1; i < $1->_vec.size(); i++)
+    {
+        auto id = $1->_vec[i];
+        $$ = $$->appendNode(VarDeclarationNode::createFromType(id, type));
+    }
+
+    //And the final one that already has the type
+    $$ = $$->appendNode($2);
+}
+    | varIdWithType {printf("P: varIdListWithType\n"); $$ = VarDeclarationListNode::createListNode($1);}
     ;
             
-varList: varIdWithType '=' expr {printf("P: varList\n");}
-    | ID '=' expr {printf("P: varList\n");}
-    | varIdListWithType {printf("P: varList\n");}
+varList: varIdWithType '=' expr {printf("P: varList\n"); $$ = VarDeclarationListNode::createListNode(VarDeclarationNode::createFromValueAndType($1->_varName, $3, $1->_typeNode));}
+    | ID '=' expr {printf("P: varList\n"); $$ = VarDeclarationListNode::createListNode(VarDeclarationNode::createFromValue($1, $3));}
+    | varIdListWithType {printf("P: varList\n"); $$ = $1;}
     ;
 
-varVarList: varList
-    | varVarList ',' varList
+varVarList: varList {$$ = $1;}
+    | varVarList ',' varList { $$ = $$->appendNodeList($3);}
     ;
         
-varDeclIncommplete: VAR varVarList {printf("P: varDeclIncommplete\n");}
-    | LET varVarList {printf("P: varDeclIncommplete\n");}
+varDeclIncommplete: VAR varVarList {printf("P: varDeclIncommplete\n"); $$ = $2;}
+    | LET varVarList {printf("P: varDeclIncommplete\n"); $$ = $2;}
     ;
 
-varDeclaration:modifiersWordsList varDeclIncommplete {printf("P: variable declaration with prefix\n");}
-    | varDeclIncommplete {printf("P: variable declaration default\n");}
+varDeclaration: modifiersWordsList varDeclIncommplete {printf("P: variable declaration with prefix\n"); $$ = $2;}
+    | varDeclIncommplete {printf("P: variable declaration default\n"); $$ = $1;}
     ;
 
 typeList: type {printf("P: enum: typeList \n");}
