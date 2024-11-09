@@ -19,7 +19,7 @@ public:
 
 	static StmtNode* createStmtExpr(ExprNode* expr);
 
-	void generateDotExpr(std::ofstream& file) override;
+	void generateDot(std::ofstream& file) override;
 };
 
 
@@ -32,7 +32,7 @@ public:
 
 	StmtListNode* appendStmt(StmtNode* stmtToAdd);
 
-	void generateDotExpr(std::ofstream& file) override;
+	void generateDot(std::ofstream& file) override;
 };
 
 

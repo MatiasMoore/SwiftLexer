@@ -9,14 +9,14 @@ StmtNode* StmtNode::createStmtExpr(ExprNode* expr)
 	return node;
 }
 
-void StmtNode::generateDotExpr(std::ofstream& file)
+void StmtNode::generateDot(std::ofstream& file)
 {
 	switch (this->_type)
 	{
 	case StmtType::Expr:
 		file << dotLabel(this->_id, "Stmt");
 		file << dotConnection(this->_id, this->_expr->_id);
-		this->_expr->generateDotExpr(file);
+		this->_expr->generateDot(file);
 		break;
 	default:
 		throw std::runtime_error("Unknown type!");
@@ -39,12 +39,12 @@ StmtListNode* StmtListNode::appendStmt(StmtNode* stmtToAdd)
 	return this;
 }
 
-void StmtListNode::generateDotExpr(std::ofstream& file)
+void StmtListNode::generateDot(std::ofstream& file)
 {
 	file << dotLabel(this->_id, "Stmt list");
 	for (auto& child : this->_stmtVec)
 	{
 		file << dotConnection(this->_id, child->_id);
-		child->generateDotExpr(file);
+		child->generateDot(file);
 	}
 }

@@ -7,6 +7,6 @@ class Dottable
 {
 public:
 	int _id = getNewId();
-	virtual void generateDotExpr(std::ofstream& file) = 0;
+	virtual void generateDot(std::ofstream& file) = 0;
 };
 

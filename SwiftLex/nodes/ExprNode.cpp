@@ -56,7 +56,7 @@ std::string ExprNode::getName()
 	}
 }
 
-void ExprNode::generateDotExpr(std::ofstream& file)
+void ExprNode::generateDot(std::ofstream& file)
 {
 	switch (this->_type)
 	{
@@ -73,8 +73,8 @@ void ExprNode::generateDotExpr(std::ofstream& file)
 		file << dotLabel(this->_id, this->getName());
 		file << dotConnection(this->_id, this->_left->_id);
 		file << dotConnection(this->_id, this->_right->_id);
-		this->_left->generateDotExpr(file);
-		this->_right->generateDotExpr(file);
+		this->_left->generateDot(file);
+		this->_right->generateDot(file);
 		break;
 	default:
 		throw std::runtime_error("Unknown type!");

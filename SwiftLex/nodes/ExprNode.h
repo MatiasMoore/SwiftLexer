@@ -30,5 +30,5 @@ public:
 
 	std::string getName();
 
-	void generateDotExpr(std::ofstream& file) override;
+	void generateDot(std::ofstream& file) override;
 };

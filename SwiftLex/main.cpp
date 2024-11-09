@@ -33,7 +33,7 @@ int main(int argc, const char* argv[])
 	dotFile.open("swift.dot");
 
 	dotFile << "digraph swift {\n";
-	_root->generateDotExpr(dotFile);
+	_root->generateDot(dotFile);
 	dotFile << "}\n";
 
 	dotFile.close();
