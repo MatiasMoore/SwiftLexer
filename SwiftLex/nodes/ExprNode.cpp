@@ -110,6 +110,9 @@ std::string ExprNode::getName()
 	case ExprType::BitAnd:
 		return "BitAnd &";
 		break;
+	case ExprType::BitOr:
+		return "BitOr |";
+		break;
 	default:
 		throw std::runtime_error("Unknown type!");
 		break;
@@ -147,6 +150,7 @@ void ExprNode::generateDot(std::ofstream& file)
 	case ExprType::EQ:
 	case ExprType::NEQ:
 	case ExprType::BitAnd:
+	case ExprType::BitOr:
 		file << dotLabel(this->_id, this->getName());
 		file << dotConnection(this->_id, this->_left->_id);
 		file << dotConnection(this->_id, this->_right->_id);

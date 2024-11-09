@@ -19,7 +19,8 @@ enum ExprType
 	LTE,
 	EQ,
 	NEQ,
-	BitAnd
+	BitAnd,
+	BitOr
 };
 
 class ExprNode : public Dottable
