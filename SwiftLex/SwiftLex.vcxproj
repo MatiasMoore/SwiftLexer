@@ -29,6 +29,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="swift.tab.cpp" />
     <ClCompile Include="nodes\ExprNode.cpp" />
+    <ClCompile Include="nodes\TypeNode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt" />
@@ -46,6 +47,7 @@
     <ClInclude Include="swift.tab.h" />
     <ClInclude Include="nodes\ExprNode.h" />
     <ClInclude Include="allNodes.h" />
+    <ClInclude Include="nodes\TypeNode.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

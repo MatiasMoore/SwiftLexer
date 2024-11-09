@@ -20,6 +20,7 @@
     class StmtNode* stmtNode;
     class StmtListNode* stmtListNode;
     class ExprListNode* exprListNode;
+    class TypeNode* typeNode;
 }
 %locations
 
@@ -111,6 +112,7 @@ SUBSCRIPT_SQUARE_BRACKET SUBSCRIPT_ROUND_BRACKET
 %type<stmtNode> stmt
 %type<stmtListNode> stmtList
 %type<stmtListNode> program
+%type<typeNode> type
 
 // Start
 %start program
@@ -121,24 +123,24 @@ program: stmtList {printf("P: program\n"); $$ = $1; _root = $$;}
     ;
 
 
-type: TYPE_BOOL
-    | TYPE_STRING
-    | TYPE_CHARACTER
-    | TYPE_INT8
-    | TYPE_INT16
-    | TYPE_INT32
-    | TYPE_INT64
-    | TYPE_INT
-    | TYPE_UINT8
-    | TYPE_UINT16
-    | TYPE_UINT32
-    | TYPE_UINT64
-    | TYPE_UINT
-    | TYPE_FLOAT
-    | TYPE_FLOAT80
-    | TYPE_DOUBLE
-    | ID
-    | '[' type ']'
+type: TYPE_BOOL {$$ = TypeNode::createType(TypeType::BoolT);}
+    | TYPE_STRING {$$ = TypeNode::createType(TypeType::StringT);}
+    | TYPE_CHARACTER {$$ = TypeNode::createType(TypeType::CharacterT);}
+    | TYPE_INT8 {$$ = TypeNode::createType(TypeType::IntT);}
+    | TYPE_INT16 {$$ = TypeNode::createType(TypeType::IntT);}
+    | TYPE_INT32 {$$ = TypeNode::createType(TypeType::IntT);}
+    | TYPE_INT64 {$$ = TypeNode::createType(TypeType::IntT);}
+    | TYPE_INT {$$ = TypeNode::createType(TypeType::IntT);}
+    | TYPE_UINT8 {$$ = TypeNode::createType(TypeType::IntT);}
+    | TYPE_UINT16 {$$ = TypeNode::createType(TypeType::IntT);}
+    | TYPE_UINT32 {$$ = TypeNode::createType(TypeType::IntT);}
+    | TYPE_UINT64 {$$ = TypeNode::createType(TypeType::IntT);}
+    | TYPE_UINT {$$ = TypeNode::createType(TypeType::IntT);}
+    | TYPE_FLOAT {$$ = TypeNode::createType(TypeType::FloatT);}
+    | TYPE_FLOAT80 {$$ = TypeNode::createType(TypeType::FloatT);}
+    | TYPE_DOUBLE {$$ = TypeNode::createType(TypeType::FloatT);}
+    | ID {$$ = TypeNode::createType(TypeType::IdT);}
+    | '[' type ']' {$$ = TypeNode::createArrayType($2);}
     ;
 
 stmt: varDeclaration {printf("P: stmt varDec\n");}
