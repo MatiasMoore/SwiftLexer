@@ -116,6 +116,9 @@ std::string ExprNode::getName()
 	case ExprType::BitXor:
 		return "BitXor ^";
 		break;
+	case ExprType::LogAnd:
+		return "LogAnd &&";
+		break;
 	default:
 		throw std::runtime_error("Unknown type!");
 		break;
@@ -155,6 +158,7 @@ void ExprNode::generateDot(std::ofstream& file)
 	case ExprType::BitAnd:
 	case ExprType::BitOr:
 	case ExprType::BitXor:
+	case ExprType::LogAnd:
 		file << dotLabel(this->_id, this->getName());
 		file << dotConnection(this->_id, this->_left->_id);
 		file << dotConnection(this->_id, this->_right->_id);

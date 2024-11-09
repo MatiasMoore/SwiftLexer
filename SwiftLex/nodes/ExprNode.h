@@ -21,7 +21,8 @@ enum ExprType
 	NEQ,
 	BitAnd,
 	BitOr,
-	BitXor
+	BitXor,
+	LogAnd
 };
 
 class ExprNode : public Dottable
