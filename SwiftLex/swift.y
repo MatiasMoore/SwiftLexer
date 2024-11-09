@@ -437,7 +437,7 @@ expr: LITERAL_INT {printf("P: expr int\n"); switchStateToSubscript(); $$ = ExprN
     | expr '/' expr {printf("P: expr /\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::Div, $1, $3);}
     | expr '*' expr {printf("P: expr *\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::Mul, $1, $3);}
     | expr '%' expr {printf("P: expr %\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::Modulus, $1, $3);}
-    | expr '<' expr {printf("P: expr <\n"); switchStateToSubscript();}
+    | expr '<' expr {printf("P: expr <\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::LT, $1, $3);}
     | expr '>' expr {printf("P: expr >\n"); switchStateToSubscript();}
     | expr OP_GTE expr {printf("P: expr >=\n"); switchStateToSubscript();}
     | expr OP_LTE expr {printf("P: expr <=\n"); switchStateToSubscript();}
