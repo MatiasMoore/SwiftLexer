@@ -451,7 +451,7 @@ expr: LITERAL_INT {printf("P: expr int\n"); switchStateToSubscript(); $$ = ExprN
     | expr OP_LSHIFT expr {printf("P: expr <<\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::Lshift, $1, $3);}
     | expr OP_RSHIFT expr {printf("P: expr >>\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::Rshift, $1, $3);}
     | expr OP_CLOSED_RANGE expr {printf("P: expr ...\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::ClosedRange, $1, $3);}
-    | expr OP_HALF_OPEN_RANGE expr {printf("P: expr ..<\n"); switchStateToSubscript();}
+    | expr OP_HALF_OPEN_RANGE expr {printf("P: expr ..<\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::HalfOpenRange, $1, $3);}
     | expr OP_NIL_COALESCE expr {printf("P: expr ??\n"); switchStateToSubscript();}
     | expr IS type {printf("P: expr is\n"); switchStateToSubscript();}
     | expr AS type {printf("P: expr as\n"); switchStateToSubscript();}

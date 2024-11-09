@@ -26,7 +26,8 @@ enum ExprType
 	LogOr,
 	Lshift,
 	Rshift,
-	ClosedRange
+	ClosedRange,
+	HalfOpenRange
 };
 
 class ExprNode : public Dottable
