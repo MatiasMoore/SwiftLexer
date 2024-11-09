@@ -30,7 +30,8 @@ enum ExprType
 	HalfOpenRange,
 	NilCoalesce,
 	BitNot,
-	LogNot
+	LogNot,
+	UnaryMinus
 };
 
 class ExprNode : public Dottable

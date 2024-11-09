@@ -152,6 +152,9 @@ std::string ExprNode::getName()
 	case ExprType::LogNot:
 		return "LogNot !";
 		break;
+	case ExprType::UnaryMinus:
+		return "UnaryMinus -";
+		break;
 	default:
 		throw std::runtime_error("Unknown type!");
 		break;
@@ -179,6 +182,7 @@ void ExprNode::generateDot(std::ofstream& file)
 		break;
 	case ExprType::BitNot:
 	case ExprType::LogNot:
+	case ExprType::UnaryMinus:
 		file << dotLabel(this->_id, this->getName());
 		file << dotConnection(this->_id, this->_unary->_id);
 		this->_unary->generateDot(file);

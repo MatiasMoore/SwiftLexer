@@ -431,7 +431,7 @@ expr: LITERAL_INT {printf("P: expr int\n"); switchStateToSubscript(); $$ = ExprN
     | FALSE {printf("P: expr FALSE\n"); switchStateToSubscript(); $$ = ExprNode::createBool(false);}
     | '~' expr {printf("P: expr ~\n"); switchStateToSubscript(); $$ = ExprNode::createUnaryOp(ExprType::BitNot, $2);}
     | '!' expr {printf("P: expr !\n"); switchStateToSubscript(); $$ = ExprNode::createUnaryOp(ExprType::LogNot, $2);}
-    | UNARY_MINUS expr {printf("P: expr unary -\n"); switchStateToSubscript();}
+    | UNARY_MINUS expr {printf("P: expr unary -\n"); switchStateToSubscript(); $$ = ExprNode::createUnaryOp(ExprType::UnaryMinus, $2);}
     | expr '+' expr {printf("P: expr +\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::Sum, $1, $3);}
     | expr BINARY_MINUS expr {printf("P: expr -\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::Sub, $1, $3);}
     | expr '/' expr {printf("P: expr /\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::Div, $1, $3);}
