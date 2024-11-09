@@ -13,7 +13,8 @@ enum ExprType
 	Id,
 	Bool,
 	Modulus,
-	LT
+	LT,
+	GT
 };
 
 class ExprNode : public Dottable

@@ -91,6 +91,8 @@ std::string ExprNode::getName()
 		break;
 	case ExprType::LT:
 		return "LT <";
+	case ExprType::GT:
+		return "GT >";
 	default:
 		throw std::runtime_error("Unknown type!");
 		break;
@@ -122,6 +124,7 @@ void ExprNode::generateDot(std::ofstream& file)
 	case ExprType::Mul:
 	case ExprType::Modulus:
 	case ExprType::LT:
+	case ExprType::GT:
 		file << dotLabel(this->_id, this->getName());
 		file << dotConnection(this->_id, this->_left->_id);
 		file << dotConnection(this->_id, this->_right->_id);
