@@ -1,7 +1,5 @@
 #pragma once
-#include <iostream>
-#include "idsystem.h"
-#include "dotHelpers.h"
+#include "dottable.h"
 
 enum ExprType
 {
@@ -13,11 +11,9 @@ enum ExprType
 	Div,
 };
 
-struct ExprNode
+class ExprNode : public Dottable
 {
 public:
-	int _id = getNewId();
-
 	ExprType _type;
 
 	int _intValue;
@@ -25,12 +21,14 @@ public:
 
 	ExprNode* _left;
 	ExprNode* _right;
+
+	static ExprNode* createInt(int value);
+
+	static ExprNode* createFloat(double value);
+
+	static ExprNode* createBinaryOp(ExprType type, ExprNode* left, ExprNode* right);
+
+	std::string getName();
+
+	void generateDotExpr(std::ofstream& file) override;
 };
-
-ExprNode* createInt(int value);
-
-ExprNode* createFloat(double value);
-
-ExprNode* createBinaryOp(ExprType type, ExprNode* left, ExprNode* right);
-
-void generateDotExpr(std::ofstream& file, ExprNode* node);

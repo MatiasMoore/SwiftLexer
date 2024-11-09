@@ -1,6 +1,6 @@
 #include "ExprNode.h"
 
-ExprNode* createInt(int value)
+ExprNode* ExprNode::createInt(int value)
 {
 	auto node = new ExprNode();
 	node->_type = ExprType::Int;
@@ -9,7 +9,7 @@ ExprNode* createInt(int value)
 	return node;
 }
 
-ExprNode* createFloat(double value)
+ExprNode* ExprNode::createFloat(double value)
 {
 	auto node = new ExprNode();
 	node->_type = ExprType::Float;
@@ -18,7 +18,7 @@ ExprNode* createFloat(double value)
 	return node;
 }
 
-ExprNode* createBinaryOp(ExprType type, ExprNode* left, ExprNode* right)
+ExprNode* ExprNode::createBinaryOp(ExprType type, ExprNode* left, ExprNode* right)
 {
 	auto node = new ExprNode();
 	node->_type = type;
@@ -28,43 +28,53 @@ ExprNode* createBinaryOp(ExprType type, ExprNode* left, ExprNode* right)
 	return node;
 }
 
-void generateDotExpr(std::ofstream& file, ExprNode* node)
+std::string ExprNode::getName()
 {
-	switch (node->_type)
+	switch (this->_type)
 	{
 	case ExprType::Int:
-		file << dotLabel(node->_id, "Int: " + std::to_string(node->_intValue));
+		return "Int";
 		break;
 	case ExprType::Float:
-		file << dotLabel(node->_id, "Float: " + std::to_string(node->_floatValue));
-		break;
-	case ExprType::Sum:
-		file << dotLabel(node->_id, "Sum");
-		file << dotConnection(node->_id, node->_left->_id);
-		file << dotConnection(node->_id, node->_right->_id);
-		generateDotExpr(file, node->_left);
-		generateDotExpr(file, node->_right);
-		break;
-	case ExprType::Sub:
-		file << dotLabel(node->_id, "Sub");
-		file << dotConnection(node->_id, node->_left->_id);
-		file << dotConnection(node->_id, node->_right->_id);
-		generateDotExpr(file, node->_left);
-		generateDotExpr(file, node->_right);
-		break;
-	case ExprType::Div:
-		file << dotLabel(node->_id, "Div");
-		file << dotConnection(node->_id, node->_left->_id);
-		file << dotConnection(node->_id, node->_right->_id);
-		generateDotExpr(file, node->_left);
-		generateDotExpr(file, node->_right);
+		return "Float";
 		break;
 	case ExprType::Mul:
-		file << dotLabel(node->_id, "Mul");
-		file << dotConnection(node->_id, node->_left->_id);
-		file << dotConnection(node->_id, node->_right->_id);
-		generateDotExpr(file, node->_left);
-		generateDotExpr(file, node->_right);
+		return "Mul";
+		break;
+	case ExprType::Div:
+		return "Div";
+		break;
+	case ExprType::Sum:
+		return "Sum";
+		break;
+	case ExprType::Sub:
+		return "Sub";
+		break;
+	default:
+		throw std::runtime_error("Unknown type!");
+		break;
+	}
+}
+
+void ExprNode::generateDotExpr(std::ofstream& file)
+{
+	switch (this->_type)
+	{
+	case ExprType::Int:
+		file << dotLabel(this->_id, this->getName() + ": " + std::to_string(this->_intValue));
+		break;
+	case ExprType::Float:
+		file << dotLabel(this->_id, this->getName() + ": " + std::to_string(this->_floatValue));
+		break;
+	case ExprType::Sum:
+	case ExprType::Sub:
+	case ExprType::Div:
+	case ExprType::Mul:
+		file << dotLabel(this->_id, this->getName());
+		file << dotConnection(this->_id, this->_left->_id);
+		file << dotConnection(this->_id, this->_right->_id);
+		this->_left->generateDotExpr(file);
+		this->_right->generateDotExpr(file);
 		break;
 	default:
 		throw std::runtime_error("Unknown type!");

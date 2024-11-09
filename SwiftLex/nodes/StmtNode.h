@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
-#include "idsystem.h"
-#include "dotHelpers.h"
+#include "dottable.h"
 #include "ExprNode.h"
 
 enum StmtType
@@ -9,32 +8,31 @@ enum StmtType
 	Expr
 };
 
-struct StmtNode
+struct StmtNode : public Dottable
 {
 public:
-	int _id = getNewId();
-
 	bool _hasSemicolon = false;
 
 	StmtType _type;
 
 	ExprNode* _expr;
+
+	static StmtNode* createStmtExpr(ExprNode* expr);
+
+	void generateDotExpr(std::ofstream& file) override;
 };
 
-StmtNode* createStmtExpr(ExprNode* expr);
 
-void generateDotStmt(std::ofstream& file, StmtNode* node);
-
-struct StmtListNode
+struct StmtListNode : public Dottable
 {
 public:
-	int _id = getNewId();
-
 	std::vector<StmtNode*> _stmtVec = {};
+
+	static StmtListNode* createStmtList(StmtNode* stmt);
+
+	StmtListNode* appendStmt(StmtNode* stmtToAdd);
+
+	void generateDotExpr(std::ofstream& file) override;
 };
 
-StmtListNode* createStmtList(StmtNode* stmt);
 
-StmtListNode* appendStmtToStmtList(StmtListNode* list, StmtNode* stmtToAdd);
-
-void generateDotStmtList(std::ofstream& file, StmtListNode* node);

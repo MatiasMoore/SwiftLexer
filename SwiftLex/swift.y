@@ -16,9 +16,9 @@
 	float fval;
 	double dval;
     char* strval;
-    struct ExprNode* exprNode;
-    struct StmtNode* stmtNode;
-    struct StmtListNode* stmtListNode;
+    class ExprNode* exprNode;
+    class StmtNode* stmtNode;
+    class StmtListNode* stmtListNode;
 }
 %locations
 
@@ -146,8 +146,8 @@ stmt: varDeclaration {printf("P: stmt varDec\n");}
     | exprReturn {printf("P: stmt return\n");}
     | classDeclaration {printf("P: stmt classDec\n");}
     | assignment {printf("P: stmt assignment\n");}
-    | expr {printf("P: stmt expr\n"); $$ = createStmtExpr($1);}
-    | expr ';' {printf("P: stmt expr\n"); $$ = createStmtExpr($1); $$->_hasSemicolon = true; }
+    | expr {printf("P: stmt expr\n"); $$ = StmtNode::createStmtExpr($1);}
+    | expr ';' {printf("P: stmt expr\n"); $$ = StmtNode::createStmtExpr($1); $$->_hasSemicolon = true; }
     | enumDeclaration {printf("P: stmt enum\n");}
     | ifElse {printf("P: stmt ifElse\n");}
     | whileLoop {printf("P: stmt whileLoop\n");}
@@ -157,14 +157,14 @@ stmt: varDeclaration {printf("P: stmt varDec\n");}
     | structDeclaration {printf("P: stmt struct\n");}
 	;
 
-stmtList: stmt {printf("P: stmtList start\n"); $$ = createStmtList($1);}
+stmtList: stmt {printf("P: stmtList start\n"); $$ = StmtListNode::createStmtList($1);}
 	| stmtList stmt {
         if (!($1->_stmtVec.back()->_hasSemicolon) && @1.last_line == @2.first_line){
             yyerror("Syntax error: two statements in one line must be separated with a ';'");
         }
         else {
 			printf("P: stmtList\n");
-            $$ = appendStmtToStmtList($1, $2);
+            $$ = $1->appendStmt($2);
 		}
     }
 	;
@@ -423,8 +423,8 @@ caseList: caseElement {printf("P: caseList\n");}
 defaultCase: DEFAULT ':' stmtList {printf("P: defaultCase\n");}
 	;
 
-expr: LITERAL_INT {printf("P: expr int\n"); switchStateToSubscript(); $$ = createInt($1);}
-    | LITERAL_FLOAT {printf("P: expr float\n"); switchStateToSubscript(); $$ = createFloat($1);}
+expr: LITERAL_INT {printf("P: expr int\n"); switchStateToSubscript(); $$ = ExprNode::createInt($1);}
+    | LITERAL_FLOAT {printf("P: expr float\n"); switchStateToSubscript(); $$ = ExprNode::createFloat($1);}
     | LITERAL_STRING {printf("P: expr string\n"); switchStateToSubscript();}
     | ID {printf("P: expr ID\n"); switchStateToSubscript();}
     | TRUE {printf("P: expr TRUE\n"); switchStateToSubscript();}
@@ -432,10 +432,10 @@ expr: LITERAL_INT {printf("P: expr int\n"); switchStateToSubscript(); $$ = creat
     | '~' expr {printf("P: expr ~\n"); switchStateToSubscript();}
     | '!' expr {printf("P: expr !\n"); switchStateToSubscript();}
     | UNARY_MINUS expr {printf("P: expr unary -\n"); switchStateToSubscript();}
-    | expr '+' expr {printf("P: expr +\n"); switchStateToSubscript(); $$ = createBinaryOp(ExprType::Sum, $1, $3);}
-    | expr BINARY_MINUS expr {printf("P: expr -\n"); switchStateToSubscript(); $$ = createBinaryOp(ExprType::Sub, $1, $3);}
-    | expr '/' expr {printf("P: expr /\n"); switchStateToSubscript(); $$ = createBinaryOp(ExprType::Div, $1, $3);}
-    | expr '*' expr {printf("P: expr *\n"); switchStateToSubscript(); $$ = createBinaryOp(ExprType::Mul, $1, $3);}
+    | expr '+' expr {printf("P: expr +\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::Sum, $1, $3);}
+    | expr BINARY_MINUS expr {printf("P: expr -\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::Sub, $1, $3);}
+    | expr '/' expr {printf("P: expr /\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::Div, $1, $3);}
+    | expr '*' expr {printf("P: expr *\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::Mul, $1, $3);}
     | expr '%' expr {printf("P: expr %\n"); switchStateToSubscript();}
     | expr '<' expr {printf("P: expr <\n"); switchStateToSubscript();}
     | expr '>' expr {printf("P: expr >\n"); switchStateToSubscript();}

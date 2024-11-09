@@ -1,6 +1,6 @@
 #include "StmtNode.h"
 
-StmtNode* createStmtExpr(ExprNode* expr)
+StmtNode* StmtNode::createStmtExpr(ExprNode* expr)
 {
 	auto node = new StmtNode();
 	node->_type = StmtType::Expr;
@@ -9,14 +9,14 @@ StmtNode* createStmtExpr(ExprNode* expr)
 	return node;
 }
 
-void generateDotStmt(std::ofstream& file, StmtNode* node)
+void StmtNode::generateDotExpr(std::ofstream& file)
 {
-	switch (node->_type)
+	switch (this->_type)
 	{
 	case StmtType::Expr:
-		file << dotLabel(node->_id, "Stmt");
-		file << dotConnection(node->_id, node->_expr->_id);
-		generateDotExpr(file, node->_expr);
+		file << dotLabel(this->_id, "Stmt");
+		file << dotConnection(this->_id, this->_expr->_id);
+		this->_expr->generateDotExpr(file);
 		break;
 	default:
 		throw std::runtime_error("Unknown type!");
@@ -24,7 +24,7 @@ void generateDotStmt(std::ofstream& file, StmtNode* node)
 	}
 }
 
-StmtListNode* createStmtList(StmtNode* stmt)
+StmtListNode* StmtListNode::createStmtList(StmtNode* stmt)
 {
 	auto node = new StmtListNode();
 	node->_stmtVec.push_back(stmt);
@@ -32,19 +32,19 @@ StmtListNode* createStmtList(StmtNode* stmt)
 	return node;
 }
 
-StmtListNode* appendStmtToStmtList(StmtListNode* list, StmtNode* stmtToAdd)
+StmtListNode* StmtListNode::appendStmt(StmtNode* stmtToAdd)
 {
-	list->_stmtVec.push_back(stmtToAdd);
+	this->_stmtVec.push_back(stmtToAdd);
 	printf("N: append to stmt list\n");
-	return list;
+	return this;
 }
 
-void generateDotStmtList(std::ofstream& file, StmtListNode* node)
+void StmtListNode::generateDotExpr(std::ofstream& file)
 {
-	file << dotLabel(node->_id, "Stmt list");
-	for (auto& child : node->_stmtVec)
+	file << dotLabel(this->_id, "Stmt list");
+	for (auto& child : this->_stmtVec)
 	{
-		file << dotConnection(node->_id, child->_id);
-		generateDotStmt(file, child);
+		file << dotConnection(this->_id, child->_id);
+		child->generateDotExpr(file);
 	}
 }
