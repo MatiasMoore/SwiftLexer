@@ -107,6 +107,9 @@ std::string ExprNode::getName()
 	case ExprType::NEQ:
 		return "NEQ !=";
 		break;
+	case ExprType::BitAnd:
+		return "BitAnd &";
+		break;
 	default:
 		throw std::runtime_error("Unknown type!");
 		break;
@@ -143,6 +146,7 @@ void ExprNode::generateDot(std::ofstream& file)
 	case ExprType::LTE:
 	case ExprType::EQ:
 	case ExprType::NEQ:
+	case ExprType::BitAnd:
 		file << dotLabel(this->_id, this->getName());
 		file << dotConnection(this->_id, this->_left->_id);
 		file << dotConnection(this->_id, this->_right->_id);
