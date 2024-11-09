@@ -20,7 +20,8 @@ enum ExprType
 	EQ,
 	NEQ,
 	BitAnd,
-	BitOr
+	BitOr,
+	BitXor
 };
 
 class ExprNode : public Dottable
