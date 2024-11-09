@@ -15,7 +15,8 @@ enum ExprType
 	Modulus,
 	LT,
 	GT,
-	GTE
+	GTE,
+	LTE
 };
 
 class ExprNode : public Dottable
