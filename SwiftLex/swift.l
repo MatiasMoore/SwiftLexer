@@ -20,6 +20,7 @@ WHITESPACES [ \n	]
 #include <stdio.h>
 #include <iostream>
 #include <string>
+#include <algorithm>
 #include "swift.tab.h"
 using namespace std;
 
@@ -42,6 +43,7 @@ void switchStateToSubscript();
 
 	int multilineStringLineNumber = 1;
 	string stringMultiline;
+	int multilineStringStartTabCount = 0;
 	string stringOneLine;
 	string unicodeHexBuffer;
 
@@ -266,8 +268,14 @@ Double {cout << "Type Double: " << yytext << endl; return TYPE_DOUBLE;}
 
 	/* STRINGS */
 
-\"\"\" { stringMultiline.clear(); multilineStringLineNumber = lineNumber; BEGIN(STRING_MULTILINE); }
-<STRING_MULTILINE>[^\n\r] { stringMultiline += yytext; }
+[\t]*\"\"\" { 
+	stringMultiline.clear();  
+	string str = string(yytext); 
+	multilineStringStartTabCount = count(str.begin(), str.end(), '\t'); 
+	multilineStringLineNumber = lineNumber; 
+	BEGIN(STRING_MULTILINE); 
+}
+<STRING_MULTILINE>[^\n\r] { stringMultiline += yytext;}
 	/* TODO MAYBE WE SHOULD IGNORE ALL TABS COMPLETELY */
 <STRING_MULTILINE>\\\n\t* { stringMultiline += ""; }
 <STRING_MULTILINE>\n { stringMultiline += yytext; lineNumber++; }
@@ -291,7 +299,33 @@ Double {cout << "Type Double: " << yytext << endl; return TYPE_DOUBLE;}
 <STRING_MULTILINE>\"{1,2} { stringMultiline += yytext; }
 	/* TODO THIS MAY NOT WORK ALL THE TIME */
 <STRING_MULTILINE>\\\n\s*\"\"\" { cout << "ERROR: Escaped newline at the last line of multiline string is not allowed at line " << multilineStringLineNumber << endl; isSubsciptActive = false; BEGIN(INITIAL); }
-<STRING_MULTILINE>\s*\"\"\" { 
+<STRING_MULTILINE>[\t]*\"\"\" {
+	string str = string(yytext); 
+	int tabCount = count(str.begin(), str.end(), '\t');
+
+	if (tabCount != multilineStringStartTabCount)
+	{
+		cout << "ERROR: Multiline string tabulation is not the same at line " << multilineStringLineNumber << endl; 
+	}
+
+	//Remove extra tabs
+	string temp = stringMultiline;
+	stringMultiline.clear();
+	int tabsToRemove = multilineStringStartTabCount;
+	for (auto& letter : temp)
+	{
+		if (letter == '\t' && tabsToRemove > 0)
+		{
+			tabsToRemove -= 1;
+			continue;
+		}
+		else if (letter == '\n')
+		{
+			tabsToRemove = multilineStringStartTabCount;
+		}
+		stringMultiline += letter;
+	}
+
 	cout << "Multiline string: " << stringMultiline << endl; 
 	isSubsciptActive ? BEGIN(SUBSCRIPT) : BEGIN(INITIAL); 
 	//This is a memory leak
