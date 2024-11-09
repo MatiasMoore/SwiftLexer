@@ -23,7 +23,8 @@ enum ExprType
 	BitOr,
 	BitXor,
 	LogAnd,
-	LogOr
+	LogOr,
+	Lshift
 };
 
 class ExprNode : public Dottable
