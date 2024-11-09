@@ -55,6 +55,15 @@ ExprNode* ExprNode::createBinaryOp(ExprType type, ExprNode* left, ExprNode* righ
 	return node;
 }
 
+ExprNode* ExprNode::createUnaryOp(ExprType type, ExprNode* unary)
+{
+	auto node = new ExprNode();
+	node->_type = type;
+	node->_unary = unary;
+	printf("N: unaryOp %d\n", (int)type);
+	return node;
+}
+
 std::string ExprNode::getName()
 {
 	switch (this->_type)
@@ -137,6 +146,9 @@ std::string ExprNode::getName()
 	case ExprType::NilCoalesce:
 		return "NilCoalesce ??";
 		break;
+	case ExprType::BitNot:
+		return "BitNot ~";
+		break;
 	default:
 		throw std::runtime_error("Unknown type!");
 		break;
@@ -161,6 +173,11 @@ void ExprNode::generateDot(std::ofstream& file)
 		break;
 	case ExprType::Id:
 		file << dotLabel(this->_id, this->getName() + ": " + _stringValue);
+		break;
+	case ExprType::BitNot:
+		file << dotLabel(this->_id, this->getName());
+		file << dotConnection(this->_id, this->_unary->_id);
+		this->_unary->generateDot(file);
 		break;
 	case ExprType::Sum:
 	case ExprType::Sub:

@@ -28,7 +28,8 @@ enum ExprType
 	Rshift,
 	ClosedRange,
 	HalfOpenRange,
-	NilCoalesce
+	NilCoalesce,
+	BitNot
 };
 
 class ExprNode : public Dottable
@@ -43,6 +44,7 @@ public:
 
 	ExprNode* _left;
 	ExprNode* _right;
+	ExprNode* _unary;
 
 	static ExprNode* createBool(bool value);
 
@@ -55,6 +57,8 @@ public:
 	static ExprNode* createId(std::string value);
 
 	static ExprNode* createBinaryOp(ExprType type, ExprNode* left, ExprNode* right);
+	
+	static ExprNode* createUnaryOp(ExprType type, ExprNode* unary);
 
 	std::string getName();
 
