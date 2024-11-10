@@ -229,6 +229,8 @@ funcReturnTypeE: %empty
     ;
 
 funcDecIncomplete: FUNC ID anyRoundBracket funcDeclArgListE ')' funcReturnTypeE '{' stmtListE '}' {printf("P: func declIncomplete\n");}
+    | FUNC ID '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' funcReturnTypeE '{' stmtListE '}' {printf("P: func declIncomplete generic\n");}
+    | FUNC ID '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' funcReturnTypeE whereClause '{' stmtListE '}' {printf("P: func declIncomplete generic where\n");}
     ;
 
     
@@ -295,9 +297,17 @@ funcCallArg: ID ':' expr {printf("P: funcCallArg\n");}
 funcCallArgList: funcCallArg {printf("P: funcCallArgList\n");}
     | funcCallArgList ',' funcCallArg {printf("P: funcCallArgList\n");}
     ;
-    
+
+genericIdList:  type {printf("P: genericIdList\n");}
+    | ID ':' type {printf("P: genericIdList\n");}
+    | genericIdList ',' ID {printf("P: genericIdList\n");}
+    | genericIdList ',' ID ':' type  {printf("P: genericIdList\n");}
+    ;
+
 classDeclIncomplete: CLASS ID '{' stmtListE '}' {printf("P: classDeclIncomplete\n");}
     | CLASS ID ':' ID '{' stmtListE '}' {printf("P: classDeclIncomplete\n");}
+    | CLASS ID '<' genericIdList '>' '{' stmtListE '}' {printf("P: classDeclIncomplete generic\n");}
+    | CLASS ID '<' genericIdList '>' whereClause '{' stmtListE '}' {printf("P: classDeclIncomplete generic\n");}
     ;
 
 classDeclaration: modifiersWordsList classDeclIncomplete {printf("P: class declaration with prefix\n");}
@@ -306,6 +316,8 @@ classDeclaration: modifiersWordsList classDeclIncomplete {printf("P: class decla
 
 structDeclIncomplete: STRUCT ID '{' stmtListE '}' {printf("P: structDeclIncomplete\n");}
 	| STRUCT ID ':' ID '{' stmtListE '}' {printf("P: structDeclIncomplete\n");}
+    | STRUCT ID '<' genericIdList '>' '{' stmtListE '}' {printf("P: structDeclIncomplete generic\n");}
+    | STRUCT ID '<' genericIdList '>' whereClause '{' stmtListE '}' {printf("P: structDeclIncomplete generic\n");}
 	;
 
 structDeclaration: modifiersWordsList structDeclIncomplete {printf("P: struct declaration with prefix\n");}
@@ -320,8 +332,14 @@ exprListE: %empty
     | exprList
     ;
 
+genericIdType:  ID '<' typeList '>' {printf("P: genericIdType\n"); switchStateToSubscript();}
+	;
+
 funcCall: ID SUBSCRIPT_ROUND_BRACKET exprListE ')' {printf("P: funcCall exprList\n");}
+    | genericIdType SUBSCRIPT_ROUND_BRACKET exprListE ')' {printf("P: funcCall generic exprList\n");}
+
     | ID SUBSCRIPT_ROUND_BRACKET funcCallArgList ')' {printf("P: funcCall labelArgs\n");}
+    | genericIdType SUBSCRIPT_ROUND_BRACKET funcCallArgList ')' {printf("P: funcCall generic labelArgs\n");}
     ;
 
 assignment: expr '=' expr {printf("P: assignment\n");}
@@ -377,8 +395,8 @@ varDeclaration: modifiersWordsList varDeclIncommplete {printf("P: variable decla
     | varDeclIncommplete {printf("P: variable declaration default\n"); $$ = $1;}
     ;
 
-typeList: type {printf("P: enum: typeList \n");}
-    | typeList ',' type {printf("P: enum: typeList \n");}
+typeList: type {printf("P: typeList \n");}
+    | typeList ',' type {printf("P: typeList \n");}
     ;
 
 enumId: ID anyRoundBracket typeList ')' {printf("P: enum: enumId \n");}
@@ -418,7 +436,13 @@ repeatWhileLoop: REPEAT '{' stmtList '}' WHILE exprList {printf("P: repeatWhileL
     | REPEAT '{' '}' WHILE exprList {printf("P: repeatWhileLoop\n");}
     ;
 
-whereClause: WHERE expr
+    //TODO: move this to expr
+whereIdTypes: ID ':' type {printf("P: whereIdTypes\n");}
+	| whereIdTypes ',' ID ':' type {printf("P: whereIdTypes\n");}
+	;
+
+whereClause: WHERE exprList {printf("P: whereClause\n");}
+    | WHERE whereIdTypes {printf("P: whereClause ID type\n");}
     ;
 
 forInLoop: FOR expr IN expr whereClause '{' stmtList '}' {printf("P: forInLoop\n");}
