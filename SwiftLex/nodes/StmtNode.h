@@ -8,7 +8,8 @@
 enum StmtType
 {
 	Expr,
-	VarDeclarationList
+	VarDeclarationList,
+	Assignment
 };
 
 class StmtNode : public Dottable
@@ -20,9 +21,14 @@ public:
 
 	ExprNode* _expr;
 
+	ExprNode* _assignLeft;
+	ExprNode* _assignRight;
+
 	VarDeclarationListNode* _varDeclList;
 
 	static StmtNode* createStmtExpr(ExprNode* expr);
+
+	static StmtNode* createStmtAssignment(ExprNode* left, ExprNode* right);
 
 	static StmtNode* createStmtVarDeclaration(VarDeclarationListNode* varDeclList);
 

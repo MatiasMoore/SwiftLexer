@@ -113,6 +113,7 @@ SUBSCRIPT_SQUARE_BRACKET SUBSCRIPT_ROUND_BRACKET
 %type<exprNode> expr
 %type<exprListNode> exprList
 %type<stmtNode> stmt
+%type<stmtNode> assignment
 %type<stmtListNode> stmtList
 %type<stmtListNode> program
 %type<typeNode> type
@@ -163,7 +164,8 @@ stmt: varDeclaration {printf("P: stmt varDec\n"); $$ = StmtNode::createStmtVarDe
     | destructorDeclaration {printf("P: stmt destructorDecl\n");}
     | exprReturn {printf("P: stmt return\n");}
     | classDeclaration {printf("P: stmt classDec\n");}
-    | assignment {printf("P: stmt assignment\n");}
+    | assignment {printf("P: stmt assignment\n"); $$ = $1;}
+    | assignment ';' {printf("P: stmt assignment\n"); $$ = $1; $$->_hasSemicolon = true;}
     | expr {printf("P: stmt expr\n"); $$ = StmtNode::createStmtExpr($1);}
     | expr ';' {printf("P: stmt expr\n"); $$ = StmtNode::createStmtExpr($1); $$->_hasSemicolon = true; }
     | enumDeclaration {printf("P: stmt enum\n");}
@@ -324,7 +326,7 @@ funcCall: ID SUBSCRIPT_ROUND_BRACKET exprListE ')' {printf("P: funcCall exprList
     | ID SUBSCRIPT_ROUND_BRACKET funcCallArgList ')' {printf("P: funcCall labelArgs\n");}
     ;
 
-assignment: expr '=' expr {printf("P: assignment\n");}
+assignment: expr '=' expr {printf("P: assignment\n"); $$ = StmtNode::createStmtAssignment($1, $3); }
     ;
 
 varIdWithComma: ID ',' {printf("P: varIdWithComma\n"); $$ = $1;}

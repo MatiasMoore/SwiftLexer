@@ -9,6 +9,16 @@ StmtNode* StmtNode::createStmtExpr(ExprNode* expr)
 	return node;
 }
 
+StmtNode* StmtNode::createStmtAssignment(ExprNode* left, ExprNode* right)
+{
+	auto node = new StmtNode();
+	node->_type = StmtType::Assignment;
+	node->_assignLeft = left;
+	node->_assignRight = right;
+	printf("N: stmt assignment\n");
+	return node;
+}
+
 StmtNode* StmtNode::createStmtVarDeclaration(VarDeclarationListNode* varDeclList)
 {
 	auto node = new StmtNode();
@@ -31,6 +41,13 @@ void StmtNode::generateDot(std::ofstream& file)
 		file << dotLabel(this->_id, "VarDeclaration");
 		file << dotConnection(this->_id, this->_varDeclList->_id);
 		this->_varDeclList->generateDot(file);
+		break;
+	case StmtType::Assignment:
+		file << dotLabel(this->_id, "Assignment");
+		file << dotConnectionWithLabel(this->_id, this->_assignLeft->_id, "left");
+		file << dotConnectionWithLabel(this->_id, this->_assignRight->_id, "right");
+		this->_assignLeft->generateDot(file);
+		this->_assignRight->generateDot(file);
 		break;
 	default:
 		throw std::runtime_error("Unknown type!");
