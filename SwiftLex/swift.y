@@ -163,6 +163,7 @@ stmt: varDeclaration {printf("P: stmt varDec\n"); $$ = StmtNode::createStmtVarDe
     | constructorDeclaration {printf("P: stmt constructorDecl\n");}
     | destructorDeclaration {printf("P: stmt destructorDecl\n");}
     | exprReturn {printf("P: stmt return\n");}
+    | exprThrow {printf("P: stmt throw\n");}
     | classDeclaration {printf("P: stmt classDec\n");}
     | assignment {printf("P: stmt assignment\n"); $$ = $1;}
     | assignment ';' {printf("P: stmt assignment\n"); $$ = $1; $$->_hasSemicolon = true;}
@@ -210,6 +211,9 @@ statements -> statement statements?
 
 exprReturn: RETURN expr {printf("P: return\n");}
     ;
+
+exprThrow: THROW expr {printf("P: throw\n");}
+	;
 
 funcDeclArg: ID ':' type {printf("P: func arg with value\n");}
     | ID ':' type '=' expr {printf("P: func arg with value\n");}
