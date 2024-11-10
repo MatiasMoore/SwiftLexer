@@ -183,6 +183,8 @@ stmt: varDeclaration {printf("P: stmt varDec\n"); $$ = StmtNode::createStmtVarDe
     | forInLoop {printf("P: stmt forInLoop\n");}
     | switchCase {printf("P: stmt switch\n");}
     | structDeclaration {printf("P: stmt struct\n");}
+    | tryStmt {printf("P: stmt try\n");}
+    | doCatchStmt {printf("P: stmt doCatch\n");}
 	;
 
 stmtList: stmt {printf("P: stmtList start\n"); $$ = StmtListNode::createListNode($1);}
@@ -525,6 +527,27 @@ caseList: caseElement {printf("P: caseList\n");}
 	;
 
 defaultCase: DEFAULT ':' stmtList {printf("P: defaultCase\n");}
+	;
+
+tryStmt: TRY expr {printf("P: try\n");}
+	;
+
+varDeclCatchIncomplete:ID {printf("P: varDeclCatchIncomplete\n");}
+	| ID AS type{printf("P: varDeclCatchIncomplete\n");}
+	;
+
+varDeclCatch: VAR varDeclCatchIncomplete {printf("P: varDecl\n");}
+    | LET varDeclCatchIncomplete {printf("P: varDeclCatch\n");}
+	;
+
+catchExprE: exprListE {printf("P: catchExpr\n");}
+    | DEFAULT {printf("P: catchExpr\n");}
+	| varDeclCatch {printf("P: catchExpr\n");}
+    | IS expr {printf("P: catchExpr\n");}
+    ;
+
+doCatchStmt: DO '{' stmtList '}' {printf("P: do \n");}
+    | doCatchStmt CATCH catchExprE '{' stmtList '}' {printf("P: do catch\n");}
 	;
 
 expr: LITERAL_INT {printf("P: expr int\n"); switchStateToSubscript(); $$ = ExprNode::createInt($1);}
