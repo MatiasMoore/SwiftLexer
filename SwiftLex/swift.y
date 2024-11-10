@@ -24,6 +24,9 @@
     class VarDeclarationNode* varDeclNode;
     class VarDeclarationListNode* varDeclListNode;
     class StringList* strList;
+    class FuncCallArgNode* funcCallArgNode;
+    class FuncCallArgListNode* funcCallArgListNode;
+    class FuncCallNode* funcCallNode;
 }
 %locations
 
@@ -127,6 +130,10 @@ SUBSCRIPT_SQUARE_BRACKET SUBSCRIPT_ROUND_BRACKET
 %type<varDeclListNode> varDeclIncommplete 
 //TODO: TEMPORARY!!!! SHOULD BE EXPANDED TO INCLUDE ACCESS MODIFIERS
 %type<varDeclListNode> varDeclaration
+
+%type<funcCallArgNode> funcCallArg
+%type<funcCallArgListNode> funcCallArgList
+%type<funcCallNode> funcCall
 
 // Start
 %start program
@@ -291,11 +298,11 @@ constructorDeclaration: INIT anyRoundBracket funcDeclArgListE ')' '{' stmtListE 
 destructorDeclaration: DEINIT '{' stmtListE '}' {printf("P: destructor declaration\n");}
     ;
 
-funcCallArg: ID ':' expr {printf("P: funcCallArg\n");}
+funcCallArg: ID ':' expr {printf("P: funcCallArg\n"); $$ = FuncCallArgNode::createFromExprAndName($3, $1);}
     ;
 
-funcCallArgList: funcCallArg {printf("P: funcCallArgList\n");}
-    | funcCallArgList ',' funcCallArg {printf("P: funcCallArgList\n");}
+funcCallArgList: funcCallArg {printf("P: funcCallArgList\n"); $$ = FuncCallArgListNode::createListNode($1);}
+    | funcCallArgList ',' funcCallArg {printf("P: funcCallArgList\n"); $$ = $$->appendNode($3);}
     ;
     
 classDeclIncomplete: CLASS ID '{' stmtListE '}' {printf("P: classDeclIncomplete\n");}
@@ -322,8 +329,28 @@ exprListE: %empty
     | exprList
     ;
 
-funcCall: ID SUBSCRIPT_ROUND_BRACKET exprListE ')' {printf("P: funcCall exprList\n");}
-    | ID SUBSCRIPT_ROUND_BRACKET funcCallArgList ')' {printf("P: funcCall labelArgs\n");}
+funcCall: ID SUBSCRIPT_ROUND_BRACKET ')' {printf("P: funcCall exprList\n"); $$ = FuncCallNode::createFuncCallNoArgs($1);}
+    | ID SUBSCRIPT_ROUND_BRACKET exprList ')' {
+        printf("P: funcCall exprList\n"); 
+
+        //Convert exprList to argList
+
+        //Convert first and create list
+        auto exprList = $3;
+        auto argList = FuncCallArgListNode::createListNode(FuncCallArgNode::createFromExpr(exprList->_vec[0]));
+
+        //Convert the rest
+        for (int i = 1; i < exprList->_vec.size(); i++)
+        {
+            argList = argList->appendNode(FuncCallArgNode::createFromExpr(exprList->_vec[i]));
+        }
+
+        //Finally create the func call node
+
+        $$ = FuncCallNode::createFuncCall($1, argList);
+
+    }
+    | ID SUBSCRIPT_ROUND_BRACKET funcCallArgList ')' {printf("P: funcCall labelArgs\n"); $$ = FuncCallNode::createFuncCall($1, $3);}
     ;
 
 assignment: expr '=' expr {printf("P: assignment\n"); $$ = StmtNode::createStmtAssignment($1, $3); }
@@ -498,10 +525,10 @@ expr: LITERAL_INT {printf("P: expr int\n"); switchStateToSubscript(); $$ = ExprN
     | expr AS '!' type {printf("P: expr as !\n"); switchStateToSubscript();}
     | expr '?' expr ':' expr {printf("P: expr ternary ? :\n"); switchStateToSubscript(); $$ = ExprNode::createTernary($1, $3, $5);}
     | anyRoundBracket expr ')' {printf("P: expr brackets\n"); $$ = $2; switchStateToSubscript();}
-    | funcCall {printf("P: expr funcCall\n"); switchStateToSubscript(); switchStateToSubscript();}
-    | SUPER '.' funcCall {printf("P: expr super funcCall\n"); switchStateToSubscript();}
-    | expr '.' funcCall {printf("P: expr func access\n"); switchStateToSubscript();}
-    | SELF '.' funcCall {printf("P: expr self func access\n"); switchStateToSubscript();}
+    | funcCall {printf("P: expr funcCall\n"); switchStateToSubscript(); switchStateToSubscript(); $$ = ExprNode::createFuncCall($1);}
+    | SUPER '.' funcCall {printf("P: expr super funcCall\n"); switchStateToSubscript(); $3->_scopeType = superCall; $$ = ExprNode::createFuncCall($3);}
+    | expr '.' funcCall {printf("P: expr func access\n"); switchStateToSubscript(); $3->setAsExprAccess($1); $$ = ExprNode::createFuncCall($3);}
+    | SELF '.' funcCall {printf("P: expr self func access\n"); switchStateToSubscript(); $3->_scopeType = selfCall; $$ = ExprNode::createFuncCall($3);}
     | expr '.' ID {printf("P: expr field access\n"); switchStateToSubscript();}
     | SELF '.' ID {printf("P: expr self fieldAccess\n"); switchStateToSubscript();}
     // WARNING THIS CAUSES 2 CONFLICTS 

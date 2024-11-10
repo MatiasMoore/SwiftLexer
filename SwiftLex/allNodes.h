@@ -3,3 +3,5 @@
 #include "nodes/StmtNode.h"
 #include "nodes/TypeNode.h"
 #include "nodes/VarDeclarationNode.h"
+#include "nodes/FuncCallArgNode.h"
+#include "nodes/FuncCallNode.h"

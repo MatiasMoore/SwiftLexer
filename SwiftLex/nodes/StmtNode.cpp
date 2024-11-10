@@ -33,17 +33,17 @@ void StmtNode::generateDot(std::ofstream& file)
 	switch (this->_type)
 	{
 	case StmtType::Expr:
-		file << dotLabel(this->_id, "Stmt");
+		file << dotLabel(this->_id, "ExprStmt");
 		file << dotConnection(this->_id, this->_expr->_id);
 		this->_expr->generateDot(file);
 		break;
 	case StmtType::VarDeclarationList:
-		file << dotLabel(this->_id, "VarDeclaration");
+		file << dotLabel(this->_id, "VarDeclarationStmt");
 		file << dotConnection(this->_id, this->_varDeclList->_id);
 		this->_varDeclList->generateDot(file);
 		break;
 	case StmtType::Assignment:
-		file << dotLabel(this->_id, "Assignment");
+		file << dotLabel(this->_id, "AssignmentStmt");
 		file << dotConnectionWithLabel(this->_id, this->_assignLeft->_id, "left");
 		file << dotConnectionWithLabel(this->_id, this->_assignRight->_id, "right");
 		this->_assignLeft->generateDot(file);

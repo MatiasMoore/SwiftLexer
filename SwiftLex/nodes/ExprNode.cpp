@@ -84,6 +84,15 @@ ExprNode* ExprNode::createArray(ExprListNode* list)
 	return node;
 }
 
+ExprNode* ExprNode::createFuncCall(FuncCallNode* func)
+{
+	auto node = new ExprNode();
+	node->_type = ExprType::FuncCall;
+	node->_funcCall = func;
+	printf("N: func call %d\n", (int)node->_type);
+	return node;
+}
+
 std::string ExprNode::getName()
 {
 	switch (this->_type)
@@ -184,6 +193,9 @@ std::string ExprNode::getName()
 	case ExprType::Subscript:
 		return "Subscript []";
 		break;
+	case ExprType::FuncCall:
+		return "FuncCall";
+		break;
 	default:
 		throw std::runtime_error("Unknown type!");
 		break;
@@ -263,6 +275,11 @@ void ExprNode::generateDot(std::ofstream& file)
 		file << dotConnectionWithLabel(this->_id, this->_right->_id, "index");
 		this->_left->generateDot(file);
 		this->_right->generateDot(file);
+		break;
+	case ExprType::FuncCall:
+		file << dotLabel(this->_id, this->getName());
+		file << dotConnection(this->_id, this->_funcCall->_id);
+		this->_funcCall->generateDot(file);
 		break;
 	default:
 		throw std::runtime_error("Unknown type!");

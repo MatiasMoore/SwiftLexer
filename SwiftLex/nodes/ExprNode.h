@@ -1,6 +1,7 @@
 #pragma once
 #include "dottable.h"
 #include "GenericListNode.h"
+#include "FuncCallNode.h"
 
 enum ExprType
 {
@@ -35,7 +36,8 @@ enum ExprType
 	UnaryMinus,
 	Ternary,
 	Array,
-	Subscript
+	Subscript,
+	FuncCall
 };
 
 //Forward declaration for list
@@ -65,6 +67,8 @@ public:
 	ExprNode* _ternaryIfFalse;
 	ExprListNode* _arrayExprList;
 
+	FuncCallNode* _funcCall;
+
 	static ExprNode* createBool(bool value);
 
 	static ExprNode* createInt(int value);
@@ -82,6 +86,8 @@ public:
 	static ExprNode* createTernary(ExprNode* condition, ExprNode* ifTrue, ExprNode* ifFalse);
 
 	static ExprNode* createArray(ExprListNode* list);
+
+	static ExprNode* createFuncCall(FuncCallNode* func);
 
 	std::string getName();
 
