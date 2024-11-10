@@ -345,7 +345,7 @@ genericIdType:  ID '<' typeList '>' {printf("P: genericIdType\n"); switchStateTo
 	;
 
 funcCall: ID SUBSCRIPT_ROUND_BRACKET ')' {printf("P: funcCall exprList\n"); $$ = FuncCallNode::createFuncCallNoArgs($1);}
-	| genericIdType ID SUBSCRIPT_ROUND_BRACKET ')' {printf("P: funcCall exprList\n"); $$ = FuncCallNode::createFuncCallNoArgs($2);}
+	| genericIdType SUBSCRIPT_ROUND_BRACKET ')' {printf("P: funcCall exprList\n");}
     | ID SUBSCRIPT_ROUND_BRACKET exprList ')' {
         printf("P: funcCall exprList\n"); 
 
@@ -366,28 +366,9 @@ funcCall: ID SUBSCRIPT_ROUND_BRACKET ')' {printf("P: funcCall exprList\n"); $$ =
         $$ = FuncCallNode::createFuncCall($1, argList);
 
     }
-	| genericIdType ID SUBSCRIPT_ROUND_BRACKET exprList ')' {
-        printf("P: funcCall exprList\n"); 
-
-        //Convert exprList to argList
-
-        //Convert first and create list
-        auto exprList = $4;
-        auto argList = FuncCallArgListNode::createListNode(FuncCallArgNode::createFromExpr(exprList->_vec[0]));
-
-        //Convert the rest
-        for (int i = 1; i < exprList->_vec.size(); i++)
-        {
-            argList = argList->appendNode(FuncCallArgNode::createFromExpr(exprList->_vec[i]));
-        }
-
-        //Finally create the func call node
-
-        $$ = FuncCallNode::createFuncCall($2, argList);
-
-    }
+	| genericIdType SUBSCRIPT_ROUND_BRACKET exprList ')' {printf("P: funcCall exprList\n");}
     | ID SUBSCRIPT_ROUND_BRACKET funcCallArgList ')' {printf("P: funcCall labelArgs\n"); $$ = FuncCallNode::createFuncCall($1, $3);}
-	| genericIdType ID SUBSCRIPT_ROUND_BRACKET funcCallArgList ')' {printf("P: funcCall labelArgs\n"); $$ = FuncCallNode::createFuncCall($2, $4);}
+	| genericIdType SUBSCRIPT_ROUND_BRACKET funcCallArgList ')' {printf("P: funcCall labelArgs\n");}
     ;
 
 assignment: expr '=' expr {printf("P: assignment\n"); $$ = StmtNode::createStmtAssignment($1, $3); }
