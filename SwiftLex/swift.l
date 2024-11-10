@@ -323,6 +323,10 @@ Double {cout << "Type Double: " << yytext << endl; return TYPE_DOUBLE;}
 		{
 			tabsToRemove = multilineStringStartTabCount;
 		}
+		else
+		{
+			tabsToRemove = 0;
+		}
 		stringMultiline += letter;
 	}
 
