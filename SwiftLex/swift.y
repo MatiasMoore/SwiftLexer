@@ -288,6 +288,8 @@ modifiersWordsList: modifiersWords {printf("P: modifiersWordsList\n");}
 	;
 
 constructorDeclaration: INIT anyRoundBracket funcDeclArgListE ')' '{' stmtListE '}' {printf("P: constructor declaration\n");}
+    | INIT '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' '{' stmtListE '}' {printf("P: constructor declaration generic\n");}
+    | INIT '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' whereClause '{' stmtListE '}' {printf("P: constructor declaration generic\n");}
     ;
 
 destructorDeclaration: DEINIT '{' stmtListE '}' {printf("P: destructor declaration\n");}
