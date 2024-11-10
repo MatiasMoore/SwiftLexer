@@ -170,6 +170,7 @@ stmt: varDeclaration {printf("P: stmt varDec\n"); $$ = StmtNode::createStmtVarDe
     | constructorDeclaration {printf("P: stmt constructorDecl\n");}
     | destructorDeclaration {printf("P: stmt destructorDecl\n");}
     | exprReturn {printf("P: stmt return\n");}
+    | exprThrow {printf("P: stmt throw\n");}
     | classDeclaration {printf("P: stmt classDec\n");}
     | assignment {printf("P: stmt assignment\n"); $$ = $1;}
     | assignment ';' {printf("P: stmt assignment\n"); $$ = $1; $$->_hasSemicolon = true;}
@@ -218,6 +219,9 @@ statements -> statement statements?
 exprReturn: RETURN expr {printf("P: return\n");}
     ;
 
+exprThrow: THROW expr {printf("P: throw\n");}
+	;
+
 funcDeclArg: ID ':' type {printf("P: func arg with value\n");}
     | ID ':' type '=' expr {printf("P: func arg with value\n");}
     ;
@@ -240,6 +244,10 @@ funcReturnTypeE: %empty
 funcDecIncomplete: FUNC ID anyRoundBracket funcDeclArgListE ')' funcReturnTypeE '{' stmtListE '}' {printf("P: func declIncomplete\n");}
     | FUNC ID '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' funcReturnTypeE '{' stmtListE '}' {printf("P: func declIncomplete generic\n");}
     | FUNC ID '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' funcReturnTypeE whereClause '{' stmtListE '}' {printf("P: func declIncomplete generic where\n");}
+
+    | FUNC ID anyRoundBracket funcDeclArgListE ')' THROWS funcReturnTypeE '{' stmtListE '}' {printf("P: func declIncomplete throws\n");}
+    | FUNC ID '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' THROWS funcReturnTypeE '{' stmtListE '}' {printf("P: func declIncomplete generic throws\n");}
+    | FUNC ID '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' THROWS funcReturnTypeE whereClause '{' stmtListE '}' {printf("P: func declIncomplete generic where throws\n");}
     ;
 
     
@@ -295,6 +303,12 @@ modifiersWordsList: modifiersWords {printf("P: modifiersWordsList\n");}
 	;
 
 constructorDeclaration: INIT anyRoundBracket funcDeclArgListE ')' '{' stmtListE '}' {printf("P: constructor declaration\n");}
+    | INIT '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' '{' stmtListE '}' {printf("P: constructor declaration generic\n");}
+    | INIT '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' whereClause '{' stmtListE '}' {printf("P: constructor declaration generic\n");}
+
+    | INIT anyRoundBracket funcDeclArgListE ')' '{' stmtListE '}' THROWS {printf("P: constructor declaration\n");}
+    | INIT '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' THROWS '{' stmtListE '}' {printf("P: constructor declaration generic\n");}
+    | INIT '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' THROWS whereClause '{' stmtListE '}' {printf("P: constructor declaration generic\n");}
     ;
 
 destructorDeclaration: DEINIT '{' stmtListE '}' {printf("P: destructor declaration\n");}
