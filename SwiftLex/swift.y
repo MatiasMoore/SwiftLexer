@@ -459,7 +459,8 @@ enumDefinition: CASE enumIdList {printf("P: enum: enumDefinition \n");}
 enumDefinitionList: enumDefinition {printf("P: enum: enumDefinitionList \n");}
     | enumDefinitionList ';' enumDefinition  {printf("P: enum: enumDefinitionList \n");}
     | enumDefinitionList enumDefinition  {
-        if (!($1->_vec.back()->_hasSemicolon) && @1.last_line == @2.first_line){
+        //TODO: add check for semicolon
+        if (@1.last_line == @2.first_line){
             yyerror("Syntax error: two enum statements in one line must be separated with a ';'");
         }
         else {
