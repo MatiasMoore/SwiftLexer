@@ -495,11 +495,11 @@ whereClause: WHERE exprList {printf("P: whereClause\n");}
     | WHERE whereIdTypes {printf("P: whereClause ID type\n");}
     ;
 
-forInLoop: FOR expr IN expr whereClause '{' stmtList '}' {printf("P: forInLoop\n");}
-    | FOR expr IN expr '{' stmtList '}' {printf("P: forInLoop\n");}
+forInLoop: FOR ID IN expr whereClause '{' stmtList '}' {printf("P: forInLoop\n");}
+    | FOR ID IN expr '{' stmtList '}' {printf("P: forInLoop\n");}
 
-    | FOR expr IN expr whereClause '{' '}' {printf("P: forInLoop\n");}
-    | FOR expr IN expr '{' '}' {printf("P: forInLoop\n");}
+    | FOR ID IN expr whereClause '{' '}' {printf("P: forInLoop\n");}
+    | FOR ID IN expr '{' '}' {printf("P: forInLoop\n");}
     ;
 
 ifElse: IF exprList '{' stmtList '}' {printf("P: ifElse\n");}
