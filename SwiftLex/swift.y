@@ -117,6 +117,7 @@ SUBSCRIPT_SQUARE_BRACKET SUBSCRIPT_ROUND_BRACKET
 %type<exprListNode> exprList
 %type<stmtNode> stmt
 %type<stmtNode> assignment
+%type<stmtNode> stmtOperators
 %type<stmtListNode> stmtList
 %type<stmtListNode> program
 %type<typeNode> type
@@ -185,7 +186,8 @@ stmt: varDeclaration {printf("P: stmt varDec\n"); $$ = StmtNode::createStmtVarDe
     | structDeclaration {printf("P: stmt struct\n");}
     | tryStmt {printf("P: stmt try\n");}
     | doCatchStmt {printf("P: stmt doCatch\n");}
-    | stmtOperators {printf("P: stmt operators\n");}
+    | stmtOperators {printf("P: stmt operators\n"); $$ = $1;}
+    | stmtOperators ';' {printf("P: stmt operators\n"); $$ = $1; $$->_hasSemicolon = true;}
 	;
 
 stmtList: stmt {printf("P: stmtList start\n"); $$ = StmtListNode::createListNode($1);}
@@ -551,11 +553,26 @@ doCatchStmt: DO '{' stmtList '}' {printf("P: do \n");}
     | doCatchStmt CATCH catchExprE '{' stmtList '}' {printf("P: do catch\n");}
 	;
 
-stmtOperators: expr OP_MINUS_ASSIGN expr {printf("P: stmtOperator OP_MINUS_ASSIGN\n");}
-    | expr OP_DIV_ASSIGN expr {printf("P: stmtOperator OP_DIV_ASSIGN\n");}
-    | expr OP_MUL_ASSIGN expr {printf("P: stmtOperator OP_MUL_ASSIGN\n");}
-    | expr OP_MOD_ASSIGN expr {printf("P: stmtOperator OP_MOD_ASSIGN\n");}
-    | expr OP_PLUS_ASSIGN expr {printf("P: stmtOperator OP_PLUS_ASSIGN\n");}
+stmtOperators: expr OP_MINUS_ASSIGN expr {
+    printf("P: stmtOperator OP_MINUS_ASSIGN\n"); 
+    $$ = StmtNode::createStmtAssignment($1, ExprNode::createBinaryOp(ExprType::Sub, $1, $3)); 
+    }
+    | expr OP_DIV_ASSIGN expr {
+    printf("P: stmtOperator OP_DIV_ASSIGN\n");
+    $$ = StmtNode::createStmtAssignment($1, ExprNode::createBinaryOp(ExprType::Div, $1, $3)); 
+    }
+    | expr OP_MUL_ASSIGN expr {
+    printf("P: stmtOperator OP_MUL_ASSIGN\n");
+    $$ = StmtNode::createStmtAssignment($1, ExprNode::createBinaryOp(ExprType::Mul, $1, $3)); 
+    }
+    | expr OP_MOD_ASSIGN expr {
+    printf("P: stmtOperator OP_MOD_ASSIGN\n");
+    $$ = StmtNode::createStmtAssignment($1, ExprNode::createBinaryOp(ExprType::Modulus, $1, $3)); 
+    }
+    | expr OP_PLUS_ASSIGN expr {
+    printf("P: stmtOperator OP_PLUS_ASSIGN\n");
+    $$ = StmtNode::createStmtAssignment($1, ExprNode::createBinaryOp(ExprType::Sum, $1, $3)); 
+    }
     ;
 
 expr: LITERAL_INT {printf("P: expr int\n"); switchStateToSubscript(); $$ = ExprNode::createInt($1);}
