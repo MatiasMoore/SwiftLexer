@@ -185,6 +185,7 @@ stmt: varDeclaration {printf("P: stmt varDec\n"); $$ = StmtNode::createStmtVarDe
     | structDeclaration {printf("P: stmt struct\n");}
     | tryStmt {printf("P: stmt try\n");}
     | doCatchStmt {printf("P: stmt doCatch\n");}
+    | stmtOperators {printf("P: stmt operators\n");}
 	;
 
 stmtList: stmt {printf("P: stmtList start\n"); $$ = StmtListNode::createListNode($1);}
@@ -549,6 +550,13 @@ catchExprE: exprListE {printf("P: catchExpr\n");}
 doCatchStmt: DO '{' stmtList '}' {printf("P: do \n");}
     | doCatchStmt CATCH catchExprE '{' stmtList '}' {printf("P: do catch\n");}
 	;
+
+stmtOperators: expr OP_MINUS_ASSIGN expr {printf("P: stmtOperator OP_MINUS_ASSIGN\n");}
+    | expr OP_DIV_ASSIGN expr {printf("P: stmtOperator OP_DIV_ASSIGN\n");}
+    | expr OP_MUL_ASSIGN expr {printf("P: stmtOperator OP_MUL_ASSIGN\n");}
+    | expr OP_MOD_ASSIGN expr {printf("P: stmtOperator OP_MOD_ASSIGN\n");}
+    | expr OP_PLUS_ASSIGN expr {printf("P: stmtOperator OP_PLUS_ASSIGN\n");}
+    ;
 
 expr: LITERAL_INT {printf("P: expr int\n"); switchStateToSubscript(); $$ = ExprNode::createInt($1);}
     | LITERAL_FLOAT {printf("P: expr float\n"); switchStateToSubscript(); $$ = ExprNode::createFloat($1);}
