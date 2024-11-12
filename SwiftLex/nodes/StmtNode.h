@@ -4,12 +4,14 @@
 #include "GenericListNode.h"
 #include "ExprNode.h"
 #include "VarDeclarationNode.h"
+#include "ReturnNode.h"
 
 enum StmtType
 {
 	Expr,
 	VarDeclarationList,
-	Assignment
+	Assignment,
+	Return
 };
 
 class StmtNode : public Dottable
@@ -24,6 +26,8 @@ public:
 	ExprNode* _assignLeft;
 	ExprNode* _assignRight;
 
+	ReturnNode* _return;
+
 	VarDeclarationListNode* _varDeclList;
 
 	static StmtNode* createStmtExpr(ExprNode* expr);
@@ -31,6 +35,8 @@ public:
 	static StmtNode* createStmtAssignment(ExprNode* left, ExprNode* right);
 
 	static StmtNode* createStmtVarDeclaration(VarDeclarationListNode* varDeclList);
+
+	static StmtNode* createStmtReturn(ReturnNode* ret);
 
 	void generateDot(std::ofstream& file) override;
 };

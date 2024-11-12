@@ -27,6 +27,7 @@
     <ClCompile Include="nodes\dotHelpers.cpp" />
     <ClCompile Include="nodes\idsystem.cpp" />
     <ClCompile Include="nodes\StmtNode.cpp" />
+    <ClCompile Include="nodes\ReturnNode.cpp" />
     <ClCompile Include="swift.flex.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="swift.tab.cpp" />
@@ -49,6 +50,7 @@
     <ClInclude Include="globalVars.h" />
     <ClInclude Include="nodes\idsystem.h" />
     <ClInclude Include="nodes\StmtNode.h" />
+    <ClInclude Include="nodes\ReturnNode.h" />
     <ClInclude Include="swift.tab.h" />
     <ClInclude Include="nodes\ExprNode.h" />
     <ClInclude Include="allNodes.h" />

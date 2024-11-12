@@ -27,6 +27,7 @@
     class FuncCallArgNode* funcCallArgNode;
     class FuncCallArgListNode* funcCallArgListNode;
     class FuncCallNode* funcCallNode;
+    class ReturnNode* returnNode;
 }
 %locations
 
@@ -115,9 +116,12 @@ SUBSCRIPT_SQUARE_BRACKET SUBSCRIPT_ROUND_BRACKET
 // Nodes
 %type<exprNode> expr
 %type<exprListNode> exprList
+%type<returnNode> return
 %type<stmtNode> stmt
+%type<stmtNode> returnStmt
 %type<stmtNode> assignment
 %type<stmtListNode> stmtList
+%type<stmtListNode> stmtListIncomplete
 %type<stmtListNode> program
 %type<typeNode> type
 
@@ -169,7 +173,6 @@ stmt: varDeclaration {printf("P: stmt varDec\n"); $$ = StmtNode::createStmtVarDe
     | funcDeclaration {printf("P: stmt funcDec\n");}
     | constructorDeclaration {printf("P: stmt constructorDecl\n");}
     | destructorDeclaration {printf("P: stmt destructorDecl\n");}
-    | exprReturn {printf("P: stmt return\n");}
     | exprThrow {printf("P: stmt throw\n");}
     | classDeclaration {printf("P: stmt classDec\n");}
     | assignment {printf("P: stmt assignment\n"); $$ = $1;}
@@ -188,13 +191,30 @@ stmt: varDeclaration {printf("P: stmt varDec\n"); $$ = StmtNode::createStmtVarDe
     | stmtOperators {printf("P: stmt operators\n");}
 	;
 
-stmtList: stmt {printf("P: stmtList start\n"); $$ = StmtListNode::createListNode($1);}
-	| stmtList stmt {
+returnStmt: return {printf("P: stmt return\n"); $$ = StmtNode::createStmtReturn($1);}
+    | return ';' {printf("P: stmt return\n"); $$ = StmtNode::createStmtReturn($1); $$->_hasSemicolon = true;}
+    ;
+
+stmtList: stmtListIncomplete returnStmt {
+        if (@1.last_line == @2.first_line){
+            yyerror("Syntax error: two statements in one line must be separated with a ';'");
+        }
+        else {
+			printf("P: END stmtList RETURN + stmtListIncomplete\n");
+            $$ = $1->appendNode($2);
+		}
+    }
+    | stmtListIncomplete {printf("P: END stmtList stmtListIncomplete only\n"); $$ = $1;}
+    | returnStmt {printf("P: END stmtList RETURN only\n"); $$ = StmtListNode::createListNode($1);}
+	;
+
+stmtListIncomplete: stmt {printf("P: stmtListIncomplete start\n"); $$ = StmtListNode::createListNode($1);}
+	| stmtListIncomplete stmt {
         if (!($1->_vec.back()->_hasSemicolon) && @1.last_line == @2.first_line){
             yyerror("Syntax error: two statements in one line must be separated with a ';'");
         }
         else {
-			printf("P: stmtList\n");
+			printf("P: stmtListIncomplete\n");
             $$ = $1->appendNode($2);
 		}
     }
@@ -219,7 +239,8 @@ statement -> compiler-control-statement
 statements -> statement statements?
     */
 
-exprReturn: RETURN expr {printf("P: return\n");}
+return: RETURN expr  {printf("P: return\n"); $$ = ReturnNode::createExprReturn($2);}
+    | RETURN {printf("P: return empty\n"); $$ = ReturnNode::createVoidReturn();}
     ;
 
 exprThrow: THROW expr {printf("P: throw\n");}

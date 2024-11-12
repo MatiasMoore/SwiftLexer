@@ -5,3 +5,4 @@
 #include "nodes/VarDeclarationNode.h"
 #include "nodes/FuncCallArgNode.h"
 #include "nodes/FuncCallNode.h"
+#include "nodes/ReturnNode.h"

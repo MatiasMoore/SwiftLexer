@@ -28,6 +28,15 @@ StmtNode* StmtNode::createStmtVarDeclaration(VarDeclarationListNode* varDeclList
 	return node;
 }
 
+StmtNode* StmtNode::createStmtReturn(ReturnNode* ret)
+{
+	auto node = new StmtNode();
+	node->_type = StmtType::Return;
+	node->_return = ret;
+	printf("N: stmt return\n");
+	return node;
+}
+
 void StmtNode::generateDot(std::ofstream& file)
 {
 	switch (this->_type)
@@ -48,6 +57,11 @@ void StmtNode::generateDot(std::ofstream& file)
 		file << dotConnectionWithLabel(this->_id, this->_assignRight->_id, "right");
 		this->_assignLeft->generateDot(file);
 		this->_assignRight->generateDot(file);
+		break;
+	case StmtType::Return:
+		file << dotLabel(this->_id, "ReturnStmt");
+		file << dotConnection(this->_id, this->_return->_id);
+		this->_return->generateDot(file);
 		break;
 	default:
 		throw std::runtime_error("Unknown type!");
