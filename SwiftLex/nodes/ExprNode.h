@@ -1,8 +1,10 @@
 #pragma once
 #include "dottable.h"
 #include "GenericListNode.h"
-#include "FuncCallNode.h"
-#include "TypeNode.h"
+
+class ExprNode;
+class TypeNode;
+class FuncCallNode;
 
 enum ExprType
 {
@@ -46,9 +48,6 @@ enum ExprType
 	TypeCastWithThrow,
 	TypeCastWithCheck
 };
-
-//Forward declaration for list
-class ExprNode;
 
 class ExprListNode : public GenericListNode<ExprNode, ExprListNode>
 {

@@ -1,19 +1,6 @@
 #include "LoopNode.h"
-
-class StmtListNode : public Dottable
-{
-
-};
-
-class ExprNode : public Dottable
-{
-
-};
-
-class ExprListNode : public Dottable
-{
-
-};
+#include "StmtNode.h"
+#include "ExprNode.h"
 
 LoopNode* LoopNode::createForLoop(std::string id, ExprNode* iterable, StmtListNode* body)
 {

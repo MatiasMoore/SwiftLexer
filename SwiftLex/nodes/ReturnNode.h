@@ -1,6 +1,7 @@
 #pragma once
 #include "dottable.h"
-#include "ExprNode.h"
+
+class ExprNode;
 
 enum ReturnNodeType 
 {

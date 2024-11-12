@@ -1,4 +1,6 @@
 #include "ExprNode.h"
+#include "FuncCallNode.h"
+#include "TypeNode.h"
 
 ExprNode* ExprNode::createBool(bool value)
 {

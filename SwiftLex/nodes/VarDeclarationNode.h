@@ -1,8 +1,9 @@
 #pragma once
 #include "dottable.h"
-#include "ExprNode.h"
-#include "TypeNode.h"
 #include "GenericListNode.h"
+
+class ExprNode;
+class TypeNode;
 
 enum VarDeclType
 {

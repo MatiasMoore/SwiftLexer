@@ -1,7 +1,6 @@
 #pragma once
 #include "dottable.h"
 
-//Forward decalaration to prevent include loop
 class FuncCallArgListNode;
 class ExprNode;
 

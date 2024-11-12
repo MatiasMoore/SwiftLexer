@@ -1,9 +1,6 @@
 #include "IfElseNode.h"
-
-class StmtListNode : public Dottable
-{
-
-};
+#include "ExprNode.h"
+#include "StmtNode.h"
 
 IfElseNode* IfElseNode::createSimple(ExprListNode* conditions, StmtListNode* ifTrue, StmtListNode* elseSimple)
 {

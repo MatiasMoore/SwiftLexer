@@ -1,4 +1,6 @@
 #include "FuncDeclArgNode.h"
+#include "TypeNode.h"
+#include "ExprNode.h"
 
 FuncDeclArgNode* FuncDeclArgNode::createPositionalArg(std::string argName, TypeNode* argType, ExprNode* argValue)
 {

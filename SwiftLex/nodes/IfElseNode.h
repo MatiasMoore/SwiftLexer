@@ -1,8 +1,9 @@
 #pragma once
 #include "dottable.h"
-#include "ExprNode.h"
 
 class StmtListNode;
+class ExprNode;
+class ExprListNode;
 
 enum IfElseNodeType
 {

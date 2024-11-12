@@ -1,9 +1,10 @@
 #pragma once
 #include "dottable.h"
-#include "FuncDeclArgNode.h"
-#include "TypeForGenericNode.h"
 
 class StmtListNode;
+class FuncDeclArgListNode;
+class TypeForGenericListNode;
+class TypeNode;
 
 enum FuncDeclType
 {

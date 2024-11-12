@@ -1,4 +1,10 @@
 #include "StmtNode.h"
+#include "ExprNode.h"
+#include "VarDeclarationNode.h"
+#include "ReturnNode.h"
+#include "LoopNode.h"
+#include "IfElseNode.h"
+#include "FuncDeclNode.h"
 
 StmtNode* StmtNode::createStmtExpr(ExprNode* expr)
 {

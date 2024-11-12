@@ -2,12 +2,13 @@
 #include <vector>
 #include "dottable.h"
 #include "GenericListNode.h"
-#include "ExprNode.h"
-#include "VarDeclarationNode.h"
-#include "ReturnNode.h"
-#include "LoopNode.h"
-#include "IfElseNode.h"
-#include "FuncDeclNode.h"
+
+class ReturnNode;
+class ExprNode;
+class LoopNode;
+class IfElseNode;
+class VarDeclarationListNode;
+class FuncDeclNode;
 
 enum StmtType
 {

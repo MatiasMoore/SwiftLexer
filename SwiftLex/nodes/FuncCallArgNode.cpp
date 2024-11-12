@@ -1,4 +1,5 @@
 #include "FuncCallArgNode.h"
+#include "ExprNode.h"
 
 FuncCallArgNode* FuncCallArgNode::createFromExpr(ExprNode* expr)
 {

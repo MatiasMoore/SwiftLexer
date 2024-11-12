@@ -1,4 +1,5 @@
 #include "ReturnNode.h"
+#include "ExprNode.h"
 
 ReturnNode* ReturnNode::createVoidReturn()
 {

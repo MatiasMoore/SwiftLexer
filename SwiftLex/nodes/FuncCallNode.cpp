@@ -1,15 +1,6 @@
 #include "FuncCallNode.h"
-
-//Forward decalaration to prevent include loop
-class FuncCallArgListNode : public Dottable
-{
-
-};
-
-class ExprNode : public Dottable
-{
-
-};
+#include "FuncCallArgNode.h"
+#include "ExprNode.h"
 
 FuncCallNode* FuncCallNode::createFuncCall(std::string funcName, FuncCallArgListNode* funcArgs)
 {

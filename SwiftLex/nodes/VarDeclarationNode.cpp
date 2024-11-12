@@ -1,4 +1,6 @@
 #include "VarDeclarationNode.h"
+#include "TypeNode.h"
+#include "ExprNode.h"
 
 VarDeclarationNode* VarDeclarationNode::createFromValue(std::string varName, ExprNode* value)
 {

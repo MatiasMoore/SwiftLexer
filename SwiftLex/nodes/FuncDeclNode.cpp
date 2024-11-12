@@ -1,5 +1,8 @@
 #include "FuncDeclNode.h"
 #include "StmtNode.h"
+#include "FuncDeclArgNode.h"
+#include "TypeForGenericNode.h"
+#include "TypeNode.h"
 
 FuncDeclNode* FuncDeclNode::createRegular(std::string idName, FuncDeclArgListNode* argList, StmtListNode* body, TypeNode* returnType, bool throwsException)
 {

@@ -1,7 +1,8 @@
 #pragma once
 #include "dottable.h"
 #include "GenericListNode.h"
-#include "ExprNode.h"
+
+class ExprNode;
 
 enum FuncCallArgType
 {
