@@ -28,6 +28,7 @@
     class FuncCallArgListNode* funcCallArgListNode;
     class FuncCallNode* funcCallNode;
     class ReturnNode* returnNode;
+    class LoopNode* loopNode;
 }
 %locations
 
@@ -140,6 +141,10 @@ SUBSCRIPT_SQUARE_BRACKET FUNC_CALL_ROUND_BRACKET
 %type<funcCallArgListNode> funcCallArgList
 %type<funcCallNode> funcCall
 
+%type<loopNode> forInLoop
+%type<loopNode> repeatWhileLoop
+%type<loopNode> whileLoop
+
 // Start
 %start program
 
@@ -182,9 +187,12 @@ stmt: varDeclaration {printf("P: stmt varDec\n"); $$ = StmtNode::createStmtVarDe
     | expr ';' {printf("P: stmt expr\n"); $$ = StmtNode::createStmtExpr($1); $$->_hasSemicolon = true; }
     | enumDeclaration {printf("P: stmt enum\n");}
     | ifElse {printf("P: stmt ifElse\n");}
-    | whileLoop {printf("P: stmt whileLoop\n");}
-    | repeatWhileLoop {printf("P: stmt repeatWhileLoop\n");}
-    | forInLoop {printf("P: stmt forInLoop\n");}
+    | whileLoop {printf("P: stmt whileLoop\n"); $$ = StmtNode::createStmtLoop($1);}
+    | whileLoop ';' {printf("P: stmt whileLoop\n"); $$ = StmtNode::createStmtLoop($1); $$->_hasSemicolon = true;}
+    | repeatWhileLoop {printf("P: stmt repeatWhileLoop\n"); $$ = StmtNode::createStmtLoop($1);}
+    | repeatWhileLoop ';' {printf("P: stmt repeatWhileLoop\n"); $$ = StmtNode::createStmtLoop($1); $$->_hasSemicolon = true;}
+    | forInLoop {printf("P: stmt forInLoop\n"); $$ = StmtNode::createStmtLoop($1);}
+    | forInLoop ';' {printf("P: stmt forInLoop\n"); $$ = StmtNode::createStmtLoop($1); $$->_hasSemicolon = true;}
     | switchCase {printf("P: stmt switch\n");}
     | structDeclaration {printf("P: stmt struct\n");}
     | tryStmt {printf("P: stmt try\n");}
@@ -484,12 +492,12 @@ enumDeclaration: modifiersWordsList enumDeclarationIncomplete {printf("P: enumDe
     | enumDeclarationIncomplete {printf("P: enumDeclaration\n");}
 	;
 
-whileLoop: WHILE exprList '{' stmtList '}' {printf("P: whileLoop\n");}
-    | WHILE exprList '{' '}' {printf("P: whileLoop\n");}
+whileLoop: WHILE exprList '{' stmtList '}' {printf("P: whileLoop\n"); $$ = LoopNode::createWhileLoop($2, $4);}
+    | WHILE exprList '{' '}' {printf("P: whileLoop\n"); $$ = LoopNode::createWhileLoopNoBody($2);}
     ;
 
-repeatWhileLoop: REPEAT '{' stmtList '}' WHILE exprList {printf("P: repeatWhileLoop\n");}
-    | REPEAT '{' '}' WHILE exprList {printf("P: repeatWhileLoop\n");}
+repeatWhileLoop: REPEAT '{' stmtList '}' WHILE exprList {printf("P: repeatWhileLoop\n"); $$ = LoopNode::createRepeatWhileLoop($3, $6);}
+    | REPEAT '{' '}' WHILE exprList {printf("P: repeatWhileLoop\n"); $$ = LoopNode::createRepeatWhileLoopNoBody($5);}
     ;
 
     //TODO: move this to expr
@@ -501,11 +509,12 @@ whereClause: WHERE exprList {printf("P: whereClause\n");}
     | WHERE whereIdTypes {printf("P: whereClause ID type\n");}
     ;
 
-forInLoop: FOR ID IN expr whereClause '{' stmtList '}' {printf("P: forInLoop\n");}
-    | FOR ID IN expr '{' stmtList '}' {printf("P: forInLoop\n");}
+    //TODO add where clause to loops
+forInLoop: FOR ID IN expr whereClause '{' stmtList '}' {printf("P: forInLoop\n"); }
+    | FOR ID IN expr '{' stmtList '}' {printf("P: forInLoop\n"); $$ = LoopNode::createForLoop($2, $4, $6);}
 
     | FOR ID IN expr whereClause '{' '}' {printf("P: forInLoop\n");}
-    | FOR ID IN expr '{' '}' {printf("P: forInLoop\n");}
+    | FOR ID IN expr '{' '}' {printf("P: forInLoop\n"); $$ = LoopNode::createForLoopNoBody($2, $4);}
     ;
 
 ifElse: IF exprList '{' stmtList '}' {printf("P: ifElse\n");}

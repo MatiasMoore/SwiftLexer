@@ -53,6 +53,9 @@
     <ClCompile Include="nodes\FuncCallNode.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="nodes\LoopNode.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt">
@@ -102,6 +105,9 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="nodes\FuncCallNode.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="nodes\LoopNode.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

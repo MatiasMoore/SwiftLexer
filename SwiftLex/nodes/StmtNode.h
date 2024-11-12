@@ -5,13 +5,15 @@
 #include "ExprNode.h"
 #include "VarDeclarationNode.h"
 #include "ReturnNode.h"
+#include "LoopNode.h"
 
 enum StmtType
 {
 	Expr,
 	VarDeclarationList,
 	Assignment,
-	Return
+	Return,
+	Loop
 };
 
 class StmtNode : public Dottable
@@ -28,6 +30,8 @@ public:
 
 	ReturnNode* _return;
 
+	LoopNode* _loop;
+
 	VarDeclarationListNode* _varDeclList;
 
 	static StmtNode* createStmtExpr(ExprNode* expr);
@@ -37,6 +41,8 @@ public:
 	static StmtNode* createStmtVarDeclaration(VarDeclarationListNode* varDeclList);
 
 	static StmtNode* createStmtReturn(ReturnNode* ret);
+
+	static StmtNode* createStmtLoop(LoopNode* loop);
 
 	void generateDot(std::ofstream& file) override;
 };

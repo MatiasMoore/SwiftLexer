@@ -6,3 +6,4 @@
 #include "nodes/FuncCallArgNode.h"
 #include "nodes/FuncCallNode.h"
 #include "nodes/ReturnNode.h"
+#include "nodes/LoopNode.h"

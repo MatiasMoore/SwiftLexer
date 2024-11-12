@@ -22,6 +22,7 @@
     <Flex Include="swift.l" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="nodes\LoopNode.cpp" />
     <ClCompile Include="nodes\FuncCallNode.cpp" />
     <ClCompile Include="nodes\FuncCallArgNode.cpp" />
     <ClCompile Include="nodes\dotHelpers.cpp" />
@@ -42,6 +43,7 @@
     <Bison Include="swift.y" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="nodes\LoopNode.h" />
     <ClInclude Include="nodes\FuncCallNode.h" />
     <ClInclude Include="nodes\FuncCallArgNode.h" />
     <ClInclude Include="nodes\GenericListNode.h" />
