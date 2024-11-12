@@ -118,6 +118,7 @@ SUBSCRIPT_SQUARE_BRACKET FUNC_CALL_ROUND_BRACKET
 %type<exprNode> expr
 %type<exprListNode> exprList
 %type<returnNode> return
+%type<stmtNode> stmtIncomplete
 %type<stmtNode> stmt
 %type<stmtNode> returnStmt
 %type<stmtNode> assignment
@@ -174,32 +175,29 @@ type: TYPE_BOOL {$$ = TypeNode::createType(TypeType::BoolT);}
     | '[' type ']' {$$ = TypeNode::createArrayType($2);}
     ;
 
-stmt: varDeclaration {printf("P: stmt varDec\n"); $$ = StmtNode::createStmtVarDeclaration($1);}
-    | varDeclaration ';' {printf("P: stmt varDec\n"); $$ = StmtNode::createStmtVarDeclaration($1); $$->_hasSemicolon = true;}
+stmtIncomplete: varDeclaration {printf("P: stmt varDec\n"); $$ = StmtNode::createStmtVarDeclaration($1);}
     | funcDeclaration {printf("P: stmt funcDec\n");}
     | constructorDeclaration {printf("P: stmt constructorDecl\n");}
     | destructorDeclaration {printf("P: stmt destructorDecl\n");}
     | exprThrow {printf("P: stmt throw\n");}
     | classDeclaration {printf("P: stmt classDec\n");}
     | assignment {printf("P: stmt assignment\n"); $$ = $1;}
-    | assignment ';' {printf("P: stmt assignment\n"); $$ = $1; $$->_hasSemicolon = true;}
     | expr {printf("P: stmt expr\n"); $$ = StmtNode::createStmtExpr($1);}
-    | expr ';' {printf("P: stmt expr\n"); $$ = StmtNode::createStmtExpr($1); $$->_hasSemicolon = true; }
     | enumDeclaration {printf("P: stmt enum\n");}
     | ifElse {printf("P: stmt ifElse\n");}
     | whileLoop {printf("P: stmt whileLoop\n"); $$ = StmtNode::createStmtLoop($1);}
-    | whileLoop ';' {printf("P: stmt whileLoop\n"); $$ = StmtNode::createStmtLoop($1); $$->_hasSemicolon = true;}
     | repeatWhileLoop {printf("P: stmt repeatWhileLoop\n"); $$ = StmtNode::createStmtLoop($1);}
-    | repeatWhileLoop ';' {printf("P: stmt repeatWhileLoop\n"); $$ = StmtNode::createStmtLoop($1); $$->_hasSemicolon = true;}
     | forInLoop {printf("P: stmt forInLoop\n"); $$ = StmtNode::createStmtLoop($1);}
-    | forInLoop ';' {printf("P: stmt forInLoop\n"); $$ = StmtNode::createStmtLoop($1); $$->_hasSemicolon = true;}
     | switchCase {printf("P: stmt switch\n");}
     | structDeclaration {printf("P: stmt struct\n");}
     | tryStmt {printf("P: stmt try\n");}
     | doCatchStmt {printf("P: stmt doCatch\n");}
     | stmtOperators {printf("P: stmt operators\n"); $$ = $1;}
-    | stmtOperators ';' {printf("P: stmt operators\n"); $$ = $1; $$->_hasSemicolon = true;}
 	;
+
+stmt: stmtIncomplete { $$ = $1; }
+    | stmtIncomplete ';' { $$ = $1; $$->_hasSemicolon = true; }
+    ;
 
 returnStmt: return {printf("P: stmt return\n"); $$ = StmtNode::createStmtReturn($1);}
     | return ';' {printf("P: stmt return\n"); $$ = StmtNode::createStmtReturn($1); $$->_hasSemicolon = true;}
