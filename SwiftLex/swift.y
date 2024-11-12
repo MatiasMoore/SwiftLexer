@@ -27,6 +27,7 @@
     class FuncCallArgNode* funcCallArgNode;
     class FuncCallArgListNode* funcCallArgListNode;
     class FuncCallNode* funcCallNode;
+    class ReturnNode* returnNode;
 }
 %locations
 
@@ -91,7 +92,7 @@ TYPE_UINT16 TYPE_UINT32 TYPE_UINT64
 TYPE_UINT TYPE_FLOAT TYPE_FLOAT80  
 TYPE_DOUBLE
 
-SUBSCRIPT_SQUARE_BRACKET SUBSCRIPT_ROUND_BRACKET
+SUBSCRIPT_SQUARE_BRACKET FUNC_CALL_ROUND_BRACKET
 
 %left '=' ID
 %right '?' ':' 
@@ -110,15 +111,18 @@ SUBSCRIPT_SQUARE_BRACKET SUBSCRIPT_ROUND_BRACKET
 %nonassoc IS AS
 %left UNARY_PLUS UNARY_MINUS
 %left '[' ']' SUBSCRIPT_SQUARE_BRACKET
-%right '(' ')' SUBSCRIPT_ROUND_BRACKET
+%right '(' ')' FUNC_CALL_ROUND_BRACKET
 
 // Nodes
 %type<exprNode> expr
 %type<exprListNode> exprList
+%type<returnNode> return
 %type<stmtNode> stmt
+%type<stmtNode> returnStmt
 %type<stmtNode> assignment
 %type<stmtNode> stmtOperators
 %type<stmtListNode> stmtList
+%type<stmtListNode> stmtListIncomplete
 %type<stmtListNode> program
 %type<typeNode> type
 
@@ -170,7 +174,6 @@ stmt: varDeclaration {printf("P: stmt varDec\n"); $$ = StmtNode::createStmtVarDe
     | funcDeclaration {printf("P: stmt funcDec\n");}
     | constructorDeclaration {printf("P: stmt constructorDecl\n");}
     | destructorDeclaration {printf("P: stmt destructorDecl\n");}
-    | exprReturn {printf("P: stmt return\n");}
     | exprThrow {printf("P: stmt throw\n");}
     | classDeclaration {printf("P: stmt classDec\n");}
     | assignment {printf("P: stmt assignment\n"); $$ = $1;}
@@ -190,13 +193,30 @@ stmt: varDeclaration {printf("P: stmt varDec\n"); $$ = StmtNode::createStmtVarDe
     | stmtOperators ';' {printf("P: stmt operators\n"); $$ = $1; $$->_hasSemicolon = true;}
 	;
 
-stmtList: stmt {printf("P: stmtList start\n"); $$ = StmtListNode::createListNode($1);}
-	| stmtList stmt {
+returnStmt: return {printf("P: stmt return\n"); $$ = StmtNode::createStmtReturn($1);}
+    | return ';' {printf("P: stmt return\n"); $$ = StmtNode::createStmtReturn($1); $$->_hasSemicolon = true;}
+    ;
+
+stmtList: stmtListIncomplete returnStmt {
+        if (@1.last_line == @2.first_line){
+            yyerror("Syntax error: two statements in one line must be separated with a ';'");
+        }
+        else {
+			printf("P: END stmtList RETURN + stmtListIncomplete\n");
+            $$ = $1->appendNode($2);
+		}
+    }
+    | stmtListIncomplete {printf("P: END stmtList stmtListIncomplete only\n"); $$ = $1;}
+    | returnStmt {printf("P: END stmtList RETURN only\n"); $$ = StmtListNode::createListNode($1);}
+	;
+
+stmtListIncomplete: stmt {printf("P: stmtListIncomplete start\n"); $$ = StmtListNode::createListNode($1);}
+	| stmtListIncomplete stmt {
         if (!($1->_vec.back()->_hasSemicolon) && @1.last_line == @2.first_line){
             yyerror("Syntax error: two statements in one line must be separated with a ';'");
         }
         else {
-			printf("P: stmtList\n");
+			printf("P: stmtListIncomplete\n");
             $$ = $1->appendNode($2);
 		}
     }
@@ -206,22 +226,8 @@ stmtListE: %empty
     | stmtList
     ;
 
-    /*
-Grammar of a statement
-
-statement -> expression ;?
-statement -> declaration ;?
-statement -> loop-statement ;?
-statement -> branch-statement ;?
-statement -> labeled-statement ;?
-statement -> control-transfer-statement ;?
-statement -> defer-statement ;?
-statement -> do-statement ;?
-statement -> compiler-control-statement
-statements -> statement statements?
-    */
-
-exprReturn: RETURN expr {printf("P: return\n");}
+return: RETURN expr  {printf("P: return\n"); $$ = ReturnNode::createExprReturn($2);}
+    | RETURN {printf("P: return empty\n"); $$ = ReturnNode::createVoidReturn();}
     ;
 
 exprThrow: THROW expr {printf("P: throw\n");}
@@ -363,9 +369,9 @@ exprListE: %empty
 genericIdType:  ID '<' typeList '>' {printf("P: genericIdType\n"); switchStateToSubscript();}
 	;
 
-funcCall: ID SUBSCRIPT_ROUND_BRACKET ')' {printf("P: funcCall exprList\n"); $$ = FuncCallNode::createFuncCallNoArgs($1);}
-	| genericIdType SUBSCRIPT_ROUND_BRACKET ')' {printf("P: funcCall exprList\n");}
-    | ID SUBSCRIPT_ROUND_BRACKET exprList ')' {
+funcCall: ID FUNC_CALL_ROUND_BRACKET ')' {printf("P: funcCall exprList\n"); $$ = FuncCallNode::createFuncCallNoArgs($1);}
+	| genericIdType FUNC_CALL_ROUND_BRACKET ')' {printf("P: funcCall exprList\n");}
+    | ID FUNC_CALL_ROUND_BRACKET exprList ')' {
         printf("P: funcCall exprList\n"); 
 
         //Convert exprList to argList
@@ -385,9 +391,9 @@ funcCall: ID SUBSCRIPT_ROUND_BRACKET ')' {printf("P: funcCall exprList\n"); $$ =
         $$ = FuncCallNode::createFuncCall($1, argList);
 
     }
-	| genericIdType SUBSCRIPT_ROUND_BRACKET exprList ')' {printf("P: funcCall exprList\n");}
-    | ID SUBSCRIPT_ROUND_BRACKET funcCallArgList ')' {printf("P: funcCall labelArgs\n"); $$ = FuncCallNode::createFuncCall($1, $3);}
-	| genericIdType SUBSCRIPT_ROUND_BRACKET funcCallArgList ')' {printf("P: funcCall labelArgs\n");}
+	| genericIdType FUNC_CALL_ROUND_BRACKET exprList ')' {printf("P: funcCall exprList\n");}
+    | ID FUNC_CALL_ROUND_BRACKET funcCallArgList ')' {printf("P: funcCall labelArgs\n"); $$ = FuncCallNode::createFuncCall($1, $3);}
+	| genericIdType FUNC_CALL_ROUND_BRACKET funcCallArgList ')' {printf("P: funcCall labelArgs\n");}
     ;
 
 assignment: expr '=' expr {printf("P: assignment\n"); $$ = StmtNode::createStmtAssignment($1, $3); }
@@ -619,15 +625,12 @@ expr: LITERAL_INT {printf("P: expr int\n"); switchStateToSubscript(); $$ = ExprN
     | SELF '.' funcCall {printf("P: expr self func access\n"); switchStateToSubscript(); $3->_scopeType = selfCall; $$ = ExprNode::createFuncCall($3);}
     | expr '.' ID {printf("P: expr field access\n"); switchStateToSubscript();}
     | SELF '.' ID {printf("P: expr self fieldAccess\n"); switchStateToSubscript();}
-    // WARNING THIS CAUSES 2 CONFLICTS 
-    // BUT THEY ARE RESOLVED CORRECTLY BY DEFAULT
-    // TODO: RESOLVE CONFLICT EXPLICITLY
     | '[' exprList ']' {printf("P: expr array\n"); switchStateToSubscript(); $$ = ExprNode::createArray($2);}
     | expr SUBSCRIPT_SQUARE_BRACKET expr ']' {printf("P: expr array indexing\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::Subscript, $1, $3);}
     ;
 
 anyRoundBracket: '('
-	| SUBSCRIPT_ROUND_BRACKET
+	| FUNC_CALL_ROUND_BRACKET
 	;
         
 %%
