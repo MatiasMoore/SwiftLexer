@@ -76,8 +76,14 @@ HASH_FUNCTION HASH_IF HASH_IMAGELITERAL
 HASH_KEYPATH HASH_LINE HASH_SELECTOR  
 HASH_SOURCELOCATION HASH_WARNING
 
-BINARY_MINUS
-UNARY_MINUS
+BINARY_MINUS PREFIX_MINUS POSTFIX_MINUS
+BINARY_PLUS PREFIX_PLUS POSTFIX_PLUS
+BINARY_DIV PREFIX_DIV POSTFIX_DIV
+BINARY_MUL PREFIX_MUL POSTFIX_MUL
+BINARY_MOD PREFIX_MOD POSTFIX_MOD
+BINARY_LOG_AND PREFIX_LOG_AND POSTFIX_LOG_AND
+BINARY_LOG_OR PREFIX_LOG_OR POSTFIX_LOG_OR
+BINARY_NOT PREFIX_NOT POSTFIX_NOT
 OP_PLUS_ASSIGN OP_MINUS_ASSIGN OP_DIV_ASSIGN  
 OP_MUL_ASSIGN OP_MOD_ASSIGN OP_LSHIFT  
 OP_RSHIFT OP_EQ OP_LTE  
@@ -96,23 +102,38 @@ TYPE_DOUBLE
 SUBSCRIPT_SQUARE_BRACKET FUNC_CALL_ROUND_BRACKET
 
 %left '=' ID
-%right '?' ':' 
-%right OP_NIL_COALESCE
-%left OP_LOG_OR
-%left OP_LOG_AND
-%left '|'
-%left '^'
-%left '&'
-%nonassoc OP_EQ OP_NEQ 
-%nonassoc '<' '>' OP_LTE OP_GTE OP_RSHIFT OP_LSHIFT
-%left OP_CLOSED_RANGE OP_HALF_OPEN_RANGE
-%left BINARY_MINUS '+'
-%left '*' '/' '%' '.'
-%right '~' '!'
-%nonassoc IS AS
-%left UNARY_PLUS UNARY_MINUS
-%left '[' ']' SUBSCRIPT_SQUARE_BRACKET
-%right '(' ')' FUNC_CALL_ROUND_BRACKET
+
+%right '?' ':'  
+
+%right OP_NIL_COALESCE  
+
+%left BINARY_LOG_OR  
+%left BINARY_LOG_AND 
+
+%left '^' 
+
+%nonassoc OP_EQ OP_NEQ  
+%nonassoc '<' '>' OP_LTE OP_GTE OP_RSHIFT OP_LSHIFT  
+
+%left OP_CLOSED_RANGE OP_HALF_OPEN_RANGE  
+%left BINARY_NOT
+%left BINARY_MINUS  
+%left BINARY_PLUS   
+%left '|'           
+
+%left BINARY_MUL BINARY_DIV BINARY_MOD '&' 
+%left '.'  
+
+%nonassoc IS AS  
+
+%right '~'  
+
+%right PREFIX_NOT PREFIX_PLUS PREFIX_MINUS PREFIX_DIV PREFIX_MUL PREFIX_MOD PREFIX_LOG_AND PREFIX_LOG_OR
+%left POSTFIX_LOG_AND POSTFIX_LOG_OR POSTFIX_NOT POSTFIX_MINUS POSTFIX_PLUS POSTFIX_DIV POSTFIX_MUL POSTFIX_MOD
+
+%left '[' ']' SUBSCRIPT_SQUARE_BRACKET  
+
+%right '(' ')' FUNC_CALL_ROUND_BRACKET  
 
 // Nodes
 %type<exprNode> expr
@@ -268,12 +289,21 @@ funcDecIncomplete: FUNC ID anyRoundBracket funcDeclArgListE ')' funcReturnTypeE 
     ;
 
     
-overloadableOperators: '+'
+overloadableOperators: BINARY_PLUS
+    | PREFIX_PLUS
+    | POSTFIX_PLUS
     | BINARY_MINUS
-    | UNARY_MINUS
-    | '*'
-    | '/'
-    | '%'
+    | PREFIX_MINUS
+    | POSTFIX_MINUS
+    | BINARY_MUL
+    | PREFIX_MUL
+    | POSTFIX_MUL
+    | BINARY_DIV
+    | PREFIX_DIV
+    | POSTFIX_DIV
+    | BINARY_MOD
+    | PREFIX_MOD
+    | POSTFIX_MOD
     | '<'
     | '>'
     | OP_GTE
@@ -283,8 +313,12 @@ overloadableOperators: '+'
     | '&'
     | '|'
     | '^'
-    | OP_LOG_AND
-    | OP_LOG_OR
+    | BINARY_LOG_AND
+    | PREFIX_LOG_AND
+    | POSTFIX_LOG_AND
+    | BINARY_LOG_OR
+    | PREFIX_LOG_OR
+    | POSTFIX_LOG_OR
     | OP_LSHIFT
     | OP_RSHIFT
     | OP_CLOSED_RANGE
@@ -597,13 +631,31 @@ expr: LITERAL_INT {printf("P: expr int\n"); switchStateToSubscript(); $$ = ExprN
     | TRUE {printf("P: expr TRUE\n"); switchStateToSubscript(); $$ = ExprNode::createBool(true);}
     | FALSE {printf("P: expr FALSE\n"); switchStateToSubscript(); $$ = ExprNode::createBool(false);}
     | '~' expr {printf("P: expr ~\n"); switchStateToSubscript(); $$ = ExprNode::createUnaryOp(ExprType::BitNot, $2);}
-    | '!' expr {printf("P: expr !\n"); switchStateToSubscript(); $$ = ExprNode::createUnaryOp(ExprType::LogNot, $2);}
-    | UNARY_MINUS expr {printf("P: expr unary -\n"); switchStateToSubscript(); $$ = ExprNode::createUnaryOp(ExprType::UnaryMinus, $2);}
-    | expr '+' expr {printf("P: expr +\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::Sum, $1, $3);}
-    | expr BINARY_MINUS expr {printf("P: expr -\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::Sub, $1, $3);}
-    | expr '/' expr {printf("P: expr /\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::Div, $1, $3);}
-    | expr '*' expr {printf("P: expr *\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::Mul, $1, $3);}
-    | expr '%' expr {printf("P: expr %\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::Modulus, $1, $3);}
+
+    | expr BINARY_NOT expr {printf("P: expr BINARY_NOT\n"); switchStateToSubscript();}
+    | PREFIX_NOT expr {printf("P: expr PREFIX_NOT\n"); switchStateToSubscript(); $$ = ExprNode::createUnaryOp(ExprType::LogNot, $2);}
+    | expr POSTFIX_NOT {printf("P: expr POSTFIX_NOT\n"); switchStateToSubscript();}
+    
+    | expr BINARY_MINUS expr {printf("P: expr BINARY_MINUS\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::Sub, $1, $3);}
+    | PREFIX_MINUS expr {printf("P: expr PREFIX_MINUS\n"); switchStateToSubscript(); $$ = ExprNode::createUnaryOp(ExprType::UnaryMinus, $2);}
+    | expr POSTFIX_MINUS {printf("P: expr postfix POSTFIX_MINUS\n"); switchStateToSubscript();}
+
+    | expr BINARY_PLUS expr {printf("P: expr +\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::Sum, $1, $3);}
+    | PREFIX_PLUS expr {printf("P: expr +\n"); switchStateToSubscript();}
+    | expr POSTFIX_PLUS {printf("P: expr +\n"); switchStateToSubscript();}
+    
+    | expr BINARY_DIV expr {printf("P: expr BINARY_DIV\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::Div, $1, $3);}
+    | PREFIX_DIV expr {printf("P: expr PREFIX_DIV\n"); switchStateToSubscript();}
+    | expr POSTFIX_DIV {printf("P: expr POSTFIX_DIV\n"); switchStateToSubscript();}
+
+    | expr BINARY_MUL expr {printf("P: expr BINARY_MUL\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::Mul, $1, $3);}
+    | PREFIX_MUL expr {printf("P: expr PREFIX_MUL\n"); switchStateToSubscript();}
+    | expr POSTFIX_MUL {printf("P: expr POSTFIX_MUL\n"); switchStateToSubscript();}
+
+    | expr BINARY_MOD expr {printf("P: expr BINARY_MOD\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::Modulus, $1, $3);}
+    | PREFIX_MOD expr {printf("P: expr PREFIX_MOD\n"); switchStateToSubscript();}
+    | expr POSTFIX_MOD {printf("P: expr POSTFIX_MOD\n"); switchStateToSubscript();}
+
     | expr '<' expr {printf("P: expr <\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::LT, $1, $3);}
     | expr '>' expr {printf("P: expr >\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::GT, $1, $3);}
     | expr OP_GTE expr {printf("P: expr >=\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::GTE, $1, $3);}
@@ -613,8 +665,15 @@ expr: LITERAL_INT {printf("P: expr int\n"); switchStateToSubscript(); $$ = ExprN
     | expr '&' expr {printf("P: expr &\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::BitAnd, $1, $3);}
     | expr '|' expr {printf("P: expr |\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::BitOr, $1, $3);}
     | expr '^' expr {printf("P: expr ^\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::BitXor, $1, $3);}
-    | expr OP_LOG_AND expr {printf("P: expr &&\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::LogAnd, $1, $3);}
-    | expr OP_LOG_OR expr {printf("P: expr ||\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::LogOr, $1, $3);}
+
+    | expr BINARY_LOG_AND expr {printf("P: expr BINARY_LOG_AND\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::LogAnd, $1, $3);}
+    | PREFIX_LOG_AND expr {printf("P: expr PREFIX_LOG_AND\n"); switchStateToSubscript();}
+    | expr POSTFIX_LOG_AND {printf("P: expr POSTFIX_LOG_AND\n"); switchStateToSubscript();}
+
+    | expr BINARY_LOG_OR expr {printf("P: expr BINARY_LOG_OR\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::LogOr, $1, $3);}
+    | PREFIX_LOG_OR expr {printf("P: expr PREFIX_LOG_OR\n"); switchStateToSubscript();}
+    | expr POSTFIX_LOG_OR {printf("P: expr POSTFIX_LOG_OR\n"); switchStateToSubscript();}
+
     | expr OP_LSHIFT expr {printf("P: expr <<\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::Lshift, $1, $3);}
     | expr OP_RSHIFT expr {printf("P: expr >>\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::Rshift, $1, $3);}
     | expr OP_CLOSED_RANGE expr {printf("P: expr ...\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::ClosedRange, $1, $3);}

@@ -15,12 +15,19 @@ INT_DECIMAL [0-9][_0-9]*
 INT_HEXADECIMAL 0x[0-9a-fA-F][_0-9a-fA-F]*
 ANTI_DELIM [^	() \[\]{};\-=+<>&|~!\^%\*\/\.,:\?\n]
 WHITESPACES [ \n	]
+BEFORE_BINARY [^;]
+NOT_WHITESPACES [^ \n	]
+AFTER_NO_WHITESPACE_BINARY [^ \n	;)]
+OPERATORS [-+/*%!]|\&\&|\|\|
+AFTER_PREFIX [^*/ \n	>=-]
+BEFORE_PREFIX [(; \n	]
 
 %{
 #include <stdio.h>
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <vector>
 #include "swift.tab.h"
 using namespace std;
 
@@ -30,6 +37,11 @@ bool isSubsciptActive = false;
 #define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno;
 
 void switchStateToSubscript();
+yytokentype getPrefixOperatorFromString(string str);
+yytokentype getPostfixOperatorFromString(string str);
+yytokentype getBinaryOperatorFromString(string str);
+
+vector<yytokentype> tokenQueue;
 
 %}
 
@@ -50,6 +62,14 @@ void switchStateToSubscript();
 	int intBuf = 0;
 	float floatBuf = 0;
 	double doubleBuf = 0;
+
+	if (tokenQueue.size() > 0)
+	{
+		yytokentype token = tokenQueue.back();
+		tokenQueue.pop_back();
+		cout << "Send element from queue" << endl;
+		return token;
+	}
 %}
 
 <SUBSCRIPT>\[ { cout << "Subscript left square bracket: " << yytext << endl; isSubsciptActive = false; return SUBSCRIPT_SQUARE_BRACKET; BEGIN(INITIAL);}
@@ -166,20 +186,6 @@ willSet {cout << "Keyword willSet: " << yytext << endl; return WILLSET;}
 \#sourceLocation {cout << "Keyword #sourceLocation: " << yytext << endl; return HASH_SOURCELOCATION;}
 \#warning {cout << "Keyword #warning: " << yytext << endl; return HASH_WARNING;}
 
-\+ {cout << "Binary Operator plus: " << yytext << endl; return '+';}
-
-^{WHITESPACES}*\-{WHITESPACES} {cout << "ERROR: unary operator cannot be separated from its operand: " << yytext << endl;}
-^\- {cout << "Unary Operator minus: " << yytext << endl; return UNARY_MINUS;}
-{WHITESPACES}\-/{WHITESPACES} {cout << "Binary whitespaces Operator minus: " << yytext << endl; return BINARY_MINUS;}
-{WHITESPACES}\-/[^>=-] {cout << "Unary Operator minus: " << yytext << endl; return UNARY_MINUS;}
-\-/{WHITESPACES} {cout << "ERROR: \'-\' is not a postfix unary operator: " << yytext << endl;}
-\- {cout << "Binary no whitespaces Operator minus: " << yytext << endl; return BINARY_MINUS;}
-
-\/ {cout << "Binary Operator division: " << yytext << endl; return '/';}
-
-\* {cout << "Operator multiplication: " << yytext << endl; return '*';}
-\% {cout << "Operator modulus: " << yytext << endl; return '%';}
-
 \= {cout << "Operator assignment: " << yytext << endl; return '=';}
 \+\= {cout << "Operator addition assignment: " << yytext << endl; return OP_PLUS_ASSIGN;}
 \-\= {cout << "Operator subtraction assignment: " << yytext << endl; return OP_MINUS_ASSIGN;}
@@ -200,10 +206,6 @@ willSet {cout << "Keyword willSet: " << yytext << endl; return WILLSET;}
 \<\= {cout << "Operator less than or equal to: " << yytext << endl; return OP_LTE;}
 \>\= {cout << "Operator greater than or equal to: " << yytext << endl; return OP_GTE;}
 \!\= {cout << "Operator not equal to: " << yytext << endl; return OP_NEQ;}
-		 
-\&\& {cout << "Operator logical AND: " << yytext << endl; return OP_LOG_AND;}
-\|\| {cout << "Operator logical OR: " << yytext << endl; return OP_LOG_OR;}
-\! {cout << "Operator logical NOT: " << yytext << endl; return '!';}
 	
 \?\? {cout << "Operator nil coalescing: " << yytext << endl; return OP_NIL_COALESCE;}
 \+\+ {cout << "Operator increment: " << yytext << endl; return OP_INC;}
@@ -466,6 +468,74 @@ Double {cout << "Type Double: " << yytext << endl; return TYPE_DOUBLE;}
 	return ID;
 }
 
+	/* BINARY */
+{WHITESPACES}{OPERATORS}/{WHITESPACES} {
+	cout << "Binary whitespaces Operator: " << yytext << endl;
+	str = yytext;
+	return getBinaryOperatorFromString(str);
+
+}
+
+	/* PREFIX UNNARY */
+{BEFORE_PREFIX}{OPERATORS}/{AFTER_PREFIX} {
+	cout << "Prefix operator: " << yytext << endl;
+	str = yytext;
+	if (str.find('(') != string::npos) {
+		cout << "Added operator to queue, ";
+		tokenQueue.push_back(getPrefixOperatorFromString(str));
+		if (isSubsciptActive) {
+			BEGIN(INITIAL);
+			cout << "send function call round bracket" << endl;
+			return FUNC_CALL_ROUND_BRACKET;
+		} else {
+			cout << "send (" << endl;
+			return '(';
+		}
+	} else if (str.find(';') != string::npos) {
+		cout << "Added operator to queue, ";
+		tokenQueue.push_back(getPrefixOperatorFromString(str));
+		cout << "send ;" << endl;
+		return ';';
+	};
+
+	return getPrefixOperatorFromString(str);
+}
+
+	/* PREFIX UNNARY */
+^{OPERATORS}/{AFTER_PREFIX} {
+	cout << "Prefix newline operator: " << yytext << endl; 
+	str = yytext;
+	return getPrefixOperatorFromString(str);
+}	
+
+
+	/* POSTFIX UNNARY */
+{OPERATORS}/{WHITESPACES} {
+	cout << "Postfix operator: " << yytext << endl;
+	str = yytext;
+	return getPostfixOperatorFromString(str);
+}
+
+	/* BINARY */
+{OPERATORS}/{AFTER_NO_WHITESPACE_BINARY} {
+	cout << "Binary no whitespaces Operator: " << yytext << endl; 
+	str = yytext;
+	return getBinaryOperatorFromString(str);
+}
+
+	/* BINARY EOF*/
+{WHITESPACES}{OPERATORS} {
+	cout << "Binary whitespaces Operator EOF: " << yytext << endl;
+	str = yytext;
+	return getBinaryOperatorFromString(str);
+}
+
+	/* POSTFIX UNNARY EOF */
+{OPERATORS} {
+	cout << "Postfix operator EOF: " << yytext << endl;
+	str = yytext;
+	return getPostfixOperatorFromString(str);
+}
 	/* TODO: DELETE THIS WHEN EVERYTHING IS DONE*/
 .|[^.] {}
 %%
@@ -481,4 +551,68 @@ void switchStateToSubscript(){
 	cout << "Switched to subscript state" << endl;
 	isSubsciptActive = true;
 	BEGIN(SUBSCRIPT);
+}
+
+yytokentype getPrefixOperatorFromString(string str)
+{	// +-/*%&&||!
+
+	if (str.find('-') != string::npos) {
+		return PREFIX_MINUS;
+	} else if (str.find('+') != string::npos) {
+		return PREFIX_PLUS;
+	} else if (str.find('/') != string::npos) {
+		return PREFIX_DIV;
+	} else if (str.find('*') != string::npos) {
+		return PREFIX_MUL;
+	} else if (str.find('%') != string::npos) {
+		return PREFIX_MOD;
+	} else if (str.find("&&") != string::npos) {
+		return PREFIX_LOG_AND;
+	} else if (str.find("||") != string::npos) {
+		return PREFIX_LOG_OR;
+	} else if (str.find('!') != string::npos) {
+		return PREFIX_NOT;
+	}
+}
+
+yytokentype getPostfixOperatorFromString(string str)
+{
+	if (str.find('-') != string::npos) {
+		return POSTFIX_MINUS;
+	} else if (str.find('+') != string::npos) {
+		return POSTFIX_PLUS;
+	} else if (str.find('/') != string::npos) {
+		return POSTFIX_DIV;
+	} else if (str.find('*') != string::npos) {
+		return POSTFIX_MUL;
+	} else if (str.find('%') != string::npos) {
+		return POSTFIX_MOD;
+	} else if (str.find("&&") != string::npos) {
+		return POSTFIX_LOG_AND;
+	} else if (str.find("||") != string::npos) {
+		return POSTFIX_LOG_OR;
+	} else if (str.find('!') != string::npos) {
+		return POSTFIX_NOT;
+	}
+}
+
+yytokentype getBinaryOperatorFromString(string str)
+{
+	if (str.find('-') != string::npos) {
+		return BINARY_MINUS;
+	}  else if (str.find('+') != string::npos) {
+		return BINARY_PLUS;
+	} else if (str.find('/') != string::npos) {
+		return BINARY_DIV;
+	} else if (str.find('*') != string::npos) {
+		return BINARY_MUL;
+	} else if (str.find('%') != string::npos) {
+		return BINARY_MOD;
+	} else if (str.find("&&") != string::npos) {
+		return BINARY_LOG_AND;
+	} else if (str.find("||") != string::npos) {
+		return BINARY_LOG_OR;
+	} else if (str.find('!') != string::npos) {
+		return BINARY_NOT;
+	}
 }
