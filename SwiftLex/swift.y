@@ -30,6 +30,10 @@
     class ReturnNode* returnNode;
     class LoopNode* loopNode;
     class IfElseNode* ifElseNode;
+    class FuncDeclArgNode* funcDeclArgNode;
+    class FuncDeclArgListNode* funcDeclArgListNode;
+    class TypeForGenericListNode* typeForGenericListNode;
+    class FuncDeclNode* funcDeclNode;
 }
 %locations
 
@@ -125,6 +129,7 @@ SUBSCRIPT_SQUARE_BRACKET FUNC_CALL_ROUND_BRACKET
 %type<stmtNode> assignment
 %type<stmtNode> stmtOperators
 %type<stmtListNode> stmtList
+%type<stmtListNode> stmtListE
 %type<stmtListNode> stmtListIncomplete
 %type<stmtListNode> program
 %type<typeNode> type
@@ -148,6 +153,15 @@ SUBSCRIPT_SQUARE_BRACKET FUNC_CALL_ROUND_BRACKET
 %type<loopNode> whileLoop
 
 %type<ifElseNode> ifElse
+
+%type<funcDeclArgNode> funcDeclArg
+%type<funcDeclArgListNode> funcDeclArgList
+%type<funcDeclArgListNode> funcDeclArgListE
+%type<typeNode> funcReturnType
+%type<typeNode> funcReturnTypeE
+%type<typeForGenericListNode> genericIdList
+%type<funcDeclNode> funcDecIncomplete
+%type<funcDeclNode> funcDeclaration
 
 // Start
 %start program
@@ -179,7 +193,7 @@ type: TYPE_BOOL {$$ = TypeNode::createType(TypeType::BoolT);}
     ;
 
 stmtIncomplete: varDeclaration {printf("P: stmt varDec\n"); $$ = StmtNode::createStmtVarDeclaration($1);}
-    | funcDeclaration {printf("P: stmt funcDec\n");}
+    | funcDeclaration {printf("P: stmt funcDec\n"); $$ = StmtNode::createStmtFuncDecl($1);}
     | constructorDeclaration {printf("P: stmt constructorDecl\n");}
     | destructorDeclaration {printf("P: stmt destructorDecl\n");}
     | exprThrow {printf("P: stmt throw\n");}
@@ -231,8 +245,8 @@ stmtListIncomplete: stmt {printf("P: stmtListIncomplete start\n"); $$ = StmtList
     }
 	;
 
-stmtListE: %empty
-    | stmtList
+stmtListE: %empty { $$ = nullptr; }
+    | stmtList { $$ = $1; }
     ;
 
 return: RETURN expr  {printf("P: return\n"); $$ = ReturnNode::createExprReturn($2);}
@@ -242,32 +256,51 @@ return: RETURN expr  {printf("P: return\n"); $$ = ReturnNode::createExprReturn($
 exprThrow: THROW expr {printf("P: throw\n");}
 	;
 
-funcDeclArg: ID ':' type {printf("P: func arg with value\n");}
-    | ID ':' type '=' expr {printf("P: func arg with value\n");}
+funcDeclArg: ID ':' type {printf("P: func arg with value\n"); $$ = FuncDeclArgNode::createLabeledArg($1, $3, nullptr);}
+    | '_' ID ':' type {printf("P: func arg with value\n"); $$ = FuncDeclArgNode::createPositionalArg($2, $4, nullptr);}
+    | ID ':' type '=' expr {printf("P: func arg with value\n"); $$ = FuncDeclArgNode::createLabeledArg($1, $3, $5);}
+    | '_' ID ':' type '=' expr {printf("P: func arg with value\n"); $$ = FuncDeclArgNode::createPositionalArg($2, $4, $6);}
     ;
 
-funcDeclArgList: funcDeclArg {printf("P: funcDeclArgList\n");}
-    | funcDeclArgList ',' funcDeclArg {printf("P: funcDeclArgList\n");}
+funcDeclArgList: funcDeclArg {printf("P: funcDeclArgList\n"); $$ = FuncDeclArgListNode::createListNode($1);}
+    | funcDeclArgList ',' funcDeclArg {printf("P: funcDeclArgList\n"); $$ = $$->appendNode($3);}
     ;
 
-funcDeclArgListE: %empty
-    | funcDeclArgList
+funcDeclArgListE: %empty { $$ = nullptr; }
+    | funcDeclArgList { $$ = $1; }
     ;
 
-funcReturnType: OP_FUNC_RETURN type
+funcReturnType: OP_FUNC_RETURN type { $$ = $2; }
     ;
 
-funcReturnTypeE: %empty
-    | funcReturnType
+funcReturnTypeE: %empty { $$ = nullptr; }
+    | funcReturnType { $$ = $1; }
     ;
 
-funcDecIncomplete: FUNC ID anyRoundBracket funcDeclArgListE ')' funcReturnTypeE '{' stmtListE '}' {printf("P: func declIncomplete\n");}
-    | FUNC ID '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' funcReturnTypeE '{' stmtListE '}' {printf("P: func declIncomplete generic\n");}
-    | FUNC ID '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' funcReturnTypeE whereClause '{' stmtListE '}' {printf("P: func declIncomplete generic where\n");}
+    //TODO add where clause
+funcDecIncomplete: FUNC ID anyRoundBracket funcDeclArgListE ')' funcReturnTypeE '{' stmtListE '}' {
+    printf("P: func declIncomplete\n");
+    $$ = FuncDeclNode::createRegular($2, $4, $8, $6, false);
+    }
+    | FUNC ID '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' funcReturnTypeE '{' stmtListE '}' {
+    printf("P: func declIncomplete generic\n");
+    $$ = FuncDeclNode::createGeneric($2, $4, $7, $11, $9, false);
+    }
+    | FUNC ID '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' funcReturnTypeE whereClause '{' stmtListE '}' {
+    printf("P: func declIncomplete generic where\n");
+    }
 
-    | FUNC ID anyRoundBracket funcDeclArgListE ')' THROWS funcReturnTypeE '{' stmtListE '}' {printf("P: func declIncomplete throws\n");}
-    | FUNC ID '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' THROWS funcReturnTypeE '{' stmtListE '}' {printf("P: func declIncomplete generic throws\n");}
-    | FUNC ID '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' THROWS funcReturnTypeE whereClause '{' stmtListE '}' {printf("P: func declIncomplete generic where throws\n");}
+    | FUNC ID anyRoundBracket funcDeclArgListE ')' THROWS funcReturnTypeE '{' stmtListE '}' {
+    printf("P: func declIncomplete throws\n");
+    $$ = FuncDeclNode::createRegular($2, $4, $9, $7, true);
+    }
+    | FUNC ID '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' THROWS funcReturnTypeE '{' stmtListE '}' {
+    printf("P: func declIncomplete generic throws\n");
+    $$ = FuncDeclNode::createGeneric($2, $4, $7, $12, $10, true);
+    }
+    | FUNC ID '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' THROWS funcReturnTypeE whereClause '{' stmtListE '}' {
+    printf("P: func declIncomplete generic where throws\n");
+    }
     ;
 
     
@@ -298,8 +331,10 @@ overloadableOperators: '+'
 funcOverloadOperatorIncomplete: FUNC overloadableOperators anyRoundBracket funcDeclArgListE ')' funcReturnTypeE '{' stmtListE '}' {printf("P: func overload Operator Incomplete\n");}
 	;
 
-funcDeclaration: modifiersWordsList funcDecIncomplete {printf("P: func declaration prefix\n");}
-    | funcDecIncomplete {printf("P: func declaration default\n");}
+    //TODO add modifiers to funcDecl node
+    //TODO add operator overloading
+funcDeclaration: modifiersWordsList funcDecIncomplete {printf("P: func declaration prefix\n"); $$ = $2;}
+    | funcDecIncomplete {printf("P: func declaration default\n"); $$ = $1;}
     
     // operator overloading
     | funcOverloadOperatorIncomplete {printf("P: func overload Operator\n");}
@@ -341,10 +376,10 @@ funcCallArgList: funcCallArg {printf("P: funcCallArgList\n"); $$ = FuncCallArgLi
     | funcCallArgList ',' funcCallArg {printf("P: funcCallArgList\n"); $$ = $$->appendNode($3);}
     ;
 
-genericIdList:  type {printf("P: genericIdList\n");}
-    | ID ':' type {printf("P: genericIdList\n");}
-    | genericIdList ',' ID {printf("P: genericIdList\n");}
-    | genericIdList ',' ID ':' type  {printf("P: genericIdList\n");}
+genericIdList: ID {printf("P: genericIdList\n"); $$ = TypeForGenericListNode::createListNode(TypeForGenericNode::createNoBaseClass($1));}
+    | ID ':' ID {printf("P: genericIdList\n"); $$ = TypeForGenericListNode::createListNode(TypeForGenericNode::createWithBaseClass($1, $3));}
+    | genericIdList ',' ID {printf("P: genericIdList\n"); $$ = $$->appendNode(TypeForGenericNode::createNoBaseClass($3));}
+    | genericIdList ',' ID ':' ID  {printf("P: genericIdList\n"); $$ = $$->appendNode(TypeForGenericNode::createWithBaseClass($3, $5));}
     ;
 
 classDeclIncomplete: CLASS ID '{' stmtListE '}' {printf("P: classDeclIncomplete\n");}

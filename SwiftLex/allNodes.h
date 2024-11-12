@@ -8,3 +8,6 @@
 #include "nodes/ReturnNode.h"
 #include "nodes/LoopNode.h"
 #include "nodes/IfElseNode.h"
+#include "nodes/FuncDeclArgNode.h"
+#include "nodes/TypeForGenericNode.h"
+#include "nodes/FuncDeclNode.h"

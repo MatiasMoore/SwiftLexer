@@ -22,6 +22,8 @@
     <Flex Include="swift.l" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="nodes\FuncDeclNode.cpp" />
+    <ClCompile Include="nodes\FuncDeclArgNode.cpp" />
     <ClCompile Include="nodes\IfElseNode.cpp" />
     <ClCompile Include="nodes\LoopNode.cpp" />
     <ClCompile Include="nodes\FuncCallNode.cpp" />
@@ -36,6 +38,7 @@
     <ClCompile Include="nodes\ExprNode.cpp" />
     <ClCompile Include="nodes\TypeNode.cpp" />
     <ClCompile Include="nodes\VarDeclarationNode.cpp" />
+    <ClCompile Include="nodes\TypeForGenericNode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt" />
@@ -44,6 +47,8 @@
     <Bison Include="swift.y" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="nodes\FuncDeclNode.h" />
+    <ClInclude Include="nodes\FuncDeclArgNode.h" />
     <ClInclude Include="nodes\IfElseNode.h" />
     <ClInclude Include="nodes\LoopNode.h" />
     <ClInclude Include="nodes\FuncCallNode.h" />
@@ -60,6 +65,7 @@
     <ClInclude Include="allNodes.h" />
     <ClInclude Include="nodes\TypeNode.h" />
     <ClInclude Include="nodes\VarDeclarationNode.h" />
+    <ClInclude Include="nodes\TypeForGenericNode.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

@@ -7,6 +7,7 @@
 #include "ReturnNode.h"
 #include "LoopNode.h"
 #include "IfElseNode.h"
+#include "FuncDeclNode.h"
 
 enum StmtType
 {
@@ -15,7 +16,8 @@ enum StmtType
 	Assignment,
 	Return,
 	Loop,
-	IfElse
+	IfElse,
+	FuncDecl
 };
 
 class StmtNode : public Dottable
@@ -38,6 +40,8 @@ public:
 
 	VarDeclarationListNode* _varDeclList;
 
+	FuncDeclNode* _funcDecl;
+
 	static StmtNode* createStmtExpr(ExprNode* expr);
 
 	static StmtNode* createStmtAssignment(ExprNode* left, ExprNode* right);
@@ -49,6 +53,8 @@ public:
 	static StmtNode* createStmtLoop(LoopNode* loop);
 
 	static StmtNode* createStmtIfElse(IfElseNode* ifElse);
+
+	static StmtNode* createStmtFuncDecl(FuncDeclNode* funcDecl);
 
 	void generateDot(std::ofstream& file) override;
 };

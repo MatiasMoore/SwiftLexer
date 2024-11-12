@@ -55,6 +55,15 @@ StmtNode* StmtNode::createStmtIfElse(IfElseNode* ifElse)
 	return node;
 }
 
+StmtNode* StmtNode::createStmtFuncDecl(FuncDeclNode* funcDecl)
+{
+	auto node = new StmtNode();
+	node->_type = StmtType::FuncDecl;
+	node->_funcDecl = funcDecl;
+	printf("N: stmt funcDecl\n");
+	return node;
+}
+
 void StmtNode::generateDot(std::ofstream& file)
 {
 	switch (this->_type)
@@ -90,6 +99,11 @@ void StmtNode::generateDot(std::ofstream& file)
 		file << dotLabel(this->_id, "IfElseStmt");
 		file << dotConnection(this->_id, this->_ifElse->_id);
 		this->_ifElse->generateDot(file);
+		break;
+	case StmtType::FuncDecl:
+		file << dotLabel(this->_id, "FuncDeclStmt");
+		file << dotConnection(this->_id, this->_funcDecl->_id);
+		this->_funcDecl->generateDot(file);
 		break;
 	default:
 		throw std::runtime_error("Unknown type!");
