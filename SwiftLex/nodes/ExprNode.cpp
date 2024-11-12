@@ -112,6 +112,42 @@ ExprNode* ExprNode::createFieldAccessSelf(std::string fieldName)
 	return node;
 }
 
+ExprNode* ExprNode::createTypeCheck(ExprNode* toCheck, TypeNode* type)
+{
+	auto node = new ExprNode();
+	node->_type = ExprType::TypeCheck;
+	node->_typeCheckCastExpr = toCheck;
+	node->_typeCheckCastType = type;
+	return node;
+}
+
+ExprNode* ExprNode::createTypeCast(ExprNode* toCheck, TypeNode* type)
+{
+	auto node = new ExprNode();
+	node->_type = ExprType::TypeCast;
+	node->_typeCheckCastExpr = toCheck;
+	node->_typeCheckCastType = type;
+	return node;
+}
+
+ExprNode* ExprNode::createTypeCastWithThrow(ExprNode* toCheck, TypeNode* type)
+{
+	auto node = new ExprNode();
+	node->_type = ExprType::TypeCastWithThrow;
+	node->_typeCheckCastExpr = toCheck;
+	node->_typeCheckCastType = type;
+	return node;
+}
+
+ExprNode* ExprNode::createTypeCastWithCheck(ExprNode* toCheck, TypeNode* type)
+{
+	auto node = new ExprNode();
+	node->_type = ExprType::TypeCastWithCheck;
+	node->_typeCheckCastExpr = toCheck;
+	node->_typeCheckCastType = type;
+	return node;
+}
+
 std::string ExprNode::getName()
 {
 	switch (this->_type)
@@ -221,6 +257,18 @@ std::string ExprNode::getName()
 	case ExprType::SelfFieldAccess:
 		return "SelfFieldAccess";
 		break;
+	case ExprType::TypeCheck:
+		return "TypeCheck is";
+		break;
+	case ExprType::TypeCast:
+		return "TypeCast as";
+		break;
+	case ExprType::TypeCastWithThrow:
+		return "TypeCastWithThrow as!";
+		break;
+	case ExprType::TypeCastWithCheck:
+		return "TypeCastWithCheck as?";
+		break;
 	default:
 		throw std::runtime_error("Unknown type!");
 		break;
@@ -274,6 +322,16 @@ void ExprNode::generateDot(std::ofstream& file)
 		break;
 	case ExprType::SelfFieldAccess:
 		file << dotLabel(this->_id, this->getName() + "\n fieldId: " + this->_fieldAccessFieldName);
+		break;
+	case ExprType::TypeCheck:
+	case ExprType::TypeCast:
+	case ExprType::TypeCastWithCheck:
+	case ExprType::TypeCastWithThrow:
+		file << dotLabel(this->_id, this->getName());
+		file << dotConnectionWithLabel(this->_id, this->_typeCheckCastExpr->_id, "to cast/check");
+		file << dotConnectionWithLabel(this->_id, this->_typeCheckCastType->_id, "type");
+		this->_typeCheckCastExpr->generateDot(file);
+		this->_typeCheckCastType->generateDot(file);
 		break;
 	case ExprType::Sum:
 	case ExprType::Sub:

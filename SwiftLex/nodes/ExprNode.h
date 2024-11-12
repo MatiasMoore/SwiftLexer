@@ -2,6 +2,7 @@
 #include "dottable.h"
 #include "GenericListNode.h"
 #include "FuncCallNode.h"
+#include "TypeNode.h"
 
 enum ExprType
 {
@@ -39,7 +40,11 @@ enum ExprType
 	Subscript,
 	FuncCall,
 	FieldAccess,
-	SelfFieldAccess
+	SelfFieldAccess,
+	TypeCheck,
+	TypeCast,
+	TypeCastWithThrow,
+	TypeCastWithCheck
 };
 
 //Forward declaration for list
@@ -72,6 +77,9 @@ public:
 	std::string _fieldAccessFieldName;
 	ExprNode* _fieldAccessExpr;
 
+	ExprNode* _typeCheckCastExpr;
+	TypeNode* _typeCheckCastType;
+
 	FuncCallNode* _funcCall;
 
 	static ExprNode* createBool(bool value);
@@ -97,6 +105,14 @@ public:
 	static ExprNode* createFieldAccessExpr(ExprNode* expr, std::string fieldName);
 
 	static ExprNode* createFieldAccessSelf(std::string fieldName);
+
+	static ExprNode* createTypeCheck(ExprNode* toCheck, TypeNode* type);
+
+	static ExprNode* createTypeCast(ExprNode* toCheck, TypeNode* type);
+
+	static ExprNode* createTypeCastWithThrow(ExprNode* toCheck, TypeNode* type);
+
+	static ExprNode* createTypeCastWithCheck(ExprNode* toCheck, TypeNode* type);
 
 	std::string getName();
 

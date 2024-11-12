@@ -622,10 +622,10 @@ expr: LITERAL_INT {printf("P: expr int\n"); switchStateToSubscript(); $$ = ExprN
     | expr OP_CLOSED_RANGE expr {printf("P: expr ...\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::ClosedRange, $1, $3);}
     | expr OP_HALF_OPEN_RANGE expr {printf("P: expr ..<\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::HalfOpenRange, $1, $3);}
     | expr OP_NIL_COALESCE expr {printf("P: expr ??\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::NilCoalesce, $1, $3);}
-    | expr IS type {printf("P: expr is\n"); switchStateToSubscript();}
-    | expr AS type {printf("P: expr as\n"); switchStateToSubscript();}
-    | expr AS '?' type {printf("P: expr as ?\n"); switchStateToSubscript();}
-    | expr AS '!' type {printf("P: expr as !\n"); switchStateToSubscript();}
+    | expr IS type {printf("P: expr is\n"); switchStateToSubscript(); $$ = ExprNode::createTypeCheck($1, $3);}
+    | expr AS type {printf("P: expr as\n"); switchStateToSubscript(); $$ = ExprNode::createTypeCast($1, $3);}
+    | expr AS '?' type {printf("P: expr as ?\n"); switchStateToSubscript(); $$ = ExprNode::createTypeCastWithCheck($1, $4);}
+    | expr AS '!' type {printf("P: expr as !\n"); switchStateToSubscript(); $$ = ExprNode::createTypeCastWithThrow($1, $4);}
     | expr '?' expr ':' expr {printf("P: expr ternary ? :\n"); switchStateToSubscript(); $$ = ExprNode::createTernary($1, $3, $5);}
     | anyRoundBracket expr ')' {printf("P: expr brackets\n"); $$ = $2; switchStateToSubscript();}
     | funcCall {printf("P: expr funcCall\n"); switchStateToSubscript(); switchStateToSubscript(); $$ = ExprNode::createFuncCall($1);}
