@@ -53,7 +53,7 @@ void switchStateToSubscript();
 %}
 
 <SUBSCRIPT>\[ { cout << "Subscript left square bracket: " << yytext << endl; isSubsciptActive = false; return SUBSCRIPT_SQUARE_BRACKET; BEGIN(INITIAL);}
-<SUBSCRIPT>\( { cout << "Subscript left round bracket: " << yytext << endl; isSubsciptActive = false; return SUBSCRIPT_ROUND_BRACKET; BEGIN(INITIAL);}
+<SUBSCRIPT>\( { cout << "Subscript left round bracket: " << yytext << endl; isSubsciptActive = false; return FUNC_CALL_ROUND_BRACKET; BEGIN(INITIAL);}
 <SUBSCRIPT>[^	]|[^ ] { cout << "Subscript end" << endl;  yyless(0); isSubsciptActive = false; BEGIN(INITIAL);}
 
 	/* KEYWORDS */

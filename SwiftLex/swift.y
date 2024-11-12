@@ -92,7 +92,7 @@ TYPE_UINT16 TYPE_UINT32 TYPE_UINT64
 TYPE_UINT TYPE_FLOAT TYPE_FLOAT80  
 TYPE_DOUBLE
 
-SUBSCRIPT_SQUARE_BRACKET SUBSCRIPT_ROUND_BRACKET
+SUBSCRIPT_SQUARE_BRACKET FUNC_CALL_ROUND_BRACKET
 
 %left '=' ID
 %right '?' ':' 
@@ -111,7 +111,7 @@ SUBSCRIPT_SQUARE_BRACKET SUBSCRIPT_ROUND_BRACKET
 %nonassoc IS AS
 %left UNARY_PLUS UNARY_MINUS
 %left '[' ']' SUBSCRIPT_SQUARE_BRACKET
-%right '(' ')' SUBSCRIPT_ROUND_BRACKET
+%right '(' ')' FUNC_CALL_ROUND_BRACKET
 
 // Nodes
 %type<exprNode> expr
@@ -223,21 +223,6 @@ stmtListIncomplete: stmt {printf("P: stmtListIncomplete start\n"); $$ = StmtList
 stmtListE: %empty
     | stmtList
     ;
-
-    /*
-Grammar of a statement
-
-statement -> expression ;?
-statement -> declaration ;?
-statement -> loop-statement ;?
-statement -> branch-statement ;?
-statement -> labeled-statement ;?
-statement -> control-transfer-statement ;?
-statement -> defer-statement ;?
-statement -> do-statement ;?
-statement -> compiler-control-statement
-statements -> statement statements?
-    */
 
 return: RETURN expr  {printf("P: return\n"); $$ = ReturnNode::createExprReturn($2);}
     | RETURN {printf("P: return empty\n"); $$ = ReturnNode::createVoidReturn();}
@@ -382,9 +367,9 @@ exprListE: %empty
 genericIdType:  ID '<' typeList '>' {printf("P: genericIdType\n"); switchStateToSubscript();}
 	;
 
-funcCall: ID SUBSCRIPT_ROUND_BRACKET ')' {printf("P: funcCall exprList\n"); $$ = FuncCallNode::createFuncCallNoArgs($1);}
-	| genericIdType SUBSCRIPT_ROUND_BRACKET ')' {printf("P: funcCall exprList\n");}
-    | ID SUBSCRIPT_ROUND_BRACKET exprList ')' {
+funcCall: ID FUNC_CALL_ROUND_BRACKET ')' {printf("P: funcCall exprList\n"); $$ = FuncCallNode::createFuncCallNoArgs($1);}
+	| genericIdType FUNC_CALL_ROUND_BRACKET ')' {printf("P: funcCall exprList\n");}
+    | ID FUNC_CALL_ROUND_BRACKET exprList ')' {
         printf("P: funcCall exprList\n"); 
 
         //Convert exprList to argList
@@ -404,9 +389,9 @@ funcCall: ID SUBSCRIPT_ROUND_BRACKET ')' {printf("P: funcCall exprList\n"); $$ =
         $$ = FuncCallNode::createFuncCall($1, argList);
 
     }
-	| genericIdType SUBSCRIPT_ROUND_BRACKET exprList ')' {printf("P: funcCall exprList\n");}
-    | ID SUBSCRIPT_ROUND_BRACKET funcCallArgList ')' {printf("P: funcCall labelArgs\n"); $$ = FuncCallNode::createFuncCall($1, $3);}
-	| genericIdType SUBSCRIPT_ROUND_BRACKET funcCallArgList ')' {printf("P: funcCall labelArgs\n");}
+	| genericIdType FUNC_CALL_ROUND_BRACKET exprList ')' {printf("P: funcCall exprList\n");}
+    | ID FUNC_CALL_ROUND_BRACKET funcCallArgList ')' {printf("P: funcCall labelArgs\n"); $$ = FuncCallNode::createFuncCall($1, $3);}
+	| genericIdType FUNC_CALL_ROUND_BRACKET funcCallArgList ')' {printf("P: funcCall labelArgs\n");}
     ;
 
 assignment: expr '=' expr {printf("P: assignment\n"); $$ = StmtNode::createStmtAssignment($1, $3); }
@@ -623,15 +608,12 @@ expr: LITERAL_INT {printf("P: expr int\n"); switchStateToSubscript(); $$ = ExprN
     | SELF '.' funcCall {printf("P: expr self func access\n"); switchStateToSubscript(); $3->_scopeType = selfCall; $$ = ExprNode::createFuncCall($3);}
     | expr '.' ID {printf("P: expr field access\n"); switchStateToSubscript();}
     | SELF '.' ID {printf("P: expr self fieldAccess\n"); switchStateToSubscript();}
-    // WARNING THIS CAUSES 2 CONFLICTS 
-    // BUT THEY ARE RESOLVED CORRECTLY BY DEFAULT
-    // TODO: RESOLVE CONFLICT EXPLICITLY
     | '[' exprList ']' {printf("P: expr array\n"); switchStateToSubscript(); $$ = ExprNode::createArray($2);}
     | expr SUBSCRIPT_SQUARE_BRACKET expr ']' {printf("P: expr array indexing\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::Subscript, $1, $3);}
     ;
 
 anyRoundBracket: '('
-	| SUBSCRIPT_ROUND_BRACKET
+	| FUNC_CALL_ROUND_BRACKET
 	;
         
 %%
