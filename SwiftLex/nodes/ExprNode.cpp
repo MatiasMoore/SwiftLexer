@@ -93,6 +93,25 @@ ExprNode* ExprNode::createFuncCall(FuncCallNode* func)
 	return node;
 }
 
+ExprNode* ExprNode::createFieldAccessExpr(ExprNode* expr, std::string fieldName)
+{
+	auto node = new ExprNode();
+	node->_type = ExprType::FieldAccess;
+	node->_fieldAccessExpr = expr;
+	node->_fieldAccessFieldName = fieldName;
+	printf("N: field access %d\n", (int)node->_type);
+	return node;
+}
+
+ExprNode* ExprNode::createFieldAccessSelf(std::string fieldName)
+{
+	auto node = new ExprNode();
+	node->_type = ExprType::SelfFieldAccess;
+	node->_fieldAccessFieldName = fieldName;
+	printf("N: field access %d\n", (int)node->_type);
+	return node;
+}
+
 std::string ExprNode::getName()
 {
 	switch (this->_type)
@@ -196,6 +215,12 @@ std::string ExprNode::getName()
 	case ExprType::FuncCall:
 		return "FuncCall";
 		break;
+	case ExprType::FieldAccess:
+		return "FieldAccess";
+		break;
+	case ExprType::SelfFieldAccess:
+		return "SelfFieldAccess";
+		break;
 	default:
 		throw std::runtime_error("Unknown type!");
 		break;
@@ -241,6 +266,14 @@ void ExprNode::generateDot(std::ofstream& file)
 		file << dotLabel(this->_id, this->getName());
 		file << dotConnection(this->_id, this->_unary->_id);
 		this->_unary->generateDot(file);
+		break;
+	case ExprType::FieldAccess:
+		file << dotLabel(this->_id, this->getName() + "\n fieldId: " + this->_fieldAccessFieldName);
+		file << dotConnection(this->_id, this->_fieldAccessExpr->_id);
+		this->_fieldAccessExpr->generateDot(file);
+		break;
+	case ExprType::SelfFieldAccess:
+		file << dotLabel(this->_id, this->getName() + "\n fieldId: " + this->_fieldAccessFieldName);
 		break;
 	case ExprType::Sum:
 	case ExprType::Sub:

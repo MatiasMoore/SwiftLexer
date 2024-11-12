@@ -632,8 +632,8 @@ expr: LITERAL_INT {printf("P: expr int\n"); switchStateToSubscript(); $$ = ExprN
     | SUPER '.' funcCall {printf("P: expr super funcCall\n"); switchStateToSubscript(); $3->_scopeType = superCall; $$ = ExprNode::createFuncCall($3);}
     | expr '.' funcCall {printf("P: expr func access\n"); switchStateToSubscript(); $3->setAsExprAccess($1); $$ = ExprNode::createFuncCall($3);}
     | SELF '.' funcCall {printf("P: expr self func access\n"); switchStateToSubscript(); $3->_scopeType = selfCall; $$ = ExprNode::createFuncCall($3);}
-    | expr '.' ID {printf("P: expr field access\n"); switchStateToSubscript();}
-    | SELF '.' ID {printf("P: expr self fieldAccess\n"); switchStateToSubscript();}
+    | expr '.' ID {printf("P: expr field access\n"); switchStateToSubscript(); $$ = ExprNode::createFieldAccessExpr($1, $3);}
+    | SELF '.' ID {printf("P: expr self fieldAccess\n"); switchStateToSubscript(); $$ = ExprNode::createFieldAccessSelf($3);}
     | '[' exprList ']' {printf("P: expr array\n"); switchStateToSubscript(); $$ = ExprNode::createArray($2);}
     | expr SUBSCRIPT_SQUARE_BRACKET expr ']' {printf("P: expr array indexing\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::Subscript, $1, $3);}
     ;

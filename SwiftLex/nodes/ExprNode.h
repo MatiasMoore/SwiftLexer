@@ -37,7 +37,9 @@ enum ExprType
 	Ternary,
 	Array,
 	Subscript,
-	FuncCall
+	FuncCall,
+	FieldAccess,
+	SelfFieldAccess
 };
 
 //Forward declaration for list
@@ -67,6 +69,9 @@ public:
 	ExprNode* _ternaryIfFalse;
 	ExprListNode* _arrayExprList;
 
+	std::string _fieldAccessFieldName;
+	ExprNode* _fieldAccessExpr;
+
 	FuncCallNode* _funcCall;
 
 	static ExprNode* createBool(bool value);
@@ -88,6 +93,10 @@ public:
 	static ExprNode* createArray(ExprListNode* list);
 
 	static ExprNode* createFuncCall(FuncCallNode* func);
+
+	static ExprNode* createFieldAccessExpr(ExprNode* expr, std::string fieldName);
+
+	static ExprNode* createFieldAccessSelf(std::string fieldName);
 
 	std::string getName();
 
