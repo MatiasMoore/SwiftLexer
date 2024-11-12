@@ -46,6 +46,15 @@ StmtNode* StmtNode::createStmtLoop(LoopNode* loop)
 	return node;
 }
 
+StmtNode* StmtNode::createStmtIfElse(IfElseNode* ifElse)
+{
+	auto node = new StmtNode();
+	node->_type = StmtType::IfElse;
+	node->_ifElse = ifElse;
+	printf("N: stmt ifElse\n");
+	return node;
+}
+
 void StmtNode::generateDot(std::ofstream& file)
 {
 	switch (this->_type)
@@ -76,6 +85,11 @@ void StmtNode::generateDot(std::ofstream& file)
 		file << dotLabel(this->_id, "LoopStmt");
 		file << dotConnection(this->_id, this->_loop->_id);
 		this->_loop->generateDot(file);
+		break;
+	case StmtType::IfElse:
+		file << dotLabel(this->_id, "IfElseStmt");
+		file << dotConnection(this->_id, this->_ifElse->_id);
+		this->_ifElse->generateDot(file);
 		break;
 	default:
 		throw std::runtime_error("Unknown type!");

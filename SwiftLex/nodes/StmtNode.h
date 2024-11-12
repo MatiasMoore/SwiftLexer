@@ -6,6 +6,7 @@
 #include "VarDeclarationNode.h"
 #include "ReturnNode.h"
 #include "LoopNode.h"
+#include "IfElseNode.h"
 
 enum StmtType
 {
@@ -13,7 +14,8 @@ enum StmtType
 	VarDeclarationList,
 	Assignment,
 	Return,
-	Loop
+	Loop,
+	IfElse
 };
 
 class StmtNode : public Dottable
@@ -32,6 +34,8 @@ public:
 
 	LoopNode* _loop;
 
+	IfElseNode* _ifElse;
+
 	VarDeclarationListNode* _varDeclList;
 
 	static StmtNode* createStmtExpr(ExprNode* expr);
@@ -43,6 +47,8 @@ public:
 	static StmtNode* createStmtReturn(ReturnNode* ret);
 
 	static StmtNode* createStmtLoop(LoopNode* loop);
+
+	static StmtNode* createStmtIfElse(IfElseNode* ifElse);
 
 	void generateDot(std::ofstream& file) override;
 };

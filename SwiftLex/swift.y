@@ -29,6 +29,7 @@
     class FuncCallNode* funcCallNode;
     class ReturnNode* returnNode;
     class LoopNode* loopNode;
+    class IfElseNode* ifElseNode;
 }
 %locations
 
@@ -146,6 +147,8 @@ SUBSCRIPT_SQUARE_BRACKET FUNC_CALL_ROUND_BRACKET
 %type<loopNode> repeatWhileLoop
 %type<loopNode> whileLoop
 
+%type<ifElseNode> ifElse
+
 // Start
 %start program
 
@@ -184,7 +187,7 @@ stmtIncomplete: varDeclaration {printf("P: stmt varDec\n"); $$ = StmtNode::creat
     | assignment {printf("P: stmt assignment\n"); $$ = $1;}
     | expr {printf("P: stmt expr\n"); $$ = StmtNode::createStmtExpr($1);}
     | enumDeclaration {printf("P: stmt enum\n");}
-    | ifElse {printf("P: stmt ifElse\n");}
+    | ifElse {printf("P: stmt ifElse\n"); $$ = StmtNode::createStmtIfElse($1);}
     | whileLoop {printf("P: stmt whileLoop\n"); $$ = StmtNode::createStmtLoop($1);}
     | repeatWhileLoop {printf("P: stmt repeatWhileLoop\n"); $$ = StmtNode::createStmtLoop($1);}
     | forInLoop {printf("P: stmt forInLoop\n"); $$ = StmtNode::createStmtLoop($1);}
@@ -515,15 +518,15 @@ forInLoop: FOR ID IN expr whereClause '{' stmtList '}' {printf("P: forInLoop\n")
     | FOR ID IN expr '{' '}' {printf("P: forInLoop\n"); $$ = LoopNode::createForLoopNoBody($2, $4);}
     ;
 
-ifElse: IF exprList '{' stmtList '}' {printf("P: ifElse\n");}
-    | IF exprList '{' stmtList '}' ELSE '{' stmtList '}' {printf("P: ifElse with else\n");}
-    | IF exprList '{' stmtList '}' ELSE ifElse {printf("P: ifElse else if\n");}
+ifElse: IF exprList '{' stmtList '}' {printf("P: ifElse\n"); $$ = IfElseNode::createSimple($2, $4, nullptr);}
+    | IF exprList '{' stmtList '}' ELSE '{' stmtList '}' {printf("P: ifElse with else\n"); $$ = IfElseNode::createSimple($2, $4, $8);}
+    | IF exprList '{' stmtList '}' ELSE ifElse {printf("P: ifElse else if\n"); $$ = IfElseNode::createComplex($2, $4, $7);}
 
-    | IF exprList '{' '}' {printf("P: ifElse\n");}
-    | IF exprList '{' '}' ELSE '{' stmtList '}' {printf("P: ifElse with else\n");}
-    | IF exprList '{' stmtList '}' ELSE '{' '}' {printf("P: ifElse with else\n");}
-    | IF exprList '{' '}' ELSE '{' '}' {printf("P: ifElse with else\n");}
-    | IF exprList '{' '}' ELSE ifElse {printf("P: ifElse else if\n");}
+    | IF exprList '{' '}' {printf("P: ifElse\n"); $$ = IfElseNode::createSimple($2, nullptr, nullptr);}
+    | IF exprList '{' '}' ELSE '{' stmtList '}' {printf("P: ifElse with else\n"); $$ = IfElseNode::createSimple($2, nullptr, $7);}
+    | IF exprList '{' stmtList '}' ELSE '{' '}' {printf("P: ifElse with else\n"); $$ = IfElseNode::createSimple($2, $4, nullptr);}
+    | IF exprList '{' '}' ELSE '{' '}' {printf("P: ifElse with else\n"); $$ = IfElseNode::createSimple($2, nullptr, nullptr);}
+    | IF exprList '{' '}' ELSE ifElse {printf("P: ifElse else if\n"); $$ = IfElseNode::createComplex($2, nullptr, $6);}
     ;
 
 switchCase: SWITCH expr '{'caseList defaultCase '}' {printf("P: switch\n");}
