@@ -21,6 +21,7 @@ AFTER_NO_WHITESPACE_BINARY [^ \n	;)]
 OPERATORS [-+/*%!]|\&\&|\|\|
 AFTER_PREFIX [^*/ \n	>=-]
 BEFORE_PREFIX [(; \n	]
+AFTER_POSTFIX [ \n	;)]
 
 %{
 #include <stdio.h>
@@ -512,9 +513,19 @@ _ { cout << "Underscore" << endl; return '_';}
 
 
 	/* POSTFIX UNNARY */
-{OPERATORS}/{WHITESPACES} {
+{OPERATORS}/{AFTER_POSTFIX} {
 	cout << "Postfix operator: " << yytext << endl;
 	str = yytext;
+	if (str.find(')') != string::npos) {
+		cout << "Added operator to queue, ";
+		tokenQueue.push_back(getPrefixOperatorFromString(str));
+		return ')';
+	} else if (str.find(';') != string::npos) {
+		cout << "Added operator to queue, ";
+		tokenQueue.push_back(getPrefixOperatorFromString(str));
+		cout << "send ;" << endl;
+		return ';';
+	};
 	return getPostfixOperatorFromString(str);
 }
 
@@ -525,19 +536,6 @@ _ { cout << "Underscore" << endl; return '_';}
 	return getBinaryOperatorFromString(str);
 }
 
-	/* BINARY EOF*/
-{WHITESPACES}{OPERATORS} {
-	cout << "Binary whitespaces Operator EOF: " << yytext << endl;
-	str = yytext;
-	return getBinaryOperatorFromString(str);
-}
-
-	/* POSTFIX UNNARY EOF */
-{OPERATORS} {
-	cout << "Postfix operator EOF: " << yytext << endl;
-	str = yytext;
-	return getPostfixOperatorFromString(str);
-}
 	/* TODO: DELETE THIS WHEN EVERYTHING IS DONE*/
 .|[^.] {}
 %%

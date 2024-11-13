@@ -742,5 +742,5 @@ anyRoundBracket: '('
 int yyerror(const char *errormsg)
 {
       fprintf(stderr, "%s\n", errormsg);
-      exit(1);
+      throw std::runtime_error(errormsg);
 }

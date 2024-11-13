@@ -10,7 +10,17 @@ extern StmtListNode* _root;
 int main(int argc, const char* argv[])
 {
 #ifdef  _DEBUG
-	fopen_s(&yyin, "input.txt", "r");
+	std::ifstream inputFile("input.txt");
+	std::ofstream tempOutput("temp_input.txt");
+	std::string line;
+
+	while (std::getline(inputFile, line)) tempOutput << line << '\n';
+	tempOutput << '\n';
+
+	inputFile.close();
+	tempOutput.close();
+
+	fopen_s(&yyin, "temp_input.txt", "r");
 #else
 	if (argc != 2)
 	{
@@ -27,7 +37,18 @@ int main(int argc, const char* argv[])
 		std::cout << "Couldn't open file! Check the path!" << std::endl;
 		return 1;
 	}
-	yyparse();
+
+	try {
+		yyparse();
+	}
+	catch (const std::exception& e)
+	{
+		fclose(yyin);
+		std::remove("temp_input.txt");
+		return 1;
+	}
+	fclose(yyin);
+	std::remove("temp_input.txt");
 
 	std::ofstream dotFile;
 	dotFile.open("swift.dot");
