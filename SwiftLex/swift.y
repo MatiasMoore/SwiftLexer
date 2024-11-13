@@ -242,7 +242,7 @@ returnStmt: return {printf("P: stmt return\n"); $$ = StmtNode::createStmtReturn(
     ;
 
 stmtList: stmtListIncomplete returnStmt {
-        if (@1.last_line == @2.first_line){
+        if (!($1->_vec.back()->_hasSemicolon) && @1.last_line == @2.first_line){
             yyerror("Syntax error: two statements in one line must be separated with a ';'");
         }
         else {
