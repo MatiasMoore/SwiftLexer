@@ -40,6 +40,7 @@
     <ClCompile Include="nodes\VarDeclarationNode.cpp" />
     <ClCompile Include="nodes\TypeForGenericNode.cpp" />
     <ClCompile Include="nodes\ThrowNode.cpp" />
+    <ClCompile Include="nodes\TryNode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt" />
@@ -68,6 +69,7 @@
     <ClInclude Include="nodes\VarDeclarationNode.h" />
     <ClInclude Include="nodes\TypeForGenericNode.h" />
     <ClInclude Include="nodes\ThrowNode.h" />
+    <ClInclude Include="nodes\TryNode.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

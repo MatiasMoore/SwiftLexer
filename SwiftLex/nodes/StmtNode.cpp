@@ -6,6 +6,7 @@
 #include "IfElseNode.h"
 #include "FuncDeclNode.h"
 #include "ThrowNode.h"
+#include "TryNode.h"
 
 StmtNode* StmtNode::createStmtExpr(ExprNode* expr)
 {
@@ -80,6 +81,15 @@ StmtNode* StmtNode::createStmtThrow(ThrowNode* throwNode)
 	return node;
 }
 
+StmtNode* StmtNode::createStmtTry(TryNode* tryNode)
+{
+	auto node = new StmtNode();
+	node->_type = StmtType::Try;
+	node->_tryNode = tryNode;
+	printf("N: stmt throw\n");
+	return node;
+}
+
 void StmtNode::generateDot(std::ofstream& file)
 {
 	switch (this->_type)
@@ -125,6 +135,11 @@ void StmtNode::generateDot(std::ofstream& file)
 		file << dotLabel(this->_id, "ThrowStmt");
 		file << dotConnection(this->_id, this->_throw->_id);
 		this->_throw->generateDot(file);
+		break;
+	case StmtType::Try:
+		file << dotLabel(this->_id, "TryStmt");
+		file << dotConnection(this->_id, this->_tryNode->_id);
+		this->_tryNode->generateDot(file);
 		break;
 	default:
 		throw std::runtime_error("Unknown type!");

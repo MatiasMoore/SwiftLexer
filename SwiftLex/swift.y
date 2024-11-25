@@ -35,6 +35,7 @@
     class TypeForGenericListNode* typeForGenericListNode;
     class FuncDeclNode* funcDeclNode;
     class ThrowNode* throwNode;
+    class TryNode* tryNode;
 }
 %locations
 
@@ -209,6 +210,7 @@ SUBSCRIPT_SQUARE_BRACKET FUNC_CALL_ROUND_BRACKET
 
 // Error handling
 %type<throwNode> exprThrow
+%type<tryNode> tryStmt
 
 // Start
 %start program
@@ -324,7 +326,7 @@ lowLevelStmtIncomplete: varDeclaration {printf("P: lowLevelStmtIncomplete varDec
     | repeatWhileLoop {printf("P: lowLevelStmtIncomplete repeatWhileLoop\n"); $$ = StmtNode::createStmtLoop($1);}
     | forInLoop {printf("P: lowLevelStmtIncomplete forInLoop\n"); $$ = StmtNode::createStmtLoop($1);}
     | switchCase {printf("P: lowLevelStmtIncomplete switch\n");}
-    | tryStmt {printf("P: lowLevelStmtIncomplete try\n");}
+    | tryStmt {printf("P: lowLevelStmtIncomplete try\n"); $$ = StmtNode::createStmtTry($1);}
     | doCatchStmt {printf("P: lowLevelStmtIncomplete doCatch\n");}
     | stmtOperators {printf("P: lowLevelStmtIncomplete operators\n"); $$ = $1;}
     ;
@@ -728,7 +730,7 @@ caseList: caseElement {printf("P: caseList\n");}
 defaultCase: DEFAULT ':' lowLevelStmtList {printf("P: defaultCase\n");}
 	;
 
-tryStmt: TRY expr {printf("P: try\n");}
+tryStmt: TRY expr {printf("P: try\n"); $$ = TryNode::create($2);}
 	;
 
 varDeclCatchIncomplete:ID {printf("P: varDeclCatchIncomplete\n");}
