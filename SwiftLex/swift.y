@@ -144,14 +144,36 @@ SUBSCRIPT_SQUARE_BRACKET FUNC_CALL_ROUND_BRACKET
 %type<exprNode> expr
 %type<exprListNode> exprList
 %type<returnNode> return
-%type<stmtNode> stmtIncomplete
-%type<stmtNode> stmt
 %type<stmtNode> returnStmt
+
+%type<stmtNode> stmtClassInnerIncomplete
+%type<stmtNode> stmtClassInner
+%type<stmtListNode> stmtClassInnerList
+%type<stmtListNode> stmtClassInnerListE
+
+%type<stmtNode> stmtStructInnerIncomplete
+%type<stmtNode> stmtStructInner
+%type<stmtListNode> stmtStructInnerList
+%type<stmtListNode> stmtStructInnerListE
+
+%type<stmtNode> stmtEnumInnerIncomplete
+%type<stmtNode> stmtEnumInner
+%type<stmtListNode> stmtEnumInnerList
+%type<stmtListNode> stmtEnumInnerListE
+
+%type<stmtNode> lowLevelStmtIncomplete
+%type<stmtNode> lowLevelStmt
+%type<stmtListNode> lowLevelStmtList
+
+%type<stmtListNode> funcStmtListE
+
+%type<stmtNode> topLevelStmtIncomplete
+%type<stmtNode> topLevelStmt
+%type<stmtListNode> topLevelStmtList
+%type<stmtListNode> topLevelStmtListE
+
 %type<stmtNode> assignment
 %type<stmtNode> stmtOperators
-%type<stmtListNode> stmtList
-%type<stmtListNode> stmtListE
-%type<stmtListNode> stmtListIncomplete
 %type<stmtListNode> program
 %type<typeNode> type
 
@@ -189,7 +211,7 @@ SUBSCRIPT_SQUARE_BRACKET FUNC_CALL_ROUND_BRACKET
 
 %%
 
-program: stmtList {printf("P: program\n"); $$ = $1; _root = $$;}
+program: topLevelStmtListE {printf("P: program\n"); $$ = $1; _root = $$;}
     ;
 
 
@@ -213,61 +235,156 @@ type: TYPE_BOOL {$$ = TypeNode::createType(TypeType::BoolT);}
     | '[' type ']' {$$ = TypeNode::createArrayType($2);}
     ;
 
-stmtIncomplete: varDeclaration {printf("P: stmt varDec\n"); $$ = StmtNode::createStmtVarDeclaration($1);}
-    | funcDeclaration {printf("P: stmt funcDec\n"); $$ = StmtNode::createStmtFuncDecl($1);}
-    | constructorDeclaration {printf("P: stmt constructorDecl\n");}
-    | destructorDeclaration {printf("P: stmt destructorDecl\n");}
+    /* CLASS STMT */
+stmtClassInnerIncomplete: funcDeclaration {printf("P: stmt class funcdecl\n"); $$ = StmtNode::createStmtFuncDecl($1);}
+    | varDeclaration {printf("P: stmt class varDec\n"); $$ = StmtNode::createStmtVarDeclaration($1);}
+    | constructorDeclaration {printf("P: stmt class constructor\n");}
+    | destructorDeclaration {printf("P: stmt class destructor\n");}
+    ;
+
+stmtClassInner: stmtClassInnerIncomplete { $$ = $1; }
+    | stmtClassInnerIncomplete ';' { $$ = $1; $$->_hasSemicolon = true; }
+    ;
+
+stmtClassInnerList: stmtClassInner {printf("P: stmtClassInnerList\n"); $$ = StmtListNode::createListNode($1);}
+	| stmtClassInnerList stmtClassInner {
+        if (!($1->_vec.back()->_hasSemicolon) && @1.last_line == @2.first_line){
+            yyerror("Syntax error: two statements in one line must be separated with a ';'");
+        }
+        else {
+			printf("P: topLevelStmtList\n");
+            $$ = $1->appendNode($2);
+		}
+    }
+	;
+
+stmtClassInnerListE: stmtClassInnerList { $$ = $1; }
+    | %empty { $$ = nullptr; }
+    ;
+   
+    /* STRUCT STMT */
+stmtStructInnerIncomplete: varDeclaration {printf("P: stmt struct varDec\n"); $$ = StmtNode::createStmtVarDeclaration($1);}
+	;
+
+stmtStructInner: stmtStructInnerIncomplete { $$ = $1; }
+	| stmtStructInnerIncomplete ';' { $$ = $1; $$->_hasSemicolon = true; }
+	;
+
+stmtStructInnerList: stmtStructInner {printf("P: stmtStructInnerList\n"); $$ = StmtListNode::createListNode($1);}
+	| stmtStructInnerList stmtStructInner {
+        if (!($1->_vec.back()->_hasSemicolon) && @1.last_line == @2.first_line){
+            yyerror("Syntax error: two statements in one line must be separated with a ';'");
+        }
+        else {
+			printf("P: topLevelStmtList\n");
+            $$ = $1->appendNode($2);
+		}
+    }
+	;
+
+stmtStructInnerListE: stmtStructInnerList { $$ = $1; }
+	| %empty { $$ = nullptr; }
+	;
+
+    /* ENUM STMT */
+stmtEnumInnerIncomplete: enumDefinition {printf("P: stmt enum enumDefinition\n");}
+	;
+
+stmtEnumInner: stmtEnumInnerIncomplete ';' {printf("P: stmt enum\n");}
+	;
+
+stmtEnumInnerList: stmtEnumInner {printf("P: stmtEnumInnerList\n"); $$ = StmtListNode::createListNode($1);}
+	| stmtEnumInnerList stmtEnumInner {
+        if (!($1->_vec.back()->_hasSemicolon) && @1.last_line == @2.first_line){
+            yyerror("Syntax error: two statements in one line must be separated with a ';'");
+        }
+        else {
+			printf("P: topLevelStmtList\n");
+            $$ = $1->appendNode($2);
+		}
+    }
+	;
+
+stmtEnumInnerListE: stmtEnumInnerList {$$ = $1;}
+    | %empty { $$ = nullptr; }
+	;
+
+    /* LOW LEVEL STMT */
+lowLevelStmtIncomplete: varDeclaration {printf("P: stmt varDec\n"); $$ = StmtNode::createStmtVarDeclaration($1);}
     | exprThrow {printf("P: stmt throw\n");}
-    | classDeclaration {printf("P: stmt classDec\n");}
     | assignment {printf("P: stmt assignment\n"); $$ = $1;}
     | expr {printf("P: stmt expr\n"); $$ = StmtNode::createStmtExpr($1);}
-    | enumDeclaration {printf("P: stmt enum\n");}
     | ifElse {printf("P: stmt ifElse\n"); $$ = StmtNode::createStmtIfElse($1);}
     | whileLoop {printf("P: stmt whileLoop\n"); $$ = StmtNode::createStmtLoop($1);}
     | repeatWhileLoop {printf("P: stmt repeatWhileLoop\n"); $$ = StmtNode::createStmtLoop($1);}
     | forInLoop {printf("P: stmt forInLoop\n"); $$ = StmtNode::createStmtLoop($1);}
     | switchCase {printf("P: stmt switch\n");}
-    | structDeclaration {printf("P: stmt struct\n");}
     | tryStmt {printf("P: stmt try\n");}
     | doCatchStmt {printf("P: stmt doCatch\n");}
     | stmtOperators {printf("P: stmt operators\n"); $$ = $1;}
+    ;
+
+lowLevelStmt: lowLevelStmtIncomplete { $$ = $1; }
+	| lowLevelStmtIncomplete ';' { $$ = $1; $$->_hasSemicolon = true; }
 	;
 
-stmt: stmtIncomplete { $$ = $1; }
-    | stmtIncomplete ';' { $$ = $1; $$->_hasSemicolon = true; }
+lowLevelStmtList: lowLevelStmt {printf("P: lowLevelStmtList\n"); $$ = StmtListNode::createListNode($1);}
+	| lowLevelStmtList lowLevelStmt {
+        if (!($1->_vec.back()->_hasSemicolon) && @1.last_line == @2.first_line){
+            yyerror("Syntax error: two statements in one line must be separated with a ';'");
+        }
+        else {
+			printf("P: topLevelStmtList\n");
+            $$ = $1->appendNode($2);
+		}
+    }
+	;
+
+    /* FUNC STMT (with return) */
+funcStmtListE:  lowLevelStmtList returnStmt {
+        if (!($1->_vec.back()->_hasSemicolon) && @1.last_line == @2.first_line){
+            yyerror("Syntax error: two statements in one line must be separated with a ';'");
+        }
+        else {
+			printf("P: END funcStmtList lowLevelStmtList + RETURN\n");
+            $$ = $1->appendNode($2);
+		}
+    }
+    | lowLevelStmtList {printf("P: END funcStmtList lowLevelStmtList only\n"); $$ = $1;}
+    | returnStmt {printf("P: END funcStmtList RETURN only\n"); $$ = StmtListNode::createListNode($1);}
+    | %empty { $$ = nullptr; }
+	;
+
+    /* TOP LEVEL STMT */
+topLevelStmtIncomplete: funcDeclaration {printf("P: topstmt funcDec\n"); $$ = StmtNode::createStmtFuncDecl($1);}
+    | classDeclaration {printf("P: topstmt classDec\n");}
+    | enumDeclaration {printf("P: topstmt enum\n");}
+    | structDeclaration {printf("P: topstmt struct\n");}
+	| lowLevelStmtIncomplete {printf("P: topstmt toplevel\n");}
+    ;
+
+topLevelStmt: topLevelStmtIncomplete { $$ = $1; }
+	| topLevelStmtIncomplete ';' { $$ = $1; $$->_hasSemicolon = true; }
+	;
+
+topLevelStmtList: topLevelStmt {printf("P: topLevelStmtList start\n"); $$ = StmtListNode::createListNode($1);}
+	| topLevelStmtList topLevelStmt {
+        if (!($1->_vec.back()->_hasSemicolon) && @1.last_line == @2.first_line){
+            yyerror("Syntax error: two statements in one line must be separated with a ';'");
+        }
+        else {
+			printf("P: topLevelStmtList\n");
+            $$ = $1->appendNode($2);
+		}
+    }
+	;  
+
+topLevelStmtListE: topLevelStmtList {$$ = $1;}
+    | %empty {$$ =  nullptr;}
     ;
 
 returnStmt: return {printf("P: stmt return\n"); $$ = StmtNode::createStmtReturn($1);}
     | return ';' {printf("P: stmt return\n"); $$ = StmtNode::createStmtReturn($1); $$->_hasSemicolon = true;}
-    ;
-
-stmtList: stmtListIncomplete returnStmt {
-        if (!($1->_vec.back()->_hasSemicolon) && @1.last_line == @2.first_line){
-            yyerror("Syntax error: two statements in one line must be separated with a ';'");
-        }
-        else {
-			printf("P: END stmtList RETURN + stmtListIncomplete\n");
-            $$ = $1->appendNode($2);
-		}
-    }
-    | stmtListIncomplete {printf("P: END stmtList stmtListIncomplete only\n"); $$ = $1;}
-    | returnStmt {printf("P: END stmtList RETURN only\n"); $$ = StmtListNode::createListNode($1);}
-	;
-
-stmtListIncomplete: stmt {printf("P: stmtListIncomplete start\n"); $$ = StmtListNode::createListNode($1);}
-	| stmtListIncomplete stmt {
-        if (!($1->_vec.back()->_hasSemicolon) && @1.last_line == @2.first_line){
-            yyerror("Syntax error: two statements in one line must be separated with a ';'");
-        }
-        else {
-			printf("P: stmtListIncomplete\n");
-            $$ = $1->appendNode($2);
-		}
-    }
-	;
-
-stmtListE: %empty { $$ = nullptr; }
-    | stmtList { $$ = $1; }
     ;
 
 return: RETURN expr  {printf("P: return\n"); $$ = ReturnNode::createExprReturn($2);}
@@ -299,27 +416,27 @@ funcReturnTypeE: %empty { $$ = nullptr; }
     ;
 
     //TODO add where clause
-funcDecIncomplete: FUNC ID anyRoundBracket funcDeclArgListE ')' funcReturnTypeE '{' stmtListE '}' {
+funcDecIncomplete: FUNC ID anyRoundBracket funcDeclArgListE ')' funcReturnTypeE '{' funcStmtListE '}' {
     printf("P: func declIncomplete\n");
     $$ = FuncDeclNode::createRegular($2, $4, $8, $6, false);
     }
-    | FUNC ID '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' funcReturnTypeE '{' stmtListE '}' {
+    | FUNC ID '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' funcReturnTypeE '{' funcStmtListE '}' {
     printf("P: func declIncomplete generic\n");
     $$ = FuncDeclNode::createGeneric($2, $4, $7, $11, $9, false);
     }
-    | FUNC ID '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' funcReturnTypeE whereClause '{' stmtListE '}' {
+    | FUNC ID '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' funcReturnTypeE whereClause '{' funcStmtListE '}' {
     printf("P: func declIncomplete generic where\n");
     }
 
-    | FUNC ID anyRoundBracket funcDeclArgListE ')' THROWS funcReturnTypeE '{' stmtListE '}' {
+    | FUNC ID anyRoundBracket funcDeclArgListE ')' THROWS funcReturnTypeE '{' funcStmtListE '}' {
     printf("P: func declIncomplete throws\n");
     $$ = FuncDeclNode::createRegular($2, $4, $9, $7, true);
     }
-    | FUNC ID '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' THROWS funcReturnTypeE '{' stmtListE '}' {
+    | FUNC ID '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' THROWS funcReturnTypeE '{' funcStmtListE '}' {
     printf("P: func declIncomplete generic throws\n");
     $$ = FuncDeclNode::createGeneric($2, $4, $7, $12, $10, true);
     }
-    | FUNC ID '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' THROWS funcReturnTypeE whereClause '{' stmtListE '}' {
+    | FUNC ID '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' THROWS funcReturnTypeE whereClause '{' funcStmtListE '}' {
     printf("P: func declIncomplete generic where throws\n");
     }
     ;
@@ -362,7 +479,7 @@ overloadableOperators: BINARY_PLUS
     | OP_NIL_COALESCE
     ;
 
-funcOverloadOperatorIncomplete: FUNC overloadableOperators anyRoundBracket funcDeclArgListE ')' funcReturnTypeE '{' stmtListE '}' {printf("P: func overload Operator Incomplete\n");}
+funcOverloadOperatorIncomplete: FUNC overloadableOperators anyRoundBracket funcDeclArgListE ')' funcReturnTypeE '{' funcStmtListE '}' {printf("P: func overload Operator Incomplete\n");}
 	;
 
     //TODO add modifiers to funcDecl node
@@ -391,16 +508,16 @@ modifiersWordsList: modifiersWords {printf("P: modifiersWordsList\n");}
 	| modifiersWordsList modifiersWords {printf("P: modifiersWordsList\n");}
 	;
 
-constructorDeclaration: INIT anyRoundBracket funcDeclArgListE ')' '{' stmtListE '}' {printf("P: constructor declaration\n");}
-    | INIT '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' '{' stmtListE '}' {printf("P: constructor declaration generic\n");}
-    | INIT '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' whereClause '{' stmtListE '}' {printf("P: constructor declaration generic\n");}
+constructorDeclaration: INIT anyRoundBracket funcDeclArgListE ')' '{' funcStmtListE '}' {printf("P: constructor declaration\n");}
+    | INIT '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' '{' funcStmtListE '}' {printf("P: constructor declaration generic\n");}
+    | INIT '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' whereClause '{' funcStmtListE '}' {printf("P: constructor declaration generic\n");}
 
-    | INIT anyRoundBracket funcDeclArgListE ')' '{' stmtListE '}' THROWS {printf("P: constructor declaration\n");}
-    | INIT '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' THROWS '{' stmtListE '}' {printf("P: constructor declaration generic\n");}
-    | INIT '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' THROWS whereClause '{' stmtListE '}' {printf("P: constructor declaration generic\n");}
+    | INIT anyRoundBracket funcDeclArgListE ')' '{' funcStmtListE '}' THROWS {printf("P: constructor declaration\n");}
+    | INIT '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' THROWS '{' funcStmtListE '}' {printf("P: constructor declaration generic\n");}
+    | INIT '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' THROWS whereClause '{' funcStmtListE '}' {printf("P: constructor declaration generic\n");}
     ;
 
-destructorDeclaration: DEINIT '{' stmtListE '}' {printf("P: destructor declaration\n");}
+destructorDeclaration: DEINIT '{' funcStmtListE '}' {printf("P: destructor declaration\n");}
     ;
 
 funcCallArg: ID ':' expr {printf("P: funcCallArg\n"); $$ = FuncCallArgNode::createFromExprAndName($3, $1);}
@@ -416,20 +533,20 @@ genericIdList: ID {printf("P: genericIdList\n"); $$ = TypeForGenericListNode::cr
     | genericIdList ',' ID ':' ID  {printf("P: genericIdList\n"); $$ = $$->appendNode(TypeForGenericNode::createWithBaseClass($3, $5));}
     ;
 
-classDeclIncomplete: CLASS ID '{' stmtListE '}' {printf("P: classDeclIncomplete\n");}
-    | CLASS ID ':' ID '{' stmtListE '}' {printf("P: classDeclIncomplete\n");}
-    | CLASS ID '<' genericIdList '>' '{' stmtListE '}' {printf("P: classDeclIncomplete generic\n");}
-    | CLASS ID '<' genericIdList '>' whereClause '{' stmtListE '}' {printf("P: classDeclIncomplete generic\n");}
+classDeclIncomplete: CLASS ID '{' stmtClassInnerListE '}' {printf("P: classDeclIncomplete\n");}
+    | CLASS ID ':' ID '{' stmtClassInnerListE '}' {printf("P: classDeclIncomplete\n");}
+    | CLASS ID '<' genericIdList '>' '{' stmtClassInnerListE '}' {printf("P: classDeclIncomplete generic\n");}
+    | CLASS ID '<' genericIdList '>' whereClause '{' stmtClassInnerListE '}' {printf("P: classDeclIncomplete generic\n");}
     ;
 
 classDeclaration: modifiersWordsList classDeclIncomplete {printf("P: class declaration with prefix\n");}
     | classDeclIncomplete {printf("P: class declaration default\n");}
     ;
 
-structDeclIncomplete: STRUCT ID '{' stmtListE '}' {printf("P: structDeclIncomplete\n");}
-	| STRUCT ID ':' ID '{' stmtListE '}' {printf("P: structDeclIncomplete\n");}
-    | STRUCT ID '<' genericIdList '>' '{' stmtListE '}' {printf("P: structDeclIncomplete generic\n");}
-    | STRUCT ID '<' genericIdList '>' whereClause '{' stmtListE '}' {printf("P: structDeclIncomplete generic\n");}
+structDeclIncomplete: STRUCT ID '{' stmtStructInnerListE '}' {printf("P: structDeclIncomplete\n");}
+	| STRUCT ID ':' ID '{' stmtStructInnerListE '}' {printf("P: structDeclIncomplete\n");}
+    | STRUCT ID '<' genericIdList '>' '{' stmtStructInnerListE '}' {printf("P: structDeclIncomplete generic\n");}
+    | STRUCT ID '<' genericIdList '>' whereClause '{' stmtStructInnerListE '}' {printf("P: structDeclIncomplete generic\n");}
 	;
 
 structDeclaration: modifiersWordsList structDeclIncomplete {printf("P: struct declaration with prefix\n");}
@@ -542,31 +659,18 @@ enumIdList: enumId {printf("P: enum: enumIdList \n");}
 enumDefinition: CASE enumIdList {printf("P: enum: enumDefinition \n");}
     ;
 
-enumDefinitionList: enumDefinition {printf("P: enum: enumDefinitionList \n");}
-    | enumDefinitionList ';' enumDefinition  {printf("P: enum: enumDefinitionList \n");}
-    | enumDefinitionList enumDefinition  {
-        //TODO: add check for semicolon
-        if (@1.last_line == @2.first_line){
-            yyerror("Syntax error: two enum statements in one line must be separated with a ';'");
-        }
-        else {
-			printf("P: stmtList\n");
-		}
-    }
-    ;
-
-enumDeclarationIncomplete: ENUM ID '{' enumDefinitionList '}'  {printf("P: enumDeclaration\n");}
+enumDeclarationIncomplete: ENUM ID '{' stmtEnumInnerListE '}'  {printf("P: enumDeclaration\n");}
     ;
 
 enumDeclaration: modifiersWordsList enumDeclarationIncomplete {printf("P: enumDeclaration\n");}
     | enumDeclarationIncomplete {printf("P: enumDeclaration\n");}
 	;
 
-whileLoop: WHILE exprList '{' stmtList '}' {printf("P: whileLoop\n"); $$ = LoopNode::createWhileLoop($2, $4);}
+whileLoop: WHILE exprList '{' lowLevelStmtList '}' {printf("P: whileLoop\n"); $$ = LoopNode::createWhileLoop($2, $4);}
     | WHILE exprList '{' '}' {printf("P: whileLoop\n"); $$ = LoopNode::createWhileLoopNoBody($2);}
     ;
 
-repeatWhileLoop: REPEAT '{' stmtList '}' WHILE exprList {printf("P: repeatWhileLoop\n"); $$ = LoopNode::createRepeatWhileLoop($3, $6);}
+repeatWhileLoop: REPEAT '{' lowLevelStmtList '}' WHILE exprList {printf("P: repeatWhileLoop\n"); $$ = LoopNode::createRepeatWhileLoop($3, $6);}
     | REPEAT '{' '}' WHILE exprList {printf("P: repeatWhileLoop\n"); $$ = LoopNode::createRepeatWhileLoopNoBody($5);}
     ;
 
@@ -580,20 +684,20 @@ whereClause: WHERE exprList {printf("P: whereClause\n");}
     ;
 
     //TODO add where clause to loops
-forInLoop: FOR ID IN expr whereClause '{' stmtList '}' {printf("P: forInLoop\n"); }
-    | FOR ID IN expr '{' stmtList '}' {printf("P: forInLoop\n"); $$ = LoopNode::createForLoop($2, $4, $6);}
+forInLoop: FOR ID IN expr whereClause '{' lowLevelStmtList '}' {printf("P: forInLoop\n"); }
+    | FOR ID IN expr '{' lowLevelStmtList '}' {printf("P: forInLoop\n"); $$ = LoopNode::createForLoop($2, $4, $6);}
 
     | FOR ID IN expr whereClause '{' '}' {printf("P: forInLoop\n");}
     | FOR ID IN expr '{' '}' {printf("P: forInLoop\n"); $$ = LoopNode::createForLoopNoBody($2, $4);}
     ;
 
-ifElse: IF exprList '{' stmtList '}' {printf("P: ifElse\n"); $$ = IfElseNode::createSimple($2, $4, nullptr);}
-    | IF exprList '{' stmtList '}' ELSE '{' stmtList '}' {printf("P: ifElse with else\n"); $$ = IfElseNode::createSimple($2, $4, $8);}
-    | IF exprList '{' stmtList '}' ELSE ifElse {printf("P: ifElse else if\n"); $$ = IfElseNode::createComplex($2, $4, $7);}
+ifElse: IF exprList '{' lowLevelStmtList '}' {printf("P: ifElse\n"); $$ = IfElseNode::createSimple($2, $4, nullptr);}
+    | IF exprList '{' lowLevelStmtList '}' ELSE '{' lowLevelStmtList '}' {printf("P: ifElse with else\n"); $$ = IfElseNode::createSimple($2, $4, $8);}
+    | IF exprList '{' lowLevelStmtList '}' ELSE ifElse {printf("P: ifElse else if\n"); $$ = IfElseNode::createComplex($2, $4, $7);}
 
     | IF exprList '{' '}' {printf("P: ifElse\n"); $$ = IfElseNode::createSimple($2, nullptr, nullptr);}
-    | IF exprList '{' '}' ELSE '{' stmtList '}' {printf("P: ifElse with else\n"); $$ = IfElseNode::createSimple($2, nullptr, $7);}
-    | IF exprList '{' stmtList '}' ELSE '{' '}' {printf("P: ifElse with else\n"); $$ = IfElseNode::createSimple($2, $4, nullptr);}
+    | IF exprList '{' '}' ELSE '{' lowLevelStmtList '}' {printf("P: ifElse with else\n"); $$ = IfElseNode::createSimple($2, nullptr, $7);}
+    | IF exprList '{' lowLevelStmtList '}' ELSE '{' '}' {printf("P: ifElse with else\n"); $$ = IfElseNode::createSimple($2, $4, nullptr);}
     | IF exprList '{' '}' ELSE '{' '}' {printf("P: ifElse with else\n"); $$ = IfElseNode::createSimple($2, nullptr, nullptr);}
     | IF exprList '{' '}' ELSE ifElse {printf("P: ifElse else if\n"); $$ = IfElseNode::createComplex($2, nullptr, $6);}
     ;
@@ -603,7 +707,7 @@ switchCase: SWITCH expr '{'caseList defaultCase '}' {printf("P: switch\n");}
     | SWITCH expr '{'caseList'}' {printf("P: switch\n");}
 	;
 
-caseElement: CASE caseElementExpr ':' stmtList {printf("P: case\n");}
+caseElement: CASE caseElementExpr ':' lowLevelStmtList {printf("P: case\n");}
     ;
 
 caseElementExpr: exprList
@@ -616,7 +720,7 @@ caseList: caseElement {printf("P: caseList\n");}
 	| caseList caseElement {printf("P: caseList\n");}
 	;
 
-defaultCase: DEFAULT ':' stmtList {printf("P: defaultCase\n");}
+defaultCase: DEFAULT ':' lowLevelStmtList {printf("P: defaultCase\n");}
 	;
 
 tryStmt: TRY expr {printf("P: try\n");}
@@ -636,8 +740,8 @@ catchExprE: exprListE {printf("P: catchExpr\n");}
     | IS expr {printf("P: catchExpr\n");}
     ;
 
-doCatchStmt: DO '{' stmtList '}' {printf("P: do \n");}
-    | doCatchStmt CATCH catchExprE '{' stmtList '}' {printf("P: do catch\n");}
+doCatchStmt: DO '{' lowLevelStmtList '}' {printf("P: do \n");}
+    | doCatchStmt CATCH catchExprE '{' lowLevelStmtList '}' {printf("P: do catch\n");}
 	;
 
 stmtOperators: expr OP_MINUS_ASSIGN expr {
