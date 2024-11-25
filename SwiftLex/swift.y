@@ -236,10 +236,10 @@ type: TYPE_BOOL {$$ = TypeNode::createType(TypeType::BoolT);}
     ;
 
     /* CLASS STMT */
-stmtClassInnerIncomplete: funcDeclaration {printf("P: stmt class funcdecl\n"); $$ = StmtNode::createStmtFuncDecl($1);}
-    | varDeclaration {printf("P: stmt class varDec\n"); $$ = StmtNode::createStmtVarDeclaration($1);}
-    | constructorDeclaration {printf("P: stmt class constructor\n");}
-    | destructorDeclaration {printf("P: stmt class destructor\n");}
+stmtClassInnerIncomplete: funcDeclaration {printf("P: stmtClassInnerIncomplete funcdecl\n"); $$ = StmtNode::createStmtFuncDecl($1);}
+    | varDeclaration {printf("P: stmtClassInnerIncomplete varDec\n"); $$ = StmtNode::createStmtVarDeclaration($1);}
+    | constructorDeclaration {printf("P: stmtClassInnerIncomplete constructor\n");}
+    | destructorDeclaration {printf("P: stmtClassInnerIncomplete destructor\n");}
     ;
 
 stmtClassInner: stmtClassInnerIncomplete { $$ = $1; }
@@ -252,7 +252,7 @@ stmtClassInnerList: stmtClassInner {printf("P: stmtClassInnerList\n"); $$ = Stmt
             yyerror("Syntax error: two statements in one line must be separated with a ';'");
         }
         else {
-			printf("P: topLevelStmtList\n");
+			printf("P: stmtClassInnerList\n");
             $$ = $1->appendNode($2);
 		}
     }
@@ -263,7 +263,7 @@ stmtClassInnerListE: stmtClassInnerList { $$ = $1; }
     ;
    
     /* STRUCT STMT */
-stmtStructInnerIncomplete: varDeclaration {printf("P: stmt struct varDec\n"); $$ = StmtNode::createStmtVarDeclaration($1);}
+stmtStructInnerIncomplete: varDeclaration {printf("P: stmtStructInnerIncomplete varDec\n"); $$ = StmtNode::createStmtVarDeclaration($1);}
 	;
 
 stmtStructInner: stmtStructInnerIncomplete { $$ = $1; }
@@ -276,7 +276,7 @@ stmtStructInnerList: stmtStructInner {printf("P: stmtStructInnerList\n"); $$ = S
             yyerror("Syntax error: two statements in one line must be separated with a ';'");
         }
         else {
-			printf("P: topLevelStmtList\n");
+			printf("P: stmtStructInnerList\n");
             $$ = $1->appendNode($2);
 		}
     }
@@ -287,10 +287,11 @@ stmtStructInnerListE: stmtStructInnerList { $$ = $1; }
 	;
 
     /* ENUM STMT */
-stmtEnumInnerIncomplete: enumDefinition {printf("P: stmt enum enumDefinition\n");}
+stmtEnumInnerIncomplete: enumDefinition {printf("P: stmtEnumInnerIncomplete enumDefinition\n");}
 	;
 
-stmtEnumInner: stmtEnumInnerIncomplete ';' {printf("P: stmt enum\n");}
+stmtEnumInner: stmtEnumInnerIncomplete { $$ = $1; }
+    | stmtEnumInnerIncomplete ';' { $$ = $1; $$->_hasSemicolon = true; } 
 	;
 
 stmtEnumInnerList: stmtEnumInner {printf("P: stmtEnumInnerList\n"); $$ = StmtListNode::createListNode($1);}
@@ -299,7 +300,7 @@ stmtEnumInnerList: stmtEnumInner {printf("P: stmtEnumInnerList\n"); $$ = StmtLis
             yyerror("Syntax error: two statements in one line must be separated with a ';'");
         }
         else {
-			printf("P: topLevelStmtList\n");
+			printf("P: stmtEnumInnerList\n");
             $$ = $1->appendNode($2);
 		}
     }
@@ -310,18 +311,18 @@ stmtEnumInnerListE: stmtEnumInnerList {$$ = $1;}
 	;
 
     /* LOW LEVEL STMT */
-lowLevelStmtIncomplete: varDeclaration {printf("P: stmt varDec\n"); $$ = StmtNode::createStmtVarDeclaration($1);}
-    | exprThrow {printf("P: stmt throw\n");}
-    | assignment {printf("P: stmt assignment\n"); $$ = $1;}
-    | expr {printf("P: stmt expr\n"); $$ = StmtNode::createStmtExpr($1);}
-    | ifElse {printf("P: stmt ifElse\n"); $$ = StmtNode::createStmtIfElse($1);}
-    | whileLoop {printf("P: stmt whileLoop\n"); $$ = StmtNode::createStmtLoop($1);}
-    | repeatWhileLoop {printf("P: stmt repeatWhileLoop\n"); $$ = StmtNode::createStmtLoop($1);}
-    | forInLoop {printf("P: stmt forInLoop\n"); $$ = StmtNode::createStmtLoop($1);}
-    | switchCase {printf("P: stmt switch\n");}
-    | tryStmt {printf("P: stmt try\n");}
-    | doCatchStmt {printf("P: stmt doCatch\n");}
-    | stmtOperators {printf("P: stmt operators\n"); $$ = $1;}
+lowLevelStmtIncomplete: varDeclaration {printf("P: lowLevelStmtIncomplete varDec\n"); $$ = StmtNode::createStmtVarDeclaration($1);}
+    | exprThrow {printf("P: lowLevelStmtIncomplete throw\n");}
+    | assignment {printf("P: lowLevelStmtIncomplete assignment\n"); $$ = $1;}
+    | expr {printf("P: lowLevelStmtIncomplete expr\n"); $$ = StmtNode::createStmtExpr($1);}
+    | ifElse {printf("P: lowLevelStmtIncomplete ifElse\n"); $$ = StmtNode::createStmtIfElse($1);}
+    | whileLoop {printf("P: lowLevelStmtIncomplete whileLoop\n"); $$ = StmtNode::createStmtLoop($1);}
+    | repeatWhileLoop {printf("P: lowLevelStmtIncomplete repeatWhileLoop\n"); $$ = StmtNode::createStmtLoop($1);}
+    | forInLoop {printf("P: lowLevelStmtIncomplete forInLoop\n"); $$ = StmtNode::createStmtLoop($1);}
+    | switchCase {printf("P: lowLevelStmtIncomplete switch\n");}
+    | tryStmt {printf("P: lowLevelStmtIncomplete try\n");}
+    | doCatchStmt {printf("P: lowLevelStmtIncomplete doCatch\n");}
+    | stmtOperators {printf("P: lowLevelStmtIncomplete operators\n"); $$ = $1;}
     ;
 
 lowLevelStmt: lowLevelStmtIncomplete { $$ = $1; }
@@ -334,7 +335,7 @@ lowLevelStmtList: lowLevelStmt {printf("P: lowLevelStmtList\n"); $$ = StmtListNo
             yyerror("Syntax error: two statements in one line must be separated with a ';'");
         }
         else {
-			printf("P: topLevelStmtList\n");
+			printf("P: lowLevelStmtList\n");
             $$ = $1->appendNode($2);
 		}
     }
@@ -356,11 +357,11 @@ funcStmtListE:  lowLevelStmtList returnStmt {
 	;
 
     /* TOP LEVEL STMT */
-topLevelStmtIncomplete: funcDeclaration {printf("P: topstmt funcDec\n"); $$ = StmtNode::createStmtFuncDecl($1);}
-    | classDeclaration {printf("P: topstmt classDec\n");}
-    | enumDeclaration {printf("P: topstmt enum\n");}
-    | structDeclaration {printf("P: topstmt struct\n");}
-	| lowLevelStmtIncomplete {printf("P: topstmt toplevel\n");}
+topLevelStmtIncomplete: funcDeclaration {printf("P: topLevelStmtIncomplete funcDec\n"); $$ = StmtNode::createStmtFuncDecl($1);}
+    | classDeclaration {printf("P: topLevelStmtIncomplete classDec\n");}
+    | enumDeclaration {printf("P: topLevelStmtIncomplete enum\n");}
+    | structDeclaration {printf("P: topLevelStmtIncomplete struct\n");}
+	| lowLevelStmtIncomplete {printf("P: topLevelStmtIncomplete toplevel\n");}
     ;
 
 topLevelStmt: topLevelStmtIncomplete { $$ = $1; }
