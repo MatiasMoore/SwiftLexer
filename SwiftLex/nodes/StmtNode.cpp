@@ -5,6 +5,7 @@
 #include "LoopNode.h"
 #include "IfElseNode.h"
 #include "FuncDeclNode.h"
+#include "ThrowNode.h"
 
 StmtNode* StmtNode::createStmtExpr(ExprNode* expr)
 {
@@ -70,6 +71,15 @@ StmtNode* StmtNode::createStmtFuncDecl(FuncDeclNode* funcDecl)
 	return node;
 }
 
+StmtNode* StmtNode::createStmtThrow(ThrowNode* throwNode)
+{
+	auto node = new StmtNode();
+	node->_type = StmtType::Throw;
+	node->_throw = throwNode;
+	printf("N: stmt throw\n");
+	return node;
+}
+
 void StmtNode::generateDot(std::ofstream& file)
 {
 	switch (this->_type)
@@ -110,6 +120,11 @@ void StmtNode::generateDot(std::ofstream& file)
 		file << dotLabel(this->_id, "FuncDeclStmt");
 		file << dotConnection(this->_id, this->_funcDecl->_id);
 		this->_funcDecl->generateDot(file);
+		break;
+	case StmtType::Throw:
+		file << dotLabel(this->_id, "ThrowStmt");
+		file << dotConnection(this->_id, this->_throw->_id);
+		this->_throw->generateDot(file);
 		break;
 	default:
 		throw std::runtime_error("Unknown type!");

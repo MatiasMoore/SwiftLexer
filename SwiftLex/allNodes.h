@@ -11,3 +11,4 @@
 #include "nodes/FuncDeclArgNode.h"
 #include "nodes/TypeForGenericNode.h"
 #include "nodes/FuncDeclNode.h"
+#include "nodes/ThrowNode.h"

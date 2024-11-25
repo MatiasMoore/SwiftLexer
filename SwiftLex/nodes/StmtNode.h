@@ -9,6 +9,7 @@ class LoopNode;
 class IfElseNode;
 class VarDeclarationListNode;
 class FuncDeclNode;
+class ThrowNode;
 
 enum StmtType
 {
@@ -18,7 +19,8 @@ enum StmtType
 	Return,
 	Loop,
 	IfElse,
-	FuncDecl
+	FuncDecl,
+	Throw
 };
 
 class StmtNode : public Dottable
@@ -34,6 +36,8 @@ public:
 	ExprNode* _assignRight;
 
 	ReturnNode* _return;
+
+	ThrowNode* _throw;
 
 	LoopNode* _loop;
 
@@ -56,6 +60,8 @@ public:
 	static StmtNode* createStmtIfElse(IfElseNode* ifElse);
 
 	static StmtNode* createStmtFuncDecl(FuncDeclNode* funcDecl);
+
+	static StmtNode* createStmtThrow(ThrowNode* throwNode);
 
 	void generateDot(std::ofstream& file) override;
 };

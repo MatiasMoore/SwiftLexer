@@ -34,6 +34,7 @@
     class FuncDeclArgListNode* funcDeclArgListNode;
     class TypeForGenericListNode* typeForGenericListNode;
     class FuncDeclNode* funcDeclNode;
+    class ThrowNode* throwNode;
 }
 %locations
 
@@ -206,6 +207,9 @@ SUBSCRIPT_SQUARE_BRACKET FUNC_CALL_ROUND_BRACKET
 %type<funcDeclNode> funcDecIncomplete
 %type<funcDeclNode> funcDeclaration
 
+// Error handling
+%type<throwNode> exprThrow
+
 // Start
 %start program
 
@@ -312,7 +316,7 @@ stmtEnumInnerListE: stmtEnumInnerList {$$ = $1;}
 
     /* LOW LEVEL STMT */
 lowLevelStmtIncomplete: varDeclaration {printf("P: lowLevelStmtIncomplete varDec\n"); $$ = StmtNode::createStmtVarDeclaration($1);}
-    | exprThrow {printf("P: lowLevelStmtIncomplete throw\n");}
+    | exprThrow {printf("P: lowLevelStmtIncomplete throw\n"); $$ = StmtNode::createStmtThrow($1);}
     | assignment {printf("P: lowLevelStmtIncomplete assignment\n"); $$ = $1;}
     | expr {printf("P: lowLevelStmtIncomplete expr\n"); $$ = StmtNode::createStmtExpr($1);}
     | ifElse {printf("P: lowLevelStmtIncomplete ifElse\n"); $$ = StmtNode::createStmtIfElse($1);}
@@ -392,7 +396,7 @@ return: RETURN expr  {printf("P: return\n"); $$ = ReturnNode::createExprReturn($
     | RETURN {printf("P: return empty\n"); $$ = ReturnNode::createVoidReturn();}
     ;
 
-exprThrow: THROW expr {printf("P: throw\n");}
+exprThrow: THROW expr {printf("P: throw\n"); $$ = ThrowNode::createThrowExpr($2);}
 	;
 
 funcDeclArg: ID ':' type {printf("P: func arg with value\n"); $$ = FuncDeclArgNode::createLabeledArg($1, $3, nullptr);}
