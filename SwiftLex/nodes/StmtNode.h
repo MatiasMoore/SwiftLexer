@@ -13,6 +13,8 @@ class ThrowNode;
 class TryNode;
 class DoCatchNode;
 class SwitchNode;
+class EnumCaseNode;
+class EnumDeclarationNode;
 
 enum StmtType
 {
@@ -26,7 +28,9 @@ enum StmtType
 	Throw,
 	Try,
 	Do,
-	Switch
+	Switch,
+	EnumCase,
+	EnumDeclaration
 };
 
 class StmtNode : public Dottable
@@ -48,6 +52,9 @@ public:
 	DoCatchNode* _do;
 
 	SwitchNode* _switch;
+
+	EnumCaseNode* _enumCase;
+	EnumDeclarationNode* _enumDeclaration;
 
 	TryNode* _tryNode;
 
@@ -80,6 +87,10 @@ public:
 	static StmtNode* createStmtDo(DoCatchNode* doCatch);
 
 	static StmtNode* createStmtSwitch(SwitchNode* switchNode);
+
+	static StmtNode* createStmtEnumCase(EnumCaseNode* enumCase);
+
+	static StmtNode* createStmtEnumDeclaration(EnumDeclarationNode* enumCase);
 
 	void generateDot(std::ofstream& file) override;
 };

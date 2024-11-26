@@ -23,6 +23,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="nodes\AccessModifierNode.cpp" />
+    <ClCompile Include="nodes\EnumDeclarationNode.cpp" />
+    <ClCompile Include="nodes\EnumCaseNode.cpp" />
+    <ClCompile Include="nodes\IdListNode.cpp" />
     <ClCompile Include="nodes\CaseElementNode.cpp" />
     <ClCompile Include="nodes\CatchNode.cpp" />
     <ClCompile Include="nodes\DoCatchNode.cpp" />
@@ -55,6 +58,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="nodes\AccessModifierNode.h" />
+    <ClInclude Include="nodes\EnumDeclarationNode.h" />
+    <ClInclude Include="nodes\EnumCaseNode.h" />
+    <ClInclude Include="nodes\IdListNode.h" />
     <ClInclude Include="nodes\CaseElementNode.h" />
     <ClInclude Include="nodes\CatchNode.h" />
     <ClInclude Include="nodes\DoCatchNode.h" />

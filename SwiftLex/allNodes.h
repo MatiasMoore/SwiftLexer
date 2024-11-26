@@ -18,3 +18,7 @@
 #include "nodes/CaseElementNode.h"
 #include "nodes/SwitchNode.h"
 #include "nodes/AccessModifierNode.h"
+#include "nodes/IdListNode.h"
+#include "nodes/EnumCaseNode.h"
+#include "nodes/EnumDeclarationNode.h"
+
