@@ -9,6 +9,8 @@
 #include "TryNode.h"
 #include "DoCatchNode.h"
 #include "SwitchNode.h"
+#include "EnumCaseNode.h"
+#include "EnumDeclarationNode.h"
 
 StmtNode* StmtNode::createStmtExpr(ExprNode* expr)
 {
@@ -110,6 +112,24 @@ StmtNode* StmtNode::createStmtSwitch(SwitchNode* switchNode)
 	return node;
 }
 
+StmtNode* StmtNode::createStmtEnumCase(EnumCaseNode* enumCase)
+{
+	auto node = new StmtNode();
+	node->_type = StmtType::EnumCase;
+	node->_enumCase = enumCase;
+	printf("N: stmt enumCase\n");
+	return node;
+}
+
+StmtNode* StmtNode::createStmtEnumDeclaration(EnumDeclarationNode* enumDeclaration)
+{
+	auto node = new StmtNode();
+	node->_type = StmtType::EnumDeclaration;
+	node->_enumDeclaration = enumDeclaration;
+	printf("N: stmt enumDeclaration\n");
+	return node;
+}
+
 void StmtNode::generateDot(std::ofstream& file)
 {
 	switch (this->_type)
@@ -170,6 +190,16 @@ void StmtNode::generateDot(std::ofstream& file)
 		file << dotLabel(this->_id, "SwitchStmt");
 		file << dotConnection(this->_id, this->_switch->_id);
 		this->_switch->generateDot(file);
+		break;
+	case StmtType::EnumCase:
+		file << dotLabel(this->_id, "EnumCaseStmt");
+		file << dotConnection(this->_id, this->_enumCase->_id);
+		this->_enumCase->generateDot(file);
+		break;
+	case StmtType::EnumDeclaration:
+		file << dotLabel(this->_id, "EnumDeclarationStmt");
+		file << dotConnection(this->_id, this->_enumDeclaration->_id);
+		this->_enumDeclaration->generateDot(file);
 		break;
 	default:
 		throw std::runtime_error("Unknown type!");

@@ -41,6 +41,10 @@
     class CaseElementNode* caseElementNode;
     class CaseElementListNode* caseElementListNode;
     class SwitchNode* switchNode;
+    class IdNode* idNode;
+    class IdListNode* idListNode;
+    class EnumCaseNode* enumCaseNode;
+    class EnumDeclarationNode* enumDeclarationNode;
 }
 %locations
 
@@ -224,6 +228,12 @@ SUBSCRIPT_SQUARE_BRACKET FUNC_CALL_ROUND_BRACKET
 %type<caseElementNode> defaultCase
 %type<switchNode> switchCase
 
+//Enum
+%type<idListNode> enumIdList
+%type<enumCaseNode> enumCase
+%type<enumDeclarationNode> enumDeclarationIncomplete
+%type<enumDeclarationNode> enumDeclaration
+
 // Start
 %start program
 
@@ -305,7 +315,7 @@ stmtStructInnerListE: stmtStructInnerList { $$ = $1; }
 	;
 
     /* ENUM STMT */
-stmtEnumInnerIncomplete: enumDefinition {printf("P: stmtEnumInnerIncomplete enumDefinition\n");}
+stmtEnumInnerIncomplete: enumCase {printf("P: stmtEnumInnerIncomplete enumCase\n"); $$ = StmtNode::createStmtEnumCase($1);}
 	;
 
 stmtEnumInner: stmtEnumInnerIncomplete { $$ = $1; }
@@ -377,7 +387,7 @@ funcStmtListE:  lowLevelStmtList returnStmt {
     /* TOP LEVEL STMT */
 topLevelStmtIncomplete: funcDeclaration {printf("P: topLevelStmtIncomplete funcDec\n"); $$ = StmtNode::createStmtFuncDecl($1);}
     | classDeclaration {printf("P: topLevelStmtIncomplete classDec\n");}
-    | enumDeclaration {printf("P: topLevelStmtIncomplete enum\n");}
+    | enumDeclaration {printf("P: topLevelStmtIncomplete enum\n"); $$ = StmtNode::createStmtEnumDeclaration($1);}
     | structDeclaration {printf("P: topLevelStmtIncomplete struct\n");}
 	| lowLevelStmtIncomplete {printf("P: topLevelStmtIncomplete toplevel\n"); $$ = $1;}
     ;
@@ -667,22 +677,18 @@ typeList: type {printf("P: typeList \n");}
     | typeList ',' type {printf("P: typeList \n");}
     ;
 
-enumId: ID anyRoundBracket typeList ')' {printf("P: enum: enumId \n");}
-    | ID {printf("P: enum: enumId \n");}
+enumIdList: ID {printf("P: enum: enumIdList \n"); $$ = IdListNode::createListNode(IdNode::create($1));}
+    | enumIdList ',' ID {printf("P: enum: enumIdList \n"); $$ = $1->appendNode(IdNode::create($3));}
     ;
 
-enumIdList: enumId {printf("P: enum: enumIdList \n");}
-    | enumIdList ',' enumId {printf("P: enum: enumIdList \n");}
+enumCase: CASE enumIdList {printf("P: enum: enumCase \n"); $$ = EnumCaseNode::createEnumCaseNode($2);}
     ;
 
-enumDefinition: CASE enumIdList {printf("P: enum: enumDefinition \n");}
+enumDeclarationIncomplete: ENUM ID '{' stmtEnumInnerListE '}'  {printf("P: enumDeclaration\n"); $$ = EnumDeclarationNode::createEnumDeclarationNode($2, $4);}
     ;
 
-enumDeclarationIncomplete: ENUM ID '{' stmtEnumInnerListE '}'  {printf("P: enumDeclaration\n");}
-    ;
-
-enumDeclaration: modifiersWordsList enumDeclarationIncomplete {printf("P: enumDeclaration\n");}
-    | enumDeclarationIncomplete {printf("P: enumDeclaration\n");}
+enumDeclaration: modifiersWordsList enumDeclarationIncomplete {printf("P: enumDeclaration\n"); $$ = $2;}
+    | enumDeclarationIncomplete {printf("P: enumDeclaration\n"); $$ = $1;}
 	;
 
 whileLoop: WHILE exprList '{' lowLevelStmtList '}' {printf("P: whileLoop\n"); $$ = LoopNode::createWhileLoop($2, $4);}
