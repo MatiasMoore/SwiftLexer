@@ -27,8 +27,8 @@ void CaseElementNode::generateDot(std::ofstream& file)
     {
         case CaseElementType::ExprList:
             file << dotLabel(this->_id, "CaseExprList");
-            file << dotConnectionWithLabel(this->_id, this->_exprList->_id, "exprList");
-            file << dotConnectionWithLabel(this->_id, this->_stmtList->_id, "stmtList");
+            file << dotConnectionWithLabel(this->_id, this->_exprList->_id, "expected value");
+            file << dotConnectionWithLabel(this->_id, this->_stmtList->_id, "body");
             
             this->_exprList->generateDot(file);
             this->_stmtList->generateDot(file);
@@ -36,7 +36,7 @@ void CaseElementNode::generateDot(std::ofstream& file)
 		
         case CaseElementType::Default:
 			file << dotLabel(this->_id, "CaseDefault");
-			file << dotConnectionWithLabel(this->_id, this->_stmtList->_id, "stmtList");
+			file << dotConnectionWithLabel(this->_id, this->_stmtList->_id, "body");
 			
 			this->_stmtList->generateDot(file);
             break;
