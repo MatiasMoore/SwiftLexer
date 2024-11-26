@@ -11,6 +11,7 @@
 #include "SwitchNode.h"
 #include "EnumCaseNode.h"
 #include "EnumDeclarationNode.h"
+#include "StructDeclarationNode.h"
 
 StmtNode* StmtNode::createStmtExpr(ExprNode* expr)
 {
@@ -130,6 +131,15 @@ StmtNode* StmtNode::createStmtEnumDeclaration(EnumDeclarationNode* enumDeclarati
 	return node;
 }
 
+StmtNode* StmtNode::createStmtStructDeclaration(StructDeclarationNode* structDeclaration)
+{
+	auto node = new StmtNode();
+	node->_type = StmtType::StructDeclaration;
+	node->_structDeclaration = structDeclaration;
+	printf("N: stmt structDeclaration\n");
+	return node;
+}
+
 void StmtNode::generateDot(std::ofstream& file)
 {
 	switch (this->_type)
@@ -200,6 +210,11 @@ void StmtNode::generateDot(std::ofstream& file)
 		file << dotLabel(this->_id, "EnumDeclarationStmt");
 		file << dotConnection(this->_id, this->_enumDeclaration->_id);
 		this->_enumDeclaration->generateDot(file);
+		break;
+	case StmtType::StructDeclaration:
+		file << dotLabel(this->_id, "StructDeclarationStmt");
+		file << dotConnection(this->_id, this->_structDeclaration->_id);
+		this->_structDeclaration->generateDot(file);
 		break;
 	default:
 		throw std::runtime_error("Unknown type!");

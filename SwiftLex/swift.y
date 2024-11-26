@@ -47,6 +47,7 @@
     class IdListNode* idListNode;
     class EnumCaseNode* enumCaseNode;
     class EnumDeclarationNode* enumDeclarationNode;
+    class StructDeclarationNode* structDeclarationNode;
 }
 %locations
 
@@ -240,6 +241,10 @@ SUBSCRIPT_SQUARE_BRACKET FUNC_CALL_ROUND_BRACKET
 %type<enumDeclarationNode> enumDeclarationIncomplete
 %type<enumDeclarationNode> enumDeclaration
 
+// Struct
+%type<structDeclarationNode> structDeclIncomplete
+%type<structDeclarationNode> structDeclaration
+
 // Start
 %start program
 
@@ -394,7 +399,7 @@ funcStmtListE:  lowLevelStmtList returnStmt {
 topLevelStmtIncomplete: funcDeclaration {printf("P: topLevelStmtIncomplete funcDec\n"); $$ = StmtNode::createStmtFuncDecl($1);}
     | classDeclaration {printf("P: topLevelStmtIncomplete classDec\n");}
     | enumDeclaration {printf("P: topLevelStmtIncomplete enum\n"); $$ = StmtNode::createStmtEnumDeclaration($1);}
-    | structDeclaration {printf("P: topLevelStmtIncomplete struct\n");}
+    | structDeclaration {printf("P: topLevelStmtIncomplete struct\n"); $$ = StmtNode::createStmtStructDeclaration($1);}
 	| lowLevelStmtIncomplete {printf("P: topLevelStmtIncomplete toplevel\n"); $$ = $1;}
     ;
 
@@ -578,14 +583,14 @@ classDeclaration: modifiersWordsList classDeclIncomplete {printf("P: class decla
     | classDeclIncomplete {printf("P: class declaration default\n");}
     ;
 
-structDeclIncomplete: STRUCT ID '{' stmtStructInnerListE '}' {printf("P: structDeclIncomplete\n");}
-	| STRUCT ID ':' ID '{' stmtStructInnerListE '}' {printf("P: structDeclIncomplete\n");}
-    | STRUCT ID '<' genericIdList '>' '{' stmtStructInnerListE '}' {printf("P: structDeclIncomplete generic\n");}
-    | STRUCT ID '<' genericIdList '>' whereClause '{' stmtStructInnerListE '}' {printf("P: structDeclIncomplete generic\n");}
+structDeclIncomplete: STRUCT ID '{' stmtStructInnerListE '}' {printf("P: structDeclIncomplete\n"); $$ = StructDeclarationNode::createRegular($2, $4);}
+	| STRUCT ID ':' ID '{' stmtStructInnerListE '}' {printf("P: structDeclIncomplete\n"); $$ = StructDeclarationNode::createRegular($2, $6);}
+    | STRUCT ID '<' genericIdList '>' '{' stmtStructInnerListE '}' {printf("P: structDeclIncomplete generic\n");  $$ = StructDeclarationNode::createGeneric($2, $4, $7);}
+    | STRUCT ID '<' genericIdList '>' whereClause '{' stmtStructInnerListE '}' {printf("P: structDeclIncomplete generic\n"); $$ = StructDeclarationNode::createGeneric($2, $4, $8);}
 	;
 
-structDeclaration: modifiersWordsList structDeclIncomplete {printf("P: struct declaration with prefix\n");}
-	| structDeclIncomplete {printf("P: struct declaration default\n");}
+structDeclaration: modifiersWordsList structDeclIncomplete {printf("P: struct declaration with prefix\n"); $$ = $2->addModifiers($1);}
+	| structDeclIncomplete {printf("P: struct declaration default\n"); $$ = $1;}
 	;
 
 exprList: expr {printf("P: exprList\n"); $$ = ExprListNode::createListNode($1);}
