@@ -370,7 +370,7 @@ topLevelStmtIncomplete: funcDeclaration {printf("P: topLevelStmtIncomplete funcD
     | classDeclaration {printf("P: topLevelStmtIncomplete classDec\n");}
     | enumDeclaration {printf("P: topLevelStmtIncomplete enum\n");}
     | structDeclaration {printf("P: topLevelStmtIncomplete struct\n");}
-	| lowLevelStmtIncomplete {printf("P: topLevelStmtIncomplete toplevel\n");}
+	| lowLevelStmtIncomplete {printf("P: topLevelStmtIncomplete toplevel\n"); $$ = $1;}
     ;
 
 topLevelStmt: topLevelStmtIncomplete { $$ = $1; }
