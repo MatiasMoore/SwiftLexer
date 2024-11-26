@@ -50,6 +50,7 @@
     class StructDeclarationNode* structDeclarationNode;
     class ConstructorDeclNode* constructorDeclNode;
     class DestructorDeclNode* destructorDeclNode;
+    class ClassDeclNode* classDeclNode;
 }
 %locations
 
@@ -252,6 +253,8 @@ SUBSCRIPT_SQUARE_BRACKET FUNC_CALL_ROUND_BRACKET
 %type<constructorDeclNode> constructorDeclIncomplete
 %type<constructorDeclNode> constructorDeclaration
 %type<destructorDeclNode> destructorDeclaration
+%type<classDeclNode> classDeclIncomplete
+%type<classDeclNode> classDeclaration
 
 // Start
 %start program
@@ -584,14 +587,15 @@ genericIdList: ID {printf("P: genericIdList\n"); $$ = TypeForGenericListNode::cr
     | genericIdList ',' ID ':' ID  {printf("P: genericIdList\n"); $$ = $$->appendNode(TypeForGenericNode::createWithBaseClass($3, $5));}
     ;
 
-classDeclIncomplete: CLASS ID '{' stmtClassInnerListE '}' {printf("P: classDeclIncomplete\n");}
-    | CLASS ID ':' ID '{' stmtClassInnerListE '}' {printf("P: classDeclIncomplete\n");}
-    | CLASS ID '<' genericIdList '>' '{' stmtClassInnerListE '}' {printf("P: classDeclIncomplete generic\n");}
+classDeclIncomplete: CLASS ID '{' stmtClassInnerListE '}' {printf("P: classDeclIncomplete\n"); $$ = ClassDeclNode::createClass($2, $4, nullptr);}
+    | CLASS ID ':' ID '{' stmtClassInnerListE '}' {printf("P: classDeclIncomplete\n"); $$ = ClassDeclNode::createClassWithBaseClass($2, $6, nullptr, $4);}
+    | CLASS ID '<' genericIdList '>' '{' stmtClassInnerListE '}' {printf("P: classDeclIncomplete generic\n"); $$ = ClassDeclNode::createClass($2, $7, $4);}
+    | CLASS ID '<' genericIdList '>' ':' ID '{' stmtClassInnerListE '}' {printf("P: classDeclIncomplete generic\n"); $$ = ClassDeclNode::createClassWithBaseClass($2, $9, $4, $7);}
     | CLASS ID '<' genericIdList '>' whereClause '{' stmtClassInnerListE '}' {printf("P: classDeclIncomplete generic\n");}
     ;
 
-classDeclaration: modifiersWordsList classDeclIncomplete {printf("P: class declaration with prefix\n");}
-    | classDeclIncomplete {printf("P: class declaration default\n");}
+classDeclaration: modifiersWordsList classDeclIncomplete {printf("P: class declaration with prefix\n"); $$ = $2; $$ = $$->addModifiers($1);}
+    | classDeclIncomplete {printf("P: class declaration default\n"); $$ = $1;}
     ;
 
 structDeclIncomplete: STRUCT ID '{' stmtStructInnerListE '}' {printf("P: structDeclIncomplete\n"); $$ = StructDeclarationNode::createRegular($2, $4);}
