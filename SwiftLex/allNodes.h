@@ -13,3 +13,5 @@
 #include "nodes/FuncDeclNode.h"
 #include "nodes/ThrowNode.h"
 #include "nodes/TryNode.h"
+#include "nodes/DoCatchNode.h"
+#include "nodes/CatchNode.h"

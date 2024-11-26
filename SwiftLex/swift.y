@@ -36,6 +36,8 @@
     class FuncDeclNode* funcDeclNode;
     class ThrowNode* throwNode;
     class TryNode* tryNode;
+    class DoCatchNode* doCatchNode;
+    class CatchNode* catchNode;
 }
 %locations
 
@@ -211,6 +213,7 @@ SUBSCRIPT_SQUARE_BRACKET FUNC_CALL_ROUND_BRACKET
 // Error handling
 %type<throwNode> exprThrow
 %type<tryNode> tryStmt
+%type<doCatchNode> doCatchStmt
 
 // Start
 %start program
@@ -327,7 +330,7 @@ lowLevelStmtIncomplete: varDeclaration {printf("P: lowLevelStmtIncomplete varDec
     | forInLoop {printf("P: lowLevelStmtIncomplete forInLoop\n"); $$ = StmtNode::createStmtLoop($1);}
     | switchCase {printf("P: lowLevelStmtIncomplete switch\n");}
     | tryStmt {printf("P: lowLevelStmtIncomplete try\n"); $$ = StmtNode::createStmtTry($1);}
-    | doCatchStmt {printf("P: lowLevelStmtIncomplete doCatch\n");}
+    | doCatchStmt {printf("P: lowLevelStmtIncomplete doCatch\n"); $$ = StmtNode::createStmtDo($1);}
     | stmtOperators {printf("P: lowLevelStmtIncomplete operators\n"); $$ = $1;}
     ;
 
@@ -733,22 +736,9 @@ defaultCase: DEFAULT ':' lowLevelStmtList {printf("P: defaultCase\n");}
 tryStmt: TRY expr {printf("P: try\n"); $$ = TryNode::create($2);}
 	;
 
-varDeclCatchIncomplete:ID {printf("P: varDeclCatchIncomplete\n");}
-	| ID AS type{printf("P: varDeclCatchIncomplete\n");}
-	;
-
-varDeclCatch: VAR varDeclCatchIncomplete {printf("P: varDecl\n");}
-    | LET varDeclCatchIncomplete {printf("P: varDeclCatch\n");}
-	;
-
-catchExprE: exprListE {printf("P: catchExpr\n");}
-    | DEFAULT {printf("P: catchExpr\n");}
-	| varDeclCatch {printf("P: catchExpr\n");}
-    | IS expr {printf("P: catchExpr\n");}
-    ;
-
-doCatchStmt: DO '{' lowLevelStmtList '}' {printf("P: do \n");}
-    | doCatchStmt CATCH catchExprE '{' lowLevelStmtList '}' {printf("P: do catch\n");}
+doCatchStmt: DO '{' lowLevelStmtList '}' {printf("P: do \n"); $$ = DoCatchNode::createOnlyDoNode($3);}
+    | doCatchStmt CATCH expr '{' lowLevelStmtList '}' {printf("P: do catch expr\n"); auto catchNode = CatchNode::createCatchExprNode($3, $5); $$ = $1->addCatchNode(catchNode);}
+    | doCatchStmt CATCH '{' lowLevelStmtList '}' {printf("P: do catch\n"); auto catchNode = CatchNode::createCatchNode($4); $$ = $1->addCatchNode(catchNode);}
 	;
 
 stmtOperators: expr OP_MINUS_ASSIGN expr {

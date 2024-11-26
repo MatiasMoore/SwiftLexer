@@ -7,6 +7,7 @@
 #include "FuncDeclNode.h"
 #include "ThrowNode.h"
 #include "TryNode.h"
+#include "DoCatchNode.h"
 
 StmtNode* StmtNode::createStmtExpr(ExprNode* expr)
 {
@@ -90,6 +91,15 @@ StmtNode* StmtNode::createStmtTry(TryNode* tryNode)
 	return node;
 }
 
+StmtNode* StmtNode::createStmtDo(DoCatchNode* doCatch)
+{
+	auto node = new StmtNode();
+	node->_type = StmtType::Do;
+	node->_do = doCatch;
+	printf("N: stmt doCatch\n");
+	return node;
+}
+
 void StmtNode::generateDot(std::ofstream& file)
 {
 	switch (this->_type)
@@ -140,6 +150,11 @@ void StmtNode::generateDot(std::ofstream& file)
 		file << dotLabel(this->_id, "TryStmt");
 		file << dotConnection(this->_id, this->_tryNode->_id);
 		this->_tryNode->generateDot(file);
+		break;
+	case StmtType::Do:
+		file << dotLabel(this->_id, "DoStmt");
+		file << dotConnection(this->_id, this->_do->_id);
+		this->_do->generateDot(file);
 		break;
 	default:
 		throw std::runtime_error("Unknown type!");

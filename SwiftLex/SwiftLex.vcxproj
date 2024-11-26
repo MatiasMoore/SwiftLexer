@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -22,6 +22,8 @@
     <Flex Include="swift.l" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="nodes\CatchNode.cpp" />
+    <ClCompile Include="nodes\DoCatchNode.cpp" />
     <ClCompile Include="nodes\FuncDeclNode.cpp" />
     <ClCompile Include="nodes\FuncDeclArgNode.cpp" />
     <ClCompile Include="nodes\IfElseNode.cpp" />
@@ -49,6 +51,8 @@
     <Bison Include="swift.y" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="nodes\CatchNode.h" />
+    <ClInclude Include="nodes\DoCatchNode.h" />
     <ClInclude Include="nodes\FuncDeclNode.h" />
     <ClInclude Include="nodes\FuncDeclArgNode.h" />
     <ClInclude Include="nodes\IfElseNode.h" />

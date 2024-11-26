@@ -11,6 +11,7 @@ class VarDeclarationListNode;
 class FuncDeclNode;
 class ThrowNode;
 class TryNode;
+class DoCatchNode;
 
 enum StmtType
 {
@@ -22,7 +23,8 @@ enum StmtType
 	IfElse,
 	FuncDecl,
 	Throw,
-	Try
+	Try,
+	Do
 };
 
 class StmtNode : public Dottable
@@ -40,6 +42,8 @@ public:
 	ReturnNode* _return;
 
 	ThrowNode* _throw;
+
+	DoCatchNode* _do;
 
 	TryNode* _tryNode;
 
@@ -68,6 +72,8 @@ public:
 	static StmtNode* createStmtThrow(ThrowNode* throwNode);
 
 	static StmtNode* createStmtTry(TryNode* tryNode);
+
+	static StmtNode* createStmtDo(DoCatchNode* doCatch);
 
 	void generateDot(std::ofstream& file) override;
 };
