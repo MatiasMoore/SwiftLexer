@@ -698,7 +698,7 @@ enumCase: CASE enumIdList {printf("P: enum: enumCase \n"); $$ = EnumCaseNode::cr
 enumDeclarationIncomplete: ENUM ID '{' stmtEnumInnerListE '}'  {printf("P: enumDeclaration\n"); $$ = EnumDeclarationNode::createEnumDeclarationNode($2, $4);}
     ;
 
-enumDeclaration: modifiersWordsList enumDeclarationIncomplete {printf("P: enumDeclaration\n"); $$ = $2;}
+enumDeclaration: modifiersWordsList enumDeclarationIncomplete {printf("P: enumDeclaration\n"); $$ = $2->addModifiers($1);}
     | enumDeclarationIncomplete {printf("P: enumDeclaration\n"); $$ = $1;}
 	;
 
