@@ -41,6 +41,8 @@
     class CaseElementNode* caseElementNode;
     class CaseElementListNode* caseElementListNode;
     class SwitchNode* switchNode;
+    class AccessModifierNode* accessModifierNode;
+    class AccessModifierListNode* accessModifierListNode;
 }
 %locations
 
@@ -223,6 +225,10 @@ SUBSCRIPT_SQUARE_BRACKET FUNC_CALL_ROUND_BRACKET
 %type<caseElementListNode> caseList
 %type<caseElementNode> defaultCase
 %type<switchNode> switchCase
+
+// Access modifiers
+%type<accessModifierNode> modifiersWords;
+%type<accessModifierListNode> modifiersWordsList;
 
 // Start
 %start program
@@ -503,7 +509,7 @@ funcOverloadOperatorIncomplete: FUNC overloadableOperators anyRoundBracket funcD
 
     //TODO add modifiers to funcDecl node
     //TODO add operator overloading
-funcDeclaration: modifiersWordsList funcDecIncomplete {printf("P: func declaration prefix\n"); $$ = $2;}
+funcDeclaration: modifiersWordsList funcDecIncomplete {printf("P: func declaration prefix\n"); $$ = $2; $$ = $$->addModifiers($1);}
     | funcDecIncomplete {printf("P: func declaration default\n"); $$ = $1;}
     
     // operator overloading
@@ -511,20 +517,20 @@ funcDeclaration: modifiersWordsList funcDecIncomplete {printf("P: func declarati
     | modifiersWordsList funcOverloadOperatorIncomplete {printf("P: func overload Operator with prefix\n");}
     ;
 
-modifiersWords: STATIC 
-	| FINAL 
-	| OVERRIDE 
-	| OPEN
-    | PUBLIC
-    | INTERNAL
-    | FILEPRIVATE
-    | PRIVATE
-    | PREFIX
-	| POSTFIX
+modifiersWords: STATIC { $$ = AccessModifierNode::createModifier(AccessModifierType::Static);}
+	| FINAL { $$ = AccessModifierNode::createModifier(AccessModifierType::Final);}
+	| OVERRIDE { $$ = AccessModifierNode::createModifier(AccessModifierType::Override);}
+	| OPEN { $$ = AccessModifierNode::createModifier(AccessModifierType::Open);}
+    | PUBLIC { $$ = AccessModifierNode::createModifier(AccessModifierType::Public);}
+    | INTERNAL { $$ = AccessModifierNode::createModifier(AccessModifierType::Internal);}
+    | FILEPRIVATE { $$ = AccessModifierNode::createModifier(AccessModifierType::Fileprivate);}
+    | PRIVATE { $$ = AccessModifierNode::createModifier(AccessModifierType::Private);}
+    | PREFIX { $$ = AccessModifierNode::createModifier(AccessModifierType::Prefix);}
+	| POSTFIX { $$ = AccessModifierNode::createModifier(AccessModifierType::Postfix);}
 	;
 
-modifiersWordsList: modifiersWords {printf("P: modifiersWordsList\n");}
-	| modifiersWordsList modifiersWords {printf("P: modifiersWordsList\n");}
+modifiersWordsList: modifiersWords {printf("P: modifiersWordsList\n"); $$ = AccessModifierListNode::createListNode($1);}
+	| modifiersWordsList modifiersWords {printf("P: modifiersWordsList\n"); $$ = $1->appendNode($2);}
 	;
 
 constructorDeclaration: INIT anyRoundBracket funcDeclArgListE ')' '{' funcStmtListE '}' {printf("P: constructor declaration\n");}
@@ -659,7 +665,7 @@ varDeclIncommplete: VAR varVarList {printf("P: varDeclIncommplete\n"); $$ = $2;}
     | LET varVarList {printf("P: varDeclIncommplete\n"); $$ = $2;}
     ;
 
-varDeclaration: modifiersWordsList varDeclIncommplete {printf("P: variable declaration with prefix\n"); $$ = $2;}
+varDeclaration: modifiersWordsList varDeclIncommplete {printf("P: variable declaration with prefix\n"); $$ = $2; $$ = $$->addModifiers($1);}
     | varDeclIncommplete {printf("P: variable declaration default\n"); $$ = $1;}
     ;
 

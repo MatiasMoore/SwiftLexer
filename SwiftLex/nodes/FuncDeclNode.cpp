@@ -3,12 +3,14 @@
 #include "FuncDeclArgNode.h"
 #include "TypeForGenericNode.h"
 #include "TypeNode.h"
+#include "AccessModifierNode.h"
 
 FuncDeclNode* FuncDeclNode::createRegular(std::string idName, FuncDeclArgListNode* argList, StmtListNode* body, TypeNode* returnType, bool throwsException)
 {
 	auto node = new FuncDeclNode();
 	node->_type = FuncDeclType::notGeneric;
 	node->_idName = idName;
+	node->_hasModifiers = false;
 
 	if (argList == nullptr)
 	{
@@ -51,6 +53,7 @@ FuncDeclNode* FuncDeclNode::createGeneric(std::string idName, TypeForGenericList
 	node->_type = FuncDeclType::generic;
 	node->_idName = idName;
 	node->_typesForGenericList = typesForGenericList;
+	node->_hasModifiers = false;
 
 	if (argList == nullptr)
 	{
@@ -87,8 +90,21 @@ FuncDeclNode* FuncDeclNode::createGeneric(std::string idName, TypeForGenericList
 	return node;
 }
 
+FuncDeclNode* FuncDeclNode::addModifiers(AccessModifierListNode* modifiers)
+{
+	this->_hasModifiers = true;
+	this->_modifiers = modifiers;
+	return this;
+}
+
 void FuncDeclNode::generateDot(std::ofstream& file)
 {
+	if (this->_hasModifiers)
+	{
+		file << dotConnectionWithLabel(this->_id, this->_modifiers->_id, "modifiers");
+		this->_modifiers->generateDot(file);
+	}
+
 	std::string extraInfo;
 	if (!this->_hasArgs)
 		extraInfo += "\nno args";

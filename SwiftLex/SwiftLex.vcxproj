@@ -22,6 +22,7 @@
     <Flex Include="swift.l" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="nodes\AccessModifierNode.cpp" />
     <ClCompile Include="nodes\CaseElementNode.cpp" />
     <ClCompile Include="nodes\CatchNode.cpp" />
     <ClCompile Include="nodes\DoCatchNode.cpp" />
@@ -53,6 +54,7 @@
     <Bison Include="swift.y" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="nodes\AccessModifierNode.h" />
     <ClInclude Include="nodes\CaseElementNode.h" />
     <ClInclude Include="nodes\CatchNode.h" />
     <ClInclude Include="nodes\DoCatchNode.h" />

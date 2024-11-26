@@ -4,6 +4,7 @@
 
 class ExprNode;
 class TypeNode;
+class AccessModifierListNode;
 
 enum VarDeclType
 {
@@ -38,6 +39,8 @@ class VarDeclarationListNode : public GenericListNode<VarDeclarationNode, VarDec
 {
 public:
 	std::string getName() override;
+
+	VarDeclarationListNode* addModifiers(AccessModifierListNode* modifiers);
 };
 
 class VarDeclarationNode : public Dottable
@@ -49,11 +52,16 @@ public:
 	ExprNode* _valueNode;
 	TypeNode* _typeNode;
 
+	AccessModifierListNode* _modifiers;
+	bool _hasModifiers = false;
+
 	static VarDeclarationNode* createFromValue(std::string varName, ExprNode* value);
 
 	static VarDeclarationNode* createFromType(std::string varName, TypeNode* type);
 
 	static VarDeclarationNode* createFromValueAndType(std::string varName, ExprNode* value, TypeNode* type);
+
+	VarDeclarationNode* addModifiers(AccessModifierListNode* modifiers);
 
 	void generateDot(std::ofstream& file) override;
 };

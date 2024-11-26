@@ -1,6 +1,7 @@
 #include "VarDeclarationNode.h"
 #include "TypeNode.h"
 #include "ExprNode.h"
+#include "AccessModifierNode.h"
 
 VarDeclarationNode* VarDeclarationNode::createFromValue(std::string varName, ExprNode* value)
 {
@@ -30,9 +31,21 @@ VarDeclarationNode* VarDeclarationNode::createFromValueAndType(std::string varNa
 	return node;
 }
 
+VarDeclarationNode* VarDeclarationNode::addModifiers(AccessModifierListNode* modifiers)
+{
+	this->_hasModifiers = true;
+	this->_modifiers = modifiers;
+	return this;
+}
+
 void VarDeclarationNode::generateDot(std::ofstream& file)
 {
 	file << dotLabel(this->_id, "VarDecl: " + _varName);
+	if (this->_hasModifiers)
+	{
+		file << dotConnectionWithLabel(this->_id, this->_modifiers->_id, "modifiers");
+		this->_modifiers->generateDot(file);
+	}
 	if (this->_type == VarDeclType::TypeKnown || this->_type == VarDeclType::ValueAndTypeKnown)
 	{
 		file << dotConnectionWithLabel(this->_id, this->_typeNode->_id, "type");
@@ -48,4 +61,13 @@ void VarDeclarationNode::generateDot(std::ofstream& file)
 std::string VarDeclarationListNode::getName()
 {
 	return "VarDeclList";
+}
+
+VarDeclarationListNode* VarDeclarationListNode::addModifiers(AccessModifierListNode* modifiers)
+{
+	for (auto& varDecl : this->_vec)
+	{
+		varDecl->addModifiers(modifiers);
+	}
+	return this;
 }

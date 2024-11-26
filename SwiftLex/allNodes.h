@@ -17,3 +17,4 @@
 #include "nodes/CatchNode.h"
 #include "nodes/CaseElementNode.h"
 #include "nodes/SwitchNode.h"
+#include "nodes/AccessModifierNode.h"
