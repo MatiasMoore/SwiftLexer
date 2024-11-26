@@ -565,6 +565,9 @@ modifiersWordsList: modifiersWords {printf("P: modifiersWordsList\n"); $$ = Acce
 
 constructorDeclIncomplete: INIT anyRoundBracket funcDeclArgListE ')' '{' funcStmtListE '}' { printf("P: constructor declaration\n"); $$ = ConstructorDeclNode::createConstructor($3, $6, false);}
     | INIT anyRoundBracket funcDeclArgListE ')' THROWS '{' funcStmtListE '}' {printf("P: constructor declaration\n"); $$ = ConstructorDeclNode::createConstructor($3, $7, true);}
+
+    | INIT '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' '{' funcStmtListE '}' {printf("P: constructor declaration generic\n"); $$ = ConstructorDeclNode::createConstructorGeneric($3, $6, $9, false);}
+    | INIT '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' THROWS '{' funcStmtListE '}' {printf("P: constructor declaration generic\n"); $$ = ConstructorDeclNode::createConstructorGeneric($3, $6, $10, true);}
     ;
 
 constructorDeclaration: modifiersWordsList constructorDeclIncomplete { $$ = $2; $$ = $$->addModifiers($1);}
