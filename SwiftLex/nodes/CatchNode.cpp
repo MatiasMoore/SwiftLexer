@@ -36,24 +36,25 @@ void CatchNode::generateDot(std::ofstream& file)
 {
     switch (this->_type)
     {
-        case CatchNodeType::Catch:
-			file << dotLabel(this->_id, "Catch") << std::endl;
+        if (this->_stmtList != nullptr)
+        {
             file << dotConnectionWithLabel(this->_id, this->_stmtList->_id, "stmtList") << std::endl;
             this->_stmtList->generateDot(file);
+		}
+       
+        case CatchNodeType::Catch:
+			file << dotLabel(this->_id, "Catch") << std::endl;
 			break;
 
 		case CatchNodeType::CatchFieldAccess:
             file << dotLabel(this->_id, "CatchFieldAccess") << std::endl;
 			file << dotConnectionWithLabel(this->_id, this->_expr->_id, "FieldAccess") << std::endl;
-			file << dotConnectionWithLabel(this->_id, this->_stmtList->_id, "stmtList") << std::endl;
 			this->_expr->generateDot(file);
-			this->_stmtList->generateDot(file);
             break;
 
         case CatchNodeType::CatchType:
             file << dotLabel(this->_id, "CatchType") << std::endl;
             file << dotConnectionWithLabel(this->_id, this->_typeNode->_id, "type") << std::endl;
-            file << dotConnectionWithLabel(this->_id, this->_stmtList->_id, "stmtList") << std::endl;
             this->_typeNode->generateDot(file);
             break;
 

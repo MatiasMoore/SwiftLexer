@@ -178,6 +178,7 @@ SUBSCRIPT_SQUARE_BRACKET FUNC_CALL_ROUND_BRACKET
 %type<stmtNode> lowLevelStmtIncomplete
 %type<stmtNode> lowLevelStmt
 %type<stmtListNode> lowLevelStmtList
+%type<stmtListNode> lowLevelStmtListE
 
 %type<stmtListNode> funcStmtListE
 
@@ -379,6 +380,10 @@ lowLevelStmtList: lowLevelStmt {printf("P: lowLevelStmtList\n"); $$ = StmtListNo
 		}
     }
 	;
+
+lowLevelStmtListE: lowLevelStmtList {$$ = $1;}
+	| %empty { $$ = nullptr; }
+    ;
 
     /* FUNC STMT (with return) */
 funcStmtListE:  lowLevelStmtList returnStmt {
@@ -758,20 +763,20 @@ defaultCase: DEFAULT ':' lowLevelStmtList {printf("P: defaultCase\n"); $$ = Case
 tryStmt: TRY expr {printf("P: try\n"); $$ = TryNode::create($2);}
 	;
 
-doCatchStmt: DO '{' lowLevelStmtList '}' {printf("P: do \n"); $$ = DoCatchNode::createOnlyDoNode($3);}
-    | doCatchStmt CATCH expr '.' ID '{' lowLevelStmtList '}' {
+doCatchStmt: DO '{' lowLevelStmtListE '}' {printf("P: do \n"); $$ = DoCatchNode::createOnlyDoNode($3);}
+    | doCatchStmt CATCH expr '.' ID '{' lowLevelStmtListE '}' {
         printf("P: do catch field access\n"); 
         auto fieldAccess = ExprNode::createFieldAccessExpr($3, $5);
         auto catchNode = CatchNode::createCatchFieldAccessNode(fieldAccess, $7); 
         $$ = $1->addCatchNode(catchNode);
     }
-    | doCatchStmt CATCH IS ID '{' lowLevelStmtList '}' {
+    | doCatchStmt CATCH IS ID '{' lowLevelStmtListE '}' {
         printf("P: do catch expr\n");
         auto typeNode = TypeNode::createIdType($4);
         auto catchNode = CatchNode::createCatchTypeNode(typeNode, $6);
         $$ = $1->addCatchNode(catchNode);
     }
-    | doCatchStmt CATCH '{' lowLevelStmtList '}' {printf("P: do catch\n"); auto catchNode = CatchNode::createCatchNode($4); $$ = $1->addCatchNode(catchNode);}
+    | doCatchStmt CATCH '{' lowLevelStmtListE '}' {printf("P: do catch\n"); auto catchNode = CatchNode::createCatchNode($4); $$ = $1->addCatchNode(catchNode);}
 	;
 
 stmtOperators: expr OP_MINUS_ASSIGN expr {

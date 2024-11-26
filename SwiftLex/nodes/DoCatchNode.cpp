@@ -20,26 +20,22 @@ DoCatchNode* DoCatchNode::addCatchNode(CatchNode* catchNode)
 
 void DoCatchNode::generateDot(std::ofstream& file)
 {
-    switch (this->_type)
+    if (this->_doStmts != nullptr)
     {
-        case DoCatchNodeType::OnlyDo:
-            file << dotLabel(this->_id, "Do");
-            file << dotConnectionWithLabel(this->_id, this->_doStmts->_id, "do branch");
-            this->_doStmts->generateDot(file);
-	        break;
-        case DoCatchNodeType::DoCatch:
-            file << dotLabel(this->_id, "Do");
-            file << dotConnectionWithLabel(this->_id, this->_doStmts->_id, "do branch");
-            this->_doStmts->generateDot(file);
-            for (CatchNode* node : this->_catchNodes)
-            {
-                file << dotConnectionWithLabel(this->_id, node->_id, "catch branch");
-                node->generateDot(file);
-            }
-            
-        default:
-            printf("Error: DoCatchNode type not recognized\n");
-            break;
+        file << dotLabel(this->_id, "Do");
+        file << dotConnectionWithLabel(this->_id, this->_doStmts->_id, "do branch");
+        this->_doStmts->generateDot(file);
+    }
+    else {
+        file << dotLabel(this->_id, "Do (body empty)");
+    }
+
+    if (this->_type == DoCatchNodeType::DoCatch) {
+        for (CatchNode* node : this->_catchNodes)
+        {
+            file << dotConnectionWithLabel(this->_id, node->_id, "catch branch");
+            node->generateDot(file);
+        }
     }
 }
 
