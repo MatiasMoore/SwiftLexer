@@ -8,6 +8,7 @@
 #include "ThrowNode.h"
 #include "TryNode.h"
 #include "DoCatchNode.h"
+#include "SwitchNode.h"
 
 StmtNode* StmtNode::createStmtExpr(ExprNode* expr)
 {
@@ -100,6 +101,15 @@ StmtNode* StmtNode::createStmtDo(DoCatchNode* doCatch)
 	return node;
 }
 
+StmtNode* StmtNode::createStmtSwitch(SwitchNode* switchNode)
+{
+	auto node = new StmtNode();
+	node->_type = StmtType::Switch;
+	node->_switch = switchNode;
+	printf("N: stmt switch\n");
+	return node;
+}
+
 void StmtNode::generateDot(std::ofstream& file)
 {
 	switch (this->_type)
@@ -155,6 +165,11 @@ void StmtNode::generateDot(std::ofstream& file)
 		file << dotLabel(this->_id, "DoStmt");
 		file << dotConnection(this->_id, this->_do->_id);
 		this->_do->generateDot(file);
+		break;
+	case StmtType::Switch:
+		file << dotLabel(this->_id, "SwitchStmt");
+		file << dotConnection(this->_id, this->_switch->_id);
+		this->_switch->generateDot(file);
 		break;
 	default:
 		throw std::runtime_error("Unknown type!");

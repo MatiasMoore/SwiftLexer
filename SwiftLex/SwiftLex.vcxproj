@@ -22,6 +22,7 @@
     <Flex Include="swift.l" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="nodes\CaseElementNode.cpp" />
     <ClCompile Include="nodes\CatchNode.cpp" />
     <ClCompile Include="nodes\DoCatchNode.cpp" />
     <ClCompile Include="nodes\FuncDeclNode.cpp" />
@@ -43,6 +44,7 @@
     <ClCompile Include="nodes\TypeForGenericNode.cpp" />
     <ClCompile Include="nodes\ThrowNode.cpp" />
     <ClCompile Include="nodes\TryNode.cpp" />
+    <ClCompile Include="nodes\SwitchNode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt" />
@@ -51,6 +53,7 @@
     <Bison Include="swift.y" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="nodes\CaseElementNode.h" />
     <ClInclude Include="nodes\CatchNode.h" />
     <ClInclude Include="nodes\DoCatchNode.h" />
     <ClInclude Include="nodes\FuncDeclNode.h" />
@@ -74,6 +77,7 @@
     <ClInclude Include="nodes\TypeForGenericNode.h" />
     <ClInclude Include="nodes\ThrowNode.h" />
     <ClInclude Include="nodes\TryNode.h" />
+    <ClInclude Include="nodes\SwitchNode.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

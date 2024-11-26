@@ -12,6 +12,7 @@ class FuncDeclNode;
 class ThrowNode;
 class TryNode;
 class DoCatchNode;
+class SwitchNode;
 
 enum StmtType
 {
@@ -24,7 +25,8 @@ enum StmtType
 	FuncDecl,
 	Throw,
 	Try,
-	Do
+	Do,
+	Switch
 };
 
 class StmtNode : public Dottable
@@ -44,6 +46,8 @@ public:
 	ThrowNode* _throw;
 
 	DoCatchNode* _do;
+
+	SwitchNode* _switch;
 
 	TryNode* _tryNode;
 
@@ -74,6 +78,8 @@ public:
 	static StmtNode* createStmtTry(TryNode* tryNode);
 
 	static StmtNode* createStmtDo(DoCatchNode* doCatch);
+
+	static StmtNode* createStmtSwitch(SwitchNode* switchNode);
 
 	void generateDot(std::ofstream& file) override;
 };

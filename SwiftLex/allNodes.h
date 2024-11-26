@@ -15,3 +15,5 @@
 #include "nodes/TryNode.h"
 #include "nodes/DoCatchNode.h"
 #include "nodes/CatchNode.h"
+#include "nodes/CaseElementNode.h"
+#include "nodes/SwitchNode.h"

@@ -38,6 +38,9 @@
     class TryNode* tryNode;
     class DoCatchNode* doCatchNode;
     class CatchNode* catchNode;
+    class CaseElementNode* caseElementNode;
+    class CaseElementListNode* caseElementListNode;
+    class SwitchNode* switchNode;
 }
 %locations
 
@@ -215,6 +218,12 @@ SUBSCRIPT_SQUARE_BRACKET FUNC_CALL_ROUND_BRACKET
 %type<tryNode> tryStmt
 %type<doCatchNode> doCatchStmt
 
+// Switch case
+%type<caseElementNode> caseElement
+%type<caseElementListNode> caseList
+%type<caseElementNode> defaultCase
+%type<switchNode> switchCase
+
 // Start
 %start program
 
@@ -328,7 +337,7 @@ lowLevelStmtIncomplete: varDeclaration {printf("P: lowLevelStmtIncomplete varDec
     | whileLoop {printf("P: lowLevelStmtIncomplete whileLoop\n"); $$ = StmtNode::createStmtLoop($1);}
     | repeatWhileLoop {printf("P: lowLevelStmtIncomplete repeatWhileLoop\n"); $$ = StmtNode::createStmtLoop($1);}
     | forInLoop {printf("P: lowLevelStmtIncomplete forInLoop\n"); $$ = StmtNode::createStmtLoop($1);}
-    | switchCase {printf("P: lowLevelStmtIncomplete switch\n");}
+    | switchCase {printf("P: lowLevelStmtIncomplete switch\n"); $$ = StmtNode::createStmtSwitch($1);}
     | tryStmt {printf("P: lowLevelStmtIncomplete try\n"); $$ = StmtNode::createStmtTry($1);}
     | doCatchStmt {printf("P: lowLevelStmtIncomplete doCatch\n"); $$ = StmtNode::createStmtDo($1);}
     | stmtOperators {printf("P: lowLevelStmtIncomplete operators\n"); $$ = $1;}
@@ -712,25 +721,21 @@ ifElse: IF exprList '{' lowLevelStmtList '}' {printf("P: ifElse\n"); $$ = IfElse
     | IF exprList '{' '}' ELSE ifElse {printf("P: ifElse else if\n"); $$ = IfElseNode::createComplex($2, nullptr, $6);}
     ;
 
-switchCase: SWITCH expr '{'caseList defaultCase '}' {printf("P: switch\n");}
-    | SWITCH expr '{'defaultCase '}' {printf("P: switch\n");}
-    | SWITCH expr '{'caseList'}' {printf("P: switch\n");}
+switchCase: SWITCH expr '{'caseList defaultCase '}' {printf("P: switch\n"); $$ = SwitchNode::createSwitchNode($2, $4->appendNode($5));}
+    | SWITCH expr '{'defaultCase '}' {printf("P: switch\n"); $$ = SwitchNode::createSwitchNode($2, CaseElementListNode::createListNode($4));}
+    | SWITCH expr '{'caseList'}' {printf("P: switch\n"); $$ = SwitchNode::createSwitchNode($2, $4);}
 	;
 
-caseElement: CASE caseElementExpr ':' lowLevelStmtList {printf("P: case\n");}
+caseElement: CASE exprList ':' lowLevelStmtList {printf("P: case\n"); $$ = CaseElementNode::createCaseExprList($2, $4);}
+    | CASE exprList whereClause ':' lowLevelStmtList {printf("P: case\n");}
+    | CASE LET ID whereClause ':' lowLevelStmtList {printf("P: case\n");}
     ;
 
-caseElementExpr: exprList
-    | exprList whereClause {printf("P: case where\n");}
-    | LET ID whereClause {printf("P: case let\n");}
-    // TODO: add exprlist in round brackets
-    ;
-
-caseList: caseElement {printf("P: caseList\n");}
-	| caseList caseElement {printf("P: caseList\n");}
+caseList: caseElement {printf("P: caseList\n"); $$ = CaseElementListNode::createListNode($1);}
+	| caseList caseElement {printf("P: caseList\n"); $$ = $1->appendNode($2);}
 	;
 
-defaultCase: DEFAULT ':' lowLevelStmtList {printf("P: defaultCase\n");}
+defaultCase: DEFAULT ':' lowLevelStmtList {printf("P: defaultCase\n"); $$ = CaseElementNode::createCaseDefault($3);}
 	;
 
 tryStmt: TRY expr {printf("P: try\n"); $$ = TryNode::create($2);}
