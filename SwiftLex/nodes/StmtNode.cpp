@@ -137,6 +137,14 @@ StmtNode* StmtNode::createStmtStructDeclaration(StructDeclarationNode* structDec
 	node->_type = StmtType::StructDeclaration;
 	node->_structDeclaration = structDeclaration;
 	printf("N: stmt structDeclaration\n");
+}
+
+StmtNode* StmtNode::createStmtConstructorDecl(ConstructorDeclNode* constructor)
+{
+	auto node = new StmtNode();
+	node->_type = StmtType::ConstructorDecl;
+	node->_constructorDecl = constructor;
+	printf("N: stmt constructorDecl\n");
 	return node;
 }
 

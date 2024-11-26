@@ -22,4 +22,5 @@
 #include "nodes/EnumCaseNode.h"
 #include "nodes/EnumDeclarationNode.h"
 #include "nodes/StructDeclarationNode.h"
+#include "nodes/ConstructorDeclNode.h"
 
