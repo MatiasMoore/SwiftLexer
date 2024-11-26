@@ -34,7 +34,7 @@ enum StmtType
 	Switch,
 	EnumCase,
 	EnumDeclaration,
-	StructDeclaration
+	StructDeclaration,
 	ConstructorDecl,
 	DestructorDecl
 };
