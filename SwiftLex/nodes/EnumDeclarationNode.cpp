@@ -13,6 +13,8 @@ EnumDeclarationNode* EnumDeclarationNode::createEnumDeclarationNode(std::string 
 void EnumDeclarationNode::generateDot(std::ofstream& file)
 {
 	file << dotLabel(this->_id, "EnumDeclaration: " + this->_name);
-	file << dotConnection(this->_id, this->_stmtList->_id);
-	this->_stmtList->generateDot(file);
+	if (this->_stmtList != nullptr) {
+		file << dotConnection(this->_id, this->_stmtList->_id);
+		this->_stmtList->generateDot(file);
+	}
 }
