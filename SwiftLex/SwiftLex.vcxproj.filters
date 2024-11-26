@@ -97,11 +97,17 @@
     </ClCompile>
     <ClCompile Include="nodes\EnumDeclarationNode.cpp">
       <Filter>Исходные файлы</Filter>
+    </ClCompile>      
+    <ClCompile Include="nodes\StructDeclarationNode.cpp">
+		<Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="nodes\ConstructorDeclNode.cpp">
+      <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="nodes\AccessModifierNode.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="nodes\StructDeclarationNode.cpp">
+    <ClCompile Include="nodes\DestructorDeclNode.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
@@ -200,10 +206,16 @@
     <ClInclude Include="nodes\EnumDeclarationNode.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="nodes\StructDeclarationNode.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="nodes\ConstructorDeclNode.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
     <ClInclude Include="nodes\AccessModifierNode.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="nodes\StructDeclarationNode.h">
+    <ClInclude Include="nodes\DestructorDeclNode.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

@@ -23,6 +23,6 @@ public:
 
 	ConstructorDeclNode* addModifiers(AccessModifierListNode* modifiers);
 
-	void generateDot(std::ofstream& file);
+	void generateDot(std::ofstream& file) override;
 };
 

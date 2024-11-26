@@ -23,4 +23,4 @@
 #include "nodes/EnumDeclarationNode.h"
 #include "nodes/StructDeclarationNode.h"
 #include "nodes/ConstructorDeclNode.h"
-
+#include "nodes/DestructorDeclNode.h"
