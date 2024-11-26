@@ -22,4 +22,4 @@
 #include "nodes/EnumCaseNode.h"
 #include "nodes/EnumDeclarationNode.h"
 #include "nodes/ConstructorDeclNode.h"
-
+#include "nodes/DestructorDeclNode.h"

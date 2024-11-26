@@ -48,6 +48,7 @@
     class EnumCaseNode* enumCaseNode;
     class EnumDeclarationNode* enumDeclarationNode;
     class ConstructorDeclNode* constructorDeclNode;
+    class DestructorDeclNode* destructorDeclNode;
 }
 %locations
 
@@ -244,6 +245,7 @@ SUBSCRIPT_SQUARE_BRACKET FUNC_CALL_ROUND_BRACKET
 // Class
 %type<constructorDeclNode> constructorDeclIncomplete
 %type<constructorDeclNode> constructorDeclaration
+%type<destructorDeclNode> destructorDeclaration
 
 // Start
 %start program
@@ -278,7 +280,7 @@ type: TYPE_BOOL {$$ = TypeNode::createType(TypeType::BoolT);}
 stmtClassInnerIncomplete: funcDeclaration {printf("P: stmtClassInnerIncomplete funcdecl\n"); $$ = StmtNode::createStmtFuncDecl($1);}
     | varDeclaration {printf("P: stmtClassInnerIncomplete varDec\n"); $$ = StmtNode::createStmtVarDeclaration($1);}
     | constructorDeclaration {printf("P: stmtClassInnerIncomplete constructor\n"); $$ = StmtNode::createStmtConstructorDecl($1);}
-    | destructorDeclaration {printf("P: stmtClassInnerIncomplete destructor\n");}
+    | destructorDeclaration {printf("P: stmtClassInnerIncomplete destructor\n"); $$ = StmtNode::createStmtDestructorDecl($1);}
     ;
 
 stmtClassInner: stmtClassInnerIncomplete { $$ = $1; }
@@ -556,7 +558,7 @@ constructorDeclaration: modifiersWordsList constructorDeclIncomplete { $$ = $2; 
     | constructorDeclIncomplete { $$ = $1;}
     ;
 
-destructorDeclaration: DEINIT '{' funcStmtListE '}' {printf("P: destructor declaration\n");}
+destructorDeclaration: DEINIT '{' funcStmtListE '}' {printf("P: destructor declaration\n"); $$ = DestructorDeclNode::createDestructor($3);}
     ;
 
 funcCallArg: ID ':' expr {printf("P: funcCallArg\n"); $$ = FuncCallArgNode::createFromExprAndName($3, $1);}

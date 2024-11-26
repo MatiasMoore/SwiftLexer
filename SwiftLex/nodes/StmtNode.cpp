@@ -11,6 +11,8 @@
 #include "SwitchNode.h"
 #include "EnumCaseNode.h"
 #include "EnumDeclarationNode.h"
+#include "ConstructorDeclNode.h"
+#include "DestructorDeclNode.h"
 
 StmtNode* StmtNode::createStmtExpr(ExprNode* expr)
 {
@@ -139,6 +141,15 @@ StmtNode* StmtNode::createStmtConstructorDecl(ConstructorDeclNode* constructor)
 	return node;
 }
 
+StmtNode* StmtNode::createStmtDestructorDecl(DestructorDeclNode* destructor)
+{
+	auto node = new StmtNode();
+	node->_type = StmtType::DestructorDecl;
+	node->_destructorDecl = destructor;
+	printf("N: stmt destructorDecl\n");
+	return node;
+}
+
 void StmtNode::generateDot(std::ofstream& file)
 {
 	switch (this->_type)
@@ -209,6 +220,16 @@ void StmtNode::generateDot(std::ofstream& file)
 		file << dotLabel(this->_id, "EnumDeclarationStmt");
 		file << dotConnection(this->_id, this->_enumDeclaration->_id);
 		this->_enumDeclaration->generateDot(file);
+		break;
+	case StmtType::ConstructorDecl:
+		file << dotLabel(this->_id, "ConstructorDecl");
+		file << dotConnection(this->_id, this->_constructorDecl->_id);
+		this->_constructorDecl->generateDot(file);
+		break;
+	case StmtType::DestructorDecl:
+		file << dotLabel(this->_id, "DestructorDecl");
+		file << dotConnection(this->_id, this->_destructorDecl->_id);
+		this->_destructorDecl->generateDot(file);
 		break;
 	default:
 		throw std::runtime_error("Unknown type!");
