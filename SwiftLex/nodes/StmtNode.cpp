@@ -130,6 +130,15 @@ StmtNode* StmtNode::createStmtEnumDeclaration(EnumDeclarationNode* enumDeclarati
 	return node;
 }
 
+StmtNode* StmtNode::createStmtConstructorDecl(ConstructorDeclNode* constructor)
+{
+	auto node = new StmtNode();
+	node->_type = StmtType::ConstructorDecl;
+	node->_constructorDecl = constructor;
+	printf("N: stmt constructorDecl\n");
+	return node;
+}
+
 void StmtNode::generateDot(std::ofstream& file)
 {
 	switch (this->_type)

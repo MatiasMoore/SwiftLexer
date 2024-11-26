@@ -47,6 +47,7 @@
     class IdListNode* idListNode;
     class EnumCaseNode* enumCaseNode;
     class EnumDeclarationNode* enumDeclarationNode;
+    class ConstructorDeclNode* constructorDeclNode;
 }
 %locations
 
@@ -234,11 +235,15 @@ SUBSCRIPT_SQUARE_BRACKET FUNC_CALL_ROUND_BRACKET
 %type<accessModifierNode> modifiersWords;
 %type<accessModifierListNode> modifiersWordsList;
 
-//Enum
+// Enum
 %type<idListNode> enumIdList
 %type<enumCaseNode> enumCase
 %type<enumDeclarationNode> enumDeclarationIncomplete
 %type<enumDeclarationNode> enumDeclaration
+
+// Class
+%type<constructorDeclNode> constructorDeclIncomplete
+%type<constructorDeclNode> constructorDeclaration
 
 // Start
 %start program
@@ -272,7 +277,7 @@ type: TYPE_BOOL {$$ = TypeNode::createType(TypeType::BoolT);}
     /* CLASS STMT */
 stmtClassInnerIncomplete: funcDeclaration {printf("P: stmtClassInnerIncomplete funcdecl\n"); $$ = StmtNode::createStmtFuncDecl($1);}
     | varDeclaration {printf("P: stmtClassInnerIncomplete varDec\n"); $$ = StmtNode::createStmtVarDeclaration($1);}
-    | constructorDeclaration {printf("P: stmtClassInnerIncomplete constructor\n");}
+    | constructorDeclaration {printf("P: stmtClassInnerIncomplete constructor\n"); $$ = StmtNode::createStmtConstructorDecl($1);}
     | destructorDeclaration {printf("P: stmtClassInnerIncomplete destructor\n");}
     ;
 
@@ -543,13 +548,12 @@ modifiersWordsList: modifiersWords {printf("P: modifiersWordsList\n"); $$ = Acce
 	| modifiersWordsList modifiersWords {printf("P: modifiersWordsList\n"); $$ = $1->appendNode($2);}
 	;
 
-constructorDeclaration: INIT anyRoundBracket funcDeclArgListE ')' '{' funcStmtListE '}' {printf("P: constructor declaration\n");}
-    | INIT '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' '{' funcStmtListE '}' {printf("P: constructor declaration generic\n");}
-    | INIT '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' whereClause '{' funcStmtListE '}' {printf("P: constructor declaration generic\n");}
+constructorDeclIncomplete: INIT anyRoundBracket funcDeclArgListE ')' '{' funcStmtListE '}' { printf("P: constructor declaration\n"); $$ = ConstructorDeclNode::createConstructor($3, $6, false);}
+    | INIT anyRoundBracket funcDeclArgListE ')' THROWS '{' funcStmtListE '}' {printf("P: constructor declaration\n"); $$ = ConstructorDeclNode::createConstructor($3, $7, true);}
+    ;
 
-    | INIT anyRoundBracket funcDeclArgListE ')' '{' funcStmtListE '}' THROWS {printf("P: constructor declaration\n");}
-    | INIT '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' THROWS '{' funcStmtListE '}' {printf("P: constructor declaration generic\n");}
-    | INIT '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' THROWS whereClause '{' funcStmtListE '}' {printf("P: constructor declaration generic\n");}
+constructorDeclaration: modifiersWordsList constructorDeclIncomplete { $$ = $2; $$ = $$->addModifiers($1);}
+    | constructorDeclIncomplete { $$ = $1;}
     ;
 
 destructorDeclaration: DEINIT '{' funcStmtListE '}' {printf("P: destructor declaration\n");}

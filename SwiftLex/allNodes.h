@@ -21,4 +21,5 @@
 #include "nodes/IdListNode.h"
 #include "nodes/EnumCaseNode.h"
 #include "nodes/EnumDeclarationNode.h"
+#include "nodes/ConstructorDeclNode.h"
 
