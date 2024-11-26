@@ -742,7 +742,18 @@ tryStmt: TRY expr {printf("P: try\n"); $$ = TryNode::create($2);}
 	;
 
 doCatchStmt: DO '{' lowLevelStmtList '}' {printf("P: do \n"); $$ = DoCatchNode::createOnlyDoNode($3);}
-    | doCatchStmt CATCH expr '{' lowLevelStmtList '}' {printf("P: do catch expr\n"); auto catchNode = CatchNode::createCatchExprNode($3, $5); $$ = $1->addCatchNode(catchNode);}
+    | doCatchStmt CATCH expr '.' ID '{' lowLevelStmtList '}' {
+        printf("P: do catch field access\n"); 
+        auto fieldAccess = ExprNode::createFieldAccessExpr($3, $5);
+        auto catchNode = CatchNode::createCatchFieldAccessNode(fieldAccess, $7); 
+        $$ = $1->addCatchNode(catchNode);
+    }
+    | doCatchStmt CATCH IS ID '{' lowLevelStmtList '}' {
+        printf("P: do catch expr\n");
+        auto typeNode = TypeNode::createIdType($4);
+        auto catchNode = CatchNode::createCatchTypeNode(typeNode, $6);
+        $$ = $1->addCatchNode(catchNode);
+    }
     | doCatchStmt CATCH '{' lowLevelStmtList '}' {printf("P: do catch\n"); auto catchNode = CatchNode::createCatchNode($4); $$ = $1->addCatchNode(catchNode);}
 	;
 
