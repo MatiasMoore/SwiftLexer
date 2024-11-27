@@ -57,12 +57,16 @@ int main(int argc, const char* argv[])
 	dotFile.open("swift.dot");
 
 	dotFile << "digraph swift {\n";
-	_root->generateDot(dotFile);
-	dotFile << "}\n";
+	if (_root != nullptr) {
+		_root->generateDot(dotFile);
+		dotFile << "}\n";
 
-	dotFile.close();
-
-	system("cd");
-	system("Graphviz\\bin\\dot.exe -Tpng swift.dot > swift.png");
-	system("swift.png");
+		dotFile.close();
+		system("cd");
+		system("Graphviz\\bin\\dot.exe -Tpng swift.dot > swift.png");
+		system("swift.png");
+	}
+	else {
+		std::cout << "File empty" << std::endl;
+	}
 }
