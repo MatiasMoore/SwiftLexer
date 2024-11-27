@@ -7,16 +7,36 @@ class TypeForGenericListNode;
 class TypeNode;
 class AccessModifierListNode;
 
-enum FuncDeclType
+enum OverloadableOperatorType
 {
-	generic,
-	notGeneric
+    OpPLUS,
+    OpMINUS,
+    OpMUL,
+    OpDIV,
+    OpMOD,
+	OpLT,
+	OpGT,
+    OpGTE,
+    OpLTE,
+    OpEQ,
+    OpNEQ,
+    OpBitAND,
+    OpBitOR,
+    OpBitXOR,
+    OpLogAND,
+    OpLogOR,
+    OpLSHIFT,
+    OpRSHIFT,
+    OpCLOSEDRANGE,
+    OpHALFOPENRANGE,
+    OpNILCOALESCE
 };
 
 class FuncDeclNode : public Dottable
 {
 public:
-	FuncDeclType _type;
+	bool _isGeneric;
+	bool _isOperatorOverload;
 
 	bool _hasModifiers;
 	bool _hasArgs;
@@ -30,13 +50,21 @@ public:
 	StmtListNode* _body;
 	TypeNode* _returnType;
 
+	OverloadableOperatorType _overloadOpearatorType;
+
 	TypeForGenericListNode* _typesForGenericList;
 
 	static FuncDeclNode* createRegular(std::string idName, FuncDeclArgListNode* argList, StmtListNode* body, TypeNode* returnType, bool throwsException);
 
 	static FuncDeclNode* createGeneric(std::string idName, TypeForGenericListNode* typesForGenericList, FuncDeclArgListNode* argList, StmtListNode* body, TypeNode* returnType, bool throwsException);
 
+	static FuncDeclNode* createRegularOperator(OverloadableOperatorType overloadType, FuncDeclArgListNode* argList, StmtListNode* body, TypeNode* returnType, bool throwsException);
+
+	static FuncDeclNode* createGenericOperator(OverloadableOperatorType overloadType, TypeForGenericListNode* typesForGenericList, FuncDeclArgListNode* argList, StmtListNode* body, TypeNode* returnType, bool throwsException);
+
 	FuncDeclNode* addModifiers(AccessModifierListNode* modifiers);
+
+	std::string getOperatorOverloadName(OverloadableOperatorType overloadType);
 
 	void generateDot(std::ofstream& file) override;
 };

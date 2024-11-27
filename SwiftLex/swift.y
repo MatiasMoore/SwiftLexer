@@ -51,6 +51,7 @@
     class ConstructorDeclNode* constructorDeclNode;
     class DestructorDeclNode* destructorDeclNode;
     class ClassDeclNode* classDeclNode;
+    enum OverloadableOperatorType overloadOperatorType;
 }
 %locations
 
@@ -215,6 +216,7 @@ SUBSCRIPT_SQUARE_BRACKET FUNC_CALL_ROUND_BRACKET
 
 %type<ifElseNode> ifElse
 
+// Function declaration
 %type<funcDeclArgNode> funcDeclArg
 %type<funcDeclArgListNode> funcDeclArgList
 %type<funcDeclArgListNode> funcDeclArgListE
@@ -223,6 +225,8 @@ SUBSCRIPT_SQUARE_BRACKET FUNC_CALL_ROUND_BRACKET
 %type<typeForGenericListNode> genericIdList
 %type<funcDeclNode> funcDecIncomplete
 %type<funcDeclNode> funcDeclaration
+%type<overloadOperatorType> overloadableOperators 
+%type<funcDeclNode> funcOverloadOperatorIncomplete
 
 // Error handling
 %type<throwNode> exprThrow
@@ -497,44 +501,59 @@ funcDecIncomplete: FUNC ID anyRoundBracket funcDeclArgListE ')' funcReturnTypeE 
     ;
 
     
-overloadableOperators: BINARY_PLUS
-    | PREFIX_PLUS
-    | POSTFIX_PLUS
-    | BINARY_MINUS
-    | PREFIX_MINUS
-    | POSTFIX_MINUS
-    | BINARY_MUL
-    | PREFIX_MUL
-    | POSTFIX_MUL
-    | BINARY_DIV
-    | PREFIX_DIV
-    | POSTFIX_DIV
-    | BINARY_MOD
-    | PREFIX_MOD
-    | POSTFIX_MOD
-    | '<'
-    | '>'
-    | OP_GTE
-    | OP_LTE
-    | OP_EQ
-    | OP_NEQ
-    | '&'
-    | '|'
-    | '^'
-    | BINARY_LOG_AND
-    | PREFIX_LOG_AND
-    | POSTFIX_LOG_AND
-    | BINARY_LOG_OR
-    | PREFIX_LOG_OR
-    | POSTFIX_LOG_OR
-    | OP_LSHIFT
-    | OP_RSHIFT
-    | OP_CLOSED_RANGE
-    | OP_HALF_OPEN_RANGE
-    | OP_NIL_COALESCE
+overloadableOperators: BINARY_PLUS {$$ = OverloadableOperatorType::OpPLUS;}
+    | PREFIX_PLUS {$$ = OverloadableOperatorType::OpPLUS;}
+    | POSTFIX_PLUS {$$ = OverloadableOperatorType::OpPLUS;}
+    | BINARY_MINUS {$$ = OverloadableOperatorType::OpMINUS;}
+    | PREFIX_MINUS {$$ = OverloadableOperatorType::OpMINUS;}
+    | POSTFIX_MINUS {$$ = OverloadableOperatorType::OpMINUS;}
+    | BINARY_MUL {$$ = OverloadableOperatorType::OpMUL;}
+    | PREFIX_MUL {$$ = OverloadableOperatorType::OpMUL;}
+    | POSTFIX_MUL {$$ = OverloadableOperatorType::OpMUL;}
+    | BINARY_DIV {$$ = OverloadableOperatorType::OpDIV;}
+    | PREFIX_DIV {$$ = OverloadableOperatorType::OpDIV;}
+    | POSTFIX_DIV {$$ = OverloadableOperatorType::OpDIV;}
+    | BINARY_MOD {$$ = OverloadableOperatorType::OpMOD;}
+    | PREFIX_MOD {$$ = OverloadableOperatorType::OpMOD;}
+    | POSTFIX_MOD {$$ = OverloadableOperatorType::OpMOD;}
+    | '<' {$$ = OverloadableOperatorType::OpLT;}
+    | '>' {$$ = OverloadableOperatorType::OpGT;}
+    | OP_GTE {$$ = OverloadableOperatorType::OpGTE;}
+    | OP_LTE {$$ = OverloadableOperatorType::OpLTE;}
+    | OP_EQ {$$ = OverloadableOperatorType::OpEQ;}
+    | OP_NEQ {$$ = OverloadableOperatorType::OpNEQ;}
+    | '&' {$$ = OverloadableOperatorType::OpBitAND;}
+    | '|' {$$ = OverloadableOperatorType::OpBitOR;}
+    | '^' {$$ = OverloadableOperatorType::OpBitXOR;}
+    | BINARY_LOG_AND {$$ = OverloadableOperatorType::OpLogAND;}
+    | PREFIX_LOG_AND {$$ = OverloadableOperatorType::OpLogAND;}
+    | POSTFIX_LOG_AND {$$ = OverloadableOperatorType::OpLogAND;}
+    | BINARY_LOG_OR {$$ = OverloadableOperatorType::OpLogOR;}
+    | PREFIX_LOG_OR {$$ = OverloadableOperatorType::OpLogOR;}
+    | POSTFIX_LOG_OR {$$ = OverloadableOperatorType::OpLogOR;}
+    | OP_LSHIFT {$$ = OverloadableOperatorType::OpLSHIFT;}
+    | OP_RSHIFT {$$ = OverloadableOperatorType::OpRSHIFT;}
+    | OP_CLOSED_RANGE {$$ = OverloadableOperatorType::OpCLOSEDRANGE;}
+    | OP_HALF_OPEN_RANGE {$$ = OverloadableOperatorType::OpHALFOPENRANGE;}
+    | OP_NIL_COALESCE {$$ = OverloadableOperatorType::OpNILCOALESCE;}
     ;
 
-funcOverloadOperatorIncomplete: FUNC overloadableOperators anyRoundBracket funcDeclArgListE ')' funcReturnTypeE '{' funcStmtListE '}' {printf("P: func overload Operator Incomplete\n");}
+funcOverloadOperatorIncomplete: FUNC overloadableOperators anyRoundBracket funcDeclArgListE ')' funcReturnTypeE '{' funcStmtListE '}' {
+    printf("P: func overload Operator Incomplete\n");
+    $$ = FuncDeclNode::createRegularOperator($2, $4, $8, $6, false);
+}
+    | FUNC overloadableOperators anyRoundBracket funcDeclArgListE ')' THROWS funcReturnTypeE '{' funcStmtListE '}' {
+        printf("P: func overload Operator Incomplete\n");
+        $$ = FuncDeclNode::createRegularOperator($2, $4, $9, $7, true);
+        }
+    | FUNC overloadableOperators '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' funcReturnTypeE '{' funcStmtListE '}' {
+        printf("P: func overload Operator Incomplete\n");
+        $$ = FuncDeclNode::createGenericOperator($2, $4, $7, $11, $9, false);
+        }
+    | FUNC overloadableOperators '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' THROWS funcReturnTypeE '{' funcStmtListE '}' {
+        printf("P: func overload Operator Incomplete\n");
+        $$ = FuncDeclNode::createGenericOperator($2, $4, $7, $12, $10, true);
+        }
 	;
 
     //TODO add modifiers to funcDecl node
@@ -543,8 +562,8 @@ funcDeclaration: modifiersWordsList funcDecIncomplete {printf("P: func declarati
     | funcDecIncomplete {printf("P: func declaration default\n"); $$ = $1;}
     
     // operator overloading
-    | funcOverloadOperatorIncomplete {printf("P: func overload Operator\n");}
-    | modifiersWordsList funcOverloadOperatorIncomplete {printf("P: func overload Operator with prefix\n");}
+    | funcOverloadOperatorIncomplete {printf("P: func overload Operator\n"); $$ = $1;}
+    | modifiersWordsList funcOverloadOperatorIncomplete {printf("P: func overload Operator with prefix\n"); $$ = $2; $$ = $$->addModifiers($1);}
     ;
 
 modifiersWords: STATIC { $$ = AccessModifierNode::createModifier(AccessModifierType::Static);}
