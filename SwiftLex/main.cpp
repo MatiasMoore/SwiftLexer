@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <string>
 #include "allNodes.h"
 
 extern int yylex();
@@ -9,9 +10,21 @@ extern StmtListNode* _root;
 
 int main(int argc, const char* argv[])
 {
+	std::string filename = "";
 #ifdef  _DEBUG
-	std::ifstream inputFile("input.txt");
-	std::ofstream tempOutput("temp_input.txt");
+	filename = "input.txt";
+#else
+	if (argc != 2)
+	{
+		std::cout << "Incorrect amount of args! The only argument is the file name" << std::endl;
+		return 1;
+	}
+
+	filename = argv[1];
+#endif //  _DEBUG
+	std::string tempFileName = "temp_" + filename;
+	std::ifstream inputFile(filename);
+	std::ofstream tempOutput(tempFileName);
 	std::string line;
 
 	while (std::getline(inputFile, line)) tempOutput << line << '\n';
@@ -20,17 +33,7 @@ int main(int argc, const char* argv[])
 	inputFile.close();
 	tempOutput.close();
 
-	fopen_s(&yyin, "temp_input.txt", "r");
-#else
-	if (argc != 2)
-	{
-		std::cout << "Incorrect amount of args! The only argument is the file name" << std::endl;
-		return 1;
-	}
-
-	fopen_s(&yyin, argv[1], "r");
-#endif //  _DEBUG
-
+	fopen_s(&yyin, tempFileName.c_str(), "r");
 	
 	if (!yyin)
 	{
@@ -44,11 +47,11 @@ int main(int argc, const char* argv[])
 	catch (const std::exception& e)
 	{
 		fclose(yyin);
-		std::remove("temp_input.txt");
+		std::remove(tempFileName.c_str());
 		return 1;
 	}
 	fclose(yyin);
-	std::remove("temp_input.txt");
+	std::remove(tempFileName.c_str());
 
 	std::ofstream dotFile;
 	dotFile.open("swift.dot");
