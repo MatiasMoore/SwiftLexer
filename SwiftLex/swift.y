@@ -891,7 +891,7 @@ expr: LITERAL_INT {printf("P: expr int\n"); switchStateToSubscript(); $$ = ExprN
     | expr AS '?' type {printf("P: expr as ?\n"); switchStateToSubscript(); $$ = ExprNode::createTypeCastWithCheck($1, $4);}
     | expr AS '!' type {printf("P: expr as !\n"); switchStateToSubscript(); $$ = ExprNode::createTypeCastWithThrow($1, $4);}
     | expr '?' expr ':' expr {printf("P: expr ternary ? :\n"); switchStateToSubscript(); $$ = ExprNode::createTernary($1, $3, $5);}
-    | anyRoundBracket expr ')' {printf("P: expr brackets\n"); $$ = $2; switchStateToSubscript();}
+    | '(' expr ')' {printf("P: expr brackets\n"); $$ = $2; switchStateToSubscript();}
     | funcCall {printf("P: expr funcCall\n"); switchStateToSubscript(); switchStateToSubscript(); $$ = ExprNode::createFuncCall($1);}
     | SUPER '.' funcCall {printf("P: expr super funcCall\n"); switchStateToSubscript(); $3->_scopeType = superCall; $$ = ExprNode::createFuncCall($3);}
     | expr '.' funcCall {printf("P: expr func access\n"); switchStateToSubscript(); $3->setAsExprAccess($1); $$ = ExprNode::createFuncCall($3);}
