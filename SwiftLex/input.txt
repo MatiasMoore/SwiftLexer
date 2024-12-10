@@ -56,8 +56,8 @@ print("Game over!")
 
 let finalSquare = 25
 var board = 1
-board[03] = +08; board[06] = +11; board[09] = +09; board[10] = +02
-board[14] = -10; board[19] = -11; board[22] = -02; board[24] = -08
+// board[03] = +08; board[06] = +11; board[09] = +09; board[10] = +02
+// board[14] = -10; board[19] = -11; board[22] = -02; board[24] = -08
 var square = 0
 var diceRoll = 0
 
@@ -68,3 +68,115 @@ if temperatureInFahrenheit <= 32 {
 } else {
     print("It's not that cold. Wear a T-shirt.")
 }
+
+// CLASSES
+class emptyclass {}
+
+class Object {
+	var name: String
+	var age: Int
+	var weight: Double
+	var height: Double
+	
+    // constructor
+	init()
+	{
+		name = "Name"
+		age = 0
+		weight = 0.0
+		height = 0.0
+	}
+	
+	func printInfo()
+	{
+		print("Name: \(name)")
+		print("Age: \(age)")
+		print("Weight: \(weight)")
+		print("Height: \(height)")
+	}
+
+    //destructor
+    deinit
+	{
+		print("Object is destroyed")
+	}
+}
+
+// inheritance
+class Object2 : Object
+{
+    init()
+    {
+        
+    }
+}
+
+// use super/self
+class Object2 : Object
+{
+    override init()
+    {
+        // super.init()
+        // super.name = "Name2"
+        super.function()
+
+        self.name = "Name2"
+        self.function()
+    }
+}
+
+class BubbleSort {
+    func sort(_ array: [Int]) -> [Int] {
+        var arr = array
+        let n = arr.count
+        for i in 0..<n-1 {
+            for j in 0..<n-i-1 {
+                if arr[j] > arr[j+1] {
+                    let temp = arr[j]
+                    arr[j] = arr[j+1]
+                    arr[j+1] = temp
+                }
+            }
+        }
+        
+        return arr
+    }
+}
+
+let bubbleSort = BubbleSort()
+//bubbleSort.sort([5, 4, 3, 2, 1]) 
+
+// create a generic class
+class Information<T> {
+
+  // property of T type
+  var data: T
+
+  init (data: T) {
+    self.data = data
+  }
+
+  // method that return T type variable
+  func getData() -> T {
+    return self.data
+  }
+}
+
+// initialize generic class with Int data
+var intObj = Information<Int>(data: 6)
+print("Generic Class returns:", intObj.getData())
+
+// initialize generic class with String data
+var strObj = Information<String>(data: "Swift")
+print("Generic Class returns:", strObj.getData())
+
+// STRUCTS
+struct emptystruct {}
+
+struct Resolution {
+	var width = 0
+	var height = 0
+}
+
+
+
