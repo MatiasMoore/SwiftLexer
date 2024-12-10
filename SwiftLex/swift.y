@@ -184,7 +184,7 @@ SUBSCRIPT_SQUARE_BRACKET FUNC_CALL_ROUND_BRACKET
 %type<stmtListNode> lowLevelStmtList
 %type<stmtListNode> lowLevelStmtListE
 
-%type<stmtListNode> funcStmtListE
+%type<stmtListNode> lowLevelStmtListNoReturn
 
 %type<stmtNode> topLevelStmtIncomplete
 %type<stmtNode> topLevelStmt
@@ -383,8 +383,8 @@ lowLevelStmt: lowLevelStmtIncomplete { $$ = $1; }
 	| lowLevelStmtIncomplete ';' { $$ = $1; $$->_hasSemicolon = true; }
 	;
 
-lowLevelStmtList: lowLevelStmt {printf("P: lowLevelStmtList\n"); $$ = StmtListNode::createListNode($1);}
-	| lowLevelStmtList lowLevelStmt {
+lowLevelStmtListNoReturn: lowLevelStmt {printf("P: lowLevelStmtList\n"); $$ = StmtListNode::createListNode($1);}
+	| lowLevelStmtListNoReturn lowLevelStmt {
         if (!($1->_vec.back()->_hasSemicolon) && @1.last_line == @2.first_line){
             yyerror("Syntax error: two statements in one line must be separated with a ';'");
         }
@@ -395,12 +395,7 @@ lowLevelStmtList: lowLevelStmt {printf("P: lowLevelStmtList\n"); $$ = StmtListNo
     }
 	;
 
-lowLevelStmtListE: lowLevelStmtList {$$ = $1;}
-	| %empty { $$ = nullptr; }
-    ;
-
-    /* FUNC STMT (with return) */
-funcStmtListE:  lowLevelStmtList returnStmt {
+lowLevelStmtList:  lowLevelStmtListNoReturn returnStmt {
         if (!($1->_vec.back()->_hasSemicolon) && @1.last_line == @2.first_line){
             yyerror("Syntax error: two statements in one line must be separated with a ';'");
         }
@@ -409,10 +404,13 @@ funcStmtListE:  lowLevelStmtList returnStmt {
             $$ = $1->appendNode($2);
 		}
     }
-    | lowLevelStmtList {printf("P: END funcStmtList lowLevelStmtList only\n"); $$ = $1;}
+    | lowLevelStmtListNoReturn {printf("P: END funcStmtList lowLevelStmtList only\n"); $$ = $1;}
     | returnStmt {printf("P: END funcStmtList RETURN only\n"); $$ = StmtListNode::createListNode($1);}
-    | %empty { $$ = nullptr; }
 	;
+
+lowLevelStmtListE: lowLevelStmtList {$$ = $1;}
+	| %empty { $$ = nullptr; }
+    ;
 
     /* TOP LEVEL STMT */
 topLevelStmtIncomplete: funcDeclaration {printf("P: topLevelStmtIncomplete funcDec\n"); $$ = StmtNode::createStmtFuncDecl($1);}
@@ -475,27 +473,27 @@ funcReturnTypeE: %empty { $$ = nullptr; }
     ;
 
     //TODO add where clause
-funcDecIncomplete: FUNC ID anyRoundBracket funcDeclArgListE ')' funcReturnTypeE '{' funcStmtListE '}' {
+funcDecIncomplete: FUNC ID anyRoundBracket funcDeclArgListE ')' funcReturnTypeE '{' lowLevelStmtListE '}' {
     printf("P: func declIncomplete\n");
     $$ = FuncDeclNode::createRegular($2, $4, $8, $6, false);
     }
-    | FUNC ID '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' funcReturnTypeE '{' funcStmtListE '}' {
+    | FUNC ID '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' funcReturnTypeE '{' lowLevelStmtListE '}' {
     printf("P: func declIncomplete generic\n");
     $$ = FuncDeclNode::createGeneric($2, $4, $7, $11, $9, false);
     }
-    | FUNC ID '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' funcReturnTypeE whereClause '{' funcStmtListE '}' {
+    | FUNC ID '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' funcReturnTypeE whereClause '{' lowLevelStmtListE '}' {
     printf("P: func declIncomplete generic where\n");
     }
 
-    | FUNC ID anyRoundBracket funcDeclArgListE ')' THROWS funcReturnTypeE '{' funcStmtListE '}' {
+    | FUNC ID anyRoundBracket funcDeclArgListE ')' THROWS funcReturnTypeE '{' lowLevelStmtListE '}' {
     printf("P: func declIncomplete throws\n");
     $$ = FuncDeclNode::createRegular($2, $4, $9, $7, true);
     }
-    | FUNC ID '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' THROWS funcReturnTypeE '{' funcStmtListE '}' {
+    | FUNC ID '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' THROWS funcReturnTypeE '{' lowLevelStmtListE '}' {
     printf("P: func declIncomplete generic throws\n");
     $$ = FuncDeclNode::createGeneric($2, $4, $7, $12, $10, true);
     }
-    | FUNC ID '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' THROWS funcReturnTypeE whereClause '{' funcStmtListE '}' {
+    | FUNC ID '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' THROWS funcReturnTypeE whereClause '{' lowLevelStmtListE '}' {
     printf("P: func declIncomplete generic where throws\n");
     }
     ;
@@ -538,19 +536,19 @@ overloadableOperators: BINARY_PLUS {$$ = OverloadableOperatorType::OpPLUS;}
     | OP_NIL_COALESCE {$$ = OverloadableOperatorType::OpNILCOALESCE;}
     ;
 
-funcOverloadOperatorIncomplete: FUNC overloadableOperators anyRoundBracket funcDeclArgListE ')' funcReturnTypeE '{' funcStmtListE '}' {
+funcOverloadOperatorIncomplete: FUNC overloadableOperators anyRoundBracket funcDeclArgListE ')' funcReturnTypeE '{' lowLevelStmtListE '}' {
     printf("P: func overload Operator Incomplete\n");
     $$ = FuncDeclNode::createRegularOperator($2, $4, $8, $6, false);
 }
-    | FUNC overloadableOperators anyRoundBracket funcDeclArgListE ')' THROWS funcReturnTypeE '{' funcStmtListE '}' {
+    | FUNC overloadableOperators anyRoundBracket funcDeclArgListE ')' THROWS funcReturnTypeE '{' lowLevelStmtListE '}' {
         printf("P: func overload Operator Incomplete\n");
         $$ = FuncDeclNode::createRegularOperator($2, $4, $9, $7, true);
         }
-    | FUNC overloadableOperators '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' funcReturnTypeE '{' funcStmtListE '}' {
+    | FUNC overloadableOperators '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' funcReturnTypeE '{' lowLevelStmtListE '}' {
         printf("P: func overload Operator Incomplete\n");
         $$ = FuncDeclNode::createGenericOperator($2, $4, $7, $11, $9, false);
         }
-    | FUNC overloadableOperators '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' THROWS funcReturnTypeE '{' funcStmtListE '}' {
+    | FUNC overloadableOperators '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' THROWS funcReturnTypeE '{' lowLevelStmtListE '}' {
         printf("P: func overload Operator Incomplete\n");
         $$ = FuncDeclNode::createGenericOperator($2, $4, $7, $12, $10, true);
         }
@@ -582,18 +580,18 @@ modifiersWordsList: modifiersWords {printf("P: modifiersWordsList\n"); $$ = Acce
 	| modifiersWordsList modifiersWords {printf("P: modifiersWordsList\n"); $$ = $1->appendNode($2);}
 	;
 
-constructorDeclIncomplete: INIT anyRoundBracket funcDeclArgListE ')' '{' funcStmtListE '}' { printf("P: constructor declaration\n"); $$ = ConstructorDeclNode::createConstructor($3, $6, false);}
-    | INIT anyRoundBracket funcDeclArgListE ')' THROWS '{' funcStmtListE '}' {printf("P: constructor declaration\n"); $$ = ConstructorDeclNode::createConstructor($3, $7, true);}
+constructorDeclIncomplete: INIT anyRoundBracket funcDeclArgListE ')' '{' lowLevelStmtListE '}' { printf("P: constructor declaration\n"); $$ = ConstructorDeclNode::createConstructor($3, $6, false);}
+    | INIT anyRoundBracket funcDeclArgListE ')' THROWS '{' lowLevelStmtListE '}' {printf("P: constructor declaration\n"); $$ = ConstructorDeclNode::createConstructor($3, $7, true);}
 
-    | INIT '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' '{' funcStmtListE '}' {printf("P: constructor declaration generic\n"); $$ = ConstructorDeclNode::createConstructorGeneric($3, $6, $9, false);}
-    | INIT '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' THROWS '{' funcStmtListE '}' {printf("P: constructor declaration generic\n"); $$ = ConstructorDeclNode::createConstructorGeneric($3, $6, $10, true);}
+    | INIT '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' '{' lowLevelStmtListE '}' {printf("P: constructor declaration generic\n"); $$ = ConstructorDeclNode::createConstructorGeneric($3, $6, $9, false);}
+    | INIT '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' THROWS '{' lowLevelStmtListE '}' {printf("P: constructor declaration generic\n"); $$ = ConstructorDeclNode::createConstructorGeneric($3, $6, $10, true);}
     ;
 
 constructorDeclaration: modifiersWordsList constructorDeclIncomplete { $$ = $2; $$ = $$->addModifiers($1);}
     | constructorDeclIncomplete { $$ = $1;}
     ;
 
-destructorDeclaration: DEINIT '{' funcStmtListE '}' {printf("P: destructor declaration\n"); $$ = DestructorDeclNode::createDestructor($3);}
+destructorDeclaration: DEINIT '{' lowLevelStmtListE '}' {printf("P: destructor declaration\n"); $$ = DestructorDeclNode::createDestructor($3);}
     ;
 
 funcCallArg: ID ':' expr {printf("P: funcCallArg\n"); $$ = FuncCallArgNode::createFromExprAndName($3, $1);}
