@@ -124,7 +124,7 @@ TYPE_DOUBLE
 
 SUBSCRIPT_SQUARE_BRACKET FUNC_CALL_ROUND_BRACKET
 
-%left '=' ID
+%left '='
 
 %right '?' ':'  
 
@@ -195,6 +195,7 @@ SUBSCRIPT_SQUARE_BRACKET FUNC_CALL_ROUND_BRACKET
 %type<stmtNode> stmtOperators
 %type<stmtListNode> program
 %type<typeNode> type
+%type<typeNode> genericType
 
 %type<varDeclNode> varIdWithType
 %type<varDeclListNode> varList
@@ -269,6 +270,10 @@ program: topLevelStmtListE {printf("P: program\n"); $$ = $1; _root = $$;}
     ;
 
 
+typeList: type {printf("P: typeList \n");}
+    | typeList ',' type {printf("P: typeList \n");}
+    ;
+
 type: TYPE_BOOL {$$ = TypeNode::createType(TypeType::BoolT);}
     | TYPE_STRING {$$ = TypeNode::createType(TypeType::StringT);}
     | TYPE_CHARACTER {$$ = TypeNode::createType(TypeType::CharacterT);}
@@ -287,6 +292,7 @@ type: TYPE_BOOL {$$ = TypeNode::createType(TypeType::BoolT);}
     | TYPE_DOUBLE {$$ = TypeNode::createType(TypeType::FloatT);}
     | ID {$$ = TypeNode::createIdType($1);}
     | '[' type ']' {$$ = TypeNode::createArrayType($2);}
+    | ID '<' typeList '>' { $$ = nullptr; }
     ;
 
     /* CLASS STMT */
@@ -481,9 +487,6 @@ funcDecIncomplete: FUNC ID anyRoundBracket funcDeclArgListE ')' funcReturnTypeE 
     printf("P: func declIncomplete generic\n");
     $$ = FuncDeclNode::createGeneric($2, $4, $7, $11, $9, false);
     }
-    | FUNC ID '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' funcReturnTypeE whereClause '{' lowLevelStmtListE '}' {
-    printf("P: func declIncomplete generic where\n");
-    }
 
     | FUNC ID anyRoundBracket funcDeclArgListE ')' THROWS funcReturnTypeE '{' lowLevelStmtListE '}' {
     printf("P: func declIncomplete throws\n");
@@ -492,9 +495,6 @@ funcDecIncomplete: FUNC ID anyRoundBracket funcDeclArgListE ')' funcReturnTypeE 
     | FUNC ID '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' THROWS funcReturnTypeE '{' lowLevelStmtListE '}' {
     printf("P: func declIncomplete generic throws\n");
     $$ = FuncDeclNode::createGeneric($2, $4, $7, $12, $10, true);
-    }
-    | FUNC ID '<' genericIdList '>' anyRoundBracket funcDeclArgListE ')' THROWS funcReturnTypeE whereClause '{' lowLevelStmtListE '}' {
-    printf("P: func declIncomplete generic where throws\n");
     }
     ;
 
@@ -611,7 +611,6 @@ classDeclIncomplete: CLASS ID '{' stmtClassInnerListE '}' {printf("P: classDeclI
     | CLASS ID ':' ID '{' stmtClassInnerListE '}' {printf("P: classDeclIncomplete\n"); $$ = ClassDeclNode::createClassWithBaseClass($2, $6, nullptr, $4);}
     | CLASS ID '<' genericIdList '>' '{' stmtClassInnerListE '}' {printf("P: classDeclIncomplete generic\n"); $$ = ClassDeclNode::createClass($2, $7, $4);}
     | CLASS ID '<' genericIdList '>' ':' ID '{' stmtClassInnerListE '}' {printf("P: classDeclIncomplete generic\n"); $$ = ClassDeclNode::createClassWithBaseClass($2, $9, $4, $7);}
-    | CLASS ID '<' genericIdList '>' whereClause '{' stmtClassInnerListE '}' {printf("P: classDeclIncomplete generic\n");}
     ;
 
 classDeclaration: modifiersWordsList classDeclIncomplete {printf("P: class declaration with prefix\n"); $$ = $2; $$ = $$->addModifiers($1);}
@@ -621,7 +620,6 @@ classDeclaration: modifiersWordsList classDeclIncomplete {printf("P: class decla
 structDeclIncomplete: STRUCT ID '{' stmtStructInnerListE '}' {printf("P: structDeclIncomplete\n"); $$ = StructDeclarationNode::createRegular($2, $4);}
 	| STRUCT ID ':' ID '{' stmtStructInnerListE '}' {printf("P: structDeclIncomplete\n"); $$ = StructDeclarationNode::createRegular($2, $6);}
     | STRUCT ID '<' genericIdList '>' '{' stmtStructInnerListE '}' {printf("P: structDeclIncomplete generic\n");  $$ = StructDeclarationNode::createGeneric($2, $4, $7);}
-    | STRUCT ID '<' genericIdList '>' whereClause '{' stmtStructInnerListE '}' {printf("P: structDeclIncomplete generic\n"); $$ = StructDeclarationNode::createGeneric($2, $4, $8);}
 	;
 
 structDeclaration: modifiersWordsList structDeclIncomplete {printf("P: struct declaration with prefix\n"); $$ = $2->addModifiers($1);}
@@ -636,12 +634,32 @@ exprListE: %empty
     | exprList
     ;
 
-genericIdType:  ID '<' typeList '>' {printf("P: genericIdType\n"); switchStateToSubscript();}
+genericType: TYPE_BOOL {$$ = TypeNode::createType(TypeType::BoolT);}
+    | TYPE_STRING {$$ = TypeNode::createType(TypeType::StringT);}
+    | TYPE_CHARACTER {$$ = TypeNode::createType(TypeType::CharacterT);}
+    | TYPE_INT8 {$$ = TypeNode::createType(TypeType::IntT);}
+    | TYPE_INT16 {$$ = TypeNode::createType(TypeType::IntT);}
+    | TYPE_INT32 {$$ = TypeNode::createType(TypeType::IntT);}
+    | TYPE_INT64 {$$ = TypeNode::createType(TypeType::IntT);}
+    | TYPE_INT {$$ = TypeNode::createType(TypeType::IntT);}
+    | TYPE_UINT8 {$$ = TypeNode::createType(TypeType::IntT);}
+    | TYPE_UINT16 {$$ = TypeNode::createType(TypeType::IntT);}
+    | TYPE_UINT32 {$$ = TypeNode::createType(TypeType::IntT);}
+    | TYPE_UINT64 {$$ = TypeNode::createType(TypeType::IntT);}
+    | TYPE_UINT {$$ = TypeNode::createType(TypeType::IntT);}
+    | TYPE_FLOAT {$$ = TypeNode::createType(TypeType::FloatT);}
+    | TYPE_FLOAT80 {$$ = TypeNode::createType(TypeType::FloatT);}
+    | TYPE_DOUBLE {$$ = TypeNode::createType(TypeType::FloatT);}
+    | expr
+    ;
+
+genericFuncCallPrefix: type {printf("P: genericFuncCallPrefix\n"); switchStateToSubscript();}
 	;
 
-funcCall: ID FUNC_CALL_ROUND_BRACKET ')' {printf("P: funcCall exprList\n"); $$ = FuncCallNode::createFuncCallNoArgs($1);}
-	| genericIdType FUNC_CALL_ROUND_BRACKET ')' {printf("P: funcCall exprList\n");}
-    | ID FUNC_CALL_ROUND_BRACKET exprList ')' {
+funcCall: expr FUNC_CALL_ROUND_BRACKET ')' {printf("P: funcCall exprList\n"); /*$$ = FuncCallNode::createFuncCallNoArgs($1);*/}
+	| genericFuncCallPrefix FUNC_CALL_ROUND_BRACKET ')' {printf("P: funcCall exprList\n");}
+    | expr FUNC_CALL_ROUND_BRACKET exprList ')' {
+    /*
         printf("P: funcCall exprList\n"); 
 
         //Convert exprList to argList
@@ -659,11 +677,12 @@ funcCall: ID FUNC_CALL_ROUND_BRACKET ')' {printf("P: funcCall exprList\n"); $$ =
         //Finally create the func call node
 
         $$ = FuncCallNode::createFuncCall($1, argList);
+        */
 
     }
-	| genericIdType FUNC_CALL_ROUND_BRACKET exprList ')' {printf("P: funcCall exprList\n");}
-    | ID FUNC_CALL_ROUND_BRACKET funcCallArgList ')' {printf("P: funcCall labelArgs\n"); $$ = FuncCallNode::createFuncCall($1, $3);}
-	| genericIdType FUNC_CALL_ROUND_BRACKET funcCallArgList ')' {printf("P: funcCall labelArgs\n");}
+	| genericFuncCallPrefix FUNC_CALL_ROUND_BRACKET exprList ')' {printf("P: funcCall exprList\n");}
+    | expr FUNC_CALL_ROUND_BRACKET funcCallArgList ')' {printf("P: funcCall labelArgs\n"); /*$$ = FuncCallNode::createFuncCall($1, $3);*/}
+	| genericFuncCallPrefix FUNC_CALL_ROUND_BRACKET funcCallArgList ')' {printf("P: funcCall labelArgs\n");}
     ;
 
 assignment: expr '=' expr {printf("P: assignment\n"); $$ = StmtNode::createStmtAssignment($1, $3); }
@@ -719,10 +738,6 @@ varDeclaration: modifiersWordsList varDeclIncommplete {printf("P: variable decla
     | varDeclIncommplete {printf("P: variable declaration default\n"); $$ = $1;}
     ;
 
-typeList: type {printf("P: typeList \n");}
-    | typeList ',' type {printf("P: typeList \n");}
-    ;
-
 enumIdList: ID {printf("P: enum: enumIdList \n"); $$ = IdListNode::createListNode(IdNode::create($1));}
     | enumIdList ',' ID {printf("P: enum: enumIdList \n"); $$ = $1->appendNode(IdNode::create($3));}
     ;
@@ -750,15 +765,9 @@ whereIdTypes: ID ':' type {printf("P: whereIdTypes\n");}
 	| whereIdTypes ',' ID ':' type {printf("P: whereIdTypes\n");}
 	;
 
-whereClause: WHERE exprList {printf("P: whereClause\n");}
-    | WHERE whereIdTypes {printf("P: whereClause ID type\n");}
-    ;
-
     //TODO add where clause to loops
-forInLoop: FOR ID IN expr whereClause '{' lowLevelStmtList '}' {printf("P: forInLoop\n"); }
-    | FOR ID IN expr '{' lowLevelStmtList '}' {printf("P: forInLoop\n"); $$ = LoopNode::createForLoop($2, $4, $6);}
+forInLoop: FOR ID IN expr '{' lowLevelStmtList '}' {printf("P: forInLoop\n"); $$ = LoopNode::createForLoop($2, $4, $6);}
 
-    | FOR ID IN expr whereClause '{' '}' {printf("P: forInLoop\n");}
     | FOR ID IN expr '{' '}' {printf("P: forInLoop\n"); $$ = LoopNode::createForLoopNoBody($2, $4);}
     ;
 
@@ -779,8 +788,6 @@ switchCase: SWITCH expr '{'caseList defaultCase '}' {printf("P: switch\n"); $$ =
 	;
 
 caseElement: CASE exprList ':' lowLevelStmtList {printf("P: case\n"); $$ = CaseElementNode::createCaseExprList($2, $4);}
-    | CASE exprList whereClause ':' lowLevelStmtList {printf("P: case\n");}
-    | CASE LET ID whereClause ':' lowLevelStmtList {printf("P: case\n");}
     ;
 
 caseList: caseElement {printf("P: caseList\n"); $$ = CaseElementListNode::createListNode($1);}
@@ -893,9 +900,9 @@ expr: LITERAL_INT {printf("P: expr int\n"); switchStateToSubscript(); $$ = ExprN
     | expr '?' expr ':' expr {printf("P: expr ternary ? :\n"); switchStateToSubscript(); $$ = ExprNode::createTernary($1, $3, $5);}
     | '(' expr ')' {printf("P: expr brackets\n"); $$ = $2; switchStateToSubscript();}
     | funcCall {printf("P: expr funcCall\n"); switchStateToSubscript(); switchStateToSubscript(); $$ = ExprNode::createFuncCall($1);}
-    | SUPER '.' funcCall {printf("P: expr super funcCall\n"); switchStateToSubscript(); $3->_scopeType = superCall; $$ = ExprNode::createFuncCall($3);}
-    | expr '.' funcCall {printf("P: expr func access\n"); switchStateToSubscript(); $3->setAsExprAccess($1); $$ = ExprNode::createFuncCall($3);}
-    | SELF '.' funcCall {printf("P: expr self func access\n"); switchStateToSubscript(); $3->_scopeType = selfCall; $$ = ExprNode::createFuncCall($3);}
+    //| SUPER '.' funcCall {printf("P: expr super funcCall\n"); switchStateToSubscript(); $3->_scopeType = superCall; $$ = ExprNode::createFuncCall($3);}
+    //| expr '.' funcCall {printf("P: expr func access\n"); switchStateToSubscript(); $3->setAsExprAccess($1); $$ = ExprNode::createFuncCall($3);}
+    //| SELF '.' funcCall {printf("P: expr self func access\n"); switchStateToSubscript(); $3->_scopeType = selfCall; $$ = ExprNode::createFuncCall($3);}
     | expr '.' ID {printf("P: expr field access\n"); switchStateToSubscript(); $$ = ExprNode::createFieldAccessExpr($1, $3);}
     | SELF '.' ID {printf("P: expr self fieldAccess\n"); switchStateToSubscript(); $$ = ExprNode::createFieldAccessSelf($3);}
     | '[' exprList ']' {printf("P: expr array\n"); switchStateToSubscript(); $$ = ExprNode::createArray($2);}
