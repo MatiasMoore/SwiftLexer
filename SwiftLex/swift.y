@@ -839,7 +839,7 @@ expr: LITERAL_INT {printf("P: expr int\n"); switchStateToSubscript(); $$ = ExprN
     | FALSE {printf("P: expr FALSE\n"); switchStateToSubscript(); $$ = ExprNode::createBool(false);}
     | '~' expr {printf("P: expr ~\n"); switchStateToSubscript(); $$ = ExprNode::createUnaryOp(ExprType::BitNot, $2);}
 
-    | expr BINARY_NOT expr {printf("P: expr BINARY_NOT\n"); switchStateToSubscript();}
+    | expr BINARY_NOT expr {printf("P: expr BINARY_NOT\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::BinaryNot, $1, $3);}
     | PREFIX_NOT expr {printf("P: expr PREFIX_NOT\n"); switchStateToSubscript(); $$ = ExprNode::createUnaryOp(ExprType::LogNot, $2);}
     | expr POSTFIX_NOT {printf("P: expr POSTFIX_NOT\n"); switchStateToSubscript();}
     
@@ -848,20 +848,20 @@ expr: LITERAL_INT {printf("P: expr int\n"); switchStateToSubscript(); $$ = ExprN
     | expr POSTFIX_MINUS {printf("P: expr postfix POSTFIX_MINUS\n"); switchStateToSubscript();}
 
     | expr BINARY_PLUS expr {printf("P: expr +\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::Sum, $1, $3);}
-    | PREFIX_PLUS expr {printf("P: expr +\n"); switchStateToSubscript();}
-    | expr POSTFIX_PLUS {printf("P: expr +\n"); switchStateToSubscript();}
+    | PREFIX_PLUS expr {printf("P: expr +\n"); switchStateToSubscript(); $$ = ExprNode::createUnaryOp(ExprType::PrefixPlus, $2);}
+    | expr POSTFIX_PLUS {printf("P: expr +\n"); switchStateToSubscript(); $$ = ExprNode::createUnaryOp(ExprType::PostfixPlus, $1);}
     
     | expr BINARY_DIV expr {printf("P: expr BINARY_DIV\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::Div, $1, $3);}
-    | PREFIX_DIV expr {printf("P: expr PREFIX_DIV\n"); switchStateToSubscript();}
-    | expr POSTFIX_DIV {printf("P: expr POSTFIX_DIV\n"); switchStateToSubscript();}
+    | PREFIX_DIV expr {printf("P: expr PREFIX_DIV\n"); switchStateToSubscript(); $$ = ExprNode::createUnaryOp(ExprType::PrefixDiv, $2);}
+    | expr POSTFIX_DIV {printf("P: expr POSTFIX_DIV\n"); switchStateToSubscript(); $$ = ExprNode::createUnaryOp(ExprType::PostfixDiv, $1);}
 
     | expr BINARY_MUL expr {printf("P: expr BINARY_MUL\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::Mul, $1, $3);}
-    | PREFIX_MUL expr {printf("P: expr PREFIX_MUL\n"); switchStateToSubscript();}
-    | expr POSTFIX_MUL {printf("P: expr POSTFIX_MUL\n"); switchStateToSubscript();}
+    | PREFIX_MUL expr {printf("P: expr PREFIX_MUL\n"); switchStateToSubscript(); $$ = ExprNode::createUnaryOp(ExprType::PrefixMul, $2);}
+    | expr POSTFIX_MUL {printf("P: expr POSTFIX_MUL\n"); switchStateToSubscript(); $$ = ExprNode::createUnaryOp(ExprType::PostfixMul, $1);}
 
     | expr BINARY_MOD expr {printf("P: expr BINARY_MOD\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::Modulus, $1, $3);}
-    | PREFIX_MOD expr {printf("P: expr PREFIX_MOD\n"); switchStateToSubscript();}
-    | expr POSTFIX_MOD {printf("P: expr POSTFIX_MOD\n"); switchStateToSubscript();}
+    | PREFIX_MOD expr {printf("P: expr PREFIX_MOD\n"); switchStateToSubscript(); $$ = ExprNode::createUnaryOp(ExprType::PrefixMod, $2);}
+    | expr POSTFIX_MOD {printf("P: expr POSTFIX_MOD\n"); switchStateToSubscript(); $$ = ExprNode::createUnaryOp(ExprType::PostfixMod, $1);}
 
     | expr '<' expr {printf("P: expr <\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::LT, $1, $3);}
     | expr '>' expr {printf("P: expr >\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::GT, $1, $3);}
@@ -874,12 +874,12 @@ expr: LITERAL_INT {printf("P: expr int\n"); switchStateToSubscript(); $$ = ExprN
     | expr '^' expr {printf("P: expr ^\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::BitXor, $1, $3);}
 
     | expr BINARY_LOG_AND expr {printf("P: expr BINARY_LOG_AND\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::LogAnd, $1, $3);}
-    | PREFIX_LOG_AND expr {printf("P: expr PREFIX_LOG_AND\n"); switchStateToSubscript();}
-    | expr POSTFIX_LOG_AND {printf("P: expr POSTFIX_LOG_AND\n"); switchStateToSubscript();}
+    | PREFIX_LOG_AND expr {printf("P: expr PREFIX_LOG_AND\n"); switchStateToSubscript(); $$ = ExprNode::createUnaryOp(ExprType::PrefixLogAnd, $2);}
+    | expr POSTFIX_LOG_AND {printf("P: expr POSTFIX_LOG_AND\n"); switchStateToSubscript(); $$ = ExprNode::createUnaryOp(ExprType::PostfixLogAnd, $1);}
 
     | expr BINARY_LOG_OR expr {printf("P: expr BINARY_LOG_OR\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::LogOr, $1, $3);}
-    | PREFIX_LOG_OR expr {printf("P: expr PREFIX_LOG_OR\n"); switchStateToSubscript();}
-    | expr POSTFIX_LOG_OR {printf("P: expr POSTFIX_LOG_OR\n"); switchStateToSubscript();}
+    | PREFIX_LOG_OR expr {printf("P: expr PREFIX_LOG_OR\n"); switchStateToSubscript(); $$ = ExprNode::createUnaryOp(ExprType::PrefixLogOr, $2);}
+    | expr POSTFIX_LOG_OR {printf("P: expr POSTFIX_LOG_OR\n"); switchStateToSubscript(); $$ = ExprNode::createUnaryOp(ExprType::PrefixLogOr, $1);}
 
     | expr OP_LSHIFT expr {printf("P: expr <<\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::Lshift, $1, $3);}
     | expr OP_RSHIFT expr {printf("P: expr >>\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::Rshift, $1, $3);}

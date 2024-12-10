@@ -46,7 +46,20 @@ enum ExprType
 	TypeCheck,
 	TypeCast,
 	TypeCastWithThrow,
-	TypeCastWithCheck
+	TypeCastWithCheck,
+	BinaryNot,
+	PrefixPlus,
+	PostfixPlus,
+	PrefixDiv,
+	PostfixDiv,
+	PrefixMul,
+	PostfixMul,
+	PrefixMod,
+	PostfixMod,
+	PrefixLogAnd,
+	PostfixLogAnd,
+	PrefixLogOr,
+	PostfixLogOr
 };
 
 class ExprListNode : public GenericListNode<ExprNode, ExprListNode>

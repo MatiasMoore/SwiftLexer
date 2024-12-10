@@ -271,6 +271,45 @@ std::string ExprNode::getName()
 	case ExprType::TypeCastWithCheck:
 		return "TypeCastWithCheck as?";
 		break;
+	case ExprType::BinaryNot:
+		return "BinaryNot";
+		break;
+	case ExprType::PrefixPlus:
+		return "PrefixPlus";
+		break;
+	case ExprType::PostfixPlus:
+		return "PostfixPlus";
+		break;
+	case ExprType::PrefixDiv:
+		return "PrefixDiv";
+		break;
+	case ExprType::PostfixDiv:
+		return "PostfixDiv";
+		break;
+	case ExprType::PrefixMul:
+		return "PrefixMul";
+		break;
+	case ExprType::PostfixMul:
+		return "PostfixMul";
+		break;
+	case ExprType::PostfixMod:
+		return "PostfixMod";
+		break;
+	case ExprType::PrefixMod:
+		return "PrefixMod";
+		break;
+	case ExprType::PrefixLogAnd:
+		return "PrefixLogAnd";
+		break;
+	case ExprType::PostfixLogAnd:
+		return "PostfixLogAnd";
+		break;
+	case ExprType::PrefixLogOr:
+		return "PrefixLogOr";
+		break;
+	case ExprType::PostfixLogOr:
+		return "PostfixLogOr";
+		break;
 	default:
 		throw std::runtime_error("Unknown type!");
 		break;
@@ -313,6 +352,18 @@ void ExprNode::generateDot(std::ofstream& file)
 	case ExprType::BitNot:
 	case ExprType::LogNot:
 	case ExprType::UnaryMinus:
+	case ExprType::PrefixPlus:
+	case ExprType::PostfixPlus:
+	case ExprType::PrefixDiv:
+	case ExprType::PostfixDiv:
+	case ExprType::PrefixMul:
+	case ExprType::PostfixMul:
+	case ExprType::PostfixMod:
+	case ExprType::PrefixMod:
+	case ExprType::PrefixLogAnd:
+	case ExprType::PostfixLogAnd:
+	case ExprType::PrefixLogOr:
+	case ExprType::PostfixLogOr:
 		file << dotLabel(this->_id, this->getName());
 		file << dotConnection(this->_id, this->_unary->_id);
 		this->_unary->generateDot(file);
@@ -356,6 +407,7 @@ void ExprNode::generateDot(std::ofstream& file)
 	case ExprType::ClosedRange:
 	case ExprType::HalfOpenRange:
 	case ExprType::NilCoalesce:
+	case ExprType::BinaryNot:
 		file << dotLabel(this->_id, this->getName());
 		file << dotConnection(this->_id, this->_left->_id);
 		file << dotConnection(this->_id, this->_right->_id);
