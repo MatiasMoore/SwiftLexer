@@ -126,7 +126,7 @@ class Object2 : Object
 }
 
 class BubbleSort {
-    func sort(_ array: [Int]) -> [Int] {
+    public func sort(_ array: [Int]) -> [Int] {
         var arr = array
         let n = arr.count
         for i in 0..<n-1 {
@@ -163,12 +163,15 @@ class Information<T> {
 }
 
 // initialize generic class with Int data
-var intObj = Information<Int>(data: 6)
+// var intObj = Information<Int>(data: 6)
 print("Generic Class returns:", intObj.getData())
 
 // initialize generic class with String data
-var strObj = Information<String>(data: "Swift")
+// var strObj = Information<String>(data: "Swift")
 print("Generic Class returns:", strObj.getData())
+
+// ???
+//[a<Int>(), c < d, v > s]
 
 // STRUCTS
 struct emptystruct {}
@@ -178,5 +181,56 @@ struct Resolution {
 	var height = 0
 }
 
+// ENUMS
+enum emptyenum {}
+
+enum e{
+case a
+case a,b,c,d;
+case a,c,s; case a,c,v
+}
+
+// functions
+func a() {
+
+}
+
+func a(sd: int) -> String {
+    if sd > 2, sd <= 3 {
+        return "dsa"
+    }
+    return "asd"
+}
+
+func b<T>(ds : T) -> T {
+    var s : T = ds
+    return s
+}
+
+func b2<T:Obj1, T2 : Obj3, T2, T4>(){
+    
+}
+
+//func b2<T:Obj1, T2 : Obj3, T2, T4>() -> a<Int, String>{
+//    
+//}
 
 
+a+a; +a; a+; a + a;
+a-a; -a; a-; a - a;
+a!a; !a; a!; a ! a;
+a*a; *a; a*; a * a;
+a/a; /a; a/; a / a;
+a%a; %a; a%; a % a;
+a!a; !a; a!; a ! a;
+a>a; a>=a;
+//a<a; a<=a;
+a==a; a!=a;
+a&a;
+a|a;
+a^a;
+a&&;
+a||a;
+
+
+var a = a ? 1 : 2
