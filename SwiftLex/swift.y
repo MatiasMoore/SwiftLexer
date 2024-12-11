@@ -270,10 +270,6 @@ program: topLevelStmtListE {printf("P: program\n"); $$ = $1; _root = $$;}
     ;
 
 
-typeList: type {printf("P: typeList \n");}
-    | typeList ',' type {printf("P: typeList \n");}
-    ;
-
 type: TYPE_BOOL {$$ = TypeNode::createType(TypeType::BoolT);}
     | TYPE_STRING {$$ = TypeNode::createType(TypeType::StringT);}
     | TYPE_CHARACTER {$$ = TypeNode::createType(TypeType::CharacterT);}
@@ -650,10 +646,14 @@ genericType: TYPE_BOOL {$$ = TypeNode::createType(TypeType::BoolT);}
     | TYPE_FLOAT {$$ = TypeNode::createType(TypeType::FloatT);}
     | TYPE_FLOAT80 {$$ = TypeNode::createType(TypeType::FloatT);}
     | TYPE_DOUBLE {$$ = TypeNode::createType(TypeType::FloatT);}
-    | expr
+    | ID { $$ = nullptr;}
     ;
 
-genericFuncCallPrefix: type {printf("P: genericFuncCallPrefix\n"); switchStateToSubscript();}
+typeList: genericType {printf("P: typeList \n");}
+    | typeList ',' genericType {printf("P: typeList \n");}
+    ;
+
+genericFuncCallPrefix: expr '<' typeList '>' {printf("P: genericFuncCallPrefix\n"); switchStateToSubscript();}
 	;
 
 funcCall: expr FUNC_CALL_ROUND_BRACKET ')' {printf("P: funcCall exprList\n"); /*$$ = FuncCallNode::createFuncCallNoArgs($1);*/}
