@@ -18,9 +18,9 @@ print(greetAgain(person: "Anna"))
 
 func greet(person: String, alreadyGreeted: Bool) -> String {
     if alreadyGreeted {
-        // return greetAgain(person: person)
+        return greetAgain(person: person)
     } else {
-        // return greet(person: person)
+        return greet(person: person)
     }
 }
 print(greet(person: "Tim", alreadyGreeted: true))
@@ -30,7 +30,7 @@ func printAndCount(string: String) -> Int {
     return string.count
 }
 func printWithoutCounting(string: String) {
-    // let _ = printAndCount(string: string)
+
 }
 printAndCount(string: "hello, world")
 // prints "hello, world" and returns a value of 12
@@ -56,8 +56,8 @@ print("Game over!")
 
 let finalSquare = 25
 var board = 1
-// board[03] = +08; board[06] = +11; board[09] = +09; board[10] = +02
-// board[14] = -10; board[19] = -11; board[22] = -02; board[24] = -08
+board[03] = +08; board[06] = +11; board[09] = +09; board[10] = +02
+board[14] = -10; board[19] = -11; board[22] = -02; board[24] = -08
 var square = 0
 var diceRoll = 0
 
