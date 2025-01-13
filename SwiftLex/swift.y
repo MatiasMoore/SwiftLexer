@@ -594,10 +594,6 @@ exprList: expr {printf("P: exprList\n"); $$ = ExprListNode::createListNode($1);}
     | exprList ',' expr {printf("P: exprList\n"); $$ = $$->appendNode($3);}
     ;
 
-exprListE: %empty
-    | exprList
-    ;
-
 funcCall: ID FUNC_CALL_ROUND_BRACKET ')' {printf("P: funcCall exprList\n"); $$ = FuncCallNode::createFuncCallNoArgs($1);}
     | ID FUNC_CALL_ROUND_BRACKET exprList ')' {
         printf("P: funcCall exprList\n"); 
@@ -673,10 +669,6 @@ varDeclIncommplete: VAR varVarList {printf("P: varDeclIncommplete\n"); $$ = $2;}
 
 varDeclaration: modifiersWordsList varDeclIncommplete {printf("P: variable declaration with prefix\n"); $$ = $2; $$ = $$->addModifiers($1);}
     | varDeclIncommplete {printf("P: variable declaration default\n"); $$ = $1;}
-    ;
-
-typeList: type {printf("P: typeList \n");}
-    | typeList ',' type {printf("P: typeList \n");}
     ;
 
 enumIdList: ID {printf("P: enum: enumIdList \n"); $$ = IdListNode::createListNode(IdNode::create($1));}
