@@ -470,7 +470,6 @@ funcReturnTypeE: %empty { $$ = nullptr; }
     | funcReturnType { $$ = $1; }
     ;
 
-    //TODO add where clause
 funcDecIncomplete: FUNC ID anyRoundBracket funcDeclArgListE ')' funcReturnTypeE '{' lowLevelStmtListE '}' {
     printf("P: func declIncomplete\n");
     $$ = FuncDeclNode::createRegular($2, $4, $8, $6, false);
@@ -693,20 +692,8 @@ repeatWhileLoop: REPEAT '{' lowLevelStmtList '}' WHILE exprList {printf("P: repe
     | REPEAT '{' '}' WHILE exprList {printf("P: repeatWhileLoop\n"); $$ = LoopNode::createRepeatWhileLoopNoBody($5);}
     ;
 
-    //TODO: move this to expr
-whereIdTypes: ID ':' type {printf("P: whereIdTypes\n");}
-	| whereIdTypes ',' ID ':' type {printf("P: whereIdTypes\n");}
-	;
+forInLoop: FOR ID IN expr '{' lowLevelStmtList '}' {printf("P: forInLoop\n"); $$ = LoopNode::createForLoop($2, $4, $6);}
 
-whereClause: WHERE exprList {printf("P: whereClause\n");}
-    | WHERE whereIdTypes {printf("P: whereClause ID type\n");}
-    ;
-
-    //TODO add where clause to loops
-forInLoop: FOR ID IN expr whereClause '{' lowLevelStmtList '}' {printf("P: forInLoop\n"); }
-    | FOR ID IN expr '{' lowLevelStmtList '}' {printf("P: forInLoop\n"); $$ = LoopNode::createForLoop($2, $4, $6);}
-
-    | FOR ID IN expr whereClause '{' '}' {printf("P: forInLoop\n");}
     | FOR ID IN expr '{' '}' {printf("P: forInLoop\n"); $$ = LoopNode::createForLoopNoBody($2, $4);}
     ;
 
@@ -727,8 +714,6 @@ switchCase: SWITCH expr '{'caseList defaultCase '}' {printf("P: switch\n"); $$ =
 	;
 
 caseElement: CASE exprList ':' lowLevelStmtList {printf("P: case\n"); $$ = CaseElementNode::createCaseExprList($2, $4);}
-    | CASE exprList whereClause ':' lowLevelStmtList {printf("P: case\n");}
-    | CASE LET ID whereClause ':' lowLevelStmtList {printf("P: case\n");}
     ;
 
 caseList: caseElement {printf("P: caseList\n"); $$ = CaseElementListNode::createListNode($1);}
