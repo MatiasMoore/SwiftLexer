@@ -147,7 +147,7 @@ let bubbleSort = BubbleSort()
 //bubbleSort.sort([5, 4, 3, 2, 1]) 
 
 // create a generic class
-class Information<T> {
+class Information {
 
   // property of T type
   var data: T
@@ -163,11 +163,11 @@ class Information<T> {
 }
 
 // initialize generic class with Int data
-// var intObj = Information<Int>(data: 6)
+// var intObj = Information(data: 6)
 print("Generic Class returns:", intObj.getData())
 
 // initialize generic class with String data
-// var strObj = Information<String>(data: "Swift")
+// var strObj = Information(data: "Swift")
 print("Generic Class returns:", strObj.getData())
 
 // ???
@@ -202,18 +202,18 @@ func a(sd: int) -> String {
     return "asd"
 }
 
-func b<T>(ds : T) -> T {
+func b(ds : T) -> T {
     var s : T = ds
     return s
 }
 
-func b2<T:Obj1, T2 : Obj3, T2, T4>(){
+func b2(){
     
 }
 
-//func b2<T:Obj1, T2 : Obj3, T2, T4>() -> a<Int, String>{
-//    
-//}
+func b2() -> a{
+    
+}
 
 
 a+a; +a; a+; a + a;
@@ -234,3 +234,8 @@ a||a;
 
 
 var a = a ? 1 : 2
+
+
+func b2() throws -> a {
+    
+}

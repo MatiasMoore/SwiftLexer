@@ -65,9 +65,6 @@
     <ClCompile Include="nodes\FuncDeclArgNode.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="nodes\TypeForGenericNode.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="nodes\FuncDeclNode.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
@@ -174,9 +171,6 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="nodes\FuncDeclArgNode.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="nodes\TypeForGenericNode.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="nodes\FuncDeclNode.h">

@@ -35,7 +35,6 @@ enum OverloadableOperatorType
 class FuncDeclNode : public Dottable
 {
 public:
-	bool _isGeneric;
 	bool _isOperatorOverload;
 
 	bool _hasModifiers;
@@ -52,15 +51,9 @@ public:
 
 	OverloadableOperatorType _overloadOpearatorType;
 
-	TypeForGenericListNode* _typesForGenericList;
-
 	static FuncDeclNode* createRegular(std::string idName, FuncDeclArgListNode* argList, StmtListNode* body, TypeNode* returnType, bool throwsException);
 
-	static FuncDeclNode* createGeneric(std::string idName, TypeForGenericListNode* typesForGenericList, FuncDeclArgListNode* argList, StmtListNode* body, TypeNode* returnType, bool throwsException);
-
 	static FuncDeclNode* createRegularOperator(OverloadableOperatorType overloadType, FuncDeclArgListNode* argList, StmtListNode* body, TypeNode* returnType, bool throwsException);
-
-	static FuncDeclNode* createGenericOperator(OverloadableOperatorType overloadType, TypeForGenericListNode* typesForGenericList, FuncDeclArgListNode* argList, StmtListNode* body, TypeNode* returnType, bool throwsException);
 
 	FuncDeclNode* addModifiers(AccessModifierListNode* modifiers);
 

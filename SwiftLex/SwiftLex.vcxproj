@@ -49,7 +49,6 @@
     <ClCompile Include="nodes\ExprNode.cpp" />
     <ClCompile Include="nodes\TypeNode.cpp" />
     <ClCompile Include="nodes\VarDeclarationNode.cpp" />
-    <ClCompile Include="nodes\TypeForGenericNode.cpp" />
     <ClCompile Include="nodes\ThrowNode.cpp" />
     <ClCompile Include="nodes\TryNode.cpp" />
     <ClCompile Include="nodes\SwitchNode.cpp" />
@@ -90,7 +89,6 @@
     <ClInclude Include="allNodes.h" />
     <ClInclude Include="nodes\TypeNode.h" />
     <ClInclude Include="nodes\VarDeclarationNode.h" />
-    <ClInclude Include="nodes\TypeForGenericNode.h" />
     <ClInclude Include="nodes\ThrowNode.h" />
     <ClInclude Include="nodes\TryNode.h" />
     <ClInclude Include="nodes\SwitchNode.h" />

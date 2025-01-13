@@ -22,15 +22,12 @@ public:
 	StmtListNode* _body;
 	bool _hasBody;
 
-	TypeForGenericListNode* _typesForGenericList;
-	bool _isGeneric;
-
 	AccessModifierListNode* _modifiers;
 	bool _hasModifiers;
 
-	static ClassDeclNode* createClass(std::string name, StmtListNode* body, TypeForGenericListNode* genericTypes);
+	static ClassDeclNode* createClass(std::string name, StmtListNode* body);
 
-	static ClassDeclNode* createClassWithBaseClass(std::string name, StmtListNode* body, TypeForGenericListNode* genericTypes, std::string baseClass);
+	static ClassDeclNode* createClassWithBaseClass(std::string name, StmtListNode* body, std::string baseClass);
 
 	ClassDeclNode* addModifiers(AccessModifierListNode* modifiers);
 

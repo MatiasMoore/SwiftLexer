@@ -1,9 +1,8 @@
 #include "ClassDeclNode.h"
 #include "AccessModifierNode.h"
 #include "StmtNode.h"
-#include "TypeForGenericNode.h"
 
-ClassDeclNode* ClassDeclNode::createClass(std::string name, StmtListNode* body, TypeForGenericListNode* genericTypes)
+ClassDeclNode* ClassDeclNode::createClass(std::string name, StmtListNode* body)
 {
     auto node = new ClassDeclNode();
     node->_type = ClassDeclType::NoBaseClass;
@@ -19,20 +18,10 @@ ClassDeclNode* ClassDeclNode::createClass(std::string name, StmtListNode* body, 
         node->_body = body;
     }
 
-    if (genericTypes == nullptr)
-    {
-        node->_isGeneric = false;
-    }
-    else
-    {
-        node->_isGeneric = true;
-        node->_typesForGenericList = genericTypes;
-    }
-
     return node;
 }
 
-ClassDeclNode* ClassDeclNode::createClassWithBaseClass(std::string name, StmtListNode* body, TypeForGenericListNode* genericTypes, std::string baseClass)
+ClassDeclNode* ClassDeclNode::createClassWithBaseClass(std::string name, StmtListNode* body, std::string baseClass)
 {
     auto node = new ClassDeclNode();
     node->_type = ClassDeclType::HasBaseClass;
@@ -47,16 +36,6 @@ ClassDeclNode* ClassDeclNode::createClassWithBaseClass(std::string name, StmtLis
     {
         node->_hasBody = true;
         node->_body = body;
-    }
-
-    if (genericTypes == nullptr)
-    {
-        node->_isGeneric = false;
-    }
-    else
-    {
-        node->_isGeneric = true;
-        node->_typesForGenericList = genericTypes;
     }
 
     return node;
@@ -89,12 +68,6 @@ void ClassDeclNode::generateDot(std::ofstream& file)
     else
     {
         file << dotLabel(this->_id, "ClassDecl\nidName: " + this->_name + "\nbaseClass: " + this->_baseClassName + extraInfo);
-    }
-
-    if (this->_isGeneric)
-    {
-        file << dotConnectionWithLabel(this->_id, this->_typesForGenericList->_id, "generic types");
-        this->_typesForGenericList->generateDot(file);
     }
 
     if (this->_hasBody)

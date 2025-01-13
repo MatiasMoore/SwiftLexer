@@ -7,17 +7,9 @@ class AccessModifierListNode;
 class TypeNode;
 class TypeForGenericListNode;
 
-enum ConstructorType
-{
-	notGenericType,
-	genericType
-};
-
 class ConstructorDeclNode : public Dottable
 {
 public:
-	ConstructorType _type;
-
 	bool _hasModifiers;
 	bool _hasArgs;
 	bool _hasBody;
@@ -27,11 +19,7 @@ public:
 	FuncDeclArgListNode* _argList;
 	StmtListNode* _body;
 
-	TypeForGenericListNode* _genericList;
-
 	static ConstructorDeclNode* createConstructor(FuncDeclArgListNode* argList, StmtListNode* body, bool throwsException);
-
-	static ConstructorDeclNode* createConstructorGeneric(TypeForGenericListNode* genericList, FuncDeclArgListNode* argList, StmtListNode* body, bool throwsException);
 
 	ConstructorDeclNode* addModifiers(AccessModifierListNode* modifiers);
 

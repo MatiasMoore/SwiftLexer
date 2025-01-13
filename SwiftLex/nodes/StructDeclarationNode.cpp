@@ -1,12 +1,10 @@
 #include "StructDeclarationNode.h"
 #include "AccessModifierNode.h"
-#include "TypeForGenericNode.h"
 #include "StmtNode.h"
 
 StructDeclarationNode* StructDeclarationNode::createRegular(std::string name, StmtListNode* body)
 {
     auto node = new StructDeclarationNode();
-    node->_type = StructDeclarationType::NotGeneric;
     node->_name = name;
     node->_hasModifiers = false;
 
@@ -23,14 +21,6 @@ StructDeclarationNode* StructDeclarationNode::createRegular(std::string name, St
     return node;
 }
 
-StructDeclarationNode* StructDeclarationNode::createGeneric(std::string name, TypeForGenericListNode* typesForGenericList, StmtListNode* body)
-{
-    auto node = StructDeclarationNode::createRegular(name, body);
-    node->_type = StructDeclarationType::Generic;
-    node->_typesForGenericList = typesForGenericList;
-    return node;
-}
-
 StructDeclarationNode* StructDeclarationNode::addModifiers(AccessModifierListNode* modifiers)
 {
     this->_hasModifiers = true;
@@ -40,16 +30,7 @@ StructDeclarationNode* StructDeclarationNode::addModifiers(AccessModifierListNod
 
 void StructDeclarationNode::generateDot(std::ofstream& file)
 {
-    if (this->_type == StructDeclarationType::NotGeneric)
-    {
-        file << dotLabel(this->_id, "StructDeclaration: " + this->_name + " not generic");
-    }
-    else
-    {
-		file << dotLabel(this->_id, "StructDeclaration: " + this->_name + " generic");
-        file << dotConnectionWithLabel(this->_id, this->_typesForGenericList->_id, "generic types");
-        this->_typesForGenericList->generateDot(file);
-	}
+    file << dotLabel(this->_id, "StructDeclaration: " + this->_name);
 
     if (this->_hasModifiers)
     {
