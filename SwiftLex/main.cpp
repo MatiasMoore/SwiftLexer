@@ -112,6 +112,24 @@ int main(int argc, const char* argv[])
 	_root->fillTable(&classTable, nullptr, nullptr);
 
 	// Generation
+	auto constTable = classTable.items["MainClass"]->constants;
+
+	auto systemNameNum = constTable->findOrAddConstant(Utf8_C, "java/lang/System");
+	auto systemClass = constTable->findOrAddConstant(Class_C, "", 0, 0, systemNameNum);
+	auto outNameNum = constTable->findOrAddConstant(Utf8_C, "out");
+	auto outTypeNum = constTable->findOrAddConstant(Utf8_C, "Ljava/io/PrintStream;");
+	auto outNameandtypeNum = constTable->findOrAddConstant(NameAndType_C, "", 0, 0, outNameNum, outTypeNum);
+	auto outFieldrefNum = constTable->findOrAddConstant(FieldRef_C, "", 0, 0, systemClass, outNameandtypeNum);
+	auto outClassName = constTable->findOrAddConstant(Utf8_C, "java/io/PrintStream");
+	auto outClass = constTable->findOrAddConstant(Class_C, "", 0, 0, outClassName);
+
+	auto printNameNum = constTable->findOrAddConstant(Utf8_C, "println");
+	auto printTypeNum = constTable->findOrAddConstant(Utf8_C, "(Ljava/lang/String;)V");
+	auto printNameAndType = constTable->findOrAddConstant(NameAndType_C, "", 0, 0, printNameNum, printTypeNum);
+	auto printMethodRef = constTable->findOrAddConstant(MethodRef_C, "", 0, 0, outClass, printNameAndType);
+
+	auto strUtfNum = constTable->findOrAddConstant(Utf8_C, "Hello world! Yippee :)");
+	auto strNum = constTable->findOrAddConstant(String_C, "", 0, 0, strUtfNum);
 
 	// Delete old .class files
 	deleteDirectoryContents("out");

@@ -323,7 +323,7 @@ void StmtNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass
 	}
 }
 
-std::vector<char> StmtNode::generateCodeForStmt()
+std::vector<char> StmtNode::generateCodeForStmt(ClassTableElement* classElem, MethodTableElement* methodElem)
 {
 	std::vector<char> code = {};
 	switch (this->_type)
@@ -331,6 +331,9 @@ std::vector<char> StmtNode::generateCodeForStmt()
 	case StmtType::Return:
 		//TODO non void returns
 		appendVecToVec(code, jvm::_return());
+		break;
+	case StmtType::Expr:
+		appendVecToVec(code, this->_expr->generateCodeForExpr(classElem, methodElem));
 		break;
 	default:
 		throw std::runtime_error("Can't generate code for stmnt with type " + std::to_string(this->_type) + "!");

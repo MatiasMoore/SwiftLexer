@@ -2,6 +2,8 @@
 #include "FuncCallNode.h"
 #include "FuncCallArgNode.h"
 #include "TypeNode.h"
+#include "../generation/generationHelpers.h"
+#include "../tables/tables.h"
 
 ExprNode* ExprNode::createBool(bool value)
 {
@@ -456,6 +458,44 @@ ExprNode* ExprNode::semanticsTransform()
 	{
 		return this;
 	}
+}
+
+std::vector<char> ExprNode::generateCodeForExpr(ClassTableElement* classElem, MethodTableElement* methodElem)
+{
+	std::vector<char> code = {};
+	if (this->_type == ExprType::FuncCall)
+	{
+		if (this->_funcCall->_funcName != "print")
+			throw std::runtime_error("Custom function calls are not supported yet!");
+
+		auto constTable = classElem->constants;
+
+		auto systemNameNum = constTable->findOrAddConstant(Utf8_C, "java/lang/System");
+		auto systemClass = constTable->findOrAddConstant(Class_C, "", 0, 0, systemNameNum);
+		auto outNameNum = constTable->findOrAddConstant(Utf8_C, "out");
+		auto outTypeNum = constTable->findOrAddConstant(Utf8_C, "Ljava/io/PrintStream;");
+		auto outNameandtypeNum = constTable->findOrAddConstant(NameAndType_C, "", 0, 0, outNameNum, outTypeNum);
+		auto outFieldrefNum = constTable->findOrAddConstant(FieldRef_C, "", 0, 0, systemClass, outNameandtypeNum);
+		auto outClassName = constTable->findOrAddConstant(Utf8_C, "java/io/PrintStream");
+		auto outClass = constTable->findOrAddConstant(Class_C, "", 0, 0, outClassName);
+
+		auto printNameNum = constTable->findOrAddConstant(Utf8_C, "println");
+		auto printTypeNum = constTable->findOrAddConstant(Utf8_C, "(Ljava/lang/String;)V");
+		auto printNameAndType = constTable->findOrAddConstant(NameAndType_C, "", 0, 0, printNameNum, printTypeNum);
+		auto printMethodRef = constTable->findOrAddConstant(MethodRef_C, "", 0, 0, outClass, printNameAndType);
+
+		auto strUtfNum = constTable->findOrAddConstant(Utf8_C, "Hello world! Yippee :)");
+		auto strNum = constTable->findOrAddConstant(String_C, "", 0, 0, strUtfNum);
+
+		appendVecToVec(code, std::vector<char>({ (char)0xb2, (char)0x00, (char)outFieldrefNum }));    //b2 00 02  // getstatic #2
+		appendVecToVec(code, jvm::ldc(strNum));	//12 03     // ldc #3
+		appendVecToVec(code, jvm::invokevirtual(printMethodRef));	//b6 00 04  // invokevirtual #4
+	}
+	else
+	{
+		throw std::runtime_error("Can't generate code for expr with type " + std::to_string(this->_type) + "!");
+	}
+	return code;
 }
 
 std::string ExprListNode::getName()

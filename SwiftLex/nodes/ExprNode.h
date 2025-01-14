@@ -131,4 +131,6 @@ public:
 	void generateDot(std::ofstream& file) override;
 
 	ExprNode* semanticsTransform();
+
+	std::vector<char> generateCodeForExpr(class ClassTableElement* classElem, class MethodTableElement* methodElem);
 };
