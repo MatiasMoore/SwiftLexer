@@ -14,6 +14,7 @@
 #include "StructDeclarationNode.h"
 #include "ConstructorDeclNode.h"
 #include "DestructorDeclNode.h"
+#include "ClassDeclNode.h"
 
 StmtNode* StmtNode::createStmtExpr(ExprNode* expr)
 {
@@ -160,6 +161,15 @@ StmtNode* StmtNode::createStmtDestructorDecl(DestructorDeclNode* destructor)
 	return node;
 }
 
+StmtNode* StmtNode::createClassDecl(ClassDeclNode* classDecl)
+{
+	auto node = new StmtNode();
+	node->_type = StmtType::ClassDecl;
+	node->_classDecl = classDecl;
+	printf("N: stmt classDecl\n");
+	return node;
+}
+
 void StmtNode::generateDot(std::ofstream& file)
 {
 	switch (this->_type)
@@ -237,14 +247,19 @@ void StmtNode::generateDot(std::ofstream& file)
 		this->_structDeclaration->generateDot(file);
 		break;
 	case StmtType::ConstructorDecl:
-		file << dotLabel(this->_id, "ConstructorDecl");
+		file << dotLabel(this->_id, "ConstructorDeclStmt");
 		file << dotConnection(this->_id, this->_constructorDecl->_id);
 		this->_constructorDecl->generateDot(file);
 		break;
 	case StmtType::DestructorDecl:
-		file << dotLabel(this->_id, "DestructorDecl");
+		file << dotLabel(this->_id, "DestructorDeclStmt");
 		file << dotConnection(this->_id, this->_destructorDecl->_id);
 		this->_destructorDecl->generateDot(file);
+		break;
+	case StmtType::ClassDecl:
+		file << dotLabel(this->_id, "ClassDeclStmt");
+		file << dotConnection(this->_id, this->_classDecl->_id);
+		this->_classDecl->generateDot(file);
 		break;
 	default:
 		throw std::runtime_error("Unknown type!");

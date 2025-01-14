@@ -412,7 +412,7 @@ lowLevelStmtListE: lowLevelStmtList {$$ = $1;}
 
     /* TOP LEVEL STMT */
 topLevelStmtIncomplete: funcDeclaration {printf("P: topLevelStmtIncomplete funcDec\n"); $$ = StmtNode::createStmtFuncDecl($1);}
-    | classDeclaration {printf("P: topLevelStmtIncomplete classDec\n");}
+    | classDeclaration {printf("P: topLevelStmtIncomplete classDec\n"); $$ = StmtNode::createClassDecl($1);}
     | enumDeclaration {printf("P: topLevelStmtIncomplete enum\n"); $$ = StmtNode::createStmtEnumDeclaration($1);}
     | structDeclaration {printf("P: topLevelStmtIncomplete struct\n"); $$ = StmtNode::createStmtStructDeclaration($1);}
 	| lowLevelStmtIncomplete {printf("P: topLevelStmtIncomplete toplevel\n"); $$ = $1;}

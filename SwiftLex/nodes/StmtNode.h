@@ -18,6 +18,7 @@ class EnumDeclarationNode;
 class StructDeclarationNode;
 class ConstructorDeclNode;
 class DestructorDeclNode;
+class ClassDeclNode;
 
 enum StmtType
 {
@@ -36,7 +37,8 @@ enum StmtType
 	EnumDeclaration,
 	StructDeclaration,
 	ConstructorDecl,
-	DestructorDecl
+	DestructorDecl,
+	ClassDecl
 };
 
 class StmtNode : public Dottable
@@ -78,6 +80,8 @@ public:
 
 	DestructorDeclNode* _destructorDecl;
 
+	ClassDeclNode* _classDecl;
+
 	static StmtNode* createStmtExpr(ExprNode* expr);
 
 	static StmtNode* createStmtAssignment(ExprNode* left, ExprNode* right);
@@ -109,6 +113,8 @@ public:
 	static StmtNode* createStmtConstructorDecl(ConstructorDeclNode* constructor);
 
 	static StmtNode* createStmtDestructorDecl(DestructorDeclNode* destructor);
+
+	static StmtNode* createClassDecl(ClassDeclNode* classDecl);
 
 	void generateDot(std::ofstream& file) override;
 
