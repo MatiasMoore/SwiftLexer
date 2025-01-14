@@ -18,12 +18,14 @@ public:
 
 class ClassTableElement {
 public:
+    ClassTableElement(std::string name, std::string superName);
+
     // Ссылка на константу с именем класса - номер константы.
     // UTF-8?
     int name;
 
     /// Флаг, показывающий открыт ли класс для наследования.
-    int isOpen;
+    int isOpen = 0;
 
     // Ссылка на константу с именем родительского класса - номер константы.
     int superName = NULL;

@@ -20,22 +20,22 @@ void generateClassFile(ClassTable classTable, std::string className)
 	out.write(_magicConstant, 4);
 	out.write(_smallVersion, 2);
 	out.write(_bigVersion, 2);
-	ClassTableElement* elem = classTable.items[className];
-	std::stringstream sstream;
-	printf("Constants count :%d\n", elem->constants->constants.size());
+	ClassTableElement* classElem = classTable.items[className];
 
+	auto constantCount = classElem->constants->constants.size();
 
-	std::vector<char> tableLen = intToByteVector(elem->constants->constants.size() + 1, 2);
+	std::cout << "Constants count :" << constantCount << std::endl;
+
+	std::vector<char> tableLen = intToByteVector(constantCount + 1, 2);
 
 	out.write(tableLen.data(), tableLen.size());
-	sstream.clear();
 
-	std::vector<char> data = generateBytesForConstantTable(elem->constants);
+	std::vector<char> data = generateBytesForConstantTable(classElem->constants);
 	data.push_back(0x00);
 	data.push_back(0x21);
 
-	std::vector<char> thisCls = intToByteVector(elem->thisClass, 2);
-	std::vector<char> parentCls = intToByteVector(elem->superClass, 2);
+	std::vector<char> thisCls = intToByteVector(classElem->thisClass, 2);
+	std::vector<char> parentCls = intToByteVector(classElem->superClass, 2);
 	appendArrayToByteVector(&data, thisCls.data(), thisCls.size());
 	appendArrayToByteVector(&data, parentCls.data(), parentCls.size());
 	std::vector<char> interfaceCount = intToByteVector(0, 2);

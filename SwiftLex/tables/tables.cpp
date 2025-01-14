@@ -27,6 +27,7 @@ ConstantTable::ConstantTable()
 {
     this->constants = std::map<int, class ConstantTableItem*>();
     this->constants[maxId] = new ConstantTableItem(Utf8_C, maxId, "Code");
+    maxId++;
 }
 
 int ConstantTable::findOrAddConstant(enum ConstantType type, std::string utf8string, int intVal, double dVal, int fRef, int sRef)
@@ -94,4 +95,20 @@ int ConstantTable::findConstant(enum ConstantType type, std::string utf8string, 
         ++iterator; // Перейти к следующему элементу.
     }
     return -1;
+}
+
+ClassTableElement::ClassTableElement(std::string name, std::string superName)
+{
+    constants = new ConstantTable();
+    auto nameNum = constants->findOrAddConstant(ConstantType::Utf8_C, name);
+    auto classNum = constants->findOrAddConstant(ConstantType::Class_C, "", 0, 0, nameNum);
+
+    this->name = nameNum;
+    this->thisClass = classNum;
+
+    auto superNameNum = constants->findOrAddConstant(ConstantType::Utf8_C, superName);
+    auto superClassNum = constants->findOrAddConstant(ConstantType::Class_C, "", 0, 0, superNameNum);
+
+    this->superName = superNameNum;
+    this->superClass = superClassNum;
 }

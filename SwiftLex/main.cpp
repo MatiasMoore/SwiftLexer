@@ -6,6 +6,8 @@
 #include "generation/classFileGeneration.h"
 #include "tables/tables.h"
 
+bool _DRAW_DOT = false;
+
 extern int yylex();
 extern int yyparse();
 extern FILE* yyin;
@@ -57,47 +59,57 @@ int main(int argc, const char* argv[])
 	std::remove(tempFileName.c_str());
 
 	// Before semantics
-	std::ofstream dotInitial;
-	dotInitial.open("swift.dot");
 
-	if (_root != nullptr) {
-		dotInitial << "digraph swift {\n";
-		_root->generateDot(dotInitial);
-		dotInitial << "}\n";
+	if (_DRAW_DOT)
+	{
+		std::ofstream dotInitial;
+		dotInitial.open("swift.dot");
 
-		dotInitial.close();
-		system("cd");
-		system("Graphviz\\bin\\dot.exe -Tpng swift.dot > swift.png");
-		system("swift.png");
-	}
-	else {
-		std::cout << "File empty" << std::endl;
-	}
+		if (_root != nullptr) {
+			dotInitial << "digraph swift {\n";
+			_root->generateDot(dotInitial);
+			dotInitial << "}\n";
+
+			dotInitial.close();
+			system("cd");
+			system("Graphviz\\bin\\dot.exe -Tpng swift.dot > swift.png");
+			system("swift.png");
+		}
+		else {
+			std::cout << "File empty" << std::endl;
+		}
+	}	
 
 	// After semantics
 	_root = _root->semanticsTransform();
 
-	std::ofstream dotSemantics;
-	dotSemantics.open("swiftSem.dot");
+	if (_DRAW_DOT)
+	{
+		std::ofstream dotSemantics;
+		dotSemantics.open("swiftSem.dot");
 
-	if (_root != nullptr) {
-		dotSemantics << "digraph swift {\n";
-		clearDotCache();
-		_root->generateDot(dotSemantics);
-		dotSemantics << "}\n";
+		if (_root != nullptr) {
+			dotSemantics << "digraph swift {\n";
+			clearDotCache();
+			_root->generateDot(dotSemantics);
+			dotSemantics << "}\n";
 
-		dotSemantics.close();
-		system("cd");
-		system("Graphviz\\bin\\dot.exe -Tpng swiftSem.dot > swiftSem.png");
-		system("swiftSem.png");
-	}
-	else {
-		std::cout << "File empty" << std::endl;
+			dotSemantics.close();
+			system("cd");
+			system("Graphviz\\bin\\dot.exe -Tpng swiftSem.dot > swiftSem.png");
+			system("swiftSem.png");
+		}
+		else {
+			std::cout << "File empty" << std::endl;
+		}
 	}
 
 	// Attribution
 
 
 	// Generation
-	generateClassFile(ClassTable(), "main");
+	auto testClassName = "testClass";
+	auto classTable = ClassTable();
+	classTable.items[testClassName] = new ClassTableElement(testClassName, "java/lang/Object");
+	generateClassFile(classTable, testClassName);
 }
