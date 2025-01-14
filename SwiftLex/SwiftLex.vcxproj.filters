@@ -94,9 +94,9 @@
     </ClCompile>
     <ClCompile Include="nodes\EnumDeclarationNode.cpp">
       <Filter>Исходные файлы</Filter>
-    </ClCompile>      
+    </ClCompile>
     <ClCompile Include="nodes\StructDeclarationNode.cpp">
-		<Filter>Исходные файлы</Filter>
+      <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="nodes\ConstructorDeclNode.cpp">
       <Filter>Исходные файлы</Filter>
@@ -108,6 +108,15 @@
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="nodes\ClassDeclNode.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="tables\tables.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="generation\classFileGeneration.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="generation\generationHelpers.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
@@ -216,6 +225,15 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="nodes\ClassDeclNode.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="tables\tables.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="generation\classFileGeneration.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="generation\generationHelpers.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

@@ -22,6 +22,8 @@
     <Flex Include="swift.l" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="generation\generationHelpers.cpp" />
+    <ClCompile Include="generation\classFileGeneration.cpp" />
     <ClCompile Include="nodes\ClassDeclNode.cpp" />
     <ClCompile Include="nodes\DestructorDeclNode.cpp" />
     <ClCompile Include="nodes\ConstructorDeclNode.cpp" />
@@ -52,6 +54,7 @@
     <ClCompile Include="nodes\ThrowNode.cpp" />
     <ClCompile Include="nodes\TryNode.cpp" />
     <ClCompile Include="nodes\SwitchNode.cpp" />
+    <ClCompile Include="tables\tables.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt" />
@@ -60,6 +63,8 @@
     <Bison Include="swift.y" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="generation\generationHelpers.h" />
+    <ClInclude Include="generation\classFileGeneration.h" />
     <ClInclude Include="nodes\ClassDeclNode.h" />
     <ClInclude Include="nodes\DestructorDeclNode.h" />
     <ClInclude Include="nodes\ConstructorDeclNode.h" />
@@ -92,6 +97,7 @@
     <ClInclude Include="nodes\ThrowNode.h" />
     <ClInclude Include="nodes\TryNode.h" />
     <ClInclude Include="nodes\SwitchNode.h" />
+    <ClInclude Include="tables\tables.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -178,7 +184,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>

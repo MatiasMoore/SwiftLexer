@@ -3,6 +3,8 @@
 #include <string>
 #include "allNodes.h"
 #include "nodes/dotHelpers.h"
+#include "generation/classFileGeneration.h"
+#include "tables/tables.h"
 
 extern int yylex();
 extern int yyparse();
@@ -92,4 +94,10 @@ int main(int argc, const char* argv[])
 	else {
 		std::cout << "File empty" << std::endl;
 	}
+
+	// Attribution
+
+
+	// Generation
+	generateClassFile(ClassTable(), "main");
 }
