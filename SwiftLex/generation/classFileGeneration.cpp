@@ -9,6 +9,88 @@
 char _magicConstant[4] = { 0xCA, 0xFE, 0xBA, 0xBE };
 char _smallVersion[2] = { 0x00, 0x00 };
 char _bigVersion[2] = { 0x00, 0x3E };
+int _stackSize = 1000;
+
+std::vector<char> generateMethodAttribute(class MethodTableElement* mElem, ClassTableElement* cElem)
+{
+	std::vector<char> res;
+
+	int cd = cElem->constants->findOrAddConstant(Utf8_C, "Code");
+	std::vector<char> codeAttributeSizeBytes = intToByteVector(cd, 2);
+	appendArrayToByteVector(&res, codeAttributeSizeBytes.data(), codeAttributeSizeBytes.size());
+
+	std::vector<char> codeBytes = {};
+
+	//TODO WARNING REMOVE LATER THIS IS JUST A PLACEHOLDER
+	codeBytes.push_back(0xB1); //just return
+
+	//TODO generate code from body
+	/*
+	if (mElem->start != NULL) {
+		StatementNode* curStatement = mElem->start->first;
+		while (curStatement != NULL) {
+			std::vector<char> bytes = generateCodeForStatement(curStatement, cElem, mElem);
+			appendArrayToByteVector(&codeBytes, bytes.data(), bytes.size());
+			curStatement = curStatement->next;
+		}
+	}
+	printf("Code bytes len: %d\n", codeBytes.size());
+	*/
+
+	//Добавление длины атрибута
+	std::vector<char> lengthBytes = intToByteVector(12 + codeBytes.size(), 4);
+	appendArrayToByteVector(&res, lengthBytes.data(), lengthBytes.size());
+
+	//Добавление размера стека операндов
+	std::vector<char> stackSizeBytes = intToByteVector(_stackSize, 2);
+	appendArrayToByteVector(&res, stackSizeBytes.data(), stackSizeBytes.size());
+
+	//Добавление количества локальных переменных
+	int localsSize = mElem->varTable->items.size();
+	std::vector<char> localsSizeBytes = intToByteVector(localsSize, 2);
+	appendArrayToByteVector(&res, localsSizeBytes.data(), localsSizeBytes.size());
+
+	//Добавление длины байт-кода TODO: сделать
+	std::vector<char> codeSizeBytes = intToByteVector(codeBytes.size(), 4);
+	appendArrayToByteVector(&res, codeSizeBytes.data(), codeSizeBytes.size());
+
+	//Добавление байт-кода
+	appendArrayToByteVector(&res, codeBytes.data(), codeBytes.size());
+
+	//Добавление количества записей в таблице исключений
+	std::vector<char> exceptionTableSizeBytes = intToByteVector(0, 2);
+	appendArrayToByteVector(&res, exceptionTableSizeBytes.data(), exceptionTableSizeBytes.size());
+
+	//Добавление количества атрибутов
+	std::vector<char> attributesCountBytes = intToByteVector(0, 2);
+	appendArrayToByteVector(&res, attributesCountBytes.data(), attributesCountBytes.size());
+
+	return res;
+}
+
+std::vector<char> generateMethodCode(class MethodTableElement* mElem, class ClassTableElement* cElem)
+{
+	std::vector<char> res;
+
+	char publicStaticFlag[2] = { 0x00, 0x09 }; //ACC_PUBLIC + ACC_STATIC
+	appendArrayToByteVector(&res, publicStaticFlag, 2);
+
+	//Добавление имени метода
+	std::vector<char> nameBytes = intToByteVector(mElem->methodName, 2);
+	appendArrayToByteVector(&res, nameBytes.data(), nameBytes.size());
+
+	// Добавление дескриптора метода
+	std::vector<char> typeBytes = intToByteVector(mElem->descriptor, 2);
+	appendArrayToByteVector(&res, typeBytes.data(), typeBytes.size());
+
+	//Добавление атрибутов TODO:Code
+	std::vector<char> codeAttributeSizeBytes = intToByteVector(1, 2);
+	appendArrayToByteVector(&res, codeAttributeSizeBytes.data(), codeAttributeSizeBytes.size());
+	std::vector<char> codeAttributeBytes = generateMethodAttribute(mElem, cElem);
+	appendArrayToByteVector(&res, codeAttributeBytes.data(), codeAttributeBytes.size());
+
+	return res;
+}
 
 void generateClassFile(ClassTable classTable, std::string className)
 {
@@ -24,7 +106,7 @@ void generateClassFile(ClassTable classTable, std::string className)
 
 	auto constantCount = classElem->constants->constants.size();
 
-	std::cout << "Constants count :" << constantCount << std::endl;
+	std::cout << "Constants count: " << constantCount << std::endl;
 
 	std::vector<char> tableLen = intToByteVector(constantCount + 1, 2);
 
@@ -45,18 +127,15 @@ void generateClassFile(ClassTable classTable, std::string className)
 	int mCount = 0;
 	std::vector<char> codeData;
 
-	/*
-	for (auto i = elem->methods->methods.begin(); i != elem->methods->methods.end(); ++i)
+	// Для каждого метода
+	for (auto i = classElem->methods->methods.begin(); i != classElem->methods->methods.end(); ++i)
 	{
-		for (auto it = i->second.begin(); it != i->second.end(); ++it)
-		{
-			mCount++;
-			std::vector<char> methodCodeData = generateMethodCode(it->second, elem);
-			appendArrayToByteVector(&codeData, methodCodeData.data(), methodCodeData.size());
-		}
-
+		auto method = i->second;
+		mCount++;
+		std::vector<char> methodCodeData = generateMethodCode(method, classElem);
+		appendArrayToByteVector(&codeData, methodCodeData.data(), methodCodeData.size());
 	}
-
+	/*
 	if (elem->methods->methods.count("main") != 0)
 	{
 		if (elem->methods->methods["main"].count("()") != 0)
@@ -67,6 +146,8 @@ void generateClassFile(ClassTable classTable, std::string className)
 		}
 	}
 	*/
+
+	std::cout << "Method count: " << mCount << std::endl;
 
 	std::vector<char> methodCount = intToByteVector(mCount, 2);
 

@@ -110,6 +110,19 @@ int main(int argc, const char* argv[])
 	// Generation
 	auto testClassName = "testClass";
 	auto classTable = ClassTable();
-	classTable.items[testClassName] = new ClassTableElement(testClassName, "java/lang/Object");
+	auto testClass = new ClassTableElement(testClassName, "java/lang/Object");
+	auto mainMethod = FuncDeclNode::createRegular("main", 
+		FuncDeclArgListNode::createListNode(FuncDeclArgNode::createPositionalArg("args", TypeNode::createArrayType(TypeNode::createType(TypeType::StringT)), nullptr)),
+		nullptr,
+		nullptr,
+		false
+	);
+	testClass->methods->methods["main"] = new MethodTableElement(testClass->constants, mainMethod);
+	classTable.items[testClassName] = testClass;
 	generateClassFile(classTable, testClassName);
+
+
+	//Чтобы запустить: 
+	// идешь в папку рядом с testClass.class
+	// выполняешь java testClass
 }

@@ -1,4 +1,8 @@
 #include "tables.h"
+#include "../nodes/FuncDeclNode.h"
+#include "../nodes/FuncDeclArgNode.h"
+#include "../nodes/TypeNode.h"
+#include "../generation/generationHelpers.h"
 
 /* --------------------------- Элемент таблицы констант --------------------------- */
 
@@ -100,6 +104,7 @@ int ConstantTable::findConstant(enum ConstantType type, std::string utf8string, 
 ClassTableElement::ClassTableElement(std::string name, std::string superName)
 {
     constants = new ConstantTable();
+    methods = new MethodTable();
     auto nameNum = constants->findOrAddConstant(ConstantType::Utf8_C, name);
     auto classNum = constants->findOrAddConstant(ConstantType::Class_C, "", 0, 0, nameNum);
 
@@ -111,4 +116,53 @@ ClassTableElement::ClassTableElement(std::string name, std::string superName)
 
     this->superName = superNameNum;
     this->superClass = superClassNum;
+}
+
+MethodTableElement::MethodTableElement(ConstantTable* constants, FuncDeclNode* funcDecl)
+{
+    this->strName = funcDecl->_idName;
+    this->methodName = constants->findOrAddConstant(Utf8_C, this->strName);
+    this->_funcDecl = funcDecl;
+    this->strDesc = "(";
+
+    this->varTable = new LocalVariableTable();
+
+    if (funcDecl->_hasArgs)
+    {
+        for (auto& arg : funcDecl->_argList->_vec)
+        {
+            this->strDesc += descriptorForType(arg->_argType);
+            this->varTable->findOrAddLocalVar(constants, arg->_argName, arg->_argType);
+        }
+    }
+    this->strDesc += ")";
+
+    if (funcDecl->_hasNonVoidReturn)
+        this->strDesc += descriptorForType(funcDecl->_returnType);
+    else
+        this->strDesc += "V";
+
+    this->descriptor = constants->findOrAddConstant(Utf8_C, this->strDesc);
+}
+
+LocalVariableElement::LocalVariableElement(ConstantTable* constants, std::string name, TypeNode* type, int isConst, int isInitial)
+{
+    this->name = name;
+    this->nameNum = constants->findOrAddConstant(Utf8_C, this->name);
+    this->_type = type;
+    this->isConst = isConst;
+    this->isInit = isInitial;
+}
+
+int LocalVariableTable::findOrAddLocalVar(ConstantTable* constants, std::string name, TypeNode* type, int isConst, int isInitial)
+{
+    if (items.find(name) == items.cend()) // Если переменная с указанным именем не найдена.
+    {
+        items[name] = new LocalVariableElement(constants, name, type, isConst, isInitial);
+        return items[name]->nameNum;
+    }
+    else
+    {
+        return items[name]->nameNum;
+    }
 }

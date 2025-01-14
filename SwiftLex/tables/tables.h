@@ -6,6 +6,10 @@
 
 class ConstantTable;
 class ConstantTableItem;
+class MethodTableElement;
+class MethodTable;
+class TypeNode;
+class FuncDeclNode;
 
 /*! \brief Структура, описывающая таблицу классов. */
 class ClassTable
@@ -38,8 +42,9 @@ public:
     // Class??
     int superClass;
 
-
     ConstantTable* constants;
+
+    MethodTable* methods;
 };
 
 /*! Тип константы в таблице констант. */
@@ -106,4 +111,65 @@ private:
     */
     int findConstant(enum ConstantType type, std::string utf8string, int fRef = NULL, int secondRef = NULL, int intVal = NULL, double dVal = NULL);
 
+};
+
+/*! \brief Таблица методов класса. */
+class MethodTable
+{
+public:
+    std::map<std::string, class MethodTableElement*> methods;
+};
+
+/*! \brief Элемент таблицы методов класса. */
+class MethodTableElement
+{
+public:
+    /// Ссылка на номер константы с именем метода в таблице констант.
+    int methodName;
+
+    /// Ссылка на номер константы с дескриптором в таблице констант.
+    int descriptor;
+
+    /// Строковое название метода.
+    std::string strName;
+
+    /// Строковый дескриптор метода.
+    std::string strDesc;
+
+    // Объявление метода
+    class FuncDeclNode* _funcDecl;
+
+    /// Ссылка на таблицу локальных переменных.
+    class LocalVariableTable* varTable = NULL;
+
+    /// Флаг показывающий, является ли указанный метод первым кандидатом.
+    int isFirst = 0;
+
+    MethodTableElement(ConstantTable* constants, FuncDeclNode* funcDecl);
+};
+
+class LocalVariableElement
+{
+public:
+    std::string name; // Имя локальной переменной.
+    int nameNum; // Идентификатор локальной переменной.
+    TypeNode* _type; // Тип локальной переменной.
+    int isConst; // Флаг, показывающий, является ли переменная изменяемой.
+    int isInit; // Флаг, показывающий, инициализрована переменная.
+
+    LocalVariableElement(ConstantTable* constants, std::string name, TypeNode* type, int isConst = 0, int isInitial = 0);
+};
+
+/*! \brief Таблица локальных переменных. */
+class LocalVariableTable
+{
+public:
+
+    /// Текущее максимальное значение идентификатора переменной.
+    int maxId = 0;
+
+    /// Контейнер элементов.
+    std::map<std::string, class LocalVariableElement*> items = {};
+
+    int findOrAddLocalVar(ConstantTable* constants, std::string name, TypeNode* type, int isConst = 0, int isInitial = 0);
 };
