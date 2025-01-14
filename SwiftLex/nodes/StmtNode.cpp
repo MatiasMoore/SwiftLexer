@@ -16,6 +16,7 @@
 #include "DestructorDeclNode.h"
 #include "ClassDeclNode.h"
 #include "../tables/tables.h"
+#include "../generation/generationHelpers.h"
 
 StmtNode* StmtNode::createStmtExpr(ExprNode* expr)
 {
@@ -320,6 +321,22 @@ void StmtNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass
 		throw std::runtime_error("Unsupported stmnt type!");
 		break;
 	}
+}
+
+std::vector<char> StmtNode::generateCodeForStmt()
+{
+	std::vector<char> code = {};
+	switch (this->_type)
+	{
+	case StmtType::Return:
+		//TODO non void returns
+		appendVecToVec(code, jvm::_return());
+		break;
+	default:
+		throw std::runtime_error("Can't generate code for stmnt with type " + std::to_string(this->_type) + "!");
+		break;
+	}
+	return code;
 }
 
 std::string StmtListNode::getName()

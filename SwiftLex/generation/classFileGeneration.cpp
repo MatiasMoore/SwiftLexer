@@ -1,6 +1,7 @@
 #include "classFileGeneration.h"
 #include "../tables/tables.h"
 #include "generationHelpers.h"
+#include "../nodes/StmtNode.h"
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -17,53 +18,53 @@ std::vector<char> generateMethodAttribute(class MethodTableElement* mElem, Class
 
 	int cd = cElem->constants->findOrAddConstant(Utf8_C, "Code");
 	std::vector<char> codeAttributeSizeBytes = intToByteVector(cd, 2);
-	appendArrayToByteVector(&res, codeAttributeSizeBytes.data(), codeAttributeSizeBytes.size());
+	appendVecToVec(res, codeAttributeSizeBytes);
 
 	std::vector<char> codeBytes = {};
 
 	//TODO WARNING REMOVE LATER THIS IS JUST A PLACEHOLDER
-	codeBytes.push_back(0xB1); //just return
+	//codeBytes.push_back(0xB1); //just return
 
 	//TODO generate code from body
-	/*
-	if (mElem->start != NULL) {
-		StatementNode* curStatement = mElem->start->first;
-		while (curStatement != NULL) {
-			std::vector<char> bytes = generateCodeForStatement(curStatement, cElem, mElem);
-			appendArrayToByteVector(&codeBytes, bytes.data(), bytes.size());
-			curStatement = curStatement->next;
-		}
+	
+	if (mElem->_body == nullptr)
+		throw std::runtime_error("Method \"" + mElem->strName + "\" must have a body!");
+
+	for (auto& stmt : mElem->_body->_vec)
+	{
+		std::vector<char> bytes = stmt->generateCodeForStmt();// generateCodeForStatement(curStatement, cElem, mElem);
+		appendVecToVec(codeBytes, bytes);
 	}
 	printf("Code bytes len: %d\n", codeBytes.size());
-	*/
+	
 
 	//Добавление длины атрибута
 	std::vector<char> lengthBytes = intToByteVector(12 + codeBytes.size(), 4);
-	appendArrayToByteVector(&res, lengthBytes.data(), lengthBytes.size());
+	appendVecToVec(res, lengthBytes);
 
 	//Добавление размера стека операндов
 	std::vector<char> stackSizeBytes = intToByteVector(_stackSize, 2);
-	appendArrayToByteVector(&res, stackSizeBytes.data(), stackSizeBytes.size());
+	appendVecToVec(res, stackSizeBytes);
 
 	//Добавление количества локальных переменных
 	int localsSize = mElem->varTable->items.size();
 	std::vector<char> localsSizeBytes = intToByteVector(localsSize, 2);
-	appendArrayToByteVector(&res, localsSizeBytes.data(), localsSizeBytes.size());
+	appendVecToVec(res, localsSizeBytes);
 
 	//Добавление длины байт-кода TODO: сделать
 	std::vector<char> codeSizeBytes = intToByteVector(codeBytes.size(), 4);
-	appendArrayToByteVector(&res, codeSizeBytes.data(), codeSizeBytes.size());
+	appendVecToVec(res, codeSizeBytes);
 
 	//Добавление байт-кода
-	appendArrayToByteVector(&res, codeBytes.data(), codeBytes.size());
+	appendVecToVec(res, codeBytes);
 
 	//Добавление количества записей в таблице исключений
 	std::vector<char> exceptionTableSizeBytes = intToByteVector(0, 2);
-	appendArrayToByteVector(&res, exceptionTableSizeBytes.data(), exceptionTableSizeBytes.size());
+	appendVecToVec(res, exceptionTableSizeBytes);
 
 	//Добавление количества атрибутов
 	std::vector<char> attributesCountBytes = intToByteVector(0, 2);
-	appendArrayToByteVector(&res, attributesCountBytes.data(), attributesCountBytes.size());
+	appendVecToVec(res, attributesCountBytes);
 
 	return res;
 }
@@ -72,22 +73,22 @@ std::vector<char> generateMethodCode(class MethodTableElement* mElem, class Clas
 {
 	std::vector<char> res;
 
-	char publicStaticFlag[2] = { 0x00, 0x09 }; //ACC_PUBLIC + ACC_STATIC
-	appendArrayToByteVector(&res, publicStaticFlag, 2);
+	std::vector<char> publicStaticFlag = { 0x00, 0x09 }; //ACC_PUBLIC + ACC_STATIC
+	appendVecToVec(res, publicStaticFlag);
 
 	//Добавление имени метода
 	std::vector<char> nameBytes = intToByteVector(mElem->methodName, 2);
-	appendArrayToByteVector(&res, nameBytes.data(), nameBytes.size());
+	appendVecToVec(res, nameBytes);
 
 	// Добавление дескриптора метода
 	std::vector<char> typeBytes = intToByteVector(mElem->descriptor, 2);
-	appendArrayToByteVector(&res, typeBytes.data(), typeBytes.size());
+	appendVecToVec(res, typeBytes);
 
 	//Добавление атрибутов TODO:Code
 	std::vector<char> codeAttributeSizeBytes = intToByteVector(1, 2);
-	appendArrayToByteVector(&res, codeAttributeSizeBytes.data(), codeAttributeSizeBytes.size());
+	appendVecToVec(res, codeAttributeSizeBytes);
 	std::vector<char> codeAttributeBytes = generateMethodAttribute(mElem, cElem);
-	appendArrayToByteVector(&res, codeAttributeBytes.data(), codeAttributeBytes.size());
+	appendVecToVec(res, codeAttributeBytes);
 
 	return res;
 }
@@ -120,8 +121,8 @@ void generateClassFile(ClassTableElement* classElem, std::string pathToFolder)
 
 	std::vector<char> thisCls = intToByteVector(classElem->thisClass, 2);
 	std::vector<char> parentCls = intToByteVector(classElem->superClass, 2);
-	appendArrayToByteVector(&data, thisCls.data(), thisCls.size());
-	appendArrayToByteVector(&data, parentCls.data(), parentCls.size());
+	appendVecToVec(data, thisCls);
+	appendVecToVec(data, parentCls);
 	std::vector<char> interfaceCount = intToByteVector(0, 2);
 	std::vector<char> fieldCount = intToByteVector(0, 2);
 
@@ -135,7 +136,7 @@ void generateClassFile(ClassTableElement* classElem, std::string pathToFolder)
 		auto method = i->second;
 		mCount++;
 		std::vector<char> methodCodeData = generateMethodCode(method, classElem);
-		appendArrayToByteVector(&codeData, methodCodeData.data(), methodCodeData.size());
+		appendVecToVec(codeData, methodCodeData);
 	}
 	/*
 	if (elem->methods->methods.count("main") != 0)
@@ -154,11 +155,11 @@ void generateClassFile(ClassTableElement* classElem, std::string pathToFolder)
 	std::vector<char> methodCount = intToByteVector(mCount, 2);
 
 	std::vector<char> attributeCount = intToByteVector(0, 2);
-	appendArrayToByteVector(&data, interfaceCount.data(), interfaceCount.size());
-	appendArrayToByteVector(&data, fieldCount.data(), fieldCount.size());
-	appendArrayToByteVector(&data, methodCount.data(), methodCount.size());
-	appendArrayToByteVector(&data, codeData.data(), codeData.size());
-	appendArrayToByteVector(&data, attributeCount.data(), attributeCount.size());
+	appendVecToVec(data, interfaceCount);
+	appendVecToVec(data, fieldCount);
+	appendVecToVec(data, methodCount);
+	appendVecToVec(data, codeData);
+	appendVecToVec(data, attributeCount);
 
 	out.write(data.data(), data.size());
 	// Закрытие файла.

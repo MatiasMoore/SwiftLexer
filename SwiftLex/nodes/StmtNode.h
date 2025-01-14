@@ -121,6 +121,8 @@ public:
 	StmtNode* semanticsTransform();
 
 	void fillTable(class ClassTable* classTable, class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
+
+	std::vector<char> generateCodeForStmt();
 };
 
 class StmtListNode : public GenericListNode<StmtNode, StmtListNode>

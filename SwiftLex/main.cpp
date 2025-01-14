@@ -116,11 +116,17 @@ int main(int argc, const char* argv[])
 	// Delete old .class files
 	deleteDirectoryContents("out");
 
-	for (auto& classElem : classTable.items)
+	try
 	{
-		generateClassFile(classElem.second, "out/");
+		for (auto& classElem : classTable.items)
+		{
+			generateClassFile(classElem.second, "out/");
+		}
 	}
-
+	catch (std::runtime_error error)
+	{
+		std::cout << "Code generation error: " << error.what() << std::endl;
+	}
 
 	//Чтобы запустить: 
 	// идешь в папку out
