@@ -259,8 +259,8 @@ StmtNode* StmtNode::semanticsTransform()
 		this->_expr = _expr->semanticsTransform();
 	}
 	else if (this->_type == StmtType::Assignment) {
-		this->_assignLeft = _expr->semanticsTransform();
-		this->_assignRight = _expr->semanticsTransform();
+		this->_assignLeft = _assignLeft->semanticsTransform();
+		this->_assignRight = _assignRight->semanticsTransform();
 	}
 	return this;
 }
