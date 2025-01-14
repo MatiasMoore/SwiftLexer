@@ -92,17 +92,19 @@ std::vector<char> generateMethodCode(class MethodTableElement* mElem, class Clas
 	return res;
 }
 
-void generateClassFile(ClassTable classTable, std::string className)
+void generateClassFile(ClassTableElement* classElem, std::string pathToFolder)
 {
 	// Инициализация.
-	std::string fileName = className + ".class";
+	std::string fileName = pathToFolder + classElem->nameStr + ".class";
+
+	std::cout << "Generating class \"" + classElem->nameStr + "\" to file \"" + fileName + "\"" << std::endl;
+
 	std::ofstream out(fileName, std::ios::out | std::ios::binary);
 
 	// Ввод магических констант.
 	out.write(_magicConstant, 4);
 	out.write(_smallVersion, 2);
 	out.write(_bigVersion, 2);
-	ClassTableElement* classElem = classTable.items[className];
 
 	auto constantCount = classElem->constants->constants.size();
 

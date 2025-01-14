@@ -15,6 +15,7 @@
 #include "ConstructorDeclNode.h"
 #include "DestructorDeclNode.h"
 #include "ClassDeclNode.h"
+#include "../tables/tables.h"
 
 StmtNode* StmtNode::createStmtExpr(ExprNode* expr)
 {
@@ -280,6 +281,47 @@ StmtNode* StmtNode::semanticsTransform()
 	return this;
 }
 
+void StmtNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod)
+{
+	switch (this->_type)
+	{
+	case StmtType::FuncDecl:
+		if (currentMethod != nullptr)
+			throw std::runtime_error("Nested methods are not supported!");
+
+		if (currentClass == nullptr)
+			currentClass = classTable->addMainClass();
+		currentMethod = currentClass->addMethod(this->_funcDecl);
+		break;
+	case StmtType::ConstructorDecl:
+		if (currentMethod != nullptr)
+			throw std::runtime_error("Nested constructors are not supported!");
+
+		if (currentClass == nullptr)
+			throw std::runtime_error("Constructor must be inside the class!");
+
+		currentMethod = currentClass->addMethodConstructor(this->_constructorDecl);
+		break;
+	case StmtType::ClassDecl:
+		if (currentClass != nullptr)
+			throw std::runtime_error("Nested classes are not supported!");
+
+		if (currentMethod != nullptr)
+			throw std::runtime_error("Class declaration inside methods is not supported!");
+
+		currentClass = classTable->addClass(this->_classDecl);
+
+		if (this->_classDecl->_hasBody)
+		{
+			this->_classDecl->_body->fillTable(classTable, currentClass, currentMethod);
+		}
+		break;
+	default:
+		throw std::runtime_error("Unsupported stmnt type!");
+		break;
+	}
+}
+
 std::string StmtListNode::getName()
 {
 	return "StmtList";
@@ -292,4 +334,12 @@ StmtListNode* StmtListNode::semanticsTransform()
 		elem = elem->semanticsTransform();
 	}
 	return this;
+}
+
+void StmtListNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod)
+{
+	for (auto& elem : _vec)
+	{
+		elem->fillTable(classTable, currentClass, currentMethod);
+	}
 }

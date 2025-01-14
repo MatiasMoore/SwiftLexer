@@ -1,4 +1,4 @@
 #pragma once
 #include <string>
 
-void generateClassFile(class ClassTable classTable, std::string className);
+void generateClassFile(class ClassTableElement* classElem, std::string pathToFolder);

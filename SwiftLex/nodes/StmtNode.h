@@ -119,6 +119,8 @@ public:
 	void generateDot(std::ofstream& file) override;
 
 	StmtNode* semanticsTransform();
+
+	void fillTable(class ClassTable* classTable, class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
 };
 
 class StmtListNode : public GenericListNode<StmtNode, StmtListNode>
@@ -127,4 +129,6 @@ public:
 	std::string getName() override;
 
 	StmtListNode* semanticsTransform();
+
+	void fillTable(class ClassTable* classTable, class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
 };

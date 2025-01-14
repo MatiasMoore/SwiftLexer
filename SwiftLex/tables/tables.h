@@ -10,6 +10,8 @@ class MethodTableElement;
 class MethodTable;
 class TypeNode;
 class FuncDeclNode;
+class ClassDeclNode;
+class ConstructorDeclNode;
 
 /*! \brief Структура, описывающая таблицу классов. */
 class ClassTable
@@ -17,6 +19,10 @@ class ClassTable
 public:
     /// Укащатель на контейнер элементов таблицы.
     std::map<std::string, class ClassTableElement*> items;
+
+    ClassTableElement* addMainClass();
+
+    ClassTableElement* addClass(ClassDeclNode* classDecl);
 
 };
 
@@ -42,9 +48,16 @@ public:
     // Class??
     int superClass;
 
+    std::string nameStr;
+
     ConstantTable* constants;
 
     MethodTable* methods;
+
+    MethodTableElement* addMethod(FuncDeclNode* funcDecl);
+
+    MethodTableElement* addMethodConstructor(ConstructorDeclNode* constructorDecl);
+
 };
 
 /*! Тип константы в таблице констант. */
@@ -137,7 +150,7 @@ public:
     std::string strDesc;
 
     // Объявление метода
-    class FuncDeclNode* _funcDecl;
+    class StmtListNode* _body;
 
     /// Ссылка на таблицу локальных переменных.
     class LocalVariableTable* varTable = NULL;
@@ -146,6 +159,8 @@ public:
     int isFirst = 0;
 
     MethodTableElement(ConstantTable* constants, FuncDeclNode* funcDecl);
+
+    MethodTableElement(ConstantTable* constants, ConstructorDeclNode* constructorDecl);
 };
 
 class LocalVariableElement

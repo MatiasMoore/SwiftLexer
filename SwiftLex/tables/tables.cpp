@@ -2,6 +2,8 @@
 #include "../nodes/FuncDeclNode.h"
 #include "../nodes/FuncDeclArgNode.h"
 #include "../nodes/TypeNode.h"
+#include "../nodes/ClassDeclNode.h"
+#include "../nodes/ConstructorDeclNode.h"
 #include "../generation/generationHelpers.h"
 
 /* --------------------------- Ёлемент таблицы констант --------------------------- */
@@ -105,6 +107,7 @@ ClassTableElement::ClassTableElement(std::string name, std::string superName)
 {
     constants = new ConstantTable();
     methods = new MethodTable();
+    this->nameStr = name;
     auto nameNum = constants->findOrAddConstant(ConstantType::Utf8_C, name);
     auto classNum = constants->findOrAddConstant(ConstantType::Class_C, "", 0, 0, nameNum);
 
@@ -118,11 +121,25 @@ ClassTableElement::ClassTableElement(std::string name, std::string superName)
     this->superClass = superClassNum;
 }
 
+MethodTableElement* ClassTableElement::addMethod(FuncDeclNode* funcDecl)
+{
+    auto newMethod = new MethodTableElement(this->constants, funcDecl);
+    this->methods->methods[newMethod->strName] = newMethod;
+    return newMethod;
+}
+
+MethodTableElement* ClassTableElement::addMethodConstructor(ConstructorDeclNode* constructorDecl)
+{
+    auto newMethod = new MethodTableElement(this->constants, constructorDecl);
+    this->methods->methods[newMethod->strName] = newMethod;
+    return newMethod;
+}
+
 MethodTableElement::MethodTableElement(ConstantTable* constants, FuncDeclNode* funcDecl)
 {
     this->strName = funcDecl->_idName;
     this->methodName = constants->findOrAddConstant(Utf8_C, this->strName);
-    this->_funcDecl = funcDecl;
+    this->_body = funcDecl->_body;
     this->strDesc = "(";
 
     this->varTable = new LocalVariableTable();
@@ -141,6 +158,30 @@ MethodTableElement::MethodTableElement(ConstantTable* constants, FuncDeclNode* f
         this->strDesc += descriptorForType(funcDecl->_returnType);
     else
         this->strDesc += "V";
+
+    this->descriptor = constants->findOrAddConstant(Utf8_C, this->strDesc);
+}
+
+MethodTableElement::MethodTableElement(ConstantTable* constants, ConstructorDeclNode* constructorDecl)
+{
+    this->strName = "<init>";
+    this->methodName = constants->findOrAddConstant(Utf8_C, this->strName);
+    this->_body = constructorDecl->_body;
+    this->strDesc = "(";
+
+    this->varTable = new LocalVariableTable();
+
+    if (constructorDecl->_hasArgs)
+    {
+        for (auto& arg : constructorDecl->_argList->_vec)
+        {
+            this->strDesc += descriptorForType(arg->_argType);
+            this->varTable->findOrAddLocalVar(constants, arg->_argName, arg->_argType);
+        }
+    }
+    this->strDesc += ")";
+
+    this->strDesc += "L";
 
     this->descriptor = constants->findOrAddConstant(Utf8_C, this->strDesc);
 }
@@ -165,4 +206,18 @@ int LocalVariableTable::findOrAddLocalVar(ConstantTable* constants, std::string 
     {
         return items[name]->nameNum;
     }
+}
+
+ClassTableElement* ClassTable::addMainClass()
+{
+    auto mainClass = new ClassTableElement("MainClass", "java/lang/Object");
+    this->items["MainClass"] = mainClass;
+    return mainClass;
+}
+
+ClassTableElement* ClassTable::addClass(ClassDeclNode* classDecl)
+{
+    auto newClass = new ClassTableElement(classDecl->_name, classDecl->_type == ClassDeclType::HasBaseClass ? classDecl->_baseClassName : "java/lang/Object");
+    this->items[classDecl->_name] = newClass;
+    return newClass;
 }

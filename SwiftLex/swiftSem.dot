@@ -1,63 +1,120 @@
 digraph swift {
-4 [label="StmtList"]
-4->3
-3 [label="ExprStmt"]
-3->36
+6 [label="StmtList"]
+6->5
+5 [label="FuncDeclStmt"]
+5->4
+4 [label="FuncDecl
+idName: main
+no body
+void return
+doesn't throw exception"]
+4->3 [label="args"]
+3 [label="FuncDeclArgList"]
+3->2
+2 [label="FuncDeclArg
+requiresLabel
+argName: args
+no default value"]
+2->1 [label="type"]
+1 [label="Type: Array"]
+1->0
+0 [label="Type: String"]
+6->55
+55 [label="ClassDeclStmt"]
+55->54
+54 [label="ClassDecl
+idName: CustomObject
+no baseClass"]
+54->22 [label="body"]
+22 [label="StmtList"]
+22->21
+21 [label="ConstructorDeclStmt"]
+21->20
+20 [label="ConstructorDecl
+no args
+doesn't throw exception"]
+20->10 [label="body"]
+10 [label="StmtList"]
+10->9
+9 [label="AssignmentStmt"]
+9->7 [label="left"]
+9->8 [label="right"]
+7 [label="Id: name"]
+8 [label="String: Name"]
+10->13
+13 [label="AssignmentStmt"]
+13->11 [label="left"]
+13->12 [label="right"]
+11 [label="Id: age"]
+12 [label="Int: 0"]
+10->16
+16 [label="AssignmentStmt"]
+16->14 [label="left"]
+16->15 [label="right"]
+14 [label="Id: weight"]
+15 [label="Float: 0.000000"]
+10->19
+19 [label="AssignmentStmt"]
+19->17 [label="left"]
+19->18 [label="right"]
+17 [label="Id: height"]
+18 [label="Float: 0.000000"]
+22->53
+53 [label="FuncDeclStmt"]
+53->52
+52 [label="FuncDecl
+idName: printInfo
+no args
+void return
+doesn't throw exception"]
+52->30 [label="body"]
+30 [label="StmtList"]
+30->29
+29 [label="ExprStmt"]
+29->28
+28 [label="FuncCall"]
+28->27
+27 [label="Normal call with args: print"]
+27->26
+26 [label="FuncCallArgList"]
+26->25
+25 [label="Positional arg"]
+25->23
+23 [label="String: Name: (name)"]
+30->37
+37 [label="ExprStmt"]
+37->36
 36 [label="FuncCall"]
 36->35
-35 [label="Expr access call with args: plus"]
-35->27 [label="access"]
-27 [label="FuncCall"]
-27->26
-26 [label="Normal call with args: Int"]
-26->25
-25 [label="FuncCallArgList"]
-25->24
-24 [label="Positional arg"]
-24->23
-23 [label="Int: 1"]
+35 [label="Normal call with args: print"]
 35->34
 34 [label="FuncCallArgList"]
 34->33
 33 [label="Positional arg"]
-33->32
-32 [label="FuncCall"]
-32->31
-31 [label="Normal call with args: Int"]
-31->30
-30 [label="FuncCallArgList"]
-30->29
-29 [label="Positional arg"]
-29->28
-28 [label="Int: 2"]
-4->22
-22 [label="ExprStmt"]
-22->21
-21 [label="FuncCall"]
-21->20
-20 [label="Expr access call with args: plus"]
-20->10 [label="access"]
-10 [label="FuncCall"]
-10->9
-9 [label="Normal call with args: IntClass"]
-9->8
-8 [label="FuncCallArgList"]
-8->7
-7 [label="Positional arg"]
-7->5
-5 [label="Int: 1"]
-20->19
-19 [label="FuncCallArgList"]
-19->18
-18 [label="Positional arg"]
-18->16
-16 [label="FuncCall"]
-16->15
-15 [label="Normal call with args: IntClass"]
-15->14
-14 [label="FuncCallArgList"]
-14->13
-13 [label="Positional arg"]
-13->11
-11 [label="Int: 2"]
+33->31
+31 [label="String: Age: (age)"]
+30->44
+44 [label="ExprStmt"]
+44->43
+43 [label="FuncCall"]
+43->42
+42 [label="Normal call with args: print"]
+42->41
+41 [label="FuncCallArgList"]
+41->40
+40 [label="Positional arg"]
+40->38
+38 [label="String: Weight: (weight)"]
+30->51
+51 [label="ExprStmt"]
+51->50
+50 [label="FuncCall"]
+50->49
+49 [label="Normal call with args: print"]
+49->48
+48 [label="FuncCallArgList"]
+48->47
+47 [label="Positional arg"]
+47->45
+45 [label="String: Height: (height)"]
 }

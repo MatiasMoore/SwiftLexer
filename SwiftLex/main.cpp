@@ -5,6 +5,7 @@
 #include "nodes/dotHelpers.h"
 #include "generation/classFileGeneration.h"
 #include "tables/tables.h"
+#include <filesystem>
 
 bool _DRAW_DOT = false;
 
@@ -12,6 +13,8 @@ extern int yylex();
 extern int yyparse();
 extern FILE* yyin;
 extern StmtListNode* _root;
+
+void deleteDirectoryContents(const std::filesystem::path& dir);
 
 int main(int argc, const char* argv[])
 {
@@ -105,24 +108,27 @@ int main(int argc, const char* argv[])
 	}
 
 	// Attribution
-
+	auto classTable = ClassTable();
+	_root->fillTable(&classTable, nullptr, nullptr);
 
 	// Generation
-	auto testClassName = "testClass";
-	auto classTable = ClassTable();
-	auto testClass = new ClassTableElement(testClassName, "java/lang/Object");
-	auto mainMethod = FuncDeclNode::createRegular("main", 
-		FuncDeclArgListNode::createListNode(FuncDeclArgNode::createPositionalArg("args", TypeNode::createArrayType(TypeNode::createType(TypeType::StringT)), nullptr)),
-		nullptr,
-		nullptr,
-		false
-	);
-	testClass->methods->methods["main"] = new MethodTableElement(testClass->constants, mainMethod);
-	classTable.items[testClassName] = testClass;
-	generateClassFile(classTable, testClassName);
+
+	// Delete old .class files
+	deleteDirectoryContents("out");
+
+	for (auto& classElem : classTable.items)
+	{
+		generateClassFile(classElem.second, "out/");
+	}
 
 
 	//Чтобы запустить: 
-	// идешь в папку рядом с testClass.class
-	// выполняешь java testClass
+	// идешь в папку out
+	// выполняешь java MainClass
+}
+
+void deleteDirectoryContents(const std::filesystem::path& dir)
+{
+	for (const auto& entry : std::filesystem::directory_iterator(dir))
+		std::filesystem::remove_all(entry.path());
 }
