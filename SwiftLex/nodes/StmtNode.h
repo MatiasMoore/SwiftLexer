@@ -111,10 +111,14 @@ public:
 	static StmtNode* createStmtDestructorDecl(DestructorDeclNode* destructor);
 
 	void generateDot(std::ofstream& file) override;
+
+	StmtNode* semanticsTransform();
 };
 
 class StmtListNode : public GenericListNode<StmtNode, StmtListNode>
 {
 public:
 	std::string getName() override;
+
+	StmtListNode* semanticsTransform();
 };

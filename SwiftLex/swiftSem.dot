@@ -1,0 +1,63 @@
+digraph swift {
+4 [label="StmtList"]
+4->3
+3 [label="ExprStmt"]
+3->36
+36 [label="FuncCall"]
+36->35
+35 [label="Expr access call with args: plus"]
+35->27 [label="access"]
+27 [label="FuncCall"]
+27->26
+26 [label="Normal call with args: Int"]
+26->25
+25 [label="FuncCallArgList"]
+25->24
+24 [label="Positional arg"]
+24->23
+23 [label="Int: 1"]
+35->34
+34 [label="FuncCallArgList"]
+34->33
+33 [label="Positional arg"]
+33->32
+32 [label="FuncCall"]
+32->31
+31 [label="Normal call with args: Int"]
+31->30
+30 [label="FuncCallArgList"]
+30->29
+29 [label="Positional arg"]
+29->28
+28 [label="Int: 2"]
+4->22
+22 [label="ExprStmt"]
+22->21
+21 [label="FuncCall"]
+21->20
+20 [label="Expr access call with args: plus"]
+20->10 [label="access"]
+10 [label="FuncCall"]
+10->9
+9 [label="Normal call with args: IntClass"]
+9->8
+8 [label="FuncCallArgList"]
+8->7
+7 [label="Positional arg"]
+7->5
+5 [label="Int: 1"]
+20->19
+19 [label="FuncCallArgList"]
+19->18
+18 [label="Positional arg"]
+18->16
+16 [label="FuncCall"]
+16->15
+15 [label="Normal call with args: IntClass"]
+15->14
+14 [label="FuncCallArgList"]
+14->13
+13 [label="Positional arg"]
+13->11
+11 [label="Int: 2"]
+}

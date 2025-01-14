@@ -1,5 +1,6 @@
 #include "ExprNode.h"
 #include "FuncCallNode.h"
+#include "FuncCallArgNode.h"
 #include "TypeNode.h"
 
 ExprNode* ExprNode::createBool(bool value)
@@ -429,6 +430,31 @@ void ExprNode::generateDot(std::ofstream& file)
 	default:
 		throw std::runtime_error("Unknown type!");
 		break;
+	}
+}
+
+ExprNode* ExprNode::semanticsTransform()
+{
+	if (this->_type == ExprType::Int)
+	{
+		auto args = FuncCallArgListNode::createListNode(FuncCallArgNode::createFromExpr(ExprNode::createInt(this->_intValue)));
+		return ExprNode::createFuncCall(FuncCallNode::createFuncCall("Int", args));
+	}
+	else if (this->_type == ExprType::Sum)
+	{
+		this->_left = _left->semanticsTransform();
+		this->_right = _right->semanticsTransform();
+
+		auto args = FuncCallArgListNode::createListNode(FuncCallArgNode::createFromExpr(this->_right));
+
+		auto plusFunc = FuncCallNode::createFuncCall("plus", args);
+		plusFunc->setAsExprAccess(this->_left);
+
+		return ExprNode::createFuncCall(plusFunc);
+	}
+	else
+	{
+		return this;
 	}
 }
 

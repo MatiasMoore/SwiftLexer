@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include "allNodes.h"
+#include "nodes/dotHelpers.h"
 
 extern int yylex();
 extern int yyparse();
@@ -53,18 +54,40 @@ int main(int argc, const char* argv[])
 	fclose(yyin);
 	std::remove(tempFileName.c_str());
 
-	std::ofstream dotFile;
-	dotFile.open("swift.dot");
+	// Before semantics
+	std::ofstream dotInitial;
+	dotInitial.open("swift.dot");
 
-	dotFile << "digraph swift {\n";
 	if (_root != nullptr) {
-		_root->generateDot(dotFile);
-		dotFile << "}\n";
+		dotInitial << "digraph swift {\n";
+		_root->generateDot(dotInitial);
+		dotInitial << "}\n";
 
-		dotFile.close();
+		dotInitial.close();
 		system("cd");
 		system("Graphviz\\bin\\dot.exe -Tpng swift.dot > swift.png");
 		system("swift.png");
+	}
+	else {
+		std::cout << "File empty" << std::endl;
+	}
+
+	// After semantics
+	_root = _root->semanticsTransform();
+
+	std::ofstream dotSemantics;
+	dotSemantics.open("swiftSem.dot");
+
+	if (_root != nullptr) {
+		dotSemantics << "digraph swift {\n";
+		clearDotCache();
+		_root->generateDot(dotSemantics);
+		dotSemantics << "}\n";
+
+		dotSemantics.close();
+		system("cd");
+		system("Graphviz\\bin\\dot.exe -Tpng swiftSem.dot > swiftSem.png");
+		system("swiftSem.png");
 	}
 	else {
 		std::cout << "File empty" << std::endl;

@@ -8,3 +8,4 @@ std::string dotConnectionWithLabel(int id1, int id2, std::string text);
 
 std::string dotLabel(int id, std::string text);
 
+void clearDotCache();

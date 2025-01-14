@@ -129,4 +129,6 @@ public:
 	std::string getName();
 
 	void generateDot(std::ofstream& file) override;
+
+	ExprNode* semanticsTransform();
 };

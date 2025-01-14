@@ -252,7 +252,29 @@ void StmtNode::generateDot(std::ofstream& file)
 	}
 }
 
+StmtNode* StmtNode::semanticsTransform()
+{
+	if (this->_type == StmtType::Expr)
+	{
+		this->_expr = _expr->semanticsTransform();
+	}
+	else if (this->_type == StmtType::Assignment) {
+		this->_assignLeft = _expr->semanticsTransform();
+		this->_assignRight = _expr->semanticsTransform();
+	}
+	return this;
+}
+
 std::string StmtListNode::getName()
 {
 	return "StmtList";
+}
+
+StmtListNode* StmtListNode::semanticsTransform()
+{
+	for (auto& elem : _vec)
+	{
+		elem = elem->semanticsTransform();
+	}
+	return this;
 }

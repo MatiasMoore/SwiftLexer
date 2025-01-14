@@ -36,3 +36,9 @@ std::string dotLabel(int id, std::string text)
 	_labels.emplace(id);
 	return std::to_string(id) + " [label=\"" + text + "\"]" + '\n';
 }
+
+void clearDotCache()
+{
+	_connections = {};
+	_labels = {};
+}
