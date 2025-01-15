@@ -291,8 +291,12 @@ void StmtNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass
 			throw std::runtime_error("Nested methods are not supported!");
 
 		if (currentClass == nullptr)
-			currentClass = classTable->addMainClass();
+			throw std::runtime_error("Methods must be inside a class!");
+
+		//TODO probably rework this and move the code bellow inside FuncDeclNode
+
 		currentMethod = currentClass->addMethod(this->_funcDecl);
+		this->_funcDecl->_body->fillTable(classTable, currentClass, currentMethod);
 		break;
 	case StmtType::ConstructorDecl:
 		if (currentMethod != nullptr)
@@ -317,13 +321,25 @@ void StmtNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass
 			this->_classDecl->_body->fillTable(classTable, currentClass, currentMethod);
 		}
 		break;
+	case StmtType::Expr:
+		if (currentClass == nullptr)
+			throw std::runtime_error("Expr stmt must be associated with a class!");
+
+		if (currentMethod == nullptr)
+			throw std::runtime_error("Expr stmt must be inside a method!");
+
+		this->_expr->fillTable(classTable, currentClass, currentMethod);
+		break;
+	case StmtType::Return:
+		//TODO maybe do something here
+		break;
 	default:
-		throw std::runtime_error("Unsupported stmnt type!");
+		throw std::runtime_error("Unsupported stmnt with enum type " + std::to_string(this->_type) + "!");
 		break;
 	}
 }
 
-std::vector<char> StmtNode::generateCodeForStmt()
+std::vector<char> StmtNode::generateCode(ClassTableElement* currentClass, MethodTableElement* currentMethod)
 {
 	std::vector<char> code = {};
 	switch (this->_type)
@@ -331,6 +347,9 @@ std::vector<char> StmtNode::generateCodeForStmt()
 	case StmtType::Return:
 		//TODO non void returns
 		appendVecToVec(code, jvm::_return());
+		break;
+	case StmtType::Expr:
+		appendVecToVec(code, this->_expr->generateCode(currentClass, currentMethod));
 		break;
 	default:
 		throw std::runtime_error("Can't generate code for stmnt with type " + std::to_string(this->_type) + "!");

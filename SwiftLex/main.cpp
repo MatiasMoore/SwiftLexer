@@ -109,7 +109,17 @@ int main(int argc, const char* argv[])
 
 	// Attribution
 	auto classTable = ClassTable();
-	_root->fillTable(&classTable, nullptr, nullptr);
+
+	try
+	{
+		_root->fillTable(&classTable, nullptr, nullptr);
+	}
+	catch (std::runtime_error error)
+	{
+		std::cout << "Table filling error: " << error.what() << std::endl;
+		return 1;
+	}
+
 
 	// Generation
 
@@ -126,6 +136,7 @@ int main(int argc, const char* argv[])
 	catch (std::runtime_error error)
 	{
 		std::cout << "Code generation error: " << error.what() << std::endl;
+		return 1;
 	}
 
 	//Чтобы запустить: 

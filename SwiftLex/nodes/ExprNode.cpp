@@ -2,6 +2,8 @@
 #include "FuncCallNode.h"
 #include "FuncCallArgNode.h"
 #include "TypeNode.h"
+#include "../tables/tables.h"
+#include "../generation/generationHelpers.h"
 
 ExprNode* ExprNode::createBool(bool value)
 {
@@ -456,6 +458,53 @@ ExprNode* ExprNode::semanticsTransform()
 	{
 		return this;
 	}
+}
+
+TypeNode* ExprNode::evaluateType()
+{
+	switch (this->_type)
+	{
+	case String:
+		return TypeNode::createType(TypeType::StringT);
+		break;
+	default:
+		throw std::runtime_error("Can't evaluate type of expr with enum type " + std::to_string(this->_type) + "!");
+		break;
+	}
+}
+
+void ExprNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod)
+{
+	if (currentClass == nullptr)
+		throw std::runtime_error("Expression must be associated with a class!");
+
+	if (currentMethod == nullptr)
+		throw std::runtime_error("Expression must be inside a method!");
+
+	switch (this->_type)
+	{
+	case ExprType::FuncCall:
+		this->_funcCall->fillTable(classTable, currentClass, currentMethod);
+		break;
+	default:
+		throw std::runtime_error("Unsupported expr with enum type " + std::to_string(this->_type) + "!");
+		break;
+	}
+}
+
+std::vector<char> ExprNode::generateCode(ClassTableElement* currentClass, MethodTableElement* currentMethod)
+{
+	std::vector<char> code = {};
+	switch (this->_type)
+	{
+	case ExprType::FuncCall:
+		appendVecToVec(code, this->_funcCall->generateCode(currentClass, currentMethod));
+		break;
+	default:
+		throw std::runtime_error("Can't generate code for expr with type " + std::to_string(this->_type) + "!");
+		break;
+	}
+	return code;
 }
 
 std::string ExprListNode::getName()

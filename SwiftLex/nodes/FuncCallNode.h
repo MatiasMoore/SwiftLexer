@@ -1,5 +1,6 @@
 #pragma once
 #include "dottable.h"
+#include <vector>
 
 class FuncCallArgListNode;
 class ExprNode;
@@ -23,6 +24,8 @@ public:
 
 	ExprNode* _exprAccess;
 
+	int _methodRef = -1;
+
 	static FuncCallNode* createFuncCall(std::string funcName, FuncCallArgListNode* funcArgs);
 
 	static FuncCallNode* createFuncCallNoArgs(std::string funcName);
@@ -32,5 +35,9 @@ public:
 	std::string getName();
 
 	void generateDot(std::ofstream& file) override;
+
+	void fillTable(class ClassTable* classTable, class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
+
+	std::vector<char> generateCode(class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
 };
 

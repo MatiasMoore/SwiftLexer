@@ -122,7 +122,7 @@ public:
 
 	void fillTable(class ClassTable* classTable, class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
 
-	std::vector<char> generateCodeForStmt();
+	std::vector<char> generateCode(class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
 };
 
 class StmtListNode : public GenericListNode<StmtNode, StmtListNode>

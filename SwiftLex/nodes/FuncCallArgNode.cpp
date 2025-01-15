@@ -29,6 +29,11 @@ void FuncCallArgNode::generateDot(std::ofstream& file)
     this->_value->generateDot(file);
 }
 
+void FuncCallArgNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod)
+{
+    this->_argType = this->_value->evaluateType();
+}
+
 std::string FuncCallArgListNode::getName()
 {
     return "FuncCallArgList";

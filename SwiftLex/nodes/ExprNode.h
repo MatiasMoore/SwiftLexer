@@ -5,6 +5,9 @@
 class ExprNode;
 class TypeNode;
 class FuncCallNode;
+class ClassTable;
+class ClassTableElement;
+class MethodTableElement;
 
 enum ExprType
 {
@@ -131,4 +134,10 @@ public:
 	void generateDot(std::ofstream& file) override;
 
 	ExprNode* semanticsTransform();
+
+	TypeNode* evaluateType();
+
+	void fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod);
+
+	std::vector<char> generateCode(class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
 };

@@ -1,6 +1,8 @@
 #include "FuncCallNode.h"
 #include "FuncCallArgNode.h"
 #include "ExprNode.h"
+#include "../tables/tables.h"
+#include "../generation/generationHelpers.h"
 
 FuncCallNode* FuncCallNode::createFuncCall(std::string funcName, FuncCallArgListNode* funcArgs)
 {
@@ -81,4 +83,56 @@ void FuncCallNode::generateDot(std::ofstream& file)
 		}
 			break;
 	}
+}
+
+void FuncCallNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod)
+{
+	if (currentClass == nullptr)
+		throw std::runtime_error("Function call must be associated with a class!");
+
+	if (currentMethod == nullptr)
+		throw std::runtime_error("Function call must be inside a method!");
+
+	if (this->_scopeType == normalCall)
+	{	
+		auto method = currentClass->methods->methods[this->_funcName];
+		if (method == nullptr)
+			throw std::runtime_error("Method \"" + this->_funcName + "\" is not found in the method table!");
+
+		//TODO add arg type checking
+		/*
+		std::string funcDesc = "(";
+		for (auto& callArg : this->_funcArgs->_vec)
+		{
+			callArg->fillTable(classTable, currentClass, currentMethod);
+			funcDesc += descriptorForType(callArg->_argType);
+		}
+		funcDesc += ")";
+		*/
+
+		auto funcNameAndTypeRef = currentClass->constants->findOrAddConstant(NameAndType_C, "", 0, 0, method->methodName, method->descriptor);
+		auto funcMethodrefRef = currentClass->constants->findOrAddConstant(MethodRef_C, "", 0, 0, currentClass->thisClass, funcNameAndTypeRef);
+		this->_methodRef = funcMethodrefRef;
+	}
+	else
+	{
+		throw std::runtime_error("Unsupported function call scope with enum type " + std::to_string(this->_scopeType) + "!");
+	}
+	
+}
+
+std::vector<char> FuncCallNode::generateCode(ClassTableElement* currentClass, MethodTableElement* currentMethod)
+{
+	std::vector<char> code = {};
+	if (this->_scopeType == normalCall)
+	{
+		//TODO fix all of this
+		//appendVecToVec(code, jvm::ldc(currentClass->thisClass));
+		//appendVecToVec(code, jvm::invokevirtual(this->_methodRef));
+	}
+	else
+	{
+		throw std::runtime_error("Can't generate code for function call \"" + this->_funcName + "\" of enum type " + std::to_string(this->_scopeType) + "!");
+	}
+	return code;
 }

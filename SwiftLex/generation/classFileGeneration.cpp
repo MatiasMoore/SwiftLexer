@@ -32,7 +32,7 @@ std::vector<char> generateMethodAttribute(class MethodTableElement* mElem, Class
 
 	for (auto& stmt : mElem->_body->_vec)
 	{
-		std::vector<char> bytes = stmt->generateCodeForStmt();// generateCodeForStatement(curStatement, cElem, mElem);
+		std::vector<char> bytes = stmt->generateCode(cElem, mElem);// generateCodeForStatement(curStatement, cElem, mElem);
 		appendVecToVec(codeBytes, bytes);
 	}
 	printf("Code bytes len: %d\n", codeBytes.size());
