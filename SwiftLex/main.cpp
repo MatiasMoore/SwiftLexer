@@ -8,6 +8,9 @@
 #include <filesystem>
 
 bool _DRAW_DOT = false;
+bool _EXEC_MAINCLASS = true;
+
+std::string generatedClassFilesDirectory = "out/";
 
 extern int yylex();
 extern int yyparse();
@@ -124,13 +127,13 @@ int main(int argc, const char* argv[])
 	// Generation
 
 	// Delete old .class files
-	deleteDirectoryContents("out");
+	deleteDirectoryContents(generatedClassFilesDirectory);
 
 	try
 	{
 		for (auto& classElem : classTable.items)
 		{
-			generateClassFile(classElem.second, "out/");
+			generateClassFile(classElem.second, generatedClassFilesDirectory);
 		}
 	}
 	catch (std::runtime_error error)
@@ -138,10 +141,15 @@ int main(int argc, const char* argv[])
 		std::cout << "Code generation error: " << error.what() << std::endl;
 		return 1;
 	}
+	std::cout << std::endl;
+	
+	//Execute
 
-	//Чтобы запустить: 
-	// идешь в папку out
-	// выполняешь java MainClass
+	if (_EXEC_MAINCLASS) {
+		std::cout << "//---------Program exec---------\\\\" << std::endl;
+		std::string javaExecutionCommand = "java -cp " + generatedClassFilesDirectory + " MainClass";
+		system(javaExecutionCommand.c_str());
+	}
 }
 
 void deleteDirectoryContents(const std::filesystem::path& dir)
