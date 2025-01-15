@@ -126,9 +126,9 @@ std::vector<char> FuncCallNode::generateCode(ClassTableElement* currentClass, Me
 	std::vector<char> code = {};
 	if (this->_scopeType == normalCall)
 	{
-		//TODO fix all of this
-		//appendVecToVec(code, jvm::ldc(currentClass->thisClass));
-		//appendVecToVec(code, jvm::invokevirtual(this->_methodRef));
+		// appendVecToVec(code, jvm::aload(0));
+		// Static call
+		appendVecToVec(code, jvm::invokestatic(this->_methodRef));
 	}
 	else
 	{
