@@ -246,5 +246,9 @@ void FuncDeclNode::fillTable(ClassTable* classTable, ClassTableElement* currentC
 			currentMethod->varTable->addLocalVar(arg->_argName, arg->_argType);
 		}
 	}
+
+	if (!this->_hasBody)
+		throw std::runtime_error("Func decl \"" + this->_idName + "\" must have a body!");
+
 	this->_body->fillTable(classTable, currentClass, currentMethod);
 }

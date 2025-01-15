@@ -102,5 +102,9 @@ void ConstructorDeclNode::fillTable(ClassTable* classTable, ClassTableElement* c
 			currentMethod->varTable->addLocalVar(arg->_argName, arg->_argType);
 		}
 	}
+
+	if (!this->_hasBody)
+		throw std::runtime_error("Constructor decl for class \"" + currentClass->nameStr + "\" must have a body!");
+
 	this->_body->fillTable(classTable, currentClass, currentMethod);
 }
