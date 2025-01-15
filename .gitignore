@@ -406,3 +406,7 @@ SwiftLex/swift.tab.h
 
 SwiftLex/swift.png
 SwiftLex/swift.dot
+
+# tree after semantic transformation
+SwiftLex/swiftSem.png
+SwiftLex/swiftSem.dot
