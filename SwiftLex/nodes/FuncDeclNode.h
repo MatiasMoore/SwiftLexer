@@ -60,5 +60,7 @@ public:
 	std::string getOperatorOverloadName(OverloadableOperatorType overloadType);
 
 	void generateDot(std::ofstream& file) override;
+
+	void fillTable(class ClassTable* classTable, class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
 };
 

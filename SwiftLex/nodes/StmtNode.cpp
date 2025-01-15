@@ -293,10 +293,7 @@ void StmtNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass
 		if (currentClass == nullptr)
 			throw std::runtime_error("Methods must be inside a class!");
 
-		//TODO probably rework this and move the code bellow inside FuncDeclNode
-
-		currentMethod = currentClass->addMethod(this->_funcDecl);
-		this->_funcDecl->_body->fillTable(classTable, currentClass, currentMethod);
+		this->_funcDecl->fillTable(classTable, currentClass, currentMethod);
 		break;
 	case StmtType::ConstructorDecl:
 		if (currentMethod != nullptr)
@@ -305,7 +302,7 @@ void StmtNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass
 		if (currentClass == nullptr)
 			throw std::runtime_error("Constructor must be inside the class!");
 
-		currentMethod = currentClass->addMethodConstructor(this->_constructorDecl);
+		this->_constructorDecl->fillTable(classTable, currentClass, currentMethod);
 		break;
 	case StmtType::ClassDecl:
 		if (currentClass != nullptr)
@@ -314,7 +311,7 @@ void StmtNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass
 		if (currentMethod != nullptr)
 			throw std::runtime_error("Class declaration inside methods is not supported!");
 
-		currentClass = classTable->addClass(this->_classDecl);
+		currentClass = classTable->addClass(this->_classDecl->_name, this->_classDecl->_type == ClassDeclType::HasBaseClass ? this->_classDecl->_baseClassName : "java/lang/Object");
 
 		if (this->_classDecl->_hasBody)
 		{

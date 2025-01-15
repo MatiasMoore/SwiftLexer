@@ -3,6 +3,8 @@
 #include "FuncDeclArgNode.h"
 #include "TypeNode.h"
 #include "AccessModifierNode.h"
+#include "../tables/tables.h"
+#include "../generation/generationHelpers.h"
 
 FuncDeclNode* FuncDeclNode::createRegular(std::string idName, FuncDeclArgListNode* argList, StmtListNode* body, TypeNode* returnType, bool throwsException)
 {
@@ -210,4 +212,39 @@ void FuncDeclNode::generateDot(std::ofstream& file)
 		this->_returnType->generateDot(file);
 	}
 
+}
+
+void FuncDeclNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod)
+{
+	if (currentClass == nullptr)
+		throw std::runtime_error("Func decl must be associated with a class!");
+
+	if (currentMethod != nullptr)
+		throw std::runtime_error("Func decl can't be inside a method!");
+
+	std::string strDesc = "(";
+
+	if (this->_hasArgs)
+	{
+		for (auto& arg : this->_argList->_vec)
+		{
+			strDesc += descriptorForType(arg->_argType);
+		}
+	}
+	strDesc += ")";
+
+	if (this->_hasNonVoidReturn)
+		strDesc += descriptorForType(this->_returnType);
+	else
+		strDesc += "V";
+
+	currentMethod = currentClass->addMethod(this->_idName, this->_body, strDesc);
+	if (this->_hasArgs)
+	{
+		for (auto& arg : this->_argList->_vec)
+		{
+			currentMethod->varTable->findOrAddLocalVar(currentClass->constants, arg->_argName, arg->_argType);
+		}
+	}
+	this->_body->fillTable(classTable, currentClass, currentMethod);
 }

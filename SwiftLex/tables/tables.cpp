@@ -121,16 +121,9 @@ ClassTableElement::ClassTableElement(std::string name, std::string superName)
     this->superClass = superClassNum;
 }
 
-MethodTableElement* ClassTableElement::addMethod(FuncDeclNode* funcDecl)
+MethodTableElement* ClassTableElement::addMethod(std::string name, StmtListNode* body, std::string descriptor)
 {
-    auto newMethod = new MethodTableElement(this->constants, funcDecl);
-    this->methods->methods[newMethod->strName] = newMethod;
-    return newMethod;
-}
-
-MethodTableElement* ClassTableElement::addMethodConstructor(ConstructorDeclNode* constructorDecl)
-{
-    auto newMethod = new MethodTableElement(this->constants, constructorDecl);
+    auto newMethod = new MethodTableElement(this->constants, name, body, descriptor);
     this->methods->methods[newMethod->strName] = newMethod;
     return newMethod;
 }
@@ -158,6 +151,18 @@ MethodTableElement::MethodTableElement(ConstantTable* constants, FuncDeclNode* f
         this->strDesc += descriptorForType(funcDecl->_returnType);
     else
         this->strDesc += "V";
+
+    this->descriptor = constants->findOrAddConstant(Utf8_C, this->strDesc);
+}
+
+MethodTableElement::MethodTableElement(ConstantTable* constants, std::string name, StmtListNode* body, std::string descriptor)
+{
+    this->strName = name;
+    this->methodName = constants->findOrAddConstant(Utf8_C, this->strName);
+    this->_body = body;
+    this->strDesc = descriptor;
+
+    this->varTable = new LocalVariableTable();
 
     this->descriptor = constants->findOrAddConstant(Utf8_C, this->strDesc);
 }
@@ -208,16 +213,9 @@ int LocalVariableTable::findOrAddLocalVar(ConstantTable* constants, std::string 
     }
 }
 
-ClassTableElement* ClassTable::addMainClass()
+ClassTableElement* ClassTable::addClass(std::string name, std::string superName)
 {
-    auto mainClass = new ClassTableElement("MainClass", "java/lang/Object");
-    this->items["MainClass"] = mainClass;
-    return mainClass;
-}
-
-ClassTableElement* ClassTable::addClass(ClassDeclNode* classDecl)
-{
-    auto newClass = new ClassTableElement(classDecl->_name, classDecl->_type == ClassDeclType::HasBaseClass ? classDecl->_baseClassName : "java/lang/Object");
-    this->items[classDecl->_name] = newClass;
+    auto newClass = new ClassTableElement(name, superName);
+    this->items[name] = newClass;
     return newClass;
 }

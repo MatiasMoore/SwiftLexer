@@ -2,6 +2,8 @@
 #include "FuncDeclArgNode.h"
 #include "StmtNode.h"
 #include "AccessModifierNode.h"
+#include "../tables/tables.h"
+#include "../generation/generationHelpers.h"
 
 ConstructorDeclNode* ConstructorDeclNode::createConstructor(FuncDeclArgListNode* argList, StmtListNode* body, bool throwsException)
 {
@@ -71,4 +73,34 @@ void ConstructorDeclNode::generateDot(std::ofstream& file)
 		file << dotConnectionWithLabel(this->_id, this->_body->_id, "body");
 		this->_body->generateDot(file);
 	}
+}
+
+void ConstructorDeclNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod)
+{
+	if (currentClass == nullptr)
+		throw std::runtime_error("Constructor decl must be associated with a class!");
+
+	if (currentMethod != nullptr)
+		throw std::runtime_error("Constructor decl can't be inside a method!");
+
+	std::string strDesc = "(";
+
+	if (this->_hasArgs)
+	{
+		for (auto& arg : this->_argList->_vec)
+		{
+			strDesc += descriptorForType(arg->_argType);
+		}
+	}
+	strDesc += ")V";
+
+	currentMethod = currentClass->addMethod("<init>", this->_body, strDesc);
+	if (this->_hasArgs)
+	{
+		for (auto& arg : this->_argList->_vec)
+		{
+			currentMethod->varTable->findOrAddLocalVar(currentClass->constants, arg->_argName, arg->_argType);
+		}
+	}
+	this->_body->fillTable(classTable, currentClass, currentMethod);
 }
