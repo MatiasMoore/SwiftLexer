@@ -128,33 +128,6 @@ MethodTableElement* ClassTableElement::addMethod(std::string name, StmtListNode*
     return newMethod;
 }
 
-MethodTableElement::MethodTableElement(ConstantTable* constants, FuncDeclNode* funcDecl)
-{
-    this->strName = funcDecl->_idName;
-    this->methodName = constants->findOrAddConstant(Utf8_C, this->strName);
-    this->_body = funcDecl->_body;
-    this->strDesc = "(";
-
-    this->varTable = new LocalVariableTable();
-
-    if (funcDecl->_hasArgs)
-    {
-        for (auto& arg : funcDecl->_argList->_vec)
-        {
-            this->strDesc += descriptorForType(arg->_argType);
-            this->varTable->findOrAddLocalVar(constants, arg->_argName, arg->_argType);
-        }
-    }
-    this->strDesc += ")";
-
-    if (funcDecl->_hasNonVoidReturn)
-        this->strDesc += descriptorForType(funcDecl->_returnType);
-    else
-        this->strDesc += "V";
-
-    this->descriptor = constants->findOrAddConstant(Utf8_C, this->strDesc);
-}
-
 MethodTableElement::MethodTableElement(ConstantTable* constants, std::string name, StmtListNode* body, std::string descriptor)
 {
     this->strName = name;
@@ -167,50 +140,29 @@ MethodTableElement::MethodTableElement(ConstantTable* constants, std::string nam
     this->descriptor = constants->findOrAddConstant(Utf8_C, this->strDesc);
 }
 
-MethodTableElement::MethodTableElement(ConstantTable* constants, ConstructorDeclNode* constructorDecl)
-{
-    this->strName = "<init>";
-    this->methodName = constants->findOrAddConstant(Utf8_C, this->strName);
-    this->_body = constructorDecl->_body;
-    this->strDesc = "(";
-
-    this->varTable = new LocalVariableTable();
-
-    if (constructorDecl->_hasArgs)
-    {
-        for (auto& arg : constructorDecl->_argList->_vec)
-        {
-            this->strDesc += descriptorForType(arg->_argType);
-            this->varTable->findOrAddLocalVar(constants, arg->_argName, arg->_argType);
-        }
-    }
-    this->strDesc += ")";
-
-    this->strDesc += "L";
-
-    this->descriptor = constants->findOrAddConstant(Utf8_C, this->strDesc);
-}
-
-LocalVariableElement::LocalVariableElement(ConstantTable* constants, std::string name, TypeNode* type, int isConst, int isInitial)
+LocalVariableElement::LocalVariableElement(int localId, std::string name, TypeNode* type)
 {
     this->name = name;
-    this->nameNum = constants->findOrAddConstant(Utf8_C, this->name);
     this->_type = type;
-    this->isConst = isConst;
-    this->isInit = isInitial;
+    this->localId = localId;
 }
 
-int LocalVariableTable::findOrAddLocalVar(ConstantTable* constants, std::string name, TypeNode* type, int isConst, int isInitial)
+LocalVariableElement* LocalVariableTable::addLocalVar(std::string name, TypeNode* type)
 {
-    if (items.find(name) == items.cend()) // ≈сли переменна€ с указанным именем не найдена.
-    {
-        items[name] = new LocalVariableElement(constants, name, type, isConst, isInitial);
-        return items[name]->nameNum;
-    }
-    else
-    {
-        return items[name]->nameNum;
-    }
+    if (items.find(name) != items.cend())
+        throw std::runtime_error("Local variable with name " + name + " already exists!");
+    
+    int newLocalId = this->items.size();
+    this->items[name] = new LocalVariableElement(newLocalId, name, type);
+    return this->items[name];
+}
+
+LocalVariableElement* LocalVariableTable::findLocalVar(std::string name)
+{
+    if (items.find(name) == items.cend())
+        throw std::runtime_error("Local variable with name " + name + " doesn't exist!");
+
+    return this->items[name];
 }
 
 ClassTableElement* ClassTable::addClass(std::string name, std::string superName)

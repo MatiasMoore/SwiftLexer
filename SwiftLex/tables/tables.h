@@ -151,35 +151,28 @@ public:
     /// Ссылка на таблицу локальных переменных.
     class LocalVariableTable* varTable = NULL;
 
-    MethodTableElement(ConstantTable* constants, FuncDeclNode* funcDecl);
-
     MethodTableElement(ConstantTable* constants, std::string name, StmtListNode* body, std::string descriptor);
 
-    MethodTableElement(ConstantTable* constants, ConstructorDeclNode* constructorDecl);
 };
 
 class LocalVariableElement
 {
 public:
     std::string name; // Имя локальной переменной.
-    int nameNum; // Идентификатор локальной переменной.
     TypeNode* _type; // Тип локальной переменной.
-    int isConst; // Флаг, показывающий, является ли переменная изменяемой.
-    int isInit; // Флаг, показывающий, инициализрована переменная.
+    int localId;
 
-    LocalVariableElement(ConstantTable* constants, std::string name, TypeNode* type, int isConst = 0, int isInitial = 0);
+    LocalVariableElement(int localId, std::string name, TypeNode* type);
 };
 
 /*! \brief Таблица локальных переменных. */
 class LocalVariableTable
 {
 public:
-
-    /// Текущее максимальное значение идентификатора переменной.
-    int maxId = 0;
-
     /// Контейнер элементов.
     std::map<std::string, class LocalVariableElement*> items = {};
 
-    int findOrAddLocalVar(ConstantTable* constants, std::string name, TypeNode* type, int isConst = 0, int isInitial = 0);
+    LocalVariableElement* addLocalVar(std::string name, TypeNode* type);
+
+    LocalVariableElement* findLocalVar(std::string name);
 };
