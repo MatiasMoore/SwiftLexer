@@ -1,18 +1,8 @@
 class MainClass {
-	public static func print(num : Int)
-	{
-		return
-	}
 
 	public static func main(args : [String])
 	{
-		//print("a")
-		var a : Int
-		a = 37
-		print(a)
+		print(5)
 		return
 	}
 }
-
-
-

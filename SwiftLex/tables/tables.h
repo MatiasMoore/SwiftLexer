@@ -13,6 +13,7 @@ class FuncDeclNode;
 class ClassDeclNode;
 class ConstructorDeclNode;
 class StmtListNode;
+class ExternalMethodTable;
 
 enum MethodAccessFlag {
     M_ACC_PUBLIC = 0x0001,        //	Declared public; may be accessed from outside its package.
@@ -44,6 +45,8 @@ class ClassTableElement {
 public:
     ClassTableElement(std::string name, std::string superName);
 
+    void addRtlExternalMethods();
+
     // —сылка на константу с именем класса - номер константы.
     // UTF-8?
     int name;
@@ -67,6 +70,8 @@ public:
     ConstantTable* constants;
 
     MethodTable* methods;
+
+    ExternalMethodTable* externalMethods;
 
     MethodTableElement* addMethod(std::string name, StmtListNode* body, std::string descriptor, std::vector<MethodAccessFlag> flags);
 };
@@ -135,6 +140,36 @@ private:
     */
     int findConstant(enum ConstantType type, std::string utf8string, int fRef = NULL, int secondRef = NULL, int intVal = NULL, double dVal = NULL);
 
+};
+
+/*! \brief “аблица внешних методов класса. */
+class ExternalMethodTable
+{
+public:
+    std::map<std::string, class ExternalMethodTableElement*> methods = {};
+
+    ExternalMethodTableElement* addMethod(ConstantTable* constants, std::string className, std::string methodName, std::string descriptor);
+};
+
+/*! \brief Ёлемент таблицы внешних методов класса. */
+class ExternalMethodTableElement
+{
+public:
+    /// —сылка на номер константы с именем метода в таблице констант.
+    int _nameRef;
+
+    /// —сылка на номер константы с дескриптором в таблице констант.
+    int _descriptorRef;
+
+    int _methodRef;
+
+    /// —троковое название метода.
+    std::string _name;
+
+    /// —троковый дескриптор метода.
+    std::string _descriptor;
+
+    ExternalMethodTableElement(std::string name, int nameRef, std::string descriptor, int descriptorRef, int methodRef);
 };
 
 /*! \brief “аблица методов класса. */

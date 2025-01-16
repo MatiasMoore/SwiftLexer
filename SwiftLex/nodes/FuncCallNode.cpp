@@ -95,9 +95,24 @@ void FuncCallNode::fillTable(ClassTable* classTable, ClassTableElement* currentC
 
 	if (this->_scopeType == normalCall)
 	{	
-		auto method = currentClass->methods->methods[this->_funcName];
-		if (method == nullptr)
+		bool isInternal = currentClass->methods->methods.count(this->_funcName) != 0;
+		bool isExternal = currentClass->externalMethods->methods.count(this->_funcName) != 0;
+		if (isInternal)
+		{
+			auto method = currentClass->methods->methods[this->_funcName];
+			auto funcNameAndTypeRef = currentClass->constants->findOrAddConstant(NameAndType_C, "", 0, 0, method->methodName, method->descriptor);
+			auto funcMethodrefRef = currentClass->constants->findOrAddConstant(MethodRef_C, "", 0, 0, currentClass->thisClass, funcNameAndTypeRef);
+			this->_methodRef = funcMethodrefRef;
+		}
+		else if (isExternal)
+		{
+			auto externalMethod = currentClass->externalMethods->methods[this->_funcName];
+			this->_methodRef = externalMethod->_methodRef;
+		}
+		else
+		{
 			throw std::runtime_error("Method \"" + this->_funcName + "\" is not found in the method table!");
+		}
 
 		//TODO add arg type checking
 		/*
@@ -110,9 +125,7 @@ void FuncCallNode::fillTable(ClassTable* classTable, ClassTableElement* currentC
 		funcDesc += ")";
 		*/
 
-		auto funcNameAndTypeRef = currentClass->constants->findOrAddConstant(NameAndType_C, "", 0, 0, method->methodName, method->descriptor);
-		auto funcMethodrefRef = currentClass->constants->findOrAddConstant(MethodRef_C, "", 0, 0, currentClass->thisClass, funcNameAndTypeRef);
-		this->_methodRef = funcMethodrefRef;
+		
 	}
 	else
 	{

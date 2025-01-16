@@ -108,6 +108,8 @@ ClassTableElement::ClassTableElement(std::string name, std::string superName)
 {
     constants = new ConstantTable();
     methods = new MethodTable();
+    externalMethods = new ExternalMethodTable();
+
     this->nameStr = name;
     auto nameNum = constants->findOrAddConstant(ConstantType::Utf8_C, name);
     auto classNum = constants->findOrAddConstant(ConstantType::Class_C, "", 0, 0, nameNum);
@@ -120,6 +122,13 @@ ClassTableElement::ClassTableElement(std::string name, std::string superName)
 
     this->superName = superNameNum;
     this->superClass = superClassNum;
+
+    this->addRtlExternalMethods();
+}
+
+void ClassTableElement::addRtlExternalMethods()
+{
+    this->externalMethods->addMethod(this->constants, "InputOutput", "print", "(I)V");
 }
 
 MethodTableElement* ClassTableElement::addMethod(std::string name, StmtListNode* body, std::string descriptor, std::vector<MethodAccessFlag> flags)
@@ -178,4 +187,27 @@ ClassTableElement* ClassTable::addClass(std::string name, std::string superName)
     auto newClass = new ClassTableElement(name, superName);
     this->items[name] = newClass;
     return newClass;
+}
+
+ExternalMethodTableElement::ExternalMethodTableElement(std::string name, int nameRef, std::string descriptor, int descriptorRef, int methodRef)
+{
+    this->_name = name;
+    this->_nameRef = nameRef;
+    this->_descriptor = descriptor;
+    this->_descriptorRef = descriptorRef;
+    this->_methodRef = methodRef;
+}
+
+ExternalMethodTableElement* ExternalMethodTable::addMethod(ConstantTable* constants, std::string className, std::string methodName, std::string descriptor)
+{
+    auto classNameRef = constants->findOrAddConstant(Utf8_C, className);
+    auto classRef = constants->findOrAddConstant(Class_C, "", 0, 0, classNameRef, 0);
+    auto methodNameRef = constants->findOrAddConstant(Utf8_C, methodName);
+    auto descriptorRef = constants->findOrAddConstant(Utf8_C, descriptor);
+    auto methodNameAndTypeRef = constants->findOrAddConstant(NameAndType_C, "", 0, 0, methodNameRef, descriptorRef);
+    auto methodMethodRefRef = constants->findOrAddConstant(MethodRef_C, "", 0, 0, classRef, methodNameAndTypeRef);
+
+    auto newMethod = new ExternalMethodTableElement(methodName, methodNameRef, descriptor, descriptorRef, methodMethodRefRef);
+    this->methods[methodName] = newMethod;
+    return newMethod;
 }

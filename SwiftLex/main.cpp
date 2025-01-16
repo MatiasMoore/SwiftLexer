@@ -11,6 +11,7 @@ bool _DRAW_DOT = false;
 bool _EXEC_MAINCLASS = true;
 
 std::string generatedClassFilesDirectory = "out/";
+std::string rtlSourceDirectory = "rtl/";
 
 extern int yylex();
 extern int yyparse();
@@ -128,7 +129,16 @@ int main(int argc, const char* argv[])
 
 	// Delete old .class files
 	deleteDirectoryContents(generatedClassFilesDirectory);
+	
+	// Generate rtl .class files
+	for (const auto& entry : std::filesystem::directory_iterator(rtlSourceDirectory))
+	{
+		auto test = entry.path().generic_string();
+		std::string compilationCommand = "javac " + entry.path().generic_string() + " -d " + generatedClassFilesDirectory;
+		system(compilationCommand.c_str());
+	}
 
+	// Generate .class files based on _root
 	try
 	{
 		for (auto& classElem : classTable.items)
