@@ -2,6 +2,8 @@
 #include "TypeNode.h"
 #include "ExprNode.h"
 #include "AccessModifierNode.h"
+#include "../tables/tables.h"
+#include "../generation/generationHelpers.h"
 
 VarDeclarationNode* VarDeclarationNode::createFromValue(std::string varName, ExprNode* value)
 {
@@ -58,6 +60,22 @@ void VarDeclarationNode::generateDot(std::ofstream& file)
 	}
 }
 
+void VarDeclarationNode::fillTable(ClassTableElement* currentClass, MethodTableElement* currentMethod)
+{
+	switch (this->_type)
+	{
+	case ValueAndTypeKnown:
+		break;
+	case TypeKnown:
+		currentMethod->varTable->addLocalVar(this->_varName, this->_typeNode);
+		break;
+	case ValueKnown:
+		break;
+	default:
+		break;
+	}
+}
+
 std::string VarDeclarationListNode::getName()
 {
 	return "VarDeclList";
@@ -70,4 +88,12 @@ VarDeclarationListNode* VarDeclarationListNode::addModifiers(AccessModifierListN
 		varDecl->addModifiers(modifiers);
 	}
 	return this;
+}
+
+void VarDeclarationListNode::fillTable( ClassTableElement* currentClass, MethodTableElement* currentMethod)
+{
+	for (auto& elem : _vec)
+	{
+		elem->fillTable(currentClass, currentMethod);
+	}
 }

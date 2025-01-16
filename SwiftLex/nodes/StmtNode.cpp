@@ -327,6 +327,15 @@ void StmtNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass
 
 		this->_expr->fillTable(classTable, currentClass, currentMethod);
 		break;
+	case StmtType::VarDeclarationList:
+		if (currentClass == nullptr)
+			throw std::runtime_error("Expr stmt must be associated with a class!");
+
+		if (currentMethod == nullptr)
+			throw std::runtime_error("Expr stmt must be inside a method!");
+
+		this->_varDeclList->fillTable(currentClass, currentMethod);
+		break;
 	case StmtType::Return:
 		//TODO maybe do something here
 		break;
@@ -347,6 +356,9 @@ std::vector<char> StmtNode::generateCode(ClassTableElement* currentClass, Method
 		break;
 	case StmtType::Expr:
 		appendVecToVec(code, this->_expr->generateCode(currentClass, currentMethod));
+		break;
+	case VarDeclarationList:
+		//TODO
 		break;
 	default:
 		throw std::runtime_error("Can't generate code for stmnt with type " + std::to_string(this->_type) + "!");

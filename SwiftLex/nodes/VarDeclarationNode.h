@@ -41,6 +41,8 @@ public:
 	std::string getName() override;
 
 	VarDeclarationListNode* addModifiers(AccessModifierListNode* modifiers);
+
+	void fillTable(class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
 };
 
 class VarDeclarationNode : public Dottable
@@ -64,5 +66,7 @@ public:
 	VarDeclarationNode* addModifiers(AccessModifierListNode* modifiers);
 
 	void generateDot(std::ofstream& file) override;
+
+	void fillTable(class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
 };
 
