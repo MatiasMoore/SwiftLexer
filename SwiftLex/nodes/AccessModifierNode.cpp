@@ -1,4 +1,6 @@
 #include "AccessModifierNode.h"
+#include "../tables/tables.h"
+#include "../generation/generationHelpers.h"
 
 AccessModifierNode* AccessModifierNode::createModifier(AccessModifierType type)
 {
@@ -49,7 +51,41 @@ void AccessModifierNode::generateDot(std::ofstream& file)
 	file << dotLabel(this->_id, typeName);
 }
 
+std::vector<enum MethodAccessFlag> AccessModifierNode::getAccessFlags()
+{
+	switch (this->_type)
+	{
+	case (AccessModifierType::Static):
+		return { M_ACC_STATIC };
+		break;
+	case (AccessModifierType::Final):
+		return { M_ACC_FINAL };
+		break;
+	case (AccessModifierType::Public):
+		return { M_ACC_PUBLIC };
+		break;
+	case (AccessModifierType::Private):
+		return { M_ACC_PRIVATE };
+		break;
+	default:
+		throw std::runtime_error("Access flag node with type " + std::to_string(this->_type) + " can't convert to jvm access flag!");
+		break;
+	}
+}
+
 std::string AccessModifierListNode::getName()
 {
 	return "AccessModifierList";
+}
+
+std::vector<enum MethodAccessFlag> AccessModifierListNode::getAccessFlags()
+{
+	std::vector<enum MethodAccessFlag> flags = {};
+	for (auto& flagNode : _vec)
+	{
+		auto flagsForNode =  flagNode->getAccessFlags();
+		for (auto& flag : flagsForNode)
+			flags.push_back(flag);
+	}
+	return flags;
 }

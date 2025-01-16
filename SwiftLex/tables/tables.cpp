@@ -121,14 +121,14 @@ ClassTableElement::ClassTableElement(std::string name, std::string superName)
     this->superClass = superClassNum;
 }
 
-MethodTableElement* ClassTableElement::addMethod(std::string name, StmtListNode* body, std::string descriptor)
+MethodTableElement* ClassTableElement::addMethod(std::string name, StmtListNode* body, std::string descriptor, std::vector<MethodAccessFlag> flags)
 {
-    auto newMethod = new MethodTableElement(this->constants, name, body, descriptor);
+    auto newMethod = new MethodTableElement(this->constants, name, body, descriptor, flags);
     this->methods->methods[newMethod->strName] = newMethod;
     return newMethod;
 }
 
-MethodTableElement::MethodTableElement(ConstantTable* constants, std::string name, StmtListNode* body, std::string descriptor)
+MethodTableElement::MethodTableElement(ConstantTable* constants, std::string name, StmtListNode* body, std::string descriptor, std::vector<MethodAccessFlag> flags)
 {
     this->strName = name;
     this->methodName = constants->findOrAddConstant(Utf8_C, this->strName);
@@ -138,6 +138,11 @@ MethodTableElement::MethodTableElement(ConstantTable* constants, std::string nam
     this->varTable = new LocalVariableTable();
 
     this->descriptor = constants->findOrAddConstant(Utf8_C, this->strDesc);
+    this->accessFlag = 0;
+    for (auto& flag : flags)
+    {
+        this->accessFlag += (int)flag;
+    }
 }
 
 LocalVariableElement::LocalVariableElement(int localId, std::string name, TypeNode* type)

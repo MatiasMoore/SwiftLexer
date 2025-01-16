@@ -238,7 +238,19 @@ void FuncDeclNode::fillTable(ClassTable* classTable, ClassTableElement* currentC
 	else
 		strDesc += "V";
 
-	currentMethod = currentClass->addMethod(this->_idName, this->_body, strDesc);
+	if (!this->_hasModifiers)
+		throw std::runtime_error("Func decl \"" + this->_idName + "\" must have access modifiers!");
+
+	auto accessFlags = this->_modifiers->getAccessFlags();
+	currentMethod = currentClass->addMethod(this->_idName, this->_body, strDesc, accessFlags);
+
+	bool isStatic = std::find(accessFlags.begin(), accessFlags.end(), M_ACC_STATIC) != accessFlags.end();
+
+	if (!isStatic)
+	{
+		currentMethod->varTable->addLocalVar("self", TypeNode::createIdType(currentClass->nameStr));
+	}
+
 	if (this->_hasArgs)
 	{
 		for (auto& arg : this->_argList->_vec)

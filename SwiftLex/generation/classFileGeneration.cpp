@@ -73,8 +73,8 @@ std::vector<char> generateMethodCode(class MethodTableElement* mElem, class Clas
 {
 	std::vector<char> res;
 
-	std::vector<char> publicStaticFlag = { 0x00, 0x09 }; //ACC_PUBLIC + ACC_STATIC
-	appendVecToVec(res, publicStaticFlag);
+	std::vector<char> accessFlag = intToByteVector(mElem->accessFlag, 2);
+	appendVecToVec(res, accessFlag);
 
 	//Добавление имени метода
 	std::vector<char> nameBytes = intToByteVector(mElem->methodName, 2);

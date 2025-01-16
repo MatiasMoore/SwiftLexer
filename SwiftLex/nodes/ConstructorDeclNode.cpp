@@ -93,8 +93,12 @@ void ConstructorDeclNode::fillTable(ClassTable* classTable, ClassTableElement* c
 		}
 	}
 	strDesc += ")V";
+	
+	if (!this->_hasModifiers)
+		throw std::runtime_error("Constructor decl for class \"" + currentClass->nameStr + "\" must have access modifiers!");
 
-	currentMethod = currentClass->addMethod("<init>", this->_body, strDesc);
+	currentMethod = currentClass->addMethod("<init>", this->_body, strDesc, this->_modifiers->getAccessFlags());
+
 	if (this->_hasArgs)
 	{
 		for (auto& arg : this->_argList->_vec)
