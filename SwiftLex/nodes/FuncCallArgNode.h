@@ -28,9 +28,13 @@ public:
 	void generateDot(std::ofstream& file) override;
 
 	void fillTable(class ClassTable* classTable, class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
+
+	std::vector<char> generateCode(class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
 };
 
 class FuncCallArgListNode : public GenericListNode<FuncCallArgNode, FuncCallArgListNode>
 {
 	std::string getName() override;
+public:
+	std::vector<char> generateCode(class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
 };

@@ -7,6 +7,9 @@ class MainClass {
 	func main(args : [String])
 	{
 		//print("a")
+		var a : Int
+		var sd : Int
+		var asd : Int
 		return
 	}
 }

@@ -179,7 +179,12 @@ public:
     TypeNode* _type; // Тип локальной переменной.
     int localId;
 
-    LocalVariableElement(int localId, std::string name, TypeNode* type);
+    int start_pc = 0;
+    int length = 9;
+    int nameIndex;
+    int descriptorIndex;
+
+    LocalVariableElement(int localId, std::string name, TypeNode* type, ConstantTable* constantTable);
 };
 
 /*! \brief Таблица локальных переменных. */
@@ -189,7 +194,7 @@ public:
     /// Контейнер элементов.
     std::map<std::string, class LocalVariableElement*> items = {};
 
-    LocalVariableElement* addLocalVar(std::string name, TypeNode* type);
+    LocalVariableElement* addLocalVar(std::string name, TypeNode* type, ConstantTable* constantTable);
 
     LocalVariableElement* findLocalVar(std::string name);
 };

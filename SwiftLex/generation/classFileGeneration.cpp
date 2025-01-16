@@ -12,6 +12,33 @@ char _smallVersion[2] = { 0x00, 0x00 };
 char _bigVersion[2] = { 0x00, 0x3E };
 int _stackSize = 1000;
 
+std::vector<char> generateLocalVariableTable(MethodTableElement* mElem, ClassTableElement* cElem) {
+	std::vector<char> tableBytes;
+
+	// Add constant pool index for "LocalVariableTable"
+	int localVarTableIndex = cElem->constants->findOrAddConstant(Utf8_C, "LocalVariableTable");
+	appendVecToVec(tableBytes, intToByteVector(localVarTableIndex, 2));
+
+	// Calculate the local variable table entries
+	std::vector<char> localVariableEntries;
+	for (const auto& var : mElem->varTable->items) {
+		// Start PC, Length, Name Index, Descriptor Index, Index
+		auto localVar = var.second;
+		// Assuming variables have start_pc and length initialized properly
+		appendVecToVec(localVariableEntries, intToByteVector(localVar->start_pc, 2));
+		appendVecToVec(localVariableEntries, intToByteVector(localVar->length, 2));
+		appendVecToVec(localVariableEntries, intToByteVector(localVar->nameIndex, 2));
+		appendVecToVec(localVariableEntries, intToByteVector(localVar->descriptorIndex, 2));
+		appendVecToVec(localVariableEntries, intToByteVector(localVar->localId, 2));
+	}
+	appendVecToVec(tableBytes, intToByteVector(localVariableEntries.size() + 2, 4));
+	// Add the local variable table length
+	appendVecToVec(tableBytes, intToByteVector(localVariableEntries.size() / 10, 2));
+	appendVecToVec(tableBytes, localVariableEntries);
+
+	return tableBytes;
+}
+
 std::vector<char> generateMethodAttribute(class MethodTableElement* mElem, ClassTableElement* cElem)
 {
 	std::vector<char> res;
@@ -37,9 +64,11 @@ std::vector<char> generateMethodAttribute(class MethodTableElement* mElem, Class
 	}
 	printf("Code bytes len: %d\n", codeBytes.size());
 	
+	// Вычисление локальной таблицы переменных
+	std::vector<char> localVariableTable = generateLocalVariableTable(mElem, cElem);
 
 	//Добавление длины атрибута
-	std::vector<char> lengthBytes = intToByteVector(12 + codeBytes.size(), 4);
+	std::vector<char> lengthBytes = intToByteVector(12 + localVariableTable.size() + codeBytes.size(), 4);
 	appendVecToVec(res, lengthBytes);
 
 	//Добавление размера стека операндов
@@ -62,9 +91,13 @@ std::vector<char> generateMethodAttribute(class MethodTableElement* mElem, Class
 	std::vector<char> exceptionTableSizeBytes = intToByteVector(0, 2);
 	appendVecToVec(res, exceptionTableSizeBytes);
 
-	//Добавление количества атрибутов
-	std::vector<char> attributesCountBytes = intToByteVector(0, 2);
+	// Add attributes count
+	int subAttributeCount = 1; // For LocalVariableTable
+	std::vector<char> attributesCountBytes = intToByteVector(subAttributeCount, 2);
 	appendVecToVec(res, attributesCountBytes);
+
+	// Add LocalVariableTable
+	appendVecToVec(res, localVariableTable);
 
 	return res;
 }

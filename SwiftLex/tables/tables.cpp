@@ -34,6 +34,8 @@ ConstantTable::ConstantTable()
     this->constants = std::map<int, class ConstantTableItem*>();
     this->constants[maxId] = new ConstantTableItem(Utf8_C, maxId, "Code");
     maxId++;
+    this->constants[maxId] = new ConstantTableItem(Utf8_C, maxId, "LocalVariableTable");
+    maxId++;
 }
 
 int ConstantTable::findOrAddConstant(enum ConstantType type, std::string utf8string, int intVal, double dVal, int fRef, int sRef)
@@ -145,20 +147,22 @@ MethodTableElement::MethodTableElement(ConstantTable* constants, std::string nam
     }
 }
 
-LocalVariableElement::LocalVariableElement(int localId, std::string name, TypeNode* type)
+LocalVariableElement::LocalVariableElement(int localId, std::string name, TypeNode* type, ConstantTable* constantTable)
 {
     this->name = name;
     this->_type = type;
     this->localId = localId;
+    this->nameIndex = constantTable->findOrAddConstant(Utf8_C, name);
+    this->descriptorIndex = constantTable->findOrAddConstant(Utf8_C, descriptorForType(type));
 }
 
-LocalVariableElement* LocalVariableTable::addLocalVar(std::string name, TypeNode* type)
+LocalVariableElement* LocalVariableTable::addLocalVar(std::string name, TypeNode* type, ConstantTable* constantTable)
 {
     if (items.find(name) != items.cend())
         throw std::runtime_error("Local variable with name " + name + " already exists!");
     
     int newLocalId = this->items.size();
-    this->items[name] = new LocalVariableElement(newLocalId, name, type);
+    this->items[name] = new LocalVariableElement(newLocalId, name, type, constantTable);
     return this->items[name];
 }
 

@@ -327,8 +327,29 @@ void StmtNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass
 
 		this->_expr->fillTable(classTable, currentClass, currentMethod);
 		break;
+	case StmtType::VarDeclarationList:
+		if (currentClass == nullptr)
+			throw std::runtime_error("Expr stmt must be associated with a class!");
+
+		if (currentMethod == nullptr)
+			throw std::runtime_error("Expr stmt must be inside a method!");
+
+		this->_varDeclList->fillTable(currentClass, currentMethod);
+		break;
+	case StmtType::Assignment:
+		if (currentClass == nullptr)
+			throw std::runtime_error("Expr stmt must be associated with a class!");
+
+		if (currentMethod == nullptr)
+			throw std::runtime_error("Expr stmt must be inside a method!");
+
+		this->_assignLeft->fillTable(classTable, currentClass, currentMethod);
+		this->_assignRight->fillTable(classTable, currentClass, currentMethod);
+
+		break;
 	case StmtType::Return:
 		//TODO maybe do something here
+
 		break;
 	default:
 		throw std::runtime_error("Unsupported stmnt with enum type " + std::to_string(this->_type) + "!");
@@ -347,6 +368,26 @@ std::vector<char> StmtNode::generateCode(ClassTableElement* currentClass, Method
 		break;
 	case StmtType::Expr:
 		appendVecToVec(code, this->_expr->generateCode(currentClass, currentMethod));
+		break;
+	case VarDeclarationList:
+		
+		break;
+	case StmtType::Assignment:
+
+		appendVecToVec(code, this->_assignRight->generateCode(currentClass, currentMethod));
+
+		if (this->_assignLeft->_type == ExprType::Id) {
+			int varNum = currentMethod->varTable->findLocalVar(this->_assignLeft->_stringValue)->localId;
+			appendVecToVec(code, jvm::istore(varNum));
+		}
+		else {
+			throw std::runtime_error("Unsupported assignment with left operand type: " + std::to_string(this->_assignLeft->_type) + "!");
+		}
+
+		break;
+	case StmtType::FuncDecl:
+
+		
 		break;
 	default:
 		throw std::runtime_error("Can't generate code for stmnt with type " + std::to_string(this->_type) + "!");

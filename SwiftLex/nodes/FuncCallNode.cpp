@@ -128,6 +128,9 @@ std::vector<char> FuncCallNode::generateCode(ClassTableElement* currentClass, Me
 	{
 		// appendVecToVec(code, jvm::aload(0));
 		// Static call
+		if (this->_hasArgs) {
+			appendVecToVec(code, this->_funcArgs->generateCode(currentClass, currentMethod));
+		}
 		appendVecToVec(code, jvm::invokestatic(this->_methodRef));
 	}
 	else

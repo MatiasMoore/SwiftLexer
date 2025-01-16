@@ -255,7 +255,7 @@ void FuncDeclNode::fillTable(ClassTable* classTable, ClassTableElement* currentC
 	{
 		for (auto& arg : this->_argList->_vec)
 		{
-			currentMethod->varTable->addLocalVar(arg->_argName, arg->_argType);
+			currentMethod->varTable->addLocalVar(arg->_argName, arg->_argType, currentClass->constants);
 		}
 	}
 
