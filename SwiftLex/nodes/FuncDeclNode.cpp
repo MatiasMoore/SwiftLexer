@@ -248,7 +248,7 @@ void FuncDeclNode::fillTable(ClassTable* classTable, ClassTableElement* currentC
 
 	if (!isStatic)
 	{
-		currentMethod->varTable->addLocalVar("self", TypeNode::createIdType(currentClass->nameStr));
+		currentMethod->varTable->addLocalVar("self", TypeNode::createIdType(currentClass->nameStr), currentClass->constants);
 	}
 
 	if (this->_hasArgs)
