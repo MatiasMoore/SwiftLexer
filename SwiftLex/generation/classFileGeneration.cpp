@@ -68,7 +68,10 @@ std::vector<char> generateMethodAttribute(class MethodTableElement* mElem, Class
 	std::vector<char> localVariableTable = generateLocalVariableTable(mElem, cElem);
 
 	//Добавление длины атрибута
-	std::vector<char> lengthBytes = intToByteVector(12 + localVariableTable.size() + codeBytes.size(), 4);
+	// removed local var table 
+	// std::vector<char> lengthBytes = intToByteVector(12 + localVariableTable.size() + codeBytes.size(), 4);
+
+	std::vector<char> lengthBytes = intToByteVector(12 + codeBytes.size(), 4);
 	appendVecToVec(res, lengthBytes);
 
 	//Добавление размера стека операндов
@@ -92,12 +95,16 @@ std::vector<char> generateMethodAttribute(class MethodTableElement* mElem, Class
 	appendVecToVec(res, exceptionTableSizeBytes);
 
 	// Add attributes count
-	int subAttributeCount = 1; // For LocalVariableTable
+	// removed local var table 
+	//int subAttributeCount = 1; // For LocalVariableTable
+
+	int subAttributeCount = 0;
 	std::vector<char> attributesCountBytes = intToByteVector(subAttributeCount, 2);
 	appendVecToVec(res, attributesCountBytes);
 
 	// Add LocalVariableTable
-	appendVecToVec(res, localVariableTable);
+	// removed local var table 
+	//appendVecToVec(res, localVariableTable);
 
 	return res;
 }
