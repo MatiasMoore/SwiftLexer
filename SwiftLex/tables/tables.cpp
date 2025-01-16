@@ -32,10 +32,9 @@ ConstantTableItem::ConstantTableItem(enum ConstantType type, int id, std::string
 ConstantTable::ConstantTable()
 {
     this->constants = std::map<int, class ConstantTableItem*>();
-    this->constants[maxId] = new ConstantTableItem(Utf8_C, maxId, "Code");
-    maxId++;
-    this->constants[maxId] = new ConstantTableItem(Utf8_C, maxId, "LocalVariableTable");
-    maxId++;
+
+    this->findOrAddConstant(Utf8_C, "Code");
+    this->findOrAddConstant(Utf8_C, "LocalVariableTable");
 }
 
 int ConstantTable::findOrAddConstant(enum ConstantType type, std::string utf8string, int intVal, double dVal, int fRef, int sRef)
