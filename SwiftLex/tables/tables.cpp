@@ -177,7 +177,7 @@ LocalVariableElement* LocalVariableTable::addLocalVar(std::string name, TypeNode
 LocalVariableElement* LocalVariableTable::findLocalVar(std::string name)
 {
     if (items.find(name) == items.cend())
-        throw std::runtime_error("Local variable with name " + name + " doesn't exist!");
+        throw std::runtime_error("Local variable with name \"" + name + "\" doesn't exist!");
 
     return this->items[name];
 }
