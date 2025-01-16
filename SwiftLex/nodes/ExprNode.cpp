@@ -508,7 +508,7 @@ std::vector<char> ExprNode::generateCode(ClassTableElement* currentClass, Method
 		break;
 	case ExprType::Int:
 		if (this->_intValue < -32767 || this->_intValue > 32767) {
-			throw std::runtime_error("Doesn't support int with >2 bytes: " + this->_intValue);
+			throw std::runtime_error("Doesn't support int with >2 bytes: " + std::to_string(this->_intValue));
 		}
 		appendVecToVec(code, jvm::iconstBipushSipush(this->_intValue));
 		break;
