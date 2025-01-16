@@ -486,6 +486,9 @@ void ExprNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass
 	case ExprType::FuncCall:
 		this->_funcCall->fillTable(classTable, currentClass, currentMethod);
 		break;
+	case ExprType::Int:
+	case ExprType::Id:
+		break;
 	default:
 		throw std::runtime_error("Unsupported expr with enum type " + std::to_string(this->_type) + "!");
 		break;
@@ -494,11 +497,32 @@ void ExprNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass
 
 std::vector<char> ExprNode::generateCode(ClassTableElement* currentClass, MethodTableElement* currentMethod)
 {
+	
+	LocalVariableElement* localVar;
 	std::vector<char> code = {};
+	// TODO change switch to if else
 	switch (this->_type)
 	{
 	case ExprType::FuncCall:
 		appendVecToVec(code, this->_funcCall->generateCode(currentClass, currentMethod));
+		break;
+	case ExprType::Int:
+		if (this->_intValue < -32767 || this->_intValue > 32767) {
+			throw std::runtime_error("Doesn't support int with >2 bytes: " + this->_intValue);
+		}
+		appendVecToVec(code, jvm::iconstBipushSipush(this->_intValue));
+		break;
+	case ExprType::Id:
+
+		localVar = currentMethod->varTable->findLocalVar(this->_stringValue);
+		switch (localVar->_type->_type)
+		{
+		case IntT:
+			appendVecToVec(code, jvm::iload(localVar->localId));
+			break;
+		default:
+			throw std::runtime_error("Can't generate code for expr ID with type " + std::to_string(localVar->_type->_type) + "!");
+		}
 		break;
 	default:
 		throw std::runtime_error("Can't generate code for expr with type " + std::to_string(this->_type) + "!");

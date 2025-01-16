@@ -67,7 +67,7 @@ void VarDeclarationNode::fillTable(ClassTableElement* currentClass, MethodTableE
 	case ValueAndTypeKnown:
 		break;
 	case TypeKnown:
-		currentMethod->varTable->addLocalVar(this->_varName, this->_typeNode);
+		currentMethod->varTable->addLocalVar(this->_varName, this->_typeNode, currentClass->constants);
 		break;
 	case ValueKnown:
 		break;

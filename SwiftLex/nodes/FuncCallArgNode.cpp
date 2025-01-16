@@ -1,5 +1,7 @@
 #include "FuncCallArgNode.h"
 #include "ExprNode.h"
+#include "../tables/tables.h"
+#include "../generation/generationHelpers.h"
 
 FuncCallArgNode* FuncCallArgNode::createFromExpr(ExprNode* expr)
 {
@@ -34,7 +36,23 @@ void FuncCallArgNode::fillTable(ClassTable* classTable, ClassTableElement* curre
     this->_argType = this->_value->evaluateType();
 }
 
+std::vector<char> FuncCallArgNode::generateCode(ClassTableElement* currentClass, MethodTableElement* currentMethod)
+{
+    std::vector<char> code = {};
+    appendVecToVec(code, this->_value->generateCode(currentClass, currentMethod));
+    return code;
+}
+
 std::string FuncCallArgListNode::getName()
 {
     return "FuncCallArgList";
+}
+
+std::vector<char> FuncCallArgListNode::generateCode(ClassTableElement* currentClass, MethodTableElement* currentMethod)
+{
+    std::vector<char> code = {};
+    for (auto& elem : _vec) {
+        appendVecToVec(code, elem->generateCode(currentClass, currentMethod));
+    }
+    return code;
 }
