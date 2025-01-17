@@ -2,7 +2,8 @@ class MainClass {
 
 	public static func main(args : [String])
 	{
-		print(5)
+		var a, b, c, d : Int
+		print(a)
 		return
 	}
 }

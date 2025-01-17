@@ -77,7 +77,7 @@ void VarDeclarationNode::fillTable(ClassTableElement* currentClass, MethodTableE
 	}
 }
 
-std::vector<char> VarDeclarationNode::generateCode(ClassTableElement* currentClass, MethodTableElement* currentMethod)
+std::vector<char> VarDeclarationNode::generateCode(ClassTableElement * currentClass, MethodTableElement * currentMethod)
 {
 	std::vector<char> code = {};
 	switch (this->_type)
@@ -90,6 +90,40 @@ std::vector<char> VarDeclarationNode::generateCode(ClassTableElement* currentCla
 		break;
 	}
 	return code;
+}
+
+SemanticsBase* VarDeclarationNode::semanticsTransform(SemanticsStack& stack)
+{
+	stack.push(this);
+	
+	auto valueKnown = this->_type == ValueKnown || this->_type == ValueAndTypeKnown;
+	auto typeKnown = this->_type == TypeKnown || this->_type == ValueAndTypeKnown;
+
+	if (valueKnown)
+	{
+		this->_valueNode = this->_valueNode->semanticsTransform(stack)->typecast<ExprNode>();
+
+		auto typeNode = this->_typeNode;
+		if (!typeKnown)
+		{
+			typeNode = this->_valueNode->evaluateType();
+		}
+
+		auto thisNode = VarDeclarationNode::createFromType(this->_varName, typeNode);
+
+		auto thisStmtList = stack.getClosest<StmtListNode>();
+		auto thisStmt = stack.getClosest<StmtNode>();
+		
+		auto assignmentNode = StmtNode::createStmtAssignment(ExprNode::createId(this->_varName), this->_valueNode);
+
+		thisStmtList->appendNodeAfterNode(assignmentNode, thisStmt);
+
+		stack.pop();
+		return thisNode;
+	}
+
+	stack.pop();
+	return this;
 }
 
 std::string VarDeclarationListNode::getName()
@@ -122,4 +156,15 @@ std::vector<char> VarDeclarationListNode::generateCode(ClassTableElement* curren
 		appendVecToVec(code, elem->generateCode(currentClass, currentMethod));
 	}
 	return code;
+}
+
+SemanticsBase* VarDeclarationListNode::semanticsTransform(SemanticsStack& stack)
+{
+	stack.push(this);
+	for (auto& elem : _vec)
+	{
+		elem = elem->semanticsTransform(stack)->typecast<VarDeclarationNode>();
+	}
+	stack.pop();
+	return this;
 }

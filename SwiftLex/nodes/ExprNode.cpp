@@ -435,28 +435,37 @@ void ExprNode::generateDot(std::ofstream& file)
 	}
 }
 
-ExprNode* ExprNode::semanticsTransform()
+SemanticsBase* ExprNode::semanticsTransform(SemanticsStack& stack)
 {
+	stack.push(this);
 	if (this->_type == ExprType::Int)
 	{
-		auto args = FuncCallArgListNode::createListNode(FuncCallArgNode::createFromExpr(ExprNode::createInt(this->_intValue)));
-		return ExprNode::createFuncCall(FuncCallNode::createFuncCall("Int", args));
+		//auto args = FuncCallArgListNode::createListNode(FuncCallArgNode::createFromExpr(ExprNode::createInt(this->_intValue)));
+		//return ExprNode::createFuncCall(FuncCallNode::createFuncCall("Int", args));
+		stack.pop();
+		return this;
 	}
 	else if (this->_type == ExprType::Sum)
 	{
-		this->_left = _left->semanticsTransform();
-		this->_right = _right->semanticsTransform();
+		this->_left = _left->semanticsTransform(stack)->typecast<ExprNode>();
+		this->_right = _right->semanticsTransform(stack)->typecast<ExprNode>();
 
 		auto args = FuncCallArgListNode::createListNode(FuncCallArgNode::createFromExpr(this->_right));
 
 		auto plusFunc = FuncCallNode::createFuncCall("plus", args);
 		plusFunc->setAsExprAccess(this->_left);
 
+		stack.pop();
 		return ExprNode::createFuncCall(plusFunc);
+	}
+	else if (this->_type == ExprType::Id || this->_type == ExprType::FuncCall)
+	{
+		stack.pop();
+		return this;
 	}
 	else
 	{
-		return this;
+		throw std::runtime_error("Unsupported expr with enum type " + std::to_string(this->_type) + "!");
 	}
 }
 
@@ -466,6 +475,9 @@ TypeNode* ExprNode::evaluateType()
 	{
 	case String:
 		return TypeNode::createType(TypeType::StringT);
+		break;
+	case Int:
+		return TypeNode::createType(TypeType::IntT);
 		break;
 	default:
 		throw std::runtime_error("Can't evaluate type of expr with enum type " + std::to_string(this->_type) + "!");

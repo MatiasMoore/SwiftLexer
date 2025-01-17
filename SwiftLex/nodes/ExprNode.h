@@ -1,6 +1,7 @@
 #pragma once
 #include "dottable.h"
 #include "GenericListNode.h"
+#include "SemanticsBase.h"
 
 class ExprNode;
 class TypeNode;
@@ -71,7 +72,7 @@ public:
 	std::string getName() override;
 };
 
-class ExprNode : public Dottable
+class ExprNode : public Dottable, public SemanticsBase
 {
 public:
 	ExprType _type;
@@ -133,7 +134,7 @@ public:
 
 	void generateDot(std::ofstream& file) override;
 
-	ExprNode* semanticsTransform();
+	SemanticsBase* semanticsTransform(SemanticsStack& stack);
 
 	TypeNode* evaluateType();
 

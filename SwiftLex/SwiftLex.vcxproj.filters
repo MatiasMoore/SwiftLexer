@@ -119,6 +119,9 @@
     <ClCompile Include="generation\generationHelpers.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="nodes\SemanticsBase.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt">
@@ -234,6 +237,9 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="generation\generationHelpers.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="nodes\SemanticsBase.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

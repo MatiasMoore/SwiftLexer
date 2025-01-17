@@ -1,6 +1,7 @@
 #pragma once
 #include "dottable.h"
 #include "GenericListNode.h"
+#include "SemanticsBase.h"
 
 class ExprNode;
 class TypeNode;
@@ -35,7 +36,7 @@ public:
 //Forward declaration for list
 class VarDeclarationNode;
 
-class VarDeclarationListNode : public GenericListNode<VarDeclarationNode, VarDeclarationListNode>
+class VarDeclarationListNode : public GenericListNode<VarDeclarationNode, VarDeclarationListNode>, public SemanticsBase
 {
 public:
 	std::string getName() override;
@@ -45,9 +46,11 @@ public:
 	void fillTable(class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
 
 	std::vector<char> generateCode(class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
+
+	SemanticsBase* semanticsTransform(SemanticsStack& stack) override;
 };
 
-class VarDeclarationNode : public Dottable
+class VarDeclarationNode : public Dottable, public SemanticsBase
 {
 public:
 	VarDeclType _type;
@@ -72,5 +75,8 @@ public:
 	void fillTable(class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
 
 	std::vector<char> generateCode(class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
+	
+	SemanticsBase* semanticsTransform(SemanticsStack& stack) override;
+
 };
 

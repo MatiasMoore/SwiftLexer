@@ -269,16 +269,43 @@ void StmtNode::generateDot(std::ofstream& file)
 	}
 }
 
-StmtNode* StmtNode::semanticsTransform()
+SemanticsBase* StmtNode::semanticsTransform(SemanticsStack& stack)
 {
+	stack.push(this);
 	if (this->_type == StmtType::Expr)
 	{
-		this->_expr = _expr->semanticsTransform();
+		this->_expr = _expr->semanticsTransform(stack)->typecast<ExprNode>();
 	}
 	else if (this->_type == StmtType::Assignment) {
-		this->_assignLeft = _assignLeft->semanticsTransform();
-		this->_assignRight = _assignRight->semanticsTransform();
+		this->_assignLeft = _assignLeft->semanticsTransform(stack)->typecast<ExprNode>();
+		this->_assignRight = _assignRight->semanticsTransform(stack)->typecast<ExprNode>();
 	}
+	else if (this->_type == StmtType::ClassDecl)
+	{
+		if (!this->_classDecl->_hasBody)
+			throw std::runtime_error("Classes must have a body!");
+
+		this->_classDecl->_body->semanticsTransform(stack);
+	}
+	else if (this->_type == StmtType::FuncDecl)
+	{
+		if (!this->_funcDecl->_hasBody)
+			throw std::runtime_error("Functions must have a body!");
+
+		this->_funcDecl->_body->semanticsTransform(stack);
+	}
+	else if (this->_type == StmtType::VarDeclarationList)
+	{
+		this->_varDeclList->semanticsTransform(stack);
+	}
+	else if (this->_type == StmtType::Return)
+	{
+		//do nothing
+	}
+	else {
+		throw std::runtime_error("Unsupported stmnt with enum type " + std::to_string(this->_type) + "!");
+	}
+	stack.pop();
 	return this;
 }
 
@@ -401,12 +428,24 @@ std::string StmtListNode::getName()
 	return "StmtList";
 }
 
-StmtListNode* StmtListNode::semanticsTransform()
+SemanticsBase* StmtListNode::semanticsTransform(SemanticsStack& stack)
 {
+	stack.push(this);
+	/*
+	
 	for (auto& elem : _vec)
 	{
-		elem = elem->semanticsTransform();
+		elem = elem->semanticsTransform(stack)->typecast<StmtNode>();
 	}
+
+	*/
+
+	for (int i = 0; i < _vec.size(); i++)
+	{
+		_vec[i] = _vec[i]->semanticsTransform(stack)->typecast<StmtNode>();
+	}
+
+	stack.pop();
 	return this;
 }
 
