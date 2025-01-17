@@ -136,4 +136,6 @@ namespace jvm
 	std::vector<char> aastore();
 
 	std::vector<char> iadd();
+
+	std::vector<char> getstatic(int fieldRef);
 }

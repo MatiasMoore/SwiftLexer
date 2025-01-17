@@ -125,6 +125,10 @@ void FuncCallNode::fillTable(ClassTable* classTable, ClassTableElement* currentC
 		funcDesc += ")";
 		*/
 
+		if (this->_hasArgs) {
+			this->_funcArgs->fillTable(classTable, currentClass, currentMethod);
+		}
+
 		
 	}
 	else

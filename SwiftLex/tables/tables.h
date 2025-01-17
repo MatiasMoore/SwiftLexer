@@ -16,6 +16,8 @@ class ClassDeclNode;
 class ConstructorDeclNode;
 class StmtListNode;
 class ExternalMethodTable;
+class ExternalFieldTable;
+class ExternalFieldTableElement;
 
 enum MethodAccessFlag {
     M_ACC_PUBLIC = 0x0001,        //	Declared public; may be accessed from outside its package.
@@ -89,11 +91,15 @@ public:
 
     ExternalMethodTable* externalMethods;
 
+    ExternalFieldTable* externalFieldTable;
+
     MethodTableElement* addMethod(std::string name, StmtListNode* body, std::string descriptor, std::vector<MethodAccessFlag> flags);
 
     FieldElement* addField(std::vector<FieldAccessFlag> flags, std::string name, TypeNode* type);
 
     FieldElement* addStaticField(std::vector<FieldAccessFlag> flags, std::string name, TypeNode* type, int constantValueIndex);
+
+    ExternalFieldTableElement* addExternalField(std::string className, std::string fieldName, TypeNode* fieldType);
 };
 
 /*! Тип константы в таблице констант. */
@@ -190,6 +196,36 @@ public:
     std::string _descriptor;
 
     ExternalMethodTableElement(std::string name, int nameRef, std::string descriptor, int descriptorRef, int methodRef);
+};
+
+/*! \brief Таблица внешних методов класса. */
+class ExternalFieldTable
+{
+public:
+    std::map<std::string, class ExternalfieldTableElement*> methods = {};
+
+    ExternalFieldTableElement* addField(ConstantTable* constants, std::string className, std::string fieldName, std::string descriptor);
+};
+
+/*! \brief Элемент таблицы внешних методов класса. */
+class ExternalFieldTableElement
+{
+public:
+    /// Ссылка на номер константы с именем метода в таблице констант.
+    int _nameRef;
+
+    /// Ссылка на номер константы с дескриптором в таблице констант.
+    int _descriptorRef;
+
+    int _fieldRef;
+
+    /// Строковое название метода.
+    std::string _name;
+
+    /// Строковый дескриптор метода.
+    std::string _descriptor;
+
+    ExternalFieldTableElement(std::string name, int nameRef, std::string descriptor, int descriptorRef, int fieldRef);
 };
 
 /*! \brief Таблица методов класса. */

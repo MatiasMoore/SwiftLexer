@@ -74,9 +74,32 @@ void VarDeclarationNode::fillTable(ClassTableElement* currentClass, MethodTableE
 		switch (this->_type)
 		{
 		case ValueAndTypeKnown:
+			if (this->_typeNode->_type == IntT) 
+			{
+				if (this->_valueNode->_type != Int)
+				{
+					throw std::runtime_error("Value type does not support for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\n");
+				}
+
+				constantValueIndex = currentClass->constants->findOrAddConstant(Integer_C, "", this->_valueNode->_intValue);
+				auto accessFlags = this->_modifiers->getMethodAccessFlags();
+				bool isStatic = std::find(accessFlags.begin(), accessFlags.end(), M_ACC_STATIC) != accessFlags.end();
+				if (isStatic)
+				{
+					currentClass->constants->findOrAddConstant(Utf8_C, "ConstantValue");
+					currentClass->addStaticField(this->_modifiers->getFieldAccessFlags(), this->_varName, this->_typeNode, constantValueIndex);
+				}
+				else {
+					throw std::runtime_error("Non static field does not support for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\n");
+				}
+			}
+			else {
+				throw std::runtime_error("Type " + std::to_string(this->_typeNode->_type) + "does not support for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\n");
+			}
 			break;
 		case TypeKnown:
 			if (this->_typeNode->_type == IntT) {
+				// DEFAULT INTEGER = 0
 				constantValueIndex = currentClass->constants->findOrAddConstant(Integer_C, "", 0);
 				auto accessFlags = this->_modifiers->getMethodAccessFlags();
 				bool isStatic = std::find(accessFlags.begin(), accessFlags.end(), M_ACC_STATIC) != accessFlags.end();
@@ -85,16 +108,18 @@ void VarDeclarationNode::fillTable(ClassTableElement* currentClass, MethodTableE
 					currentClass->constants->findOrAddConstant(Utf8_C, "ConstantValue");
 					currentClass->addStaticField(this->_modifiers->getFieldAccessFlags(), this->_varName, this->_typeNode, constantValueIndex);
 				} else{
-					std::runtime_error("Non static field does not support for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\n");
+					throw std::runtime_error("Non static field does not support for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\n");
 				}
 			}
 			else {
-				std::runtime_error("Type " + std::to_string(this->_typeNode->_type) + "does not support for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\n");
+				throw std::runtime_error("Type " + std::to_string(this->_typeNode->_type) + "does not support for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\n");
 			}
 			break;
 		case ValueKnown:
+			throw std::runtime_error("Declaration usupported for type " + std::to_string(this->_type) + " for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\n");
 			break;
 		default:
+			throw std::runtime_error("Declaration usupported for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\n");
 			break;
 		}
 	}
