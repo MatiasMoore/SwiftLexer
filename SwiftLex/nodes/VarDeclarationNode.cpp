@@ -2,6 +2,7 @@
 #include "TypeNode.h"
 #include "ExprNode.h"
 #include "AccessModifierNode.h"
+#include "StmtNode.h"
 #include "../tables/tables.h"
 #include "../generation/generationHelpers.h"
 
@@ -64,16 +65,31 @@ void VarDeclarationNode::fillTable(ClassTableElement* currentClass, MethodTableE
 {
 	switch (this->_type)
 	{
-	case ValueAndTypeKnown:
-		break;
 	case TypeKnown:
 		currentMethod->varTable->addLocalVar(this->_varName, this->_typeNode, currentClass->constants);
 		break;
-	case ValueKnown:
+	case ValueAndTypeKnown:
+		currentMethod->varTable->addLocalVar(this->_varName, this->_typeNode, currentClass->constants);
 		break;
 	default:
+		throw std::runtime_error("Var declaration with enum type " + std::to_string(this->_type) + " is unsupported!");
 		break;
 	}
+}
+
+std::vector<char> VarDeclarationNode::generateCode(ClassTableElement* currentClass, MethodTableElement* currentMethod)
+{
+	std::vector<char> code = {};
+	switch (this->_type)
+	{
+	case TypeKnown:
+		//No code required for this type
+		break;
+	default:
+		throw std::runtime_error("Var decl with enum type " + std::to_string(this->_type) + " is not supported!");
+		break;
+	}
+	return code;
 }
 
 std::string VarDeclarationListNode::getName()
@@ -96,4 +112,14 @@ void VarDeclarationListNode::fillTable( ClassTableElement* currentClass, MethodT
 	{
 		elem->fillTable(currentClass, currentMethod);
 	}
+}
+
+std::vector<char> VarDeclarationListNode::generateCode(ClassTableElement* currentClass, MethodTableElement* currentMethod)
+{
+	std::vector<char> code = {};
+	for (auto& elem : _vec)
+	{
+		appendVecToVec(code, elem->generateCode(currentClass, currentMethod));
+	}
+	return code;
 }

@@ -370,7 +370,7 @@ std::vector<char> StmtNode::generateCode(ClassTableElement* currentClass, Method
 		appendVecToVec(code, this->_expr->generateCode(currentClass, currentMethod));
 		break;
 	case VarDeclarationList:
-		
+		appendVecToVec(code, this->_varDeclList->generateCode(currentClass, currentMethod));
 		break;
 	case StmtType::Assignment:
 
