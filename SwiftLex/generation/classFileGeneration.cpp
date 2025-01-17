@@ -229,6 +229,8 @@ void generateClassFile(ClassTableElement* classElem, std::string pathToFolder)
 	out.write(tableLen.data(), tableLen.size());
 
 	std::vector<char> data = generateBytesForConstantTable(classElem->constants);
+
+	//TODO add correct class modifiers
 	data.push_back(0x00);
 	data.push_back(0x21);
 
