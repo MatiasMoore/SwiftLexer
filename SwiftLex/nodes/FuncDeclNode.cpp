@@ -270,8 +270,18 @@ SemanticsBase* FuncDeclNode::semanticsTransform(SemanticsStack stack)
 {
 	stack.push(this);
 
+	//Add default modifiers
+	if (!this->_hasModifiers)
+	{
+		this->_modifiers = AccessModifierListNode::createListNode(AccessModifierNode::createModifier(AccessModifierType::Internal));
+		this->_hasModifiers = true;
+	}
+
+	//Check modifiers
+	this->_modifiers = this->_modifiers->semanticsTransform(stack)->typecast<AccessModifierListNode>();
+
 	//Function may not have a body if it has a void return which is checked later
-	if(this->_hasBody)
+	if (this->_hasBody)
 		this->_body = this->_body->semanticsTransform(stack)->typecast<StmtListNode>();
 
 	//Check if function ends with a return
@@ -293,6 +303,7 @@ SemanticsBase* FuncDeclNode::semanticsTransform(SemanticsStack stack)
 		}
 		else {
 			this->_body = StmtListNode::createListNode(returnStmt);
+			this->_hasBody = true;
 		}
 	}
 
