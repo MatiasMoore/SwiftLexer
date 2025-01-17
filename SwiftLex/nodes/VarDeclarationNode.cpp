@@ -2,6 +2,7 @@
 #include "TypeNode.h"
 #include "ExprNode.h"
 #include "AccessModifierNode.h"
+#include "StmtNode.h"
 #include "../tables/tables.h"
 #include "../generation/generationHelpers.h"
 
@@ -76,6 +77,40 @@ void VarDeclarationNode::fillTable(ClassTableElement* currentClass, MethodTableE
 	}
 }
 
+SemanticsBase* VarDeclarationNode::semanticsTransform(SemanticsStack& stack)
+{
+	stack.push(this);
+	
+	auto valueKnown = this->_type == ValueKnown || this->_type == ValueAndTypeKnown;
+	auto typeKnown = this->_type == TypeKnown || this->_type == ValueAndTypeKnown;
+
+	if (valueKnown)
+	{
+		this->_valueNode = this->_valueNode->semanticsTransform(stack)->typecast<ExprNode>();
+
+		auto typeNode = this->_typeNode;
+		if (!typeKnown)
+		{
+			typeNode = this->_valueNode->evaluateType();
+		}
+
+		auto thisNode = VarDeclarationNode::createFromType(this->_varName, typeNode);
+
+		auto thisStmtList = stack.getClosest<StmtListNode>();
+		auto thisStmt = stack.getClosest<StmtNode>();
+		
+		auto assignmentNode = StmtNode::createStmtAssignment(ExprNode::createId(this->_varName), this->_valueNode);
+
+		thisStmtList->appendNodeAfterNode(assignmentNode, thisStmt);
+
+		stack.pop();
+		return thisNode;
+	}
+
+	stack.pop();
+	return this;
+}
+
 std::string VarDeclarationListNode::getName()
 {
 	return "VarDeclList";
@@ -96,4 +131,15 @@ void VarDeclarationListNode::fillTable( ClassTableElement* currentClass, MethodT
 	{
 		elem->fillTable(currentClass, currentMethod);
 	}
+}
+
+SemanticsBase* VarDeclarationListNode::semanticsTransform(SemanticsStack& stack)
+{
+	stack.push(this);
+	for (auto& elem : _vec)
+	{
+		elem = elem->semanticsTransform(stack)->typecast<VarDeclarationNode>();
+	}
+	stack.pop();
+	return this;
 }

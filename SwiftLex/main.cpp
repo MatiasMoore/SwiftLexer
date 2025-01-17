@@ -7,7 +7,7 @@
 #include "tables/tables.h"
 #include <filesystem>
 
-bool _DRAW_DOT = false;
+bool _DRAW_DOT = true;
 bool _EXEC_MAINCLASS = true;
 
 std::string generatedClassFilesDirectory = "out/";
@@ -88,7 +88,17 @@ int main(int argc, const char* argv[])
 	}	
 
 	// After semantics
-	_root = _root->semanticsTransform();
+	auto newStack = SemanticsStack();
+
+	try
+	{
+		_root = _root->semanticsTransform(newStack)->typecast<StmtListNode>();
+	}
+	catch (std::runtime_error error)
+	{
+		std::cout << "Semantics transform error: " << error.what() << std::endl;
+		return 1;
+	}
 
 	if (_DRAW_DOT)
 	{

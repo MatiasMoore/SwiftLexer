@@ -2,6 +2,7 @@
 #include <vector>
 #include "dottable.h"
 #include "GenericListNode.h"
+#include "SemanticsBase.h"
 
 class ReturnNode;
 class ExprNode;
@@ -41,7 +42,7 @@ enum StmtType
 	ClassDecl
 };
 
-class StmtNode : public Dottable
+class StmtNode : public Dottable, public SemanticsBase
 {
 public:
 	bool _hasSemicolon = false;
@@ -118,19 +119,19 @@ public:
 
 	void generateDot(std::ofstream& file) override;
 
-	StmtNode* semanticsTransform();
+	SemanticsBase* semanticsTransform(SemanticsStack& stack) override;
 
 	void fillTable(class ClassTable* classTable, class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
 
 	std::vector<char> generateCode(class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
 };
 
-class StmtListNode : public GenericListNode<StmtNode, StmtListNode>
+class StmtListNode : public GenericListNode<StmtNode, StmtListNode>, public SemanticsBase
 {
 public:
 	std::string getName() override;
 
-	StmtListNode* semanticsTransform();
+	SemanticsBase* semanticsTransform(SemanticsStack& stack) override;
 
 	void fillTable(class ClassTable* classTable, class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
 };
