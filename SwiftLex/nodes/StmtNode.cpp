@@ -18,6 +18,7 @@
 #include "TypeNode.h"
 #include "../tables/tables.h"
 #include "../generation/generationHelpers.h"
+#include <set>
 
 StmtNode* StmtNode::createStmtExpr(ExprNode* expr)
 {
@@ -273,6 +274,69 @@ void StmtNode::generateDot(std::ofstream& file)
 SemanticsBase* StmtNode::semanticsTransform(SemanticsStack stack)
 {
 	stack.push(this);
+
+	std::set<StmtType> topLevelStmtTypes = { StmtType::ClassDecl };
+
+	bool isTopLevel = topLevelStmtTypes.count(this->_type) != 0;
+	if (!isTopLevel)
+	{
+		// For functions
+		if (this->_type == StmtType::FuncDecl)
+		{
+			std::set<SemanticsBase*> ignore = {};
+
+			StmtNode* parentClass = nullptr;
+			while (parentClass == nullptr)
+			{
+				auto stmt = stack.getClosest<StmtNode>(ignore);
+				if (stmt == nullptr)
+					break;
+
+				if (stmt->_type != StmtType::ClassDecl)
+				{
+					ignore.emplace(stmt);
+				}
+				else
+				{
+					parentClass = stmt;
+					break;
+				}
+			}
+
+			bool isInsideClass = parentClass != nullptr && parentClass != this;
+
+			if (!isInsideClass)
+				throw std::runtime_error("All function declarations must me inside a class!");
+		}
+		else
+		{
+			std::set<SemanticsBase*> ignore = {};
+
+			StmtNode* parentMethod = nullptr;
+			while (parentMethod == nullptr)
+			{
+				auto stmt = stack.getClosest<StmtNode>(ignore);
+				if (stmt == nullptr)
+					break;
+
+				if (stmt->_type != StmtType::FuncDecl)
+				{
+					ignore.emplace(stmt);
+				}
+				else
+				{
+					parentMethod = stmt;
+					break;
+				}
+			}
+
+			bool isInsideMethod = parentMethod != nullptr && parentMethod != this;
+
+			if (!isInsideMethod)
+				throw std::runtime_error("All low level stmts must me inside a method!");
+		}
+	}
+
 	if (this->_type == StmtType::Expr)
 	{
 		this->_expr = _expr->semanticsTransform(stack)->typecast<ExprNode>();
