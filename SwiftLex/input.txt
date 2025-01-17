@@ -1,12 +1,7 @@
-class SecondClass{
-	public static var testVariable : Int = 23
-	
+class TestClass
+{
+	static public var a : Int = 50
 }
 
-class MainClass {
-	public static func main(args : [String])
-	{
-		print(SecondClass.testVariable)
-		return
-	}
-}
+print(5)
+print(TestClass.a)

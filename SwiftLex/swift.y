@@ -289,7 +289,7 @@ type: TYPE_BOOL {$$ = TypeNode::createType(TypeType::BoolT);}
 
     /* CLASS STMT */
 stmtClassInnerIncomplete: funcDeclaration {printf("P: stmtClassInnerIncomplete funcdecl\n"); $$ = StmtNode::createStmtFuncDecl($1);}
-    | varDeclaration {printf("P: stmtClassInnerIncomplete varDec\n"); $$ = StmtNode::createStmtVarDeclaration($1);}
+    | varDeclaration {printf("P: stmtClassInnerIncomplete varDec\n"); $$ = StmtNode::createStmtVarDeclaration($1->setAsFieldDecl(true)); }
     | constructorDeclaration {printf("P: stmtClassInnerIncomplete constructor\n"); $$ = StmtNode::createStmtConstructorDecl($1);}
     | destructorDeclaration {printf("P: stmtClassInnerIncomplete destructor\n"); $$ = StmtNode::createStmtDestructorDecl($1);}
     ;

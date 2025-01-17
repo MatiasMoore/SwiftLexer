@@ -41,6 +41,12 @@ VarDeclarationNode* VarDeclarationNode::addModifiers(AccessModifierListNode* mod
 	return this;
 }
 
+VarDeclarationNode* VarDeclarationNode::setAsFieldDecl(bool flag)
+{
+	this->_isFieldDecl = flag;
+	return this;
+}
+
 void VarDeclarationNode::generateDot(std::ofstream& file)
 {
 	file << dotLabel(this->_id, "VarDecl: " + _varName);
@@ -169,44 +175,47 @@ SemanticsBase* VarDeclarationNode::semanticsTransform(SemanticsStack stack)
 		this->_hasModifiers = true;
 	}
 
-	//TODO check if field
-	auto valueKnown = this->_type == ValueKnown || this->_type == ValueAndTypeKnown;
-	auto typeKnown = this->_type == TypeKnown || this->_type == ValueAndTypeKnown;
-
-	if (valueKnown)
+	// Only if it's not a field declaration
+	if (!this->_isFieldDecl)
 	{
-		this->_valueNode = this->_valueNode->semanticsTransform(stack)->typecast<ExprNode>();
+		auto valueKnown = this->_type == ValueKnown || this->_type == ValueAndTypeKnown;
+		auto typeKnown = this->_type == TypeKnown || this->_type == ValueAndTypeKnown;
 
-		auto typeNode = this->_typeNode;
-		if (!typeKnown)
+		if (valueKnown)
 		{
-			typeNode = this->_valueNode->evaluateType();
+			this->_valueNode = this->_valueNode->semanticsTransform(stack)->typecast<ExprNode>();
+
+			auto typeNode = this->_typeNode;
+			if (!typeKnown)
+			{
+				typeNode = this->_valueNode->evaluateType();
+			}
+
+			auto thisNode = VarDeclarationNode::createFromType(this->_varName, typeNode);
+			if (this->_hasModifiers)
+			{
+				thisNode->addModifiers(this->_modifiers);
+			}
+			else {
+				throw std::runtime_error("Missing modiffiers");
+			}
+
+			auto thisStmtList = stack.getClosest<StmtListNode>();
+			if (thisStmtList == nullptr)
+				throw std::runtime_error("Critical error! Unable to find stmt list for var decl!");
+
+			auto thisStmt = stack.getClosest<StmtNode>();
+			if (thisStmt == nullptr)
+				throw std::runtime_error("Critical error! Unable to find stmt for var decl!");
+
+			auto assignmentNode = StmtNode::createStmtAssignment(ExprNode::createId(this->_varName), this->_valueNode);
+
+			thisStmtList->appendNodeAfterNode(assignmentNode, thisStmt);
+
+			return thisNode;
 		}
-
-		auto thisNode = VarDeclarationNode::createFromType(this->_varName, typeNode);
-		if (this->_hasModifiers)
-		{
-			thisNode->addModifiers(this->_modifiers);
-		}
-		else {
-			throw std::runtime_error("Missing modiffiers");
-		}
-
-		auto thisStmtList = stack.getClosest<StmtListNode>();
-		if (thisStmtList == nullptr)
-			throw std::runtime_error("Critical error! Unable to find stmt list for var decl!");
-
-		auto thisStmt = stack.getClosest<StmtNode>();
-		if (thisStmt == nullptr)
-			throw std::runtime_error("Critical error! Unable to find stmt for var decl!");
-		
-		auto assignmentNode = StmtNode::createStmtAssignment(ExprNode::createId(this->_varName), this->_valueNode);
-
-		thisStmtList->appendNodeAfterNode(assignmentNode, thisStmt);
-
-		return thisNode;
 	}
-
+	
 	return this;
 }
 
@@ -222,6 +231,26 @@ VarDeclarationListNode* VarDeclarationListNode::addModifiers(AccessModifierListN
 		varDecl->addModifiers(modifiers);
 	}
 	return this;
+}
+
+VarDeclarationListNode* VarDeclarationListNode::setAsFieldDecl(bool flag)
+{
+	for (auto& elem : _vec)
+	{
+		elem->setAsFieldDecl(flag);
+	}
+	return this;
+}
+
+bool VarDeclarationListNode::isFieldDecl()
+{
+	for (auto& elem : _vec)
+	{
+		if (elem->_isFieldDecl)
+			return true;
+	}
+
+	return false;
 }
 
 void VarDeclarationListNode::fillTable( ClassTableElement* currentClass, MethodTableElement* currentMethod)

@@ -280,8 +280,8 @@ SemanticsBase* StmtNode::semanticsTransform(SemanticsStack stack)
 	bool isTopLevel = topLevelStmtTypes.count(this->_type) != 0;
 	if (!isTopLevel)
 	{
-		// For functions
-		if (this->_type == StmtType::FuncDecl)
+		// For functions and field declarations
+		if (this->_type == StmtType::FuncDecl || (this->_type == StmtType::VarDeclarationList && this->_varDeclList->isFieldDecl()))
 		{
 			std::set<SemanticsBase*> ignore = {};
 
