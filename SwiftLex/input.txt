@@ -1,15 +1,11 @@
 class SecondClass{
-	public static var testVariable = 1
+	public static var testVariable : Int = 23
 	
 }
 
 class MainClass {
 	public static func main(args : [String])
 	{
-		var a = 5
-		print(a)
-		var b : Int = 6
-		print(b)
 		print(SecondClass.testVariable)
 		return
 	}

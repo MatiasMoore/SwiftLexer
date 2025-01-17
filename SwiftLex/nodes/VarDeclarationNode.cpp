@@ -162,7 +162,15 @@ std::vector<char> VarDeclarationNode::generateCode(ClassTableElement * currentCl
 SemanticsBase* VarDeclarationNode::semanticsTransform(SemanticsStack stack)
 {
 	stack.push(this);
-	
+
+	// Add default modiffiers
+	if (!this->_hasModifiers)
+	{
+		this->_modifiers = AccessModifierListNode::createListNode(AccessModifierNode::createModifier(Internal));
+		this->_hasModifiers = true;
+	}
+
+	//TODO check if field
 	auto valueKnown = this->_type == ValueKnown || this->_type == ValueAndTypeKnown;
 	auto typeKnown = this->_type == TypeKnown || this->_type == ValueAndTypeKnown;
 
@@ -177,6 +185,13 @@ SemanticsBase* VarDeclarationNode::semanticsTransform(SemanticsStack stack)
 		}
 
 		auto thisNode = VarDeclarationNode::createFromType(this->_varName, typeNode);
+		if (this->_hasModifiers)
+		{
+			thisNode->addModifiers(this->_modifiers);
+		}
+		else {
+			throw std::runtime_error("Missing modiffiers");
+		}
 
 		auto thisStmtList = stack.getClosest<StmtListNode>();
 		if (thisStmtList == nullptr)
