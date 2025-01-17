@@ -82,17 +82,17 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, ClassTableElement* cu
 		{
 			// Check if field type is INT
 			if (this->_typeNode->_type != IntT)
-				throw std::runtime_error("Type " + std::to_string(this->_typeNode->_type) + "does not support for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\n");
+				throw std::runtime_error("Type " + std::to_string(this->_typeNode->_type) + " does not support for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\"");
 
 			// Check if assignable value is INT
 			if (this->_valueNode->_type != Int)
-				throw std::runtime_error("Value type does not support for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\n");
+				throw std::runtime_error("Value type does not support for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\"");
 
 			// Check if field is static
 			auto accessFlags = this->_modifiers->getMethodAccessFlags();
 			bool isStatic = std::find(accessFlags.begin(), accessFlags.end(), M_ACC_STATIC) != accessFlags.end();
 			if (!isStatic)
-				throw std::runtime_error("Non static field does not support for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\n");
+				throw std::runtime_error("Non static field does not support for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\"");
 
 			// Create name for attribute
 			currentClass->constants->findOrAddConstant(Utf8_C, "ConstantValue");
@@ -105,13 +105,13 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, ClassTableElement* cu
 		{
 			// Check if field type is INT
 			if (this->_typeNode->_type != IntT)
-				throw std::runtime_error("Type " + std::to_string(this->_typeNode->_type) + "does not support for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\n");
+				throw std::runtime_error("Type " + std::to_string(this->_typeNode->_type) + " does not support for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\"");
 			
 			// Check if field is static
 			auto accessFlags = this->_modifiers->getMethodAccessFlags();
 			bool isStatic = std::find(accessFlags.begin(), accessFlags.end(), M_ACC_STATIC) != accessFlags.end();
 			if (!isStatic)
-				throw std::runtime_error("Non static field does not support for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\n");
+				throw std::runtime_error("Non static field does not support for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\"");
 
 			// Create name for attribute
 			currentClass->constants->findOrAddConstant(Utf8_C, "ConstantValue");
@@ -122,11 +122,11 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, ClassTableElement* cu
 		}
 		else if (this->_type == ValueKnown) 
 		{
-			throw std::runtime_error("Declaration usupported for type " + std::to_string(this->_type) + " for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\n");
+			throw std::runtime_error("Declaration usupported for type " + std::to_string(this->_type) + " for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\"");
 		}
 		else
 		{
-			throw std::runtime_error("Declaration usupported for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\n");
+			throw std::runtime_error("Declaration usupported for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\"");
 		}
 	}
 
