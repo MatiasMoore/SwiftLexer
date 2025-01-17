@@ -106,9 +106,10 @@ int ConstantTable::findConstant(enum ConstantType type, std::string utf8string, 
 
 ClassTableElement::ClassTableElement(std::string name, std::string superName)
 {
-    constants = new ConstantTable();
-    methods = new MethodTable();
-    externalMethods = new ExternalMethodTable();
+    this->constants = new ConstantTable();
+    this->methods = new MethodTable();
+    this->externalMethods = new ExternalMethodTable();
+    this->fields = new FieldTable();
 
     this->nameStr = name;
     auto nameNum = constants->findOrAddConstant(ConstantType::Utf8_C, name);
@@ -136,6 +137,11 @@ MethodTableElement* ClassTableElement::addMethod(std::string name, StmtListNode*
     auto newMethod = new MethodTableElement(this->constants, name, body, descriptor, flags);
     this->methods->methods[newMethod->strName] = newMethod;
     return newMethod;
+}
+
+FieldElement* ClassTableElement::addField(std::vector<FieldAccessFlag> flags, std::string name, TypeNode* type)
+{
+    return this->fields->addField(flags, name, type, this->constants);
 }
 
 MethodTableElement::MethodTableElement(ConstantTable* constants, std::string name, StmtListNode* body, std::string descriptor, std::vector<MethodAccessFlag> flags)
@@ -210,4 +216,34 @@ ExternalMethodTableElement* ExternalMethodTable::addMethod(ConstantTable* consta
     auto newMethod = new ExternalMethodTableElement(methodName, methodNameRef, descriptor, descriptorRef, methodMethodRefRef);
     this->methods[methodName] = newMethod;
     return newMethod;
+}
+
+FieldElement::FieldElement(std::vector<FieldAccessFlag> flags, std::string name, TypeNode* type, ConstantTable* constantTable)
+{
+    this->name = name;
+    this->type = type;
+    this->nameIndex = constantTable->findOrAddConstant(Utf8_C, name);
+    this->descriptorIndex = constantTable->findOrAddConstant(Utf8_C, descriptorForType(type));
+    this->accessFlag = 0;
+    for (auto& flag : flags)
+    {
+        this->accessFlag += (int)flag;
+    }
+}
+
+FieldElement* FieldTable::addField(std::vector<FieldAccessFlag> flags, std::string name, TypeNode* type, ConstantTable* constantTable)
+{
+    if (items.find(name) != items.cend())
+        throw std::runtime_error("Class field with name " + name + " already exists!");
+
+    this->items[name] = new FieldElement(flags, name, type, constantTable);
+    return this->items[name];
+}
+
+FieldElement* FieldTable::findField(std::string name)
+{
+    if (items.find(name) == items.cend())
+        throw std::runtime_error("Class field with name \"" + name + "\" doesn't exist!");
+
+    return this->items[name];
 }

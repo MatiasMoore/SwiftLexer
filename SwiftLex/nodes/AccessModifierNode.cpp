@@ -51,7 +51,7 @@ void AccessModifierNode::generateDot(std::ofstream& file)
 	file << dotLabel(this->_id, typeName);
 }
 
-std::vector<enum MethodAccessFlag> AccessModifierNode::getAccessFlags()
+std::vector<enum MethodAccessFlag> AccessModifierNode::getMethodAccessFlags()
 {
 	switch (this->_type)
 	{
@@ -68,7 +68,29 @@ std::vector<enum MethodAccessFlag> AccessModifierNode::getAccessFlags()
 		return { M_ACC_PRIVATE };
 		break;
 	default:
-		throw std::runtime_error("Access flag node with type " + std::to_string(this->_type) + " can't convert to jvm access flag!");
+		throw std::runtime_error("Method access flag node with type " + std::to_string(this->_type) + " can't convert to jvm access flag!");
+		break;
+	}
+}
+
+std::vector<enum FieldAccessFlag> AccessModifierNode::getFieldAccessFlags()
+{
+	switch (this->_type)
+	{
+	case (AccessModifierType::Static):
+		return { F_ACC_STATIC };
+		break;
+	case (AccessModifierType::Final):
+		return { F_ACC_FINAL };
+		break;
+	case (AccessModifierType::Public):
+		return { F_ACC_PUBLIC };
+		break;
+	case (AccessModifierType::Private):
+		return { F_ACC_PRIVATE };
+		break;
+	default:
+		throw std::runtime_error("Field access flag node with type " + std::to_string(this->_type) + " can't convert to jvm access flag!");
 		break;
 	}
 }
@@ -78,12 +100,29 @@ std::string AccessModifierListNode::getName()
 	return "AccessModifierList";
 }
 
-std::vector<enum MethodAccessFlag> AccessModifierListNode::getAccessFlags()
+std::vector<enum MethodAccessFlag> AccessModifierListNode::getMethodAccessFlags()
 {
 	std::vector<enum MethodAccessFlag> flags = {};
 	for (auto& flagNode : _vec)
 	{
-		auto flagsForNode =  flagNode->getAccessFlags();
+		auto flagsForNode =  flagNode->getMethodAccessFlags();
+		for (auto& flag : flagsForNode)
+			flags.push_back(flag);
+	}
+	return flags;
+}
+
+std::vector<enum FieldAccessFlag> AccessModifierListNode::getFieldAccessFlags()
+{
+	std::vector<enum FieldAccessFlag> flags = {};
+	this;
+	if (_vec.size() == 0)
+	{
+		throw std::runtime_error("No access modifier");
+	}
+	for (auto& flagNode : _vec)
+	{
+		auto flagsForNode = flagNode->getFieldAccessFlags();
 		for (auto& flag : flagsForNode)
 			flags.push_back(flag);
 	}

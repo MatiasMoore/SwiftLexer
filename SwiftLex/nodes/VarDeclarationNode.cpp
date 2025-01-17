@@ -62,18 +62,45 @@ void VarDeclarationNode::generateDot(std::ofstream& file)
 
 void VarDeclarationNode::fillTable(ClassTableElement* currentClass, MethodTableElement* currentMethod)
 {
-	switch (this->_type)
+	// Class Field
+	if (currentMethod == nullptr)
 	{
-	case ValueAndTypeKnown:
-		break;
-	case TypeKnown:
-		currentMethod->varTable->addLocalVar(this->_varName, this->_typeNode, currentClass->constants);
-		break;
-	case ValueKnown:
-		break;
-	default:
-		break;
+		if (_modifiers == nullptr)
+		{
+			throw std::runtime_error("Modifier missing for field: \"" + _varName + "\" for class \"" + currentClass->nameStr + "\"");
+		}
+
+		switch (this->_type)
+		{
+		case ValueAndTypeKnown:
+			break;
+		case TypeKnown:
+			currentClass->addField(this->_modifiers->getFieldAccessFlags(), this->_varName, this->_typeNode);
+			break;
+		case ValueKnown:
+			break;
+		default:
+			break;
+		}
 	}
+
+	// Local Variable
+	if (currentMethod != nullptr) 
+	{
+		switch (this->_type)
+		{
+		case ValueAndTypeKnown:
+			break;
+		case TypeKnown:
+			currentMethod->varTable->addLocalVar(this->_varName, this->_typeNode, currentClass->constants);
+			break;
+		case ValueKnown:
+			break;
+		default:
+			break;
+		}
+	}
+
 }
 
 std::string VarDeclarationListNode::getName()

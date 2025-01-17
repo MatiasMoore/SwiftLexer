@@ -25,7 +25,9 @@ public:
 
 	void generateDot(std::ofstream& file);
 
-	std::vector<enum MethodAccessFlag> getAccessFlags();
+	std::vector<enum MethodAccessFlag> getMethodAccessFlags();
+
+	std::vector<enum FieldAccessFlag> getFieldAccessFlags();
 };
 
 class AccessModifierListNode : public GenericListNode<AccessModifierNode, AccessModifierListNode>
@@ -33,6 +35,8 @@ class AccessModifierListNode : public GenericListNode<AccessModifierNode, Access
 public:
 	std::string getName();
 
-	std::vector<enum MethodAccessFlag> getAccessFlags();
+	std::vector<enum MethodAccessFlag> getMethodAccessFlags();
+
+	std::vector<enum FieldAccessFlag> getFieldAccessFlags();
 };
 

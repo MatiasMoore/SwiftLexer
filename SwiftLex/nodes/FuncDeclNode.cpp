@@ -241,7 +241,7 @@ void FuncDeclNode::fillTable(ClassTable* classTable, ClassTableElement* currentC
 	if (!this->_hasModifiers)
 		throw std::runtime_error("Func decl \"" + this->_idName + "\" must have access modifiers!");
 
-	auto accessFlags = this->_modifiers->getAccessFlags();
+	auto accessFlags = this->_modifiers->getMethodAccessFlags();
 	currentMethod = currentClass->addMethod(this->_idName, this->_body, strDesc, accessFlags);
 
 	bool isStatic = std::find(accessFlags.begin(), accessFlags.end(), M_ACC_STATIC) != accessFlags.end();

@@ -330,10 +330,8 @@ void StmtNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass
 	case StmtType::VarDeclarationList:
 		if (currentClass == nullptr)
 			throw std::runtime_error("Expr stmt must be associated with a class!");
-
-		if (currentMethod == nullptr)
-			throw std::runtime_error("Expr stmt must be inside a method!");
-
+		
+		// if currentMethod == null - it is class field
 		this->_varDeclList->fillTable(currentClass, currentMethod);
 		break;
 	case StmtType::Assignment:

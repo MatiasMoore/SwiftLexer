@@ -1,5 +1,5 @@
 class MainClass {
-
+	public static var a : Int
 	public static func main(args : [String])
 	{
 		print(5)
