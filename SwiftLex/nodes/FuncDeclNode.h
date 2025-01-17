@@ -1,5 +1,6 @@
 #pragma once
 #include "dottable.h"
+#include "SemanticsBase.h"
 
 class StmtListNode;
 class FuncDeclArgListNode;
@@ -32,7 +33,7 @@ enum OverloadableOperatorType
     OpNILCOALESCE
 };
 
-class FuncDeclNode : public Dottable
+class FuncDeclNode : public Dottable, public SemanticsBase
 {
 public:
 	bool _isOperatorOverload;
@@ -62,5 +63,7 @@ public:
 	void generateDot(std::ofstream& file) override;
 
 	void fillTable(class ClassTable* classTable, class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
+
+	SemanticsBase* semanticsTransform(SemanticsStack& stack) override;
 };
 

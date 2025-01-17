@@ -3,6 +3,7 @@
 #include "FuncDeclArgNode.h"
 #include "TypeNode.h"
 #include "AccessModifierNode.h"
+#include "ReturnNode.h"
 #include "../tables/tables.h"
 #include "../generation/generationHelpers.h"
 
@@ -263,4 +264,36 @@ void FuncDeclNode::fillTable(ClassTable* classTable, ClassTableElement* currentC
 		throw std::runtime_error("Func decl \"" + this->_idName + "\" must have a body!");
 
 	this->_body->fillTable(classTable, currentClass, currentMethod);
+}
+
+SemanticsBase* FuncDeclNode::semanticsTransform(SemanticsStack& stack)
+{
+	stack.push(this);
+
+	//Function may not have a body if it has a void return which is checked later
+	if(this->_hasBody)
+		this->_body->semanticsTransform(stack);
+
+	//Check if function ends with a return
+	bool hasReturnStmt = this->_hasBody 
+		&& this->_body->_vec.back()->_type == StmtType::Return; //last stmt is a return
+
+	if (!hasReturnStmt)
+	{
+		//Function has a return type and has no return stmt
+		if (this->_hasNonVoidReturn)
+			throw std::runtime_error("Method \"" + this->_idName + "\" must have at least a return stmt inside the body!");
+		
+		//Add void return
+		auto returnStmt = StmtNode::createStmtReturn(ReturnNode::createVoidReturn());
+
+		if (this->_hasBody)
+		{
+			this->_body->appendNode(returnStmt);
+		}
+		else {
+			this->_body = StmtListNode::createListNode(returnStmt);
+		}
+	}
+
 }

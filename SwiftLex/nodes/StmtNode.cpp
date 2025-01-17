@@ -15,6 +15,7 @@
 #include "ConstructorDeclNode.h"
 #include "DestructorDeclNode.h"
 #include "ClassDeclNode.h"
+#include "TypeNode.h"
 #include "../tables/tables.h"
 #include "../generation/generationHelpers.h"
 
@@ -289,10 +290,7 @@ SemanticsBase* StmtNode::semanticsTransform(SemanticsStack& stack)
 	}
 	else if (this->_type == StmtType::FuncDecl)
 	{
-		if (!this->_funcDecl->_hasBody)
-			throw std::runtime_error("Functions must have a body!");
-
-		this->_funcDecl->_body->semanticsTransform(stack);
+		this->_funcDecl->semanticsTransform(stack);
 	}
 	else if (this->_type == StmtType::VarDeclarationList)
 	{
