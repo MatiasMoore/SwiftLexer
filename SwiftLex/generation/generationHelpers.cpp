@@ -88,43 +88,6 @@ std::vector<char> generateBytesForConstantTableItem(class ConstantTableItem* ele
 	return res;
 }
 
-std::string descriptorForType(TypeNode* typeNode)
-{
-	std::string desc = "";
-	switch (typeNode->_type)
-	{
-	case BoolT:
-		desc += "Z"; // JVM descriptor for boolean
-		break;
-	case FloatT:
-		desc += "F"; // JVM descriptor for float
-		break;
-	case IntT:
-		desc += "I"; // JVM descriptor for int
-		break;
-	case StringT:
-		desc += "Ljava/lang/String;"; // JVM descriptor for String
-		break;
-	case CharacterT:
-		desc += "C"; // JVM descriptor for char
-		break;
-	case IdT:
-		desc += "L";
-		desc += typeNode->_idTypeName;
-		desc += ";";
-		break;
-	case ArrayT:
-		desc += "["; // JVM descriptor for array
-		desc += descriptorForType(typeNode->_arrayType);
-		break;
-	default:
-		throw std::runtime_error("Unsopported type for descriptor!");
-		break;
-	}
-
-	return desc;
-}
-
 std::vector<char> jvm::iconstBipushSipush(int num)
 {
 	std::vector<char> res;

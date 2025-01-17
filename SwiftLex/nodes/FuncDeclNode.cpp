@@ -229,13 +229,13 @@ void FuncDeclNode::fillTable(ClassTable* classTable, ClassTableElement* currentC
 	{
 		for (auto& arg : this->_argList->_vec)
 		{
-			strDesc += descriptorForType(arg->_argType);
+			strDesc += arg->_argType->toDescriptor(classTable, currentClass, currentMethod);
 		}
 	}
 	strDesc += ")";
 
 	if (this->_hasNonVoidReturn)
-		strDesc += descriptorForType(this->_returnType);
+		strDesc += this->_returnType->toDescriptor(classTable, currentClass, currentMethod);
 	else
 		strDesc += "V";
 
@@ -249,14 +249,14 @@ void FuncDeclNode::fillTable(ClassTable* classTable, ClassTableElement* currentC
 
 	if (!isStatic)
 	{
-		currentMethod->varTable->addLocalVar("self", TypeNode::createIdType(currentClass->nameStr), currentClass->constants);
+		currentMethod->varTable->addLocalVar("self", TypeNode::createIdType(currentClass->nameStr)->toDescriptor(classTable, currentClass, currentMethod), currentClass->constants);
 	}
 
 	if (this->_hasArgs)
 	{
 		for (auto& arg : this->_argList->_vec)
 		{
-			currentMethod->varTable->addLocalVar(arg->_argName, arg->_argType, currentClass->constants);
+			currentMethod->varTable->addLocalVar(arg->_argName, arg->_argType->toDescriptor(classTable, currentClass, currentMethod), currentClass->constants);
 		}
 	}
 

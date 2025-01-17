@@ -34,7 +34,7 @@ void FuncCallArgNode::generateDot(std::ofstream& file)
 void FuncCallArgNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod)
 {
     this->_value->fillTable(classTable, currentClass, currentMethod);
-    this->_argType = this->_value->evaluateType();
+    this->_argType = this->_value->evaluateType(classTable, currentClass, currentMethod);
 }
 
 std::vector<char> FuncCallArgNode::generateCode(ClassTableElement* currentClass, MethodTableElement* currentMethod)

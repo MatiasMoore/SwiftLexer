@@ -1,4 +1,5 @@
 #include "TypeNode.h"
+#include "../tables/tables.h"
 
 TypeNode* TypeNode::createType(TypeType type)
 {
@@ -20,6 +21,14 @@ TypeNode* TypeNode::createArrayType(TypeNode* type)
 	auto node = new TypeNode();
 	node->_type = ArrayT;
 	node->_arrayType = type;
+	return node;
+}
+
+TypeNode* TypeNode::createDynamicType(ExprNode* expr)
+{
+	auto node = new TypeNode();
+	node->_type = DynamicT;
+	node->_exprForDynamicT = expr;
 	return node;
 }
 
@@ -48,6 +57,11 @@ std::string TypeNode::getName()
 		case (TypeType::ArrayT):
 			return "Array";
 			break;
+		case (TypeType::DynamicT):
+			return "Dynamic";
+			break;
+		default:
+		throw std::runtime_error("Can't generate name for type node with enum type " + std::to_string(this->_type));
 	}
 }
 
@@ -63,4 +77,41 @@ void TypeNode::generateDot(std::ofstream& file)
 	{
 		file << dotLabel(this->_id, "Type: " + this->getName());
 	}
+}
+
+std::string TypeNode::toDescriptor(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod)
+{
+	std::string desc = "";
+	switch (this->_type)
+	{
+	case BoolT:
+		desc += "Z"; // JVM descriptor for boolean
+		break;
+	case FloatT:
+		desc += "F"; // JVM descriptor for float
+		break;
+	case IntT:
+		desc += "I"; // JVM descriptor for int
+		break;
+	case StringT:
+		desc += "Ljava/lang/String;"; // JVM descriptor for String
+		break;
+	case CharacterT:
+		desc += "C"; // JVM descriptor for char
+		break;
+	case IdT:
+		desc += "L";
+		desc += this->_idTypeName;
+		desc += ";";
+		break;
+	case ArrayT:
+		desc += "["; // JVM descriptor for array
+		desc += this->_arrayType->toDescriptor(classTable, currentClass, currentMethod);
+		break;
+	default:
+		throw std::runtime_error("Unsupported type for descriptor!");
+		break;
+	}
+
+	return desc;
 }

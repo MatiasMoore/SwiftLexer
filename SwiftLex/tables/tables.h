@@ -95,11 +95,11 @@ public:
 
     MethodTableElement* addMethod(std::string name, StmtListNode* body, std::string descriptor, std::vector<MethodAccessFlag> flags);
 
-    FieldElement* addField(std::vector<FieldAccessFlag> flags, std::string name, TypeNode* type);
+    FieldElement* addField(std::vector<FieldAccessFlag> flags, std::string name, std::string descriptor);
 
-    FieldElement* addStaticField(std::vector<FieldAccessFlag> flags, std::string name, TypeNode* type, int constantValueIndex);
+    FieldElement* addStaticField(std::vector<FieldAccessFlag> flags, std::string name, std::string descriptor, int constantValueIndex);
 
-    ExternalFieldTableElement* addExternalField(std::string className, std::string fieldName, TypeNode* fieldType);
+    ExternalFieldTableElement* addExternalField(std::string className, std::string fieldName, std::string descriptor);
 };
 
 /*! Тип константы в таблице констант. */
@@ -267,7 +267,7 @@ class LocalVariableElement
 {
 public:
     std::string name; // Имя локальной переменной.
-    TypeNode* _type; // Тип локальной переменной.
+    std::string _descriptor; // Тип локальной переменной.
     int localId;
 
     int start_pc = 0;
@@ -275,7 +275,7 @@ public:
     int nameIndex;
     int descriptorIndex;
 
-    LocalVariableElement(int localId, std::string name, TypeNode* type, ConstantTable* constantTable);
+    LocalVariableElement(int localId, std::string name, std::string descriptor, ConstantTable* constantTable);
 };
 
 /*! \brief Таблица локальных переменных. */
@@ -285,7 +285,7 @@ public:
     /// Контейнер элементов.
     std::map<std::string, class LocalVariableElement*> items = {};
 
-    LocalVariableElement* addLocalVar(std::string name, TypeNode* type, ConstantTable* constantTable);
+    LocalVariableElement* addLocalVar(std::string name, std::string descriptor, ConstantTable* constantTable);
 
     LocalVariableElement* findLocalVar(std::string name);
 };
@@ -297,9 +297,9 @@ public:
     /// Контейнер элементов.
     std::map<std::string, class FieldElement*> items = {};
 
-    FieldElement* addField(std::vector<FieldAccessFlag> flags, std::string name, TypeNode* type, ConstantTable* constantTable);
+    FieldElement* addField(std::vector<FieldAccessFlag> flags, std::string name, std::string descriptor, ConstantTable* constantTable);
 
-    FieldElement* addStaticField(std::vector<FieldAccessFlag> flags, std::string name, TypeNode* type, ConstantTable* constantTable, int constantvalueIndex);
+    FieldElement* addStaticField(std::vector<FieldAccessFlag> flags, std::string name, std::string descriptor, ConstantTable* constantTable, int constantvalueIndex);
 
     FieldElement* findField(std::string name);
 };
@@ -319,10 +319,10 @@ public:
     int descriptorIndex; 
 
     std::string name; 
-    TypeNode* type; 
+    std::string _descriptor;
 
     bool isStatic;
     int constantValueIndex;
 
-    FieldElement(std::vector<FieldAccessFlag> flags, std::string name, TypeNode* type, ConstantTable* constantTable);
+    FieldElement(std::vector<FieldAccessFlag> flags, std::string name, std::string descriptor, ConstantTable* constantTable);
 };

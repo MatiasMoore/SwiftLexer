@@ -2,6 +2,7 @@
 #include "FuncDeclArgNode.h"
 #include "StmtNode.h"
 #include "AccessModifierNode.h"
+#include "TypeNode.h"
 #include "../tables/tables.h"
 #include "../generation/generationHelpers.h"
 
@@ -89,7 +90,7 @@ void ConstructorDeclNode::fillTable(ClassTable* classTable, ClassTableElement* c
 	{
 		for (auto& arg : this->_argList->_vec)
 		{
-			strDesc += descriptorForType(arg->_argType);
+			strDesc += arg->_argType->toDescriptor(classTable, currentClass, currentMethod);
 		}
 	}
 	strDesc += ")V";
@@ -103,7 +104,7 @@ void ConstructorDeclNode::fillTable(ClassTable* classTable, ClassTableElement* c
 	{
 		for (auto& arg : this->_argList->_vec)
 		{
-			currentMethod->varTable->addLocalVar(arg->_argName, arg->_argType, currentClass->constants);
+			currentMethod->varTable->addLocalVar(arg->_argName, arg->_argType->toDescriptor(classTable, currentClass, currentMethod), currentClass->constants);
 		}
 	}
 

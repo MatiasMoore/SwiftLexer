@@ -138,7 +138,7 @@ public:
 
 	SemanticsBase* semanticsTransform(SemanticsStack stack);
 
-	TypeNode* evaluateType();
+	TypeNode* evaluateType(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod);
 
 	void fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod);
 

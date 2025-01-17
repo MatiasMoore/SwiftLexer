@@ -14,8 +14,6 @@ std::vector<char> generateBytesForConstantTable(class ConstantTable* table);
 
 std::vector<char> generateBytesForConstantTableItem(class ConstantTableItem* elem);
 
-std::string descriptorForType(TypeNode* typeNode);
-
 enum IfCommandType {
 	EQ_if,
 	NE_if,

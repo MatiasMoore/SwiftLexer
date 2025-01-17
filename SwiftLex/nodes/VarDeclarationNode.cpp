@@ -67,7 +67,7 @@ void VarDeclarationNode::generateDot(std::ofstream& file)
 	}
 }
 
-void VarDeclarationNode::fillTable(ClassTableElement* currentClass, MethodTableElement* currentMethod)
+void VarDeclarationNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod)
 {
 	// Class Field
 	int constantValueIndex;
@@ -99,7 +99,7 @@ void VarDeclarationNode::fillTable(ClassTableElement* currentClass, MethodTableE
 
 			// Create field
 			constantValueIndex = currentClass->constants->findOrAddConstant(Integer_C, "", this->_valueNode->_intValue);
-			currentClass->addStaticField(this->_modifiers->getFieldAccessFlags(), this->_varName, this->_typeNode, constantValueIndex);
+			currentClass->addStaticField(this->_modifiers->getFieldAccessFlags(), this->_varName, this->_typeNode->toDescriptor(classTable, currentClass, currentMethod), constantValueIndex);
 		}
 		else if (this->_type == TypeKnown)
 		{
@@ -118,7 +118,7 @@ void VarDeclarationNode::fillTable(ClassTableElement* currentClass, MethodTableE
 
 			// Create field
 			constantValueIndex = currentClass->constants->findOrAddConstant(Integer_C, "", 0); // DEFAULT INTEGER = 0
-			currentClass->addStaticField(this->_modifiers->getFieldAccessFlags(), this->_varName, this->_typeNode, constantValueIndex);
+			currentClass->addStaticField(this->_modifiers->getFieldAccessFlags(), this->_varName, this->_typeNode->toDescriptor(classTable, currentClass, currentMethod), constantValueIndex);
 		}
 		else if (this->_type == ValueKnown) 
 		{
@@ -138,7 +138,7 @@ void VarDeclarationNode::fillTable(ClassTableElement* currentClass, MethodTableE
 		case ValueAndTypeKnown:
 			break;
 		case TypeKnown:
-			currentMethod->varTable->addLocalVar(this->_varName, this->_typeNode, currentClass->constants);
+			currentMethod->varTable->addLocalVar(this->_varName, this->_typeNode->toDescriptor(classTable, currentClass, currentMethod), currentClass->constants);
 			break;
 		case ValueKnown:
 			break;
@@ -188,7 +188,7 @@ SemanticsBase* VarDeclarationNode::semanticsTransform(SemanticsStack stack)
 			auto typeNode = this->_typeNode;
 			if (!typeKnown)
 			{
-				typeNode = this->_valueNode->evaluateType();
+				typeNode = TypeNode::createDynamicType(this->_valueNode);
 			}
 
 			auto thisNode = VarDeclarationNode::createFromType(this->_varName, typeNode);
@@ -253,11 +253,11 @@ bool VarDeclarationListNode::isFieldDecl()
 	return false;
 }
 
-void VarDeclarationListNode::fillTable( ClassTableElement* currentClass, MethodTableElement* currentMethod)
+void VarDeclarationListNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod)
 {
 	for (auto& elem : _vec)
 	{
-		elem->fillTable(currentClass, currentMethod);
+		elem->fillTable(classTable, currentClass, currentMethod);
 	}
 }
 

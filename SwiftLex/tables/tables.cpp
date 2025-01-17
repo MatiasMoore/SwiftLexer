@@ -132,9 +132,8 @@ void ClassTableElement::addRtlExternalMethods()
     this->externalMethods->addMethod(this->constants, "InputOutput", "print", "(I)V");
 }
 
-ExternalFieldTableElement* ClassTableElement::addExternalField(std::string className, std::string fieldName, TypeNode* fieldType)
+ExternalFieldTableElement* ClassTableElement::addExternalField(std::string className, std::string fieldName, std::string descriptor)
 {
-    std::string descriptor = descriptorForType(fieldType);
     return this->externalFieldTable->addField(this->constants, className, fieldName, descriptor);
 }
 
@@ -145,14 +144,14 @@ MethodTableElement* ClassTableElement::addMethod(std::string name, StmtListNode*
     return newMethod;
 }
 
-FieldElement* ClassTableElement::addField(std::vector<FieldAccessFlag> flags, std::string name, TypeNode* type)
+FieldElement* ClassTableElement::addField(std::vector<FieldAccessFlag> flags, std::string name, std::string descriptor)
 {
-    return this->fields->addField(flags, name, type, this->constants);
+    return this->fields->addField(flags, name, descriptor, this->constants);
 }
 
-FieldElement* ClassTableElement::addStaticField(std::vector<FieldAccessFlag> flags, std::string name, TypeNode* type, int constantValueIndex)
+FieldElement* ClassTableElement::addStaticField(std::vector<FieldAccessFlag> flags, std::string name, std::string descriptor, int constantValueIndex)
 {
-    return this->fields->addStaticField(flags, name, type, this->constants, constantValueIndex);
+    return this->fields->addStaticField(flags, name, descriptor, this->constants, constantValueIndex);
 }
 
 MethodTableElement::MethodTableElement(ConstantTable* constants, std::string name, StmtListNode* body, std::string descriptor, std::vector<MethodAccessFlag> flags)
@@ -172,22 +171,22 @@ MethodTableElement::MethodTableElement(ConstantTable* constants, std::string nam
     }
 }
 
-LocalVariableElement::LocalVariableElement(int localId, std::string name, TypeNode* type, ConstantTable* constantTable)
+LocalVariableElement::LocalVariableElement(int localId, std::string name, std::string descriptor, ConstantTable* constantTable)
 {
     this->name = name;
-    this->_type = type;
+    this->_descriptor = descriptor;
     this->localId = localId;
     this->nameIndex = constantTable->findOrAddConstant(Utf8_C, name);
-    this->descriptorIndex = constantTable->findOrAddConstant(Utf8_C, descriptorForType(type));
+    this->descriptorIndex = constantTable->findOrAddConstant(Utf8_C, descriptor);
 }
 
-LocalVariableElement* LocalVariableTable::addLocalVar(std::string name, TypeNode* type, ConstantTable* constantTable)
+LocalVariableElement* LocalVariableTable::addLocalVar(std::string name, std::string descriptor, ConstantTable* constantTable)
 {
     if (items.find(name) != items.cend())
         throw std::runtime_error("Local variable with name " + name + " already exists!");
     
     int newLocalId = this->items.size();
-    this->items[name] = new LocalVariableElement(newLocalId, name, type, constantTable);
+    this->items[name] = new LocalVariableElement(newLocalId, name, descriptor, constantTable);
     return this->items[name];
 }
 
@@ -229,13 +228,13 @@ ExternalMethodTableElement* ExternalMethodTable::addMethod(ConstantTable* consta
     return newMethod;
 }
 
-FieldElement::FieldElement(std::vector<FieldAccessFlag> flags, std::string name, TypeNode* type, ConstantTable* constantTable)
+FieldElement::FieldElement(std::vector<FieldAccessFlag> flags, std::string name, std::string descriptor, ConstantTable* constantTable)
 {
     this->name = name;
     this->isStatic = false;
-    this->type = type;
+    this->_descriptor = descriptor;
     this->nameIndex = constantTable->findOrAddConstant(Utf8_C, name);
-    this->descriptorIndex = constantTable->findOrAddConstant(Utf8_C, descriptorForType(type));
+    this->descriptorIndex = constantTable->findOrAddConstant(Utf8_C, descriptor);
     this->accessFlag = 0;
     for (auto& flag : flags)
     {
@@ -246,18 +245,18 @@ FieldElement::FieldElement(std::vector<FieldAccessFlag> flags, std::string name,
     }
 }
 
-FieldElement* FieldTable::addField(std::vector<FieldAccessFlag> flags, std::string name, TypeNode* type, ConstantTable* constantTable)
+FieldElement* FieldTable::addField(std::vector<FieldAccessFlag> flags, std::string name, std::string descriptor, ConstantTable* constantTable)
 {
     if (items.find(name) != items.cend())
         throw std::runtime_error("Class field with name " + name + " already exists!");
 
-    this->items[name] = new FieldElement(flags, name, type, constantTable);
+    this->items[name] = new FieldElement(flags, name, descriptor, constantTable);
     return this->items[name];
 }
 
-FieldElement* FieldTable::addStaticField(std::vector<FieldAccessFlag> flags, std::string name, TypeNode* type, ConstantTable* constantTable, int constantValueIndex)
+FieldElement* FieldTable::addStaticField(std::vector<FieldAccessFlag> flags, std::string name, std::string descriptor, ConstantTable* constantTable, int constantValueIndex)
 {
-    auto field = this->addField(flags, name, type, constantTable);
+    auto field = this->addField(flags, name, descriptor, constantTable);
     field->isStatic = true;
     field->constantValueIndex = constantValueIndex;
     constantTable->findOrAddConstant(Utf8_C, "ConstantValue");

@@ -420,7 +420,7 @@ void StmtNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass
 			throw std::runtime_error("Expr stmt must be associated with a class!");
 		
 		// if currentMethod == null - it is class field
-		this->_varDeclList->fillTable(currentClass, currentMethod);
+		this->_varDeclList->fillTable(classTable, currentClass, currentMethod);
 		break;
 	case StmtType::Assignment:
 		if (currentClass == nullptr)

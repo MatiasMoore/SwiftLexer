@@ -466,7 +466,7 @@ SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 	}
 }
 
-TypeNode* ExprNode::evaluateType()
+TypeNode* ExprNode::evaluateType(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod)
 {
 	switch (this->_type)
 	{
@@ -505,9 +505,9 @@ void ExprNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass
 
 		if (this->_fieldAccessExpr->_type != Id)
 		{
-			throw std::runtime_error("Usupported field access with left part" + std::to_string(_fieldAccessExpr->_type) + "!" + "Field access only support \"ID\" at left part! ");
+			throw std::runtime_error("Unsupported field access with left part" + std::to_string(_fieldAccessExpr->_type) + "!" + "Field access only support \"ID\" at left part! ");
 		}
-		field =  currentClass->addExternalField(_fieldAccessExpr->_stringValue, this->_fieldAccessFieldName, this->evaluateType());
+		field = currentClass->addExternalField(_fieldAccessExpr->_stringValue, this->_fieldAccessFieldName, this->evaluateType(classTable, currentClass, currentMethod)->toDescriptor(classTable, currentClass, currentMethod));
 		this->_staticFieldRef = field->_fieldRef;
 		break;
 	case ExprType::Int:
@@ -539,13 +539,13 @@ std::vector<char> ExprNode::generateCode(ClassTableElement* currentClass, Method
 	case ExprType::Id:
 
 		localVar = currentMethod->varTable->findLocalVar(this->_stringValue);
-		switch (localVar->_type->_type)
+		if (localVar->_descriptor == "I")
 		{
-		case IntT:
 			appendVecToVec(code, jvm::iload(localVar->localId));
-			break;
-		default:
-			throw std::runtime_error("Can't generate code for expr ID with type " + std::to_string(localVar->_type->_type) + "!");
+		}
+		else
+		{
+			throw std::runtime_error("Can't generate code for expr ID with descriptor \"" + localVar->_descriptor + "\"!");
 		}
 		break;
 	case ExprType::FieldAccess:

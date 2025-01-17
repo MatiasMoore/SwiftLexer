@@ -47,7 +47,7 @@ public:
 
 	bool isFieldDecl();
 
-	void fillTable(class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
+	void fillTable(class ClassTable* classTable, class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
 
 	std::vector<char> generateCode(class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
 
@@ -79,7 +79,7 @@ public:
 
 	void generateDot(std::ofstream& file) override;
 
-	void fillTable(class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
+	void fillTable(class ClassTable* classTable, class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
 
 	std::vector<char> generateCode(class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
 	
