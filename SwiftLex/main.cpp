@@ -7,7 +7,7 @@
 #include "tables/tables.h"
 #include <filesystem>
 
-bool _DRAW_DOT = true;
+bool _DRAW_DOT = false;
 bool _EXEC_MAINCLASS = true;
 
 std::string generatedClassFilesDirectory = "out/";
