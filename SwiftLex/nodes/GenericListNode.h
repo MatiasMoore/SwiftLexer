@@ -24,10 +24,17 @@ public:
 
 	List* appendNodeAfterNode(ListElem* toAppend, ListElem* after)
 	{
-		// Finding the index of 5
 		auto afterIter = std::find(_vec.begin(), _vec.end(), after);
 		int afterIndex = afterIter - _vec.begin();
 		_vec.insert(_vec.begin() + afterIndex + 1, toAppend);
+		return (List*)this;
+	}
+
+	List* appendNodeBeforeNode(ListElem* toAppend, ListElem* before)
+	{
+		auto beforeIter = std::find(_vec.begin(), _vec.end(), before);
+		int beforeIndex = beforeIter - _vec.begin();
+		_vec.insert(_vec.begin() + beforeIndex, toAppend);
 		return (List*)this;
 	}
 

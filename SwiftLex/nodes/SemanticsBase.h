@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <string>
 #include <typeinfo>
+#include <set>
 
 class SemanticsStack;
 
@@ -29,9 +30,27 @@ public:
 	void push(SemanticsBase* elem);
 
 	template <typename SemChild>
-	SemChild* getClosest()
+	SemChild* getClosest(std::set<SemanticsBase*> ignore = {})
 	{
 		for (auto i = _vec.rbegin(); i != _vec.rend(); i++)
+		{
+			auto elem = *i;
+
+			bool shouldIgnore = ignore.count(elem) != 0;
+			if (shouldIgnore)
+				continue;
+
+			auto semChild = dynamic_cast<SemChild*>(elem);
+			if (semChild != nullptr)
+				return semChild;
+		}
+		return nullptr;
+	}
+
+	template <typename SemChild>
+	SemChild* getFurthest()
+	{
+		for (auto i = _vec.begin(); i != _vec.end(); i++)
 		{
 			auto elem = *i;
 			auto semChild = dynamic_cast<SemChild*>(elem);

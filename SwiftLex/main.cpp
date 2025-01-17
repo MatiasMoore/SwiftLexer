@@ -92,6 +92,57 @@ int main(int argc, const char* argv[])
 
 	try
 	{
+		// Add main class and method for free stmts
+		// Main method
+		auto mainFuncArgType = TypeNode::createArrayType(TypeNode::createType(TypeType::StringT));
+		auto mainFuncArg = FuncDeclArgNode::createPositionalArg("args", mainFuncArgType, nullptr);
+		auto mainFuncArgs = FuncDeclArgListNode::createListNode(mainFuncArg);
+		auto mainFuncReturn = StmtNode::createStmtReturn(ReturnNode::createVoidReturn());
+		auto mainFuncBody = StmtListNode::createListNode(mainFuncReturn);
+		auto mainFuncDecl = FuncDeclNode::createRegular("main", mainFuncArgs, mainFuncBody, nullptr, false);
+		auto mainFuncModifiers = AccessModifierListNode::createListNode(AccessModifierNode::createModifier(Public));
+		mainFuncModifiers->appendNode(AccessModifierNode::createModifier(Static));
+		mainFuncDecl->addModifiers(mainFuncModifiers);
+		auto mainFuncDeclStmt = StmtNode::createStmtFuncDecl(mainFuncDecl);
+
+		// Main class
+		auto mainClassBody = StmtListNode::createListNode(mainFuncDeclStmt);
+		auto mainClassDecl = ClassDeclNode::createClass("MainClass", mainClassBody);
+
+		StmtListNode* newRoot = StmtListNode::createListNode(StmtNode::createClassDecl(mainClassDecl));
+
+		if (_root != nullptr)
+		{
+			for (auto& stmt : _root->_vec)
+			{
+				// For classes
+				if (stmt->_type == StmtType::ClassDecl)
+				{
+					newRoot->appendNode(stmt);
+				}
+				// For functions
+				else if (stmt->_type == StmtType::FuncDecl)
+				{
+					// Make all free methods public and static
+					auto funcDecl = stmt->_funcDecl;
+					if (!funcDecl->_hasModifiers)
+					{
+						auto defaultModifiers = AccessModifierListNode::createListNode(AccessModifierNode::createModifier(Public));
+						defaultModifiers->appendNode(AccessModifierNode::createModifier(Static));
+						funcDecl->addModifiers(defaultModifiers);
+					}
+
+					mainClassBody->appendNodeBeforeNode(stmt, mainFuncDeclStmt);
+				}
+				else // All other stmts
+				{
+					mainFuncBody->appendNodeBeforeNode(stmt, mainFuncReturn);
+				}
+			}
+		}
+		
+		_root = newRoot;
+
 		_root = _root->semanticsTransform(newStack)->typecast<StmtListNode>();
 	}
 	catch (std::runtime_error error)
