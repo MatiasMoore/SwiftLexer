@@ -63,6 +63,7 @@ void VarDeclarationNode::generateDot(std::ofstream& file)
 void VarDeclarationNode::fillTable(ClassTableElement* currentClass, MethodTableElement* currentMethod)
 {
 	// Class Field
+	int constantValueIndex;
 	if (currentMethod == nullptr)
 	{
 		if (_modifiers == nullptr)
@@ -75,7 +76,21 @@ void VarDeclarationNode::fillTable(ClassTableElement* currentClass, MethodTableE
 		case ValueAndTypeKnown:
 			break;
 		case TypeKnown:
-			currentClass->addField(this->_modifiers->getFieldAccessFlags(), this->_varName, this->_typeNode);
+			if (this->_typeNode->_type == IntT) {
+				constantValueIndex = currentClass->constants->findOrAddConstant(Integer_C, "", 0);
+				auto accessFlags = this->_modifiers->getMethodAccessFlags();
+				bool isStatic = std::find(accessFlags.begin(), accessFlags.end(), M_ACC_STATIC) != accessFlags.end();
+				if (isStatic)
+				{
+					currentClass->constants->findOrAddConstant(Utf8_C, "ConstantValue");
+					currentClass->addStaticField(this->_modifiers->getFieldAccessFlags(), this->_varName, this->_typeNode, constantValueIndex);
+				} else{
+					std::runtime_error("Non static field does not support for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\n");
+				}
+			}
+			else {
+				std::runtime_error("Type " + std::to_string(this->_typeNode->_type) + "does not support for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\n");
+			}
 			break;
 		case ValueKnown:
 			break;

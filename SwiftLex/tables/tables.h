@@ -92,6 +92,8 @@ public:
     MethodTableElement* addMethod(std::string name, StmtListNode* body, std::string descriptor, std::vector<MethodAccessFlag> flags);
 
     FieldElement* addField(std::vector<FieldAccessFlag> flags, std::string name, TypeNode* type);
+
+    FieldElement* addStaticField(std::vector<FieldAccessFlag> flags, std::string name, TypeNode* type, int constantValueIndex);
 };
 
 /*! Тип константы в таблице констант. */
@@ -261,6 +263,8 @@ public:
 
     FieldElement* addField(std::vector<FieldAccessFlag> flags, std::string name, TypeNode* type, ConstantTable* constantTable);
 
+    FieldElement* addStaticField(std::vector<FieldAccessFlag> flags, std::string name, TypeNode* type, ConstantTable* constantTable, int constantvalueIndex);
+
     FieldElement* findField(std::string name);
 };
 
@@ -280,6 +284,9 @@ public:
 
     std::string name; 
     TypeNode* type; 
+
+    bool isStatic;
+    int constantValueIndex;
 
     FieldElement(std::vector<FieldAccessFlag> flags, std::string name, TypeNode* type, ConstantTable* constantTable);
 };

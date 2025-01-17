@@ -144,6 +144,11 @@ FieldElement* ClassTableElement::addField(std::vector<FieldAccessFlag> flags, st
     return this->fields->addField(flags, name, type, this->constants);
 }
 
+FieldElement* ClassTableElement::addStaticField(std::vector<FieldAccessFlag> flags, std::string name, TypeNode* type, int constantValueIndex)
+{
+    return this->fields->addStaticField(flags, name, type, this->constants, constantValueIndex);
+}
+
 MethodTableElement::MethodTableElement(ConstantTable* constants, std::string name, StmtListNode* body, std::string descriptor, std::vector<MethodAccessFlag> flags)
 {
     this->strName = name;
@@ -238,6 +243,15 @@ FieldElement* FieldTable::addField(std::vector<FieldAccessFlag> flags, std::stri
 
     this->items[name] = new FieldElement(flags, name, type, constantTable);
     return this->items[name];
+}
+
+FieldElement* FieldTable::addStaticField(std::vector<FieldAccessFlag> flags, std::string name, TypeNode* type, ConstantTable* constantTable, int constantValueIndex)
+{
+    auto field = this->addField(flags, name, type, constantTable);
+    field->isStatic = true;
+    field->constantValueIndex = constantValueIndex;
+    constantTable->findOrAddConstant(Utf8_C, "ConstantValue");
+    return field;
 }
 
 FieldElement* FieldTable::findField(std::string name)
