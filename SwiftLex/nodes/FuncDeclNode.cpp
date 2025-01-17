@@ -266,13 +266,13 @@ void FuncDeclNode::fillTable(ClassTable* classTable, ClassTableElement* currentC
 	this->_body->fillTable(classTable, currentClass, currentMethod);
 }
 
-SemanticsBase* FuncDeclNode::semanticsTransform(SemanticsStack& stack)
+SemanticsBase* FuncDeclNode::semanticsTransform(SemanticsStack stack)
 {
 	stack.push(this);
 
 	//Function may not have a body if it has a void return which is checked later
 	if(this->_hasBody)
-		this->_body->semanticsTransform(stack);
+		this->_body = this->_body->semanticsTransform(stack)->typecast<StmtListNode>();
 
 	//Check if function ends with a return
 	bool hasReturnStmt = this->_hasBody 

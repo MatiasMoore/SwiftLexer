@@ -435,14 +435,13 @@ void ExprNode::generateDot(std::ofstream& file)
 	}
 }
 
-SemanticsBase* ExprNode::semanticsTransform(SemanticsStack& stack)
+SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 {
 	stack.push(this);
 	if (this->_type == ExprType::Int)
 	{
 		//auto args = FuncCallArgListNode::createListNode(FuncCallArgNode::createFromExpr(ExprNode::createInt(this->_intValue)));
 		//return ExprNode::createFuncCall(FuncCallNode::createFuncCall("Int", args));
-		stack.pop();
 		return this;
 	}
 	else if (this->_type == ExprType::Sum)
@@ -455,12 +454,10 @@ SemanticsBase* ExprNode::semanticsTransform(SemanticsStack& stack)
 		auto plusFunc = FuncCallNode::createFuncCall("plus", args);
 		plusFunc->setAsExprAccess(this->_left);
 
-		stack.pop();
 		return ExprNode::createFuncCall(plusFunc);
 	}
 	else if (this->_type == ExprType::Id || this->_type == ExprType::FuncCall)
 	{
-		stack.pop();
 		return this;
 	}
 	else

@@ -270,7 +270,7 @@ void StmtNode::generateDot(std::ofstream& file)
 	}
 }
 
-SemanticsBase* StmtNode::semanticsTransform(SemanticsStack& stack)
+SemanticsBase* StmtNode::semanticsTransform(SemanticsStack stack)
 {
 	stack.push(this);
 	if (this->_type == StmtType::Expr)
@@ -303,7 +303,6 @@ SemanticsBase* StmtNode::semanticsTransform(SemanticsStack& stack)
 	else {
 		throw std::runtime_error("Unsupported stmnt with enum type " + std::to_string(this->_type) + "!");
 	}
-	stack.pop();
 	return this;
 }
 
@@ -426,7 +425,7 @@ std::string StmtListNode::getName()
 	return "StmtList";
 }
 
-SemanticsBase* StmtListNode::semanticsTransform(SemanticsStack& stack)
+SemanticsBase* StmtListNode::semanticsTransform(SemanticsStack stack)
 {
 	stack.push(this);
 	/*
@@ -443,7 +442,6 @@ SemanticsBase* StmtListNode::semanticsTransform(SemanticsStack& stack)
 		_vec[i] = _vec[i]->semanticsTransform(stack)->typecast<StmtNode>();
 	}
 
-	stack.pop();
 	return this;
 }
 

@@ -9,7 +9,7 @@ class SemanticsStack;
 class SemanticsBase
 {
 protected:
-	virtual SemanticsBase* semanticsTransform(SemanticsStack& stack) = 0;
+	virtual SemanticsBase* semanticsTransform(SemanticsStack stack) = 0;
 
 public:
 	template <typename SemChild>
@@ -27,8 +27,6 @@ class SemanticsStack
 {
 public:
 	void push(SemanticsBase* elem);
-
-	void pop();
 
 	template <typename SemChild>
 	SemChild* getClosest()

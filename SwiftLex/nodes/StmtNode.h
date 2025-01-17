@@ -119,7 +119,7 @@ public:
 
 	void generateDot(std::ofstream& file) override;
 
-	SemanticsBase* semanticsTransform(SemanticsStack& stack) override;
+	SemanticsBase* semanticsTransform(SemanticsStack stack) override;
 
 	void fillTable(class ClassTable* classTable, class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
 
@@ -131,7 +131,7 @@ class StmtListNode : public GenericListNode<StmtNode, StmtListNode>, public Sema
 public:
 	std::string getName() override;
 
-	SemanticsBase* semanticsTransform(SemanticsStack& stack) override;
+	SemanticsBase* semanticsTransform(SemanticsStack stack) override;
 
 	void fillTable(class ClassTable* classTable, class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
 };

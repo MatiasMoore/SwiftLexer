@@ -92,7 +92,7 @@ std::vector<char> VarDeclarationNode::generateCode(ClassTableElement * currentCl
 	return code;
 }
 
-SemanticsBase* VarDeclarationNode::semanticsTransform(SemanticsStack& stack)
+SemanticsBase* VarDeclarationNode::semanticsTransform(SemanticsStack stack)
 {
 	stack.push(this);
 	
@@ -118,11 +118,9 @@ SemanticsBase* VarDeclarationNode::semanticsTransform(SemanticsStack& stack)
 
 		thisStmtList->appendNodeAfterNode(assignmentNode, thisStmt);
 
-		stack.pop();
 		return thisNode;
 	}
 
-	stack.pop();
 	return this;
 }
 
@@ -158,13 +156,12 @@ std::vector<char> VarDeclarationListNode::generateCode(ClassTableElement* curren
 	return code;
 }
 
-SemanticsBase* VarDeclarationListNode::semanticsTransform(SemanticsStack& stack)
+SemanticsBase* VarDeclarationListNode::semanticsTransform(SemanticsStack stack)
 {
 	stack.push(this);
 	for (auto& elem : _vec)
 	{
 		elem = elem->semanticsTransform(stack)->typecast<VarDeclarationNode>();
 	}
-	stack.pop();
 	return this;
 }

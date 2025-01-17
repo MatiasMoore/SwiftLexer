@@ -64,6 +64,6 @@ public:
 
 	void fillTable(class ClassTable* classTable, class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
 
-	SemanticsBase* semanticsTransform(SemanticsStack& stack) override;
+	SemanticsBase* semanticsTransform(SemanticsStack stack) override;
 };
 

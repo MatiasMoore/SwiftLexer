@@ -47,7 +47,7 @@ public:
 
 	std::vector<char> generateCode(class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
 
-	SemanticsBase* semanticsTransform(SemanticsStack& stack) override;
+	SemanticsBase* semanticsTransform(SemanticsStack stack) override;
 };
 
 class VarDeclarationNode : public Dottable, public SemanticsBase
@@ -76,7 +76,7 @@ public:
 
 	std::vector<char> generateCode(class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
 	
-	SemanticsBase* semanticsTransform(SemanticsStack& stack) override;
+	SemanticsBase* semanticsTransform(SemanticsStack stack) override;
 
 };
 
