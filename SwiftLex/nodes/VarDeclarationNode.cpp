@@ -112,7 +112,12 @@ SemanticsBase* VarDeclarationNode::semanticsTransform(SemanticsStack stack)
 		auto thisNode = VarDeclarationNode::createFromType(this->_varName, typeNode);
 
 		auto thisStmtList = stack.getClosest<StmtListNode>();
+		if (thisStmtList == nullptr)
+			throw std::runtime_error("Critical error! Unable to find stmt list for var decl!");
+
 		auto thisStmt = stack.getClosest<StmtNode>();
+		if (thisStmt == nullptr)
+			throw std::runtime_error("Critical error! Unable to find stmt for var decl!");
 		
 		auto assignmentNode = StmtNode::createStmtAssignment(ExprNode::createId(this->_varName), this->_valueNode);
 
