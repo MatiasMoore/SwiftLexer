@@ -475,6 +475,10 @@ TypeNode* ExprNode::evaluateType()
 		break;
 	case Int:
 		return TypeNode::createType(TypeType::IntT);
+	case FieldAccess:
+		// TODO add type calculation for descriptor
+		return TypeNode::createType(TypeType::IntT);
+		std::cout << "WARNING: Field \"" + this->_fieldAccessFieldName + "\" of class \"" + _fieldAccessExpr->_stringValue + "\" must be INT!";
 		break;
 	default:
 		throw std::runtime_error("Can't evaluate type of expr with enum type " + std::to_string(this->_type) + "!");
@@ -484,6 +488,7 @@ TypeNode* ExprNode::evaluateType()
 
 void ExprNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod)
 {
+	ExternalFieldTableElement* field;
 	if (currentClass == nullptr)
 		throw std::runtime_error("Expression must be associated with a class!");
 
@@ -494,6 +499,16 @@ void ExprNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass
 	{
 	case ExprType::FuncCall:
 		this->_funcCall->fillTable(classTable, currentClass, currentMethod);
+		break;
+
+	case ExprType::FieldAccess:
+
+		if (this->_fieldAccessExpr->_type != Id)
+		{
+			throw std::runtime_error("Usupported field access with left part" + std::to_string(_fieldAccessExpr->_type) + "!" + "Field access only support \"ID\" at left part! ");
+		}
+		field =  currentClass->addExternalField(_fieldAccessExpr->_stringValue, this->_fieldAccessFieldName, this->evaluateType());
+		this->_staticFieldRef = field->_fieldRef;
 		break;
 	case ExprType::Int:
 	case ExprType::Id:
@@ -532,6 +547,9 @@ std::vector<char> ExprNode::generateCode(ClassTableElement* currentClass, Method
 		default:
 			throw std::runtime_error("Can't generate code for expr ID with type " + std::to_string(localVar->_type->_type) + "!");
 		}
+		break;
+	case ExprType::FieldAccess:
+		appendVecToVec(code, jvm::getstatic(this->_staticFieldRef));
 		break;
 	default:
 		throw std::runtime_error("Can't generate code for expr with type " + std::to_string(this->_type) + "!");

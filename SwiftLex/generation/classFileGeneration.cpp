@@ -12,6 +12,60 @@ char _smallVersion[2] = { 0x00, 0x00 };
 char _bigVersion[2] = { 0x00, 0x3E };
 int _stackSize = 1000;
 
+std::vector<char> generateFieldConstantAttribute(class FieldElement* fieldElement, ClassTableElement* classElement)
+{
+	std::vector<char> res;
+
+	int attributeNameIndex = classElement->constants->findOrAddConstant(Utf8_C, "ConstantValue");
+
+	/*
+		u2 attribute_name_index;
+		u4 attribute_length;
+		u2 constantvalue_index;
+	*/
+	appendVecToVec(res, intToByteVector(attributeNameIndex, 2));
+	appendVecToVec(res, intToByteVector(2, 4)); //The value of the attribute_length item must be two.
+	appendVecToVec(res, intToByteVector(fieldElement->constantValueIndex, 2));
+	return res;
+}
+
+std::vector<char> generateFieldCode(class FieldElement* fieldElement, class ClassTableElement* classElement)
+{
+
+
+	std::vector<char> res;
+
+	std::vector<char> accessFlags = intToByteVector(fieldElement->accessFlag, 2);
+	
+
+	std::vector<char> nameIndex = intToByteVector(fieldElement->nameIndex, 2);
+	std::vector<char> descriptorIndex = intToByteVector(fieldElement->descriptorIndex, 2);
+
+
+	std::vector<char> attributesCount = intToByteVector(0, 2);
+	std::vector<char> attributesBytes = {};
+
+	if (fieldElement->isStatic)
+	{
+		attributesCount = intToByteVector(1, 2);
+		attributesBytes = generateFieldConstantAttribute(fieldElement, classElement);
+	}
+
+	/*
+		u2             access_flags;
+		u2             name_index;
+		u2             descriptor_index;
+		u2             attributes_count;
+		attribute_info attributes[attributes_count];
+	*/
+	appendVecToVec(res, accessFlags);
+	appendVecToVec(res, nameIndex);
+	appendVecToVec(res, descriptorIndex);
+	appendVecToVec(res, attributesCount);
+	appendVecToVec(res, attributesBytes);
+	return res;
+}
+
 std::vector<char> generateLocalVariableTable(MethodTableElement* mElem, ClassTableElement* cElem) {
 	std::vector<char> tableBytes;
 
@@ -135,6 +189,25 @@ std::vector<char> generateMethodCode(class MethodTableElement* mElem, class Clas
 
 void generateClassFile(ClassTableElement* classElem, std::string pathToFolder)
 {
+	/*
+    u4             magic;
+    u2             minor_version;
+    u2             major_version;
+    u2             constant_pool_count;
+    cp_info        constant_pool[constant_pool_count-1];
+    u2             access_flags;
+    u2             this_class;
+    u2             super_class;
+    u2             interfaces_count;
+    u2             interfaces[interfaces_count];
+    u2             fields_count;
+    field_info     fields[fields_count];
+    u2             methods_count;
+    method_info    methods[methods_count];
+    u2             attributes_count;
+    attribute_info attributes[attributes_count];
+	*/
+
 	// Инициализация.
 	std::string fileName = pathToFolder + classElem->nameStr + ".class";
 
@@ -164,7 +237,19 @@ void generateClassFile(ClassTableElement* classElem, std::string pathToFolder)
 	appendVecToVec(data, thisCls);
 	appendVecToVec(data, parentCls);
 	std::vector<char> interfaceCount = intToByteVector(0, 2);
-	std::vector<char> fieldCount = intToByteVector(0, 2);
+
+	int fieldCount = 0;
+	std::vector<char> fieldsCodeData = {};
+
+	for (auto fieldItem = classElem->fields->items.begin(); fieldItem != classElem->fields->items.end(); ++fieldItem)
+	{
+		auto field = fieldItem->second;
+		fieldCount++;
+		std::vector<char> fieldCodeData = generateFieldCode(field, classElem);
+		appendVecToVec(fieldsCodeData, fieldCodeData);
+	}
+
+	std::cout << "Fields count: " << fieldCount << std::endl;
 
 	// Посчитать количество методов.
 	int mCount = 0;
@@ -193,10 +278,12 @@ void generateClassFile(ClassTableElement* classElem, std::string pathToFolder)
 	std::cout << "Method count: " << mCount << std::endl;
 
 	std::vector<char> methodCount = intToByteVector(mCount, 2);
-
 	std::vector<char> attributeCount = intToByteVector(0, 2);
+	std::vector<char> fieldCountBytes = intToByteVector(fieldCount, 2);
+
 	appendVecToVec(data, interfaceCount);
-	appendVecToVec(data, fieldCount);
+	appendVecToVec(data, fieldCountBytes);
+	appendVecToVec(data, fieldsCodeData);
 	appendVecToVec(data, methodCount);
 	appendVecToVec(data, codeData);
 	appendVecToVec(data, attributeCount);

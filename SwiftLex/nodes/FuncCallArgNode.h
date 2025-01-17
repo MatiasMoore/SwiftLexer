@@ -36,5 +36,7 @@ class FuncCallArgListNode : public GenericListNode<FuncCallArgNode, FuncCallArgL
 {
 	std::string getName() override;
 public:
+	void fillTable(class ClassTable* classTable, class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
+
 	std::vector<char> generateCode(class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
 };

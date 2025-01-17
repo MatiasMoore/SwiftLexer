@@ -98,6 +98,8 @@ public:
 
 	FuncCallNode* _funcCall;
 
+	int _staticFieldRef;
+
 	static ExprNode* createBool(bool value);
 
 	static ExprNode* createInt(int value);

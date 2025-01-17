@@ -63,18 +63,85 @@ void VarDeclarationNode::generateDot(std::ofstream& file)
 
 void VarDeclarationNode::fillTable(ClassTableElement* currentClass, MethodTableElement* currentMethod)
 {
-	switch (this->_type)
+	// Class Field
+	int constantValueIndex;
+	if (currentMethod == nullptr)
 	{
-	case TypeKnown:
-		currentMethod->varTable->addLocalVar(this->_varName, this->_typeNode, currentClass->constants);
-		break;
-	case ValueAndTypeKnown:
-		currentMethod->varTable->addLocalVar(this->_varName, this->_typeNode, currentClass->constants);
-		break;
-	default:
-		throw std::runtime_error("Var declaration with enum type " + std::to_string(this->_type) + " is unsupported!");
-		break;
+		if (_modifiers == nullptr)
+		{
+			throw std::runtime_error("Modifier missing for field: \"" + _varName + "\" for class \"" + currentClass->nameStr + "\"");
+		}
+
+		switch (this->_type)
+		{
+		case ValueAndTypeKnown:
+			if (this->_typeNode->_type == IntT) 
+			{
+				if (this->_valueNode->_type != Int)
+				{
+					throw std::runtime_error("Value type does not support for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\n");
+				}
+
+				constantValueIndex = currentClass->constants->findOrAddConstant(Integer_C, "", this->_valueNode->_intValue);
+				auto accessFlags = this->_modifiers->getMethodAccessFlags();
+				bool isStatic = std::find(accessFlags.begin(), accessFlags.end(), M_ACC_STATIC) != accessFlags.end();
+				if (isStatic)
+				{
+					currentClass->constants->findOrAddConstant(Utf8_C, "ConstantValue");
+					currentClass->addStaticField(this->_modifiers->getFieldAccessFlags(), this->_varName, this->_typeNode, constantValueIndex);
+				}
+				else {
+					throw std::runtime_error("Non static field does not support for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\n");
+				}
+			}
+			else {
+				throw std::runtime_error("Type " + std::to_string(this->_typeNode->_type) + "does not support for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\n");
+			}
+			break;
+		case TypeKnown:
+			if (this->_typeNode->_type == IntT) {
+				// DEFAULT INTEGER = 0
+				constantValueIndex = currentClass->constants->findOrAddConstant(Integer_C, "", 0);
+				auto accessFlags = this->_modifiers->getMethodAccessFlags();
+				bool isStatic = std::find(accessFlags.begin(), accessFlags.end(), M_ACC_STATIC) != accessFlags.end();
+				if (isStatic)
+				{
+					currentClass->constants->findOrAddConstant(Utf8_C, "ConstantValue");
+					currentClass->addStaticField(this->_modifiers->getFieldAccessFlags(), this->_varName, this->_typeNode, constantValueIndex);
+				} else{
+					throw std::runtime_error("Non static field does not support for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\n");
+				}
+			}
+			else {
+				throw std::runtime_error("Type " + std::to_string(this->_typeNode->_type) + "does not support for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\n");
+			}
+			break;
+		case ValueKnown:
+			throw std::runtime_error("Declaration usupported for type " + std::to_string(this->_type) + " for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\n");
+			break;
+		default:
+			throw std::runtime_error("Declaration usupported for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\n");
+			break;
+		}
 	}
+
+	// Local Variable
+	if (currentMethod != nullptr) 
+	{
+		switch (this->_type)
+		{
+		case ValueAndTypeKnown:
+			break;
+		case TypeKnown:
+			currentMethod->varTable->addLocalVar(this->_varName, this->_typeNode, currentClass->constants);
+			break;
+		case ValueKnown:
+			break;
+		default:
+			break;
+		}
+	}
+
 }
 
 std::vector<char> VarDeclarationNode::generateCode(ClassTableElement * currentClass, MethodTableElement * currentMethod)

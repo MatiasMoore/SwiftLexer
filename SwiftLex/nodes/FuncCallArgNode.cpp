@@ -33,6 +33,7 @@ void FuncCallArgNode::generateDot(std::ofstream& file)
 
 void FuncCallArgNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod)
 {
+    this->_value->fillTable(classTable, currentClass, currentMethod);
     this->_argType = this->_value->evaluateType();
 }
 
@@ -46,6 +47,14 @@ std::vector<char> FuncCallArgNode::generateCode(ClassTableElement* currentClass,
 std::string FuncCallArgListNode::getName()
 {
     return "FuncCallArgList";
+}
+
+void FuncCallArgListNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod)
+{
+    for (auto& elem : _vec)
+    {
+        elem->fillTable(classTable, currentClass, currentMethod);
+    }
 }
 
 std::vector<char> FuncCallArgListNode::generateCode(ClassTableElement* currentClass, MethodTableElement* currentMethod)

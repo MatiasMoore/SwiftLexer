@@ -6,6 +6,8 @@
 
 class ConstantTable;
 class ConstantTableItem;
+class FieldElement;
+class FieldTable;
 class MethodTableElement;
 class MethodTable;
 class TypeNode;
@@ -14,6 +16,8 @@ class ClassDeclNode;
 class ConstructorDeclNode;
 class StmtListNode;
 class ExternalMethodTable;
+class ExternalFieldTable;
+class ExternalFieldTableElement;
 
 enum MethodAccessFlag {
     M_ACC_PUBLIC = 0x0001,        //	Declared public; may be accessed from outside its package.
@@ -28,6 +32,18 @@ enum MethodAccessFlag {
     M_ACC_ABSTRACT = 0x0400,      //	Declared abstract; no implementation is provided.
     M_ACC_STRICT = 0x0800,        //	Declared strictfp; floating - point mode is FP - strict.
     M_ACC_SYNTHETIC = 0x1000,     //	Declared synthetic; not present in the source code.
+};
+
+enum FieldAccessFlag {
+    F_ACC_PUBLIC = MethodAccessFlag::M_ACC_PUBLIC,         //	Declared public; may be accessed from outside its package.
+    F_ACC_PRIVATE = MethodAccessFlag::M_ACC_PRIVATE,       //	Declared private; accessible only within the defining class.
+    F_ACC_PROTECTED = MethodAccessFlag::M_ACC_PROTECTED,   //	Declared protected; may be accessed within subclasses.
+    F_ACC_STATIC = MethodAccessFlag::M_ACC_STATIC,         //	Declared static.
+    F_ACC_FINAL = MethodAccessFlag::M_ACC_FINAL,           //	Declared final; must not be overridden(§5.4.5).
+    F_ACC_VOLATILE = 0x0040,                               //   Declared volatile; cannot be cached.
+    F_ACC_TRANSIENT = 0x0080,                              //   Declared transient; not written or read by a persistent object manager.
+    F_ACC_SYNTHETIC = MethodAccessFlag::M_ACC_SYNTHETIC,   //	Declared synthetic; not present in the source code.
+    F_ACC_ENUM = 0x4000                                    //   Declared as an element of an enum class.
 };
 
 /*! \brief Структура, описывающая таблицу классов. */
@@ -69,11 +85,21 @@ public:
 
     ConstantTable* constants;
 
+    FieldTable* fields;
+
     MethodTable* methods;
 
     ExternalMethodTable* externalMethods;
 
+    ExternalFieldTable* externalFieldTable;
+
     MethodTableElement* addMethod(std::string name, StmtListNode* body, std::string descriptor, std::vector<MethodAccessFlag> flags);
+
+    FieldElement* addField(std::vector<FieldAccessFlag> flags, std::string name, TypeNode* type);
+
+    FieldElement* addStaticField(std::vector<FieldAccessFlag> flags, std::string name, TypeNode* type, int constantValueIndex);
+
+    ExternalFieldTableElement* addExternalField(std::string className, std::string fieldName, TypeNode* fieldType);
 };
 
 /*! Тип константы в таблице констант. */
@@ -172,6 +198,36 @@ public:
     ExternalMethodTableElement(std::string name, int nameRef, std::string descriptor, int descriptorRef, int methodRef);
 };
 
+/*! \brief Таблица внешних методов класса. */
+class ExternalFieldTable
+{
+public:
+    std::map<std::string, class ExternalfieldTableElement*> methods = {};
+
+    ExternalFieldTableElement* addField(ConstantTable* constants, std::string className, std::string fieldName, std::string descriptor);
+};
+
+/*! \brief Элемент таблицы внешних методов класса. */
+class ExternalFieldTableElement
+{
+public:
+    /// Ссылка на номер константы с именем метода в таблице констант.
+    int _nameRef;
+
+    /// Ссылка на номер константы с дескриптором в таблице констант.
+    int _descriptorRef;
+
+    int _fieldRef;
+
+    /// Строковое название метода.
+    std::string _name;
+
+    /// Строковый дескриптор метода.
+    std::string _descriptor;
+
+    ExternalFieldTableElement(std::string name, int nameRef, std::string descriptor, int descriptorRef, int fieldRef);
+};
+
 /*! \brief Таблица методов класса. */
 class MethodTable
 {
@@ -232,4 +288,41 @@ public:
     LocalVariableElement* addLocalVar(std::string name, TypeNode* type, ConstantTable* constantTable);
 
     LocalVariableElement* findLocalVar(std::string name);
+};
+
+/*! \brief Таблица полей класса. */
+class FieldTable
+{
+public:
+    /// Контейнер элементов.
+    std::map<std::string, class FieldElement*> items = {};
+
+    FieldElement* addField(std::vector<FieldAccessFlag> flags, std::string name, TypeNode* type, ConstantTable* constantTable);
+
+    FieldElement* addStaticField(std::vector<FieldAccessFlag> flags, std::string name, TypeNode* type, ConstantTable* constantTable, int constantvalueIndex);
+
+    FieldElement* findField(std::string name);
+};
+
+/*! \brief поле класса.
+    u2             access_flags;
+    u2             name_index;
+    u2             descriptor_index;
+    u2             attributes_count;
+    attribute_info attributes[attributes_count];
+*/
+class FieldElement
+{
+public:
+    int accessFlag; 
+    int nameIndex; 
+    int descriptorIndex; 
+
+    std::string name; 
+    TypeNode* type; 
+
+    bool isStatic;
+    int constantValueIndex;
+
+    FieldElement(std::vector<FieldAccessFlag> flags, std::string name, TypeNode* type, ConstantTable* constantTable);
 };

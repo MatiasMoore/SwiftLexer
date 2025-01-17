@@ -106,9 +106,10 @@ int ConstantTable::findConstant(enum ConstantType type, std::string utf8string, 
 
 ClassTableElement::ClassTableElement(std::string name, std::string superName)
 {
-    constants = new ConstantTable();
-    methods = new MethodTable();
-    externalMethods = new ExternalMethodTable();
+    this->constants = new ConstantTable();
+    this->methods = new MethodTable();
+    this->externalMethods = new ExternalMethodTable();
+    this->fields = new FieldTable();
 
     this->nameStr = name;
     auto nameNum = constants->findOrAddConstant(ConstantType::Utf8_C, name);
@@ -131,11 +132,27 @@ void ClassTableElement::addRtlExternalMethods()
     this->externalMethods->addMethod(this->constants, "InputOutput", "print", "(I)V");
 }
 
+ExternalFieldTableElement* ClassTableElement::addExternalField(std::string className, std::string fieldName, TypeNode* fieldType)
+{
+    std::string descriptor = descriptorForType(fieldType);
+    return this->externalFieldTable->addField(this->constants, className, fieldName, descriptor);
+}
+
 MethodTableElement* ClassTableElement::addMethod(std::string name, StmtListNode* body, std::string descriptor, std::vector<MethodAccessFlag> flags)
 {
     auto newMethod = new MethodTableElement(this->constants, name, body, descriptor, flags);
     this->methods->methods[newMethod->strName] = newMethod;
     return newMethod;
+}
+
+FieldElement* ClassTableElement::addField(std::vector<FieldAccessFlag> flags, std::string name, TypeNode* type)
+{
+    return this->fields->addField(flags, name, type, this->constants);
+}
+
+FieldElement* ClassTableElement::addStaticField(std::vector<FieldAccessFlag> flags, std::string name, TypeNode* type, int constantValueIndex)
+{
+    return this->fields->addStaticField(flags, name, type, this->constants, constantValueIndex);
 }
 
 MethodTableElement::MethodTableElement(ConstantTable* constants, std::string name, StmtListNode* body, std::string descriptor, std::vector<MethodAccessFlag> flags)
@@ -210,4 +227,70 @@ ExternalMethodTableElement* ExternalMethodTable::addMethod(ConstantTable* consta
     auto newMethod = new ExternalMethodTableElement(methodName, methodNameRef, descriptor, descriptorRef, methodMethodRefRef);
     this->methods[methodName] = newMethod;
     return newMethod;
+}
+
+FieldElement::FieldElement(std::vector<FieldAccessFlag> flags, std::string name, TypeNode* type, ConstantTable* constantTable)
+{
+    this->name = name;
+    this->isStatic = false;
+    this->type = type;
+    this->nameIndex = constantTable->findOrAddConstant(Utf8_C, name);
+    this->descriptorIndex = constantTable->findOrAddConstant(Utf8_C, descriptorForType(type));
+    this->accessFlag = 0;
+    for (auto& flag : flags)
+    {
+        this->accessFlag += (int)flag;
+        if (flag = F_ACC_STATIC) {
+            this->isStatic = true;
+        }
+    }
+}
+
+FieldElement* FieldTable::addField(std::vector<FieldAccessFlag> flags, std::string name, TypeNode* type, ConstantTable* constantTable)
+{
+    if (items.find(name) != items.cend())
+        throw std::runtime_error("Class field with name " + name + " already exists!");
+
+    this->items[name] = new FieldElement(flags, name, type, constantTable);
+    return this->items[name];
+}
+
+FieldElement* FieldTable::addStaticField(std::vector<FieldAccessFlag> flags, std::string name, TypeNode* type, ConstantTable* constantTable, int constantValueIndex)
+{
+    auto field = this->addField(flags, name, type, constantTable);
+    field->isStatic = true;
+    field->constantValueIndex = constantValueIndex;
+    constantTable->findOrAddConstant(Utf8_C, "ConstantValue");
+    return field;
+}
+
+FieldElement* FieldTable::findField(std::string name)
+{
+    if (items.find(name) == items.cend())
+        throw std::runtime_error("Class field with name \"" + name + "\" doesn't exist!");
+
+    return this->items[name];
+}
+
+ExternalFieldTableElement* ExternalFieldTable::addField(ConstantTable* constants, std::string className, std::string fieldName, std::string descriptor)
+{
+    auto classNameRef = constants->findOrAddConstant(Utf8_C, className);
+    auto classRef = constants->findOrAddConstant(Class_C, "", 0, 0, classNameRef, 0);
+    auto fieldNameRef = constants->findOrAddConstant(Utf8_C, fieldName);
+    auto descriptorRef = constants->findOrAddConstant(Utf8_C, descriptor);
+    auto fieldNameAndTypeRef = constants->findOrAddConstant(NameAndType_C, "", 0, 0, fieldNameRef, descriptorRef);
+    auto fieldFieldRefRef = constants->findOrAddConstant(FieldRef_C, "", 0, 0, classRef, fieldNameAndTypeRef);
+
+    auto newField = new ExternalFieldTableElement(fieldName, fieldNameRef, descriptor, descriptorRef, fieldFieldRefRef);
+    // this->methods[methodName] = newMethod;
+    return newField;
+}
+
+ExternalFieldTableElement::ExternalFieldTableElement(std::string name, int nameRef, std::string descriptor, int descriptorRef, int fieldRef)
+{
+    this->_name = name;
+    this->_nameRef = nameRef;
+    this->_descriptor = descriptor;
+    this->_descriptorRef = descriptorRef;
+    this->_fieldRef = fieldRef;
 }

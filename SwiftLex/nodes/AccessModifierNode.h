@@ -28,9 +28,11 @@ public:
 
 	void generateDot(std::ofstream& file);
 
-	std::vector<enum MethodAccessFlag> getAccessFlags();
-
 	SemanticsBase* semanticsTransform(SemanticsStack stack) override;
+	
+	std::vector<enum MethodAccessFlag> getMethodAccessFlags();
+
+	std::vector<enum FieldAccessFlag> getFieldAccessFlags();
 };
 
 class AccessModifierListNode : public GenericListNode<AccessModifierNode, AccessModifierListNode>, public SemanticsBase
@@ -38,8 +40,10 @@ class AccessModifierListNode : public GenericListNode<AccessModifierNode, Access
 public:
 	std::string getName();
 
-	std::vector<enum MethodAccessFlag> getAccessFlags();
-
 	SemanticsBase* semanticsTransform(SemanticsStack stack) override;
+
+	std::vector<enum MethodAccessFlag> getMethodAccessFlags();
+
+	std::vector<enum FieldAccessFlag> getFieldAccessFlags();
 };
 
