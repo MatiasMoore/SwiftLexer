@@ -88,6 +88,16 @@ std::vector<char> generateBytesForConstantTableItem(class ConstantTableItem* ele
 	return res;
 }
 
+std::string classnameFromDescriptor(std::string descriptor)
+{
+	if (descriptor.size() <= 3)
+		throw std::runtime_error("Can't get a classname from primitive type descriptor!");
+
+	auto temp = std::string(descriptor.c_str() + 1);
+	temp.pop_back();
+	return temp;
+}
+
 std::vector<char> jvm::iconstBipushSipush(int num)
 {
 	std::vector<char> res;

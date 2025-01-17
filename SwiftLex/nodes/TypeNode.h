@@ -34,6 +34,8 @@ public:
 
 	static TypeNode* createDynamicType(ExprNode* expr);
 
+	static TypeNode* createFromDescriptor(std::string descriptor);
+
 	std::string getName();
 
 	void generateDot(std::ofstream& file) override;

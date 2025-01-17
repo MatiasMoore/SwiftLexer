@@ -32,6 +32,49 @@ TypeNode* TypeNode::createDynamicType(ExprNode* expr)
 	return node;
 }
 
+TypeNode* TypeNode::createFromDescriptor(std::string descriptor)
+{
+	if (descriptor.empty()) {
+		throw std::invalid_argument("Descriptor cannot be empty.");
+	}
+
+	TypeNode* node = nullptr;
+	char firstChar = descriptor[0];
+
+	switch (firstChar) {
+	case 'Z':
+		node = TypeNode::createType(BoolT);
+		break;
+	case 'F': 
+		node = TypeNode::createType(FloatT);
+		break;
+	case 'I': 
+		node = TypeNode::createType(IntT);
+		break;
+	case 'C': 
+		node = TypeNode::createType(CharacterT);
+		break;
+	case 'L': { 
+		size_t end = descriptor.find(';');
+		if (end == std::string::npos) {
+			throw std::runtime_error("Invalid descriptor for object type: missing ';'");
+		}
+		std::string idTypeName = descriptor.substr(1, end - 1); // Extract type name
+		node = TypeNode::createIdType(idTypeName);
+		break;
+	}
+	case '[': { 
+		TypeNode* arrayType = TypeNode::createFromDescriptor(descriptor.substr(1)); // Recursive call for array element type
+		node = TypeNode::createArrayType(arrayType);
+		break;
+	}
+	default:
+		throw std::runtime_error("Unsupported descriptor: " + descriptor);
+	}
+
+	return node;
+}
+
 std::string TypeNode::getName()
 {
 	switch (this->_type)

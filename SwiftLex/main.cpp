@@ -108,8 +108,9 @@ int main(int argc, const char* argv[])
 		// Main class
 		auto mainClassBody = StmtListNode::createListNode(mainFuncDeclStmt);
 		auto mainClassDecl = ClassDeclNode::createClass("MainClass", mainClassBody);
+		auto mainClassDeclStmt = StmtNode::createClassDecl(mainClassDecl);
 
-		StmtListNode* newRoot = StmtListNode::createListNode(StmtNode::createClassDecl(mainClassDecl));
+		StmtListNode* newRoot = StmtListNode::createListNode(mainClassDeclStmt);
 
 		if (_root != nullptr)
 		{
@@ -118,7 +119,7 @@ int main(int argc, const char* argv[])
 				// For classes
 				if (stmt->_type == StmtType::ClassDecl)
 				{
-					newRoot->appendNode(stmt);
+					newRoot->appendNodeBeforeNode(stmt, mainClassDeclStmt);
 				}
 				// For functions
 				else if (stmt->_type == StmtType::FuncDecl)

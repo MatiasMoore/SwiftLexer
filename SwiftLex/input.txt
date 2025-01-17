@@ -1,7 +1,5 @@
-class TestClass
+class A
 {
-	static public var a : Int = 50
+	public static var a : Int = 5
 }
-
-print(5)
-print(TestClass.a)
+print(A.a)

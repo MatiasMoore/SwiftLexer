@@ -456,7 +456,7 @@ SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 
 		return ExprNode::createFuncCall(plusFunc);
 	}
-	else if (this->_type == ExprType::Id || this->_type == ExprType::FuncCall)
+	else if (this->_type == ExprType::Id || this->_type == ExprType::FuncCall || this->_type == ExprType::FieldAccess)
 	{
 		return this;
 	}
@@ -468,21 +468,76 @@ SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 
 TypeNode* ExprNode::evaluateType(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod)
 {
-	switch (this->_type)
+	if (this->_type == ExprType::String)
 	{
-	case String:
 		return TypeNode::createType(TypeType::StringT);
-		break;
-	case Int:
+	}
+	else if (this->_type == ExprType::Int)
+	{
 		return TypeNode::createType(TypeType::IntT);
-	case FieldAccess:
-		// TODO add type calculation for descriptor
-		return TypeNode::createType(TypeType::IntT);
-		std::cout << "WARNING: Field \"" + this->_fieldAccessFieldName + "\" of class \"" + _fieldAccessExpr->_stringValue + "\" must be INT!";
-		break;
-	default:
+	}
+	else if (this->_type == ExprType::FieldAccess)
+	{
+
+		/*
+		class A
+		{
+			public static var a : Int = 5
+		}
+
+		print(A.a)
+		*/
+
+		std::string classId = "";
+
+		bool isLeftSideComplex = this->_fieldAccessExpr->_type != ExprType::Id;
+		bool isLocalVar = !isLeftSideComplex && currentMethod->varTable->items.count(this->_fieldAccessExpr->_stringValue);
+		bool isStatic = !isLeftSideComplex && !isLocalVar;
+
+		if (isLeftSideComplex)
+		{
+			auto leftSideType = this->_fieldAccessExpr->evaluateType(classTable, currentClass, currentMethod);
+			if (leftSideType->_type != TypeType::IdT)
+				throw std::runtime_error("Left side of a complex field access expects id, but got type with enum " + std::to_string(leftSideType->_type) + "!");
+
+			classId = leftSideType->_idTypeName;
+		}
+
+		// Static field
+		if (isStatic)
+		{
+			bool isStaticFieldFound = this->_fieldAccessExpr->_type == ExprType::Id && classTable->items.count(this->_fieldAccessExpr->_stringValue) != 0;
+
+			if (!isStaticFieldFound)
+				throw std::runtime_error("Critical error! Field access is neither static or non-static!");
+
+			classId = this->_fieldAccessExpr->_stringValue;
+		}
+		else if (classId.empty())// Non-static field with unknown class id
+		{
+			auto localVar = currentMethod->varTable->findLocalVar(this->_fieldAccessExpr->_stringValue);
+			if (localVar->_descriptor.size() == 1)
+				throw std::runtime_error("Primitive types can't be used with field access!");
+
+			classId = classnameFromDescriptor(localVar->_descriptor);
+		}
+
+		bool classFound = classTable->items.count(classId) != 0;
+
+		if (!classFound)
+			throw std::runtime_error("Class \"" + classId + "\" is not found for field access!");
+
+		bool fieldFound = classTable->items[classId]->fields->items.count(this->_fieldAccessFieldName) != 0;
+		if (!fieldFound)
+			throw std::runtime_error("Field \"" + this->_fieldAccessFieldName + "\" is not found in class \"" + classId + "\"!");
+
+		auto field = classTable->items[classId]->fields->items[this->_fieldAccessFieldName];
+
+		return TypeNode::createFromDescriptor(field->_descriptor);
+	}
+	else
+	{
 		throw std::runtime_error("Can't evaluate type of expr with enum type " + std::to_string(this->_type) + "!");
-		break;
 	}
 }
 
