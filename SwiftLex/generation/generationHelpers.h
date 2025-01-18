@@ -133,6 +133,12 @@ namespace jvm
 
 	std::vector<char> aaload();
 
+	std::vector<char> iconst_0();
+
+	std::vector<char> iconst_1();
+
+	std::vector<char> iconst_m1();
+
 	std::vector<char> aastore();
 
 	std::vector<char> iadd();

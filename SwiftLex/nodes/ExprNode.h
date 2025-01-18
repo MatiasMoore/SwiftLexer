@@ -137,7 +137,7 @@ public:
 
 	void generateDot(std::ofstream& file) override;
 
-	SemanticsBase* semanticsTransform(SemanticsStack stack);
+	SemanticsBase* semanticsTransform(SemanticsStack stack) override;
 
 	TypeNode* evaluateType(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod);
 

@@ -4,6 +4,7 @@
 #include "TypeNode.h"
 #include "../tables/tables.h"
 #include "../generation/generationHelpers.h"
+#include <set>
 
 ExprNode* ExprNode::createBool(bool value)
 {
@@ -438,6 +439,11 @@ void ExprNode::generateDot(std::ofstream& file)
 SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 {
 	stack.push(this);
+
+	std::set<ExprType> typesWithLeftRightOperands = { 
+		ExprType::LT, ExprType::GT, ExprType::GTE, ExprType::LTE, ExprType::EQ, ExprType::NEQ, 
+	};
+
 	if (this->_type == ExprType::Int)
 	{
 		//auto args = FuncCallArgListNode::createListNode(FuncCallArgNode::createFromExpr(ExprNode::createInt(this->_intValue)));
@@ -456,14 +462,24 @@ SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 
 		return ExprNode::createFuncCall(plusFunc);
 	}
-	else if (this->_type == ExprType::Id || this->_type == ExprType::FuncCall || this->_type == ExprType::FieldAccess)
+	else if (this->_type == ExprType::FuncCall)
 	{
-		return this;
+		this->_funcCall = this->_funcCall->semanticsTransform(stack)->typecast<FuncCallNode>();
+	}
+	else if (typesWithLeftRightOperands.count(this->_type) != 0)
+	{
+		this->_left = this->_left->semanticsTransform(stack)->typecast<ExprNode>();
+		this->_right = this->_right->semanticsTransform(stack)->typecast<ExprNode>();
+	}
+	else if (this->_type == ExprType::Id || this->_type == ExprType::FieldAccess)
+	{
+		//Do nothing
 	}
 	else
 	{
 		throw std::runtime_error("Unsupported expr with enum type " + std::to_string(this->_type) + "!");
 	}
+	return this;
 }
 
 TypeNode* ExprNode::evaluateType(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod)

@@ -515,3 +515,27 @@ std::vector<char> jvm::aaload()
 	res.push_back(0x32); //aaload
 	return res;
 }
+
+// ---------- iconst_0 ----------
+std::vector<char> jvm::iconst_0()
+{
+	std::vector<char> res;
+	res.push_back(0x3); //aaload
+	return res;
+}
+
+// ---------- iconst_1 ----------
+std::vector<char> jvm::iconst_1()
+{
+	std::vector<char> res;
+	res.push_back(0x4); //aaload
+	return res;
+}
+
+// ---------- iconst_m1 ----------
+std::vector<char> jvm::iconst_m1()
+{
+	std::vector<char> res;
+	res.push_back(0x2); //aaload
+	return res;
+}

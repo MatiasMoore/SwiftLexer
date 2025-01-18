@@ -1,6 +1,7 @@
 #pragma once
 #include "dottable.h"
 #include <vector>
+#include "SemanticsBase.h"
 
 class FuncCallArgListNode;
 class ExprNode;
@@ -13,7 +14,7 @@ enum FuncCallScopeType
 	exprAccessCall
 };
 
-class FuncCallNode : public Dottable
+class FuncCallNode : public Dottable, public SemanticsBase
 {
 public:
 	bool _hasArgs;
@@ -35,6 +36,8 @@ public:
 	std::string getName();
 
 	void generateDot(std::ofstream& file) override;
+
+	SemanticsBase* semanticsTransform(SemanticsStack stack) override;
 
 	void fillTable(class ClassTable* classTable, class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
 
