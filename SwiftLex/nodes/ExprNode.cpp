@@ -446,9 +446,8 @@ SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 
 	if (this->_type == ExprType::Int)
 	{
-		//auto args = FuncCallArgListNode::createListNode(FuncCallArgNode::createFromExpr(ExprNode::createInt(this->_intValue)));
-		//return ExprNode::createFuncCall(FuncCallNode::createFuncCall("Int", args));
-		return this;
+		auto args = FuncCallArgListNode::createListNode(FuncCallArgNode::createFromExpr(ExprNode::createInt(this->_intValue)));
+		return ExprNode::createFuncCall(FuncCallNode::createFuncCall("Integer", args));
 	}
 	else if (this->_type == ExprType::Sum)
 	{

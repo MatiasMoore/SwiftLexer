@@ -22,6 +22,11 @@
     <Flex Include="swift.l" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="tables\fieldTable.cpp" />
+    <ClCompile Include="tables\localVarTable.cpp" />
+    <ClCompile Include="tables\methodTable.cpp" />
+    <ClCompile Include="tables\constTable.cpp" />
+    <ClCompile Include="tables\classTable.cpp" />
     <ClCompile Include="generation\generationHelpers.cpp" />
     <ClCompile Include="generation\classFileGeneration.cpp" />
     <ClCompile Include="nodes\ClassDeclNode.cpp" />
@@ -64,6 +69,12 @@
     <Bison Include="swift.y" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ExceptionHelper.h" />
+    <ClInclude Include="tables\fieldTable.h" />
+    <ClInclude Include="tables\localVarTable.h" />
+    <ClInclude Include="tables\methodTable.h" />
+    <ClInclude Include="tables\constTable.h" />
+    <ClInclude Include="tables\classTable.h" />
     <ClInclude Include="generation\generationHelpers.h" />
     <ClInclude Include="generation\classFileGeneration.h" />
     <ClInclude Include="nodes\ClassDeclNode.h" />
