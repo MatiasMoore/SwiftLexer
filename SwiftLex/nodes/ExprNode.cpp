@@ -587,11 +587,6 @@ void ExprNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass
 	}
 }
 
-void ExprNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod)
-{
-	this->fillTable(classTable, currentClass, currentMethod, false);
-}
-
 std::vector<char> ExprNode::generateCode(ClassTableElement* currentClass, MethodTableElement* currentMethod)
 {
 	

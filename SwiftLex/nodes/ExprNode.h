@@ -141,9 +141,7 @@ public:
 
 	TypeNode* evaluateType(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod);
 
-	void fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod);
-
-	void fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod, bool forceToConstTable);
+	void fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod, bool forceToConstTable = false);
 
 	std::vector<char> generateCode(class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
 };
