@@ -8,11 +8,11 @@ InternalMethod::InternalMethod()
 
 int ExternalMethod::addMethodRefToConstTable(ConstantTable* constTable)
 {
-	auto nameRef = constTable->findOrAddConstant(Utf8_C, this->_name);
-	auto descriptorRef = constTable->findOrAddConstant(Utf8_C, this->_descriptor);
-	auto nameAndTypeRef = constTable->findOrAddConstant(NameAndType_C, "", 0, 0, nameRef, descriptorRef);
-	auto classNameRef = constTable->findOrAddConstant(Utf8_C, this->_class->_name);
-	auto classRef = constTable->findOrAddConstant(Class_C, "", 0, 0, classNameRef);
-	auto methodRef = constTable->findOrAddConstant(MethodRef_C, "", 0, 0, classRef);
+	auto nameRef = constTable->findOrAddUTF8(this->_name);
+	auto descriptorRef = constTable->findOrAddUTF8(this->_descriptor);
+	auto nameAndTypeRef = constTable->findOrAddNameAndType(nameRef, descriptorRef);
+	auto classNameRef = constTable->findOrAddUTF8(this->_class->_name);
+	auto classRef = constTable->findOrAddClassRef(classNameRef);
+	auto methodRef = constTable->findOrAddMethodRef(classRef, nameAndTypeRef);
 	return methodRef;
 }

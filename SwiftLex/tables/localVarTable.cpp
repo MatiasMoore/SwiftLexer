@@ -24,6 +24,6 @@ LocalVariableElement::LocalVariableElement(int localId, std::string name, std::s
     this->name = name;
     this->_descriptor = descriptor;
     this->localId = localId;
-    this->nameIndex = constantTable->findOrAddConstant(Utf8_C, name);
-    this->descriptorIndex = constantTable->findOrAddConstant(Utf8_C, descriptor);
+    this->nameIndex = constantTable->findOrAddUTF8(name);
+    this->descriptorIndex = constantTable->findOrAddUTF8(descriptor);
 }

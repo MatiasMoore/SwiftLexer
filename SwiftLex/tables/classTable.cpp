@@ -14,9 +14,9 @@ InternalClass* ClassTable::addInternalClass(std::string name, std::string baseNa
 	auto constTable = newClass->_constTable;
 	newClass->_name = name;
 	newClass->_baseName = baseName;
-	newClass->_nameRef = constTable->findOrAddConstant(Utf8_C, name);
-	newClass->_baseRef = constTable->findOrAddConstant(Utf8_C, baseName);
-	newClass->_classRef = constTable->findOrAddConstant(Class_C, "", 0, 0, newClass->_nameRef);
+	newClass->_nameRef = constTable->findOrAddUTF8(name);
+	newClass->_baseRef = constTable->findOrAddUTF8(baseName);
+	newClass->_classRef = constTable->findOrAddClassRef(newClass->_nameRef);
 	_internalClasses[name] = newClass;
 	return newClass;
 }
@@ -40,10 +40,10 @@ InternalMethod* InternalClass::addMethod(int accessFlag, std::string name, std::
 	newMethod->_name = name;
 	newMethod->_descriptor = descriptor;
 	newMethod->_body = body;
-	newMethod->_nameRef = _constTable->findOrAddConstant(Utf8_C, name);
-	newMethod->_descriptorRef = _constTable->findOrAddConstant(Utf8_C, descriptor);
-	auto nameAndTypeRef = _constTable->findOrAddConstant(NameAndType_C, "", 0, 0, newMethod->_nameRef, newMethod->_descriptorRef);
-	newMethod->_methodRef = _constTable->findOrAddConstant(MethodRef_C, "", 0, 0, this->_classRef);
+	newMethod->_nameRef = _constTable->findOrAddUTF8(name);
+	newMethod->_descriptorRef = _constTable->findOrAddUTF8(descriptor);
+	auto nameAndTypeRef = _constTable->findOrAddNameAndType(newMethod->_nameRef, newMethod->_descriptorRef);
+	newMethod->_methodRef = _constTable->findOrAddMethodRef(newMethod->_nameRef, this->_classRef);
 	_internalMethodMap[name] = newMethod;
 	return newMethod;
 }
