@@ -19,9 +19,39 @@ enum ConstantType
 class ConstantTable
 {
 public:
-    int maxId = 1; // Текущее максимальное значение номера констант в таблице констант.
-    std::map<int, class ConstantTableItem*> constants; // Словарь - таблица констант.
     ConstantTable();
+
+    int findOrAddUTF8(std::string utf8string);
+    int findOrAddClassRef(int utf8Ref);
+    int findOrAddMethodRef(int classRef, int nameAndTypeRef);
+    int findOrAddNameAndType(int utf8Ref, int descriptorRef);
+    int findOrAddInteger(int intValue);
+    int findOrAddDouble(double doubleValue);
+    int findOrAddFieldRef(int classRef, int NameAndTypeRef);
+    int findOrAddString(int utf8Ref);
+
+    int findUTF8(std::string utf8string);
+    int findClassRef(int utf8Ref);
+    int findMethodRef(int classRef, int nameAndTypeRef);
+    int findNameAndType(int utf8Ref, int descriptorRef);
+    int findIntegerRef(int intValue);
+    int findDoubleRef(double doubleValue);
+    int findFieldRef(int classRef, int NameAndTypeRef);
+    int findStringRef(int utf8Ref);
+
+    int addUTF8(std::string utf8string);
+    int addClassRef(int utf8Ref);
+    int addMethodRef(int classRef, int nameAndTypeRef);
+    int addNameAndType(int utf8Ref, int descriptorRef);
+    int addIntegerRef(int intValue);
+    int addDoubleRef(double doubleValue);
+    int addFieldRef(int classRef, int NameAndTypeRef);
+    int addStringRef(int utf8Ref);
+
+private:
+    int maxId = 1; // Текущее максимальное значение номера констант в таблице констант.
+    
+    std::map<int, class ConstantTableItem*> constants; // Словарь - таблица констант.
 
     /*! Найти константу в таблице констант или добавить ее в таблицу, если отсутствуюет.
     * \param[in] type Тип константы.
@@ -29,8 +59,6 @@ public:
     * \return номер константы в таблице констант, если таковая имеется; номер добавленной константы, если таковой не было.
     */
     int findOrAddConstant(enum ConstantType type, std::string utf8string = NULL, int intVal = NULL, double dVal = NULL, int fRef = NULL, int sRef = NULL);
-
-private:
 
     /*! Найти константу в таблице констант.
     * \param[in] type тип константы.
@@ -42,6 +70,7 @@ private:
     */
     int findConstant(enum ConstantType type, std::string utf8string, int fRef = NULL, int secondRef = NULL, int intVal = NULL, double dVal = NULL);
 
+    int addConstant(enum ConstantType type, std::string utf8string = NULL, int intVal = NULL, double dVal = NULL, int fRef = NULL, int sRef = NULL);
 };
 
 
