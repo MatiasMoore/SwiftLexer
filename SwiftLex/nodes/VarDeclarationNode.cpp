@@ -80,14 +80,13 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, ClassTableElement* cu
 
 		if (this->_type == ValueAndTypeKnown)
 		{
-			// Check if field type is INT
-			if (this->_typeNode->_type != IntT)
-				throw std::runtime_error("Type " + std::to_string(this->_typeNode->_type) + " does not support for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\"");
-
-			// Check if assignable value is INT
-			if (this->_valueNode->_type != Int)
-				throw std::runtime_error("Value type does not support for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\"");
-
+			// Check if var type and assignable type is equal
+			auto varTypeDescriptor = this->_typeNode->toDescriptor(classTable, currentClass, currentMethod);
+			auto assignableValueType = this->_valueNode->evaluateType(classTable, currentClass, currentMethod);
+			auto assignableValueDescriptor = assignableValueType->toDescriptor(classTable, currentClass, currentMethod);
+			if (varTypeDescriptor != assignableValueDescriptor)
+				throw std::runtime_error("Variable descriptor\"" + varTypeDescriptor + "\" does not match with assignable descriptor \"" + assignableValueDescriptor + "\" for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\"");
+			
 			// Check if field is static
 			auto accessFlags = this->_modifiers->getMethodAccessFlags();
 			bool isStatic = std::find(accessFlags.begin(), accessFlags.end(), M_ACC_STATIC) != accessFlags.end();
@@ -96,13 +95,23 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, ClassTableElement* cu
 
 			// Create name for attribute
 			currentClass->constants->findOrAddConstant(Utf8_C, "ConstantValue");
+			/* Ёто плохо и ужасно. Ќадо здесь вызывать fillTable у _valueNode и туда добавить аргумент типа там forceToConstTable (по умолчанию задать false)
+			* чтобы не добавл€ть это во всех предыдущих вызовах. ¬нутри filltable когда forceToConstTable == true надо пытатьс€ записать значение в таблицу констант
+			* если это невозможно (например вызов функци) кидаешь ошибку. ≈сли возможно, то записываешь в таблицу констант и сохран€ешь номер строки в новое поле
+			* exprNode (какой-нибудь там _constTableValueRef).
+			* —оответсвенно здесь ты просто будешь делать:
+			* currentClass->addStaticField(this->_modifiers->getFieldAccessFlags(), this->_varName, this->_typeNode->toDescriptor(classTable, currentClass, currentMethod), _valueNode->_constTableValueRef)
+			* */
+			//TODO: add method to assign non constant static variables
+			this->_valueNode->fillTable(classTable, currentClass, currentMethod, true);
+			//≈сли есть желание можно на вс€кий проверить наличие этого индекса в таблице еще и тут
 
 			// Create field
-			constantValueIndex = currentClass->constants->findOrAddConstant(Integer_C, "", this->_valueNode->_intValue);
-			currentClass->addStaticField(this->_modifiers->getFieldAccessFlags(), this->_varName, this->_typeNode->toDescriptor(classTable, currentClass, currentMethod), constantValueIndex);
+			currentClass->addStaticField(this->_modifiers->getFieldAccessFlags(), this->_varName, this->_typeNode->toDescriptor(classTable, currentClass, currentMethod), _valueNode->_constTableValueRef);
 		}
 		else if (this->_type == TypeKnown)
 		{
+			/* ћаксимум можешь проверить что не dynamicT и то тут надо подумать, но лучше пока провер€ть */
 			// Check if field type is INT
 			if (this->_typeNode->_type != IntT)
 				throw std::runtime_error("Type " + std::to_string(this->_typeNode->_type) + " does not support for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\"");
@@ -113,6 +122,8 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, ClassTableElement* cu
 			if (!isStatic)
 				throw std::runtime_error("Non static field does not support for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\"");
 
+
+			/* “ут не надо никакое дефолтное значение задавать, в джаве же можно поле без значени€ иметь, если тип указан */
 			// Create name for attribute
 			currentClass->constants->findOrAddConstant(Utf8_C, "ConstantValue");
 

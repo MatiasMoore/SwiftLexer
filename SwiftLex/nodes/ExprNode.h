@@ -99,6 +99,7 @@ public:
 	FuncCallNode* _funcCall;
 
 	int _staticFieldRef;
+	int _constTableValueRef;
 
 	static ExprNode* createBool(bool value);
 
@@ -141,6 +142,8 @@ public:
 	TypeNode* evaluateType(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod);
 
 	void fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod);
+
+	void fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod, bool forceToConstTable);
 
 	std::vector<char> generateCode(class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
 };

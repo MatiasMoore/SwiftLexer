@@ -61,6 +61,7 @@ std::vector<char> generateFieldCode(class FieldElement* fieldElement, class Clas
 	appendVecToVec(res, accessFlags);
 	appendVecToVec(res, nameIndex);
 	appendVecToVec(res, descriptorIndex);
+	// Only for constants
 	appendVecToVec(res, attributesCount);
 	appendVecToVec(res, attributesBytes);
 	return res;

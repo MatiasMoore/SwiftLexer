@@ -541,15 +541,15 @@ TypeNode* ExprNode::evaluateType(ClassTable* classTable, ClassTableElement* curr
 	}
 }
 
-void ExprNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod)
+void ExprNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod, bool forceToConstTable)
 {
 	ExternalFieldTableElement* field;
 	if (currentClass == nullptr)
 		throw std::runtime_error("Expression must be associated with a class!");
-
+/*  It is class Field
 	if (currentMethod == nullptr)
 		throw std::runtime_error("Expression must be inside a method!");
-
+*/
 	switch (this->_type)
 	{
 	case ExprType::FuncCall:
@@ -557,21 +557,39 @@ void ExprNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass
 		break;
 
 	case ExprType::FieldAccess:
-
+		//TODO non static field access; for reference see ExprNode::evaluateType
 		if (this->_fieldAccessExpr->_type != Id)
 		{
 			throw std::runtime_error("Unsupported field access with left part" + std::to_string(_fieldAccessExpr->_type) + "!" + "Field access only support \"ID\" at left part! ");
 		}
 		field = currentClass->addExternalField(_fieldAccessExpr->_stringValue, this->_fieldAccessFieldName, this->evaluateType(classTable, currentClass, currentMethod)->toDescriptor(classTable, currentClass, currentMethod));
 		this->_staticFieldRef = field->_fieldRef;
+		if (forceToConstTable)
+		{
+			throw std::runtime_error("Unsupported forceToConstTable flag for FieldAccess" + this->_fieldAccessFieldName);
+		}
 		break;
 	case ExprType::Int:
+		if (forceToConstTable)
+		{
+			this->_constTableValueRef = currentClass->constants->findOrAddConstant(Integer_C, "", this->_intValue);
+		}
+		break;
 	case ExprType::Id:
+		if (forceToConstTable)
+		{
+			throw std::runtime_error("Unsupported forceToConstTable flag for id" + this->_stringValue);
+		}
 		break;
 	default:
 		throw std::runtime_error("Unsupported expr with enum type " + std::to_string(this->_type) + "!");
 		break;
 	}
+}
+
+void ExprNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod)
+{
+	this->fillTable(classTable, currentClass, currentMethod, false);
 }
 
 std::vector<char> ExprNode::generateCode(ClassTableElement* currentClass, MethodTableElement* currentMethod)

@@ -1,5 +1,5 @@
 class A
 {
-	public static var a : Int = 5
+	public static var a : Int = 10
 }
 print(A.a)
