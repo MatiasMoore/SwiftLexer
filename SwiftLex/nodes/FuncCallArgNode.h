@@ -1,6 +1,7 @@
 #pragma once
 #include "dottable.h"
 #include "GenericListNode.h"
+#include "SemanticsBase.h"
 
 class ExprNode;
 class TypeNode;
@@ -11,7 +12,7 @@ enum FuncCallArgType
 	valueAndName
 };
 
-class FuncCallArgNode : public Dottable
+class FuncCallArgNode : public Dottable, public SemanticsBase
 {
 public:
 	FuncCallArgType _type;
@@ -27,15 +28,20 @@ public:
 
 	void generateDot(std::ofstream& file) override;
 
+	SemanticsBase* semanticsTransform(SemanticsStack stack) override;
+
 	void fillTable(class ClassTable* classTable, class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
 
 	std::vector<char> generateCode(class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
 };
 
-class FuncCallArgListNode : public GenericListNode<FuncCallArgNode, FuncCallArgListNode>
+class FuncCallArgListNode : public GenericListNode<FuncCallArgNode, FuncCallArgListNode>, public SemanticsBase
 {
 	std::string getName() override;
 public:
+
+	SemanticsBase* semanticsTransform(SemanticsStack stack) override;
+
 	void fillTable(class ClassTable* classTable, class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
 
 	std::vector<char> generateCode(class ClassTableElement* currentClass, class MethodTableElement* currentMethod);

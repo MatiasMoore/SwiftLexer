@@ -31,6 +31,15 @@ void FuncCallArgNode::generateDot(std::ofstream& file)
     this->_value->generateDot(file);
 }
 
+SemanticsBase* FuncCallArgNode::semanticsTransform(SemanticsStack stack)
+{
+    stack.push(this);
+
+    this->_value = this->_value->semanticsTransform(stack)->typecast<ExprNode>();
+
+    return this;
+}
+
 void FuncCallArgNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod)
 {
     this->_value->fillTable(classTable, currentClass, currentMethod);
@@ -47,6 +56,16 @@ std::vector<char> FuncCallArgNode::generateCode(ClassTableElement* currentClass,
 std::string FuncCallArgListNode::getName()
 {
     return "FuncCallArgList";
+}
+
+SemanticsBase* FuncCallArgListNode::semanticsTransform(SemanticsStack stack)
+{
+    stack.push(this);
+    for (int i = 0; i < _vec.size(); i++)
+    {
+        _vec[i] = _vec[i]->semanticsTransform(stack)->typecast<FuncCallArgNode>();
+    }
+    return this;
 }
 
 void FuncCallArgListNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod)

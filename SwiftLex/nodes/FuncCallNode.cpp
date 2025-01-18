@@ -85,6 +85,19 @@ void FuncCallNode::generateDot(std::ofstream& file)
 	}
 }
 
+SemanticsBase* FuncCallNode::semanticsTransform(SemanticsStack stack)
+{
+	stack.push(this);
+
+	if (this->_scopeType == FuncCallScopeType::exprAccessCall)
+		this->_exprAccess = this->_exprAccess->semanticsTransform(stack)->typecast<ExprNode>();
+	
+	if (this->_hasArgs)
+		this->_funcArgs = this->_funcArgs->semanticsTransform(stack)->typecast<FuncCallArgListNode>();
+
+	return this;
+}
+
 void FuncCallNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod)
 {
 	if (currentClass == nullptr)
