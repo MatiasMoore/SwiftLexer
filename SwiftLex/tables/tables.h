@@ -11,3 +11,5 @@
 
 #include "InternalField.h"
 #include "ExternalField.h"
+
+#include "ClassTable.h"
