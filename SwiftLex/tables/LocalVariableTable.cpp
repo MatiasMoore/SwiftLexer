@@ -1,4 +1,4 @@
-#include "localVarTable.h"
+#include "LocalVariableTable.h"
 #include <stdexcept>
 
 LocalVariableElement* LocalVariableTable::addLocalVar(std::string name, std::string descriptor)

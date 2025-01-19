@@ -1,6 +1,13 @@
 #pragma once
-#include "classTable.h"
-#include "localVarTable.h"
-#include "constTable.h"
-#include "methodTable.h"
-#include "fieldTable.h"
+
+#include "ConstantTable.h"
+#include "LocalVariableTable.h"
+
+#include "InternalClass.h"
+#include "ExternalClass.h"
+
+#include "InternalMethod.h"
+#include "ExternalMethod.h"
+
+#include "InternalField.h"
+#include "ExternalField.h"

@@ -1,4 +1,4 @@
-#include "constTable.h"
+#include "ConstantTable.h"
 #include "../ExceptionHelper.h"
 /* --------------------------- Таблица констант ---------------------------------- */
 

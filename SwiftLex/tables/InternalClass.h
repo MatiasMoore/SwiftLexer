@@ -1,48 +1,9 @@
 #pragma once
 #include <string>
 #include <map>
-#include "methodTable.h"
-#include "fieldTable.h"
-
-class ExternalClass
-{
-public:
-	ExternalClass(std::string name, std::string baseName);
-
-	/*!
-	* \brief Add an EXTERNAL method (this method does not write anything to the constant table) 
-	* \return ExternalMethod - The ExternalMethod method created
-	*/
-	virtual ExternalMethod* addMethod(std::string methodName, std::string descriptor, std::vector<MethodAccessFlag> flags);
-	
-	/*!
-	* \brief find an External method in map
-	* \return ExternalMethod - The ExternalMethod method
-	*/
-	ExternalMethod* findMethod(std::string name);
-
-	/*!
-	* \brief Add an EXTERNAL field (this method does not write anything to the constant table)
-	* \return ExternalField - The ExternalField method created
-	*/
-	virtual ExternalField* addField(std::string varName, std::string descriptor, std::vector<FieldAccessFlag> flags, ExprNode* constValue = nullptr);
-	
-	/*!
-	* \brief find an External field in map
-	* \return ExternalField - The ExternalField field
-	*/
-	ExternalField* findField(std::string varName);
-
-	std::string getClassName();
-	std::string getBaseClassName();
-
-protected:
-	std::string _name;
-	std::string _baseName;
-
-	std::map<std::string, class ExternalMethod*> _methodMap = {};
-	std::map<std::string, class ExternalField*> _fieldMap = {};
-};
+#include "InternalField.h"
+#include "InternalMethod.h"
+#include "ExternalClass.h"
 
 class InternalClass : public ExternalClass
 {
@@ -56,12 +17,9 @@ public:
 	*/
 	InternalMethod* addInternalMethodToConstantTable(std::string methodName, std::string descriptor, std::vector<MethodAccessFlag> flags, StmtListNode* body);
 	
-	/*!
-	* \brief Add an external class (not this class) method to the constant table
-	* \param ExternalMethod - The external method from another class to add
-	* \return InternalMethod - The internal method created
-	*/
-	int findOrAddExternalClassMethod(ExternalMethod* externalMethod);
+	int getMethodRefForExternalMethod(ExternalMethod* externalMethod);
+
+	int getFieldRefForExternalField(ExternalField* externalField);
 
 	/*!
 	* \brief Search for this class methods

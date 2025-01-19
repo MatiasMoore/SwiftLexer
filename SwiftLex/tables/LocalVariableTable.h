@@ -1,7 +1,7 @@
 #pragma once
 #include <map>
 #include <string>
-#include "constTable.h"
+#include "ConstantTable.h"
 
 /*! \brief Таблица локальных переменных. */
 class LocalVariableTable

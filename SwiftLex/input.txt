@@ -1,5 +1,1 @@
-class A
-{
-	public static var a : Int = 10
-}
-print(A.a)
+print(1)

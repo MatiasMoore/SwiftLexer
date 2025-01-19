@@ -2,6 +2,7 @@
 #include "FuncCallArgNode.h"
 #include "ExprNode.h"
 #include "../generation/generationHelpers.h"
+#include "../ExceptionHelper.h"
 
 FuncCallNode* FuncCallNode::createFuncCall(std::string funcName, FuncCallArgListNode* funcArgs)
 {
@@ -143,11 +144,12 @@ void FuncCallNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 
 		if (this->_funcName == "print")
 		{
-			this->_methodRef = classTable->findMethod("print", "(I)V", "InputOutput")->addMethodRefToConstTable(currentClass->getConstTable());
+			auto method = classTable->findMethod("print", "(I)V", "InputOutput");
+			this->_methodRef = currentClass->getMethodRefForExternalMethod(method);
 		}
 		else
 		{
-			this->_methodRef = currentClass->findMethod(this->_funcName)->addMethodRefToConstTable(currentClass->getConstTable());
+			throw std::runtime_error("Implement me!" + LINE_AND_FILE);
 		}
 
 

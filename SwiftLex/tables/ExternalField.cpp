@@ -1,4 +1,4 @@
-#include "fieldTable.h"
+#include "ExternalField.h"
 #include "../ExceptionHelper.h"
 
 ExternalField::ExternalField(std::string varName, std::string descriptor, std::string className, std::vector<FieldAccessFlag> flags, ExprNode* constValue)
@@ -10,9 +10,17 @@ ExternalField::ExternalField(std::string varName, std::string descriptor, std::s
 	this->_constValue = constValue;
 }
 
+int ExternalField::findOrAddFieldRef(ConstantTable* constTable)
+{
+	if (this->findFieldRef(constTable) == -1)
+		return this->addFieldRefToConstTable(constTable);
+	else
+		return this->findFieldRef(constTable);
+}
+
 int ExternalField::addFieldRefToConstTable(ConstantTable* constTable)
 {
-	if (this->findFieldRef(constTable) != -1 )
+	if (this->findFieldRef(constTable) != -1)
 		throw std::runtime_error("Equal field with name " + this->_varName + " and descriptor " + this->_descriptor + " already exists in this class!" + LINE_AND_FILE);
 
 	int varNameRef = constTable->addUTF8(this->_varName);
@@ -64,32 +72,11 @@ ExprNode* ExternalField::getConstValue()
 	return _constValue;
 }
 
+ExternalField::~ExternalField()
+{
+}
+
 std::string ExternalField::getDescriptor()
 {
 	return this->_descriptor;
-}
-
-InternalField::InternalField(ConstantTable* constantTable, std::string varName, std::string descriptor, std::string className, std::vector<FieldAccessFlag> flags, ExprNode* constValue) : ExternalField(varName, descriptor, className, flags, constValue)
-{
-	this->_fieldRef = this->addFieldRefToConstTable(constantTable);
-	this->_nameRef = constantTable->findUTF8(varName);
-	this->_descriptorRef = constantTable->findUTF8(descriptor);
-	this->_classRef = constantTable->findUTF8(className);
-	this->_nameAndTypeRef = constantTable->findNameAndType(this->_nameRef, this->_descriptorRef);
-	this->_flags = flags;
-}
-
-int InternalField::accessFlagsToInt(std::vector<FieldAccessFlag> flags)
-{
-	int accessFlag = 0;
-	for (auto& flag : flags)
-	{
-		accessFlag += (int)flag;
-	}
-	return accessFlag;
-}
-
-bool InternalField::isStatic()
-{
-	return std::find(this->_flags.begin(), this->_flags.end(), F_ACC_STATIC) != this->_flags.end();
 }
