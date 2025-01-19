@@ -144,7 +144,7 @@ InternalMethod* InternalClass::findExternalClassMethod(std::string methodName, s
 	return nullptr;
 }
 
-InternalField* InternalClass::addInternalField(std::string varName, std::string descriptor, std::vector<FieldAccessFlag> flags, ExprNode* constValue)
+InternalField* InternalClass::addInternalFieldToConstantTable(std::string varName, std::string descriptor, std::vector<FieldAccessFlag> flags, ExprNode* constValue)
 {
 	auto newField = new InternalField(this->_constTable, varName, descriptor, this->_name, flags, constValue);
 

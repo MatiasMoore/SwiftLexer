@@ -85,7 +85,7 @@ public:
 	* \brief Add this class field to the constant table
 	* \return InternalField - The internal field created
 	*/
-	InternalField* addInternalField(std::string varName, std::string descriptor, std::vector<FieldAccessFlag> flags, ExprNode* constValue = nullptr);
+	InternalField* addInternalFieldToConstantTable(std::string varName, std::string descriptor, std::vector<FieldAccessFlag> flags, ExprNode* constValue = nullptr);
 	
 	/*!
 	* \brief Add an external class (not this class) field to the constant table
