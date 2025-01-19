@@ -92,7 +92,7 @@ InternalClass::InternalClass(std::string name, std::string baseName) : ExternalC
 	_classRef = _constTable->findOrAddClassRef(_nameRef);
 }
 
-InternalMethod* InternalClass::addInternalMethod(std::string methodName, std::string descriptor, std::vector<MethodAccessFlag> flags, StmtListNode* body, LocalVariableTable* varTable)
+InternalMethod* InternalClass::addInternalMethodToConstantTable(std::string methodName, std::string descriptor, std::vector<MethodAccessFlag> flags, StmtListNode* body, LocalVariableTable* varTable)
 {
 	auto newMethod = new InternalMethod(_constTable, body, methodName, descriptor, getClassName(), flags, varTable);
 
