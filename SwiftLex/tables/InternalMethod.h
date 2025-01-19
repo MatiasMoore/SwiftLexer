@@ -11,7 +11,6 @@ class InternalMethod : public ExternalMethod
 public:
     InternalMethod(ConstantTable* constTable, StmtListNode* body, std::string methodName, std::string descriptor, std::string className, std::vector<MethodAccessFlag> flags);
     
-    int accessFlagsToInt(std::vector<MethodAccessFlag> flags);
     bool isStatic();
     class LocalVariableTable* getVarTable();
 

@@ -37,7 +37,7 @@ std::vector<char> generateFieldCode(InternalField* fieldElement, InternalClass* 
 
 	std::vector<char> res;
 	//FIXME
-	std::vector<char> accessFlags = intToByteVector(fieldElement->accessFlagsToInt(fieldElement->_flags), 2);
+	std::vector<char> accessFlags = intToByteVector(fieldElement->accessFlagsToInt(), 2);
 	
 
 	std::vector<char> nameIndex = intToByteVector(fieldElement->_nameRef, 2);
@@ -170,7 +170,7 @@ std::vector<char> generateMethodCode(InternalMethod* mElem, InternalClass* cElem
 {
 	std::vector<char> res;
 
-	std::vector<char> accessFlag = intToByteVector(mElem->accessFlagsToInt(mElem->getFlags()), 2);
+	std::vector<char> accessFlag = intToByteVector(mElem->accessFlagsToInt(), 2);
 	appendVecToVec(res, accessFlag);
 
 	//Добавление имени метода

@@ -12,7 +12,7 @@ class InternalField : public ExternalField
 public:
     InternalField(ConstantTable* constantTable, std::string varName, std::string descriptor, std::string className, std::vector<FieldAccessFlag> flags, ExprNode* constValue = nullptr);
     
-    int accessFlagsToInt(std::vector<FieldAccessFlag> flags);
+    int accessFlagsToInt();
 
     bool isStatic();
 
@@ -21,6 +21,7 @@ public:
     int _descriptorRef;
     int _classRef;
     int _nameAndTypeRef;
+private:
     std::vector<FieldAccessFlag> _flags;
 
 };

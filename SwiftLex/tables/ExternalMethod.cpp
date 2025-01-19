@@ -71,6 +71,16 @@ std::vector<MethodAccessFlag> ExternalMethod::getFlags()
 	return _flags;
 }
 
+int ExternalMethod::accessFlagsToInt()
+{
+	int accessFlag = 0;
+	for (auto& flag : this->_flags)
+	{
+		accessFlag += (int)flag;
+	}
+	return accessFlag;
+}
+
 ExternalMethod::~ExternalMethod()
 {
 }

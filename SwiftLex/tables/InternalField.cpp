@@ -11,10 +11,10 @@ InternalField::InternalField(ConstantTable* constantTable, std::string varName, 
 	this->_flags = flags;
 }
 
-int InternalField::accessFlagsToInt(std::vector<FieldAccessFlag> flags)
+int InternalField::accessFlagsToInt()
 {
 	int accessFlag = 0;
-	for (auto& flag : flags)
+	for (auto& flag : this->_flags)
 	{
 		accessFlag += (int)flag;
 	}

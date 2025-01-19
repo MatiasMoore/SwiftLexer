@@ -13,6 +13,7 @@ public:
     std::string getDescriptor();
     std::string getClassName();
     std::vector<MethodAccessFlag> getFlags();
+    int accessFlagsToInt();
 
     virtual ~ExternalMethod();
 
