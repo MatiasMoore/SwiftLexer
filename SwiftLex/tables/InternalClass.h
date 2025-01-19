@@ -25,7 +25,7 @@ public:
 	* \brief Search for this class methods
 	* \return InternalMethod - The internal method
 	*/
-	InternalMethod* findInternalMethod(std::string methodName);
+	InternalMethod* findInternalMethod(std::string methodName, std::string descriptor);
 	
 	/*!
 	* \brief Search for this class fields

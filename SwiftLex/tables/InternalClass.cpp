@@ -32,9 +32,11 @@ int InternalClass::getFieldRefForExternalField(ExternalField* externalField)
 	return externalField->addFieldRefToConstTable(_constTable);
 }
 
-InternalMethod* InternalClass::findInternalMethod(std::string methodName)
+InternalMethod* InternalClass::findInternalMethod(std::string methodName, std::string descriptor)
 {
 	if (this->_methodMap.count(methodName) == 0)
+		return nullptr;
+	if (this->_methodMap[methodName]->getDescriptor() != descriptor)
 		return nullptr;
 	return dynamic_cast<InternalMethod*>(this->_methodMap[methodName]);
 }

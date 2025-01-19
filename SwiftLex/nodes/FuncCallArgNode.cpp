@@ -76,6 +76,16 @@ void FuncCallArgListNode::fillTable(ClassTable* classTable, InternalClass* curre
     }
 }
 
+std::vector<TypeNode*> FuncCallArgListNode::getArgsTypes()
+{
+    std::vector<TypeNode*> argsTypes = {};
+    for (auto& elem : _vec)
+	{
+		argsTypes.push_back(elem->_argType);
+	}
+    return argsTypes;
+}
+
 std::vector<char> FuncCallArgListNode::generateCode(InternalClass* currentClass, InternalMethod* currentMethod)
 {
     std::vector<char> code = {};

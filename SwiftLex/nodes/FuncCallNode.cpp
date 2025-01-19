@@ -107,6 +107,16 @@ void FuncCallNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 	if (currentMethod == nullptr)
 		throw std::runtime_error("Function call must be inside a method!");
 
+	std::string funcCallDescriptor = "(";
+	if (this->_hasArgs) {
+		this->_funcArgs->fillTable(classTable, currentClass, currentMethod);
+		for (auto arg : this->_funcArgs->getArgsTypes())
+		{
+			funcCallDescriptor += arg->toDescriptor(classTable, currentClass, currentMethod);
+		}
+	}
+	funcCallDescriptor += ")";
+	funcCallDescriptor += "V"; // How can i get return type????
 
 	//FIXME IN SEMANTICS
 	if (this->_funcName == "print")
@@ -119,10 +129,10 @@ void FuncCallNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 	{
 		if (this->_scopeType == normalCall)
 		{
-			auto methodInThisClass = currentClass->findInternalMethod(this->_funcName);
+			auto methodInThisClass = currentClass->findInternalMethod(this->_funcName, funcCallDescriptor);
 
 			if (methodInThisClass == nullptr)
-				throw std::runtime_error("Method \"" + this->_funcName + "\" is not defined in class \"" + currentClass->getClassName() + "\"" + LINE_AND_FILE);
+				throw std::runtime_error("Method \"" + this->_funcName + "\" with descriptor\"" + funcCallDescriptor + "\" is not defined in class \"" + currentClass->getClassName() + "\"" + LINE_AND_FILE);
 
 			this->_methodRef = methodInThisClass->_methodRef;
 			this->_methodFlags = methodInThisClass->getFlags();
@@ -140,9 +150,9 @@ void FuncCallNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 			if (classElem == nullptr)
 				throw std::runtime_error("Critical error! Class \"" + className + "\" is not found!" + LINE_AND_FILE);
 
-			auto method = classElem->findMethod(this->_funcName);
+			auto method = classElem->findMethod(this->_funcName, funcCallDescriptor);
 			if (method == nullptr)
-				throw std::runtime_error("Method \"" + this->_funcName + "\" is not defined in class \"" + className + "\"!" + LINE_AND_FILE);
+				throw std::runtime_error("Method \"" + this->_funcName + "\" with descriptor\"" + funcCallDescriptor + "\" is not defined in class \"" + className + "\"!" + LINE_AND_FILE);
 
 			bool isCallStatic = this->_exprAccess->_type == ExprType::Id && classTable->findClass(this->_exprAccess->_stringValue) != nullptr;
 			if (!isCallStatic)
@@ -156,12 +166,7 @@ void FuncCallNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 		{
 			throw std::runtime_error("Unsupported function call type!" + LINE_AND_FILE);
 		}
-	}
-
-	if (this->_hasArgs) {
-		this->_funcArgs->fillTable(classTable, currentClass, currentMethod);
-	}
-	
+	}	
 }
 
 std::vector<char> FuncCallNode::generateCode(InternalClass* currentClass, InternalMethod* currentMethod)

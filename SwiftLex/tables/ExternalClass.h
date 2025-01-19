@@ -18,7 +18,7 @@ public:
 	* \brief find an External method in map
 	* \return ExternalMethod - The ExternalMethod method
 	*/
-	ExternalMethod* findMethod(std::string name);
+	ExternalMethod* findMethod(std::string name, std::string descriptor);
 
 	/*!
 	* \brief Add an EXTERNAL field (this method does not write anything to the constant table)

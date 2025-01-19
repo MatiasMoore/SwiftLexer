@@ -45,5 +45,7 @@ public:
 
 	void fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
 
+	std::vector<TypeNode*> getArgsTypes();
+
 	std::vector<char> generateCode(InternalClass* currentClass, InternalMethod* currentMethod);
 };

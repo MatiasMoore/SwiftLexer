@@ -17,9 +17,11 @@ ExternalMethod* ExternalClass::addMethod(std::string methodName, std::string des
 	return newMethod;
 }
 
-ExternalMethod* ExternalClass::findMethod(std::string name)
+ExternalMethod* ExternalClass::findMethod(std::string name, std::string descriptor)
 {
 	if (this->_methodMap.count(name) == 0)
+		return nullptr;
+	if (this->_methodMap[name]->getDescriptor() != descriptor)
 		return nullptr;
 	return this->_methodMap[name];
 }

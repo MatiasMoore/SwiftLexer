@@ -18,8 +18,8 @@ ExternalMethod* ClassTable::findMethod(std::string name, std::string descriptor,
 	auto myClass = this->findClass(className);
 	if (myClass != nullptr)
 	{
-		auto externalMethod = myClass->findMethod(name);
-		if (externalMethod != nullptr && externalMethod->getDescriptor() == descriptor)
+		auto externalMethod = myClass->findMethod(name, descriptor);
+		if (externalMethod != nullptr)
 			return externalMethod;
 	}
 	return nullptr;
