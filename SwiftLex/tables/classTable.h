@@ -5,16 +5,17 @@
 #include "methodTable.h"
 #include "../ExceptionHelper.h"
 #include "fieldTable.h"
+#include "../tables/localVarTable.h"
 
 class ExternalClass
 {
 public:
 	ExternalClass(std::string name, std::string baseName);
 
-	virtual ExternalMethod* addMethod(std::string name, std::string descriptor);
+	virtual ExternalMethod* addMethod(std::string methodName, std::string descriptor, std::vector<MethodAccessFlag> flags, LocalVariableTable* varTable);
+	ExternalMethod* findMethod(std::string name);
 
-	virtual ExternalField* addField(std::string varName, std::string descriptor, std::string className, std::vector<FieldAccessFlag> flags, ExprNode* constValue = nullptr);
-
+	virtual ExternalField* addField(std::string varName, std::string descriptor, std::vector<FieldAccessFlag> flags, ExprNode* constValue = nullptr);
 	ExternalField* findField(std::string varName);
 
 	std::string getClassName();
@@ -36,8 +37,14 @@ public:
     std::vector<class InternalMethod*> _externalClassMethodMap = {};
 	std::vector<class InternalField*> _externalClassFieldMap = {};
 
-	InternalMethod* addMethod(int accessFlag, std::string name, std::string descriptor, class StmtListNode* body);
+	// Methods
+	InternalMethod* addInternalMethod(std::string methodName, std::string descriptor, std::vector<MethodAccessFlag> flags, StmtListNode* body, LocalVariableTable* varTable);
+	InternalMethod* addExternalClassMethodToConstantTable(ExternalMethod* externalMethod);
+
+	InternalMethod* findInternalMethod(std::string methodName);
+	InternalMethod* findExternalClassMethod(std::string methodName, std::string className);
 	
+	// Fields
 	InternalField* addInternalField(std::string varName, std::string descriptor, std::vector<FieldAccessFlag> flags, ExprNode* constValue = nullptr);
 	InternalField* addExternalClassFieldToConstantTable(ExternalField* externalField);
 
@@ -58,6 +65,7 @@ public:
 	std::map<std::string, ExternalClass*> _classes = {};
 
 	ExternalField* findField(std::string name, std::string descriptor, std::string className);
+	ExternalMethod* findMethod(std::string name, std::string descriptor, std::string className);
 
 	InternalClass* addInternalClass(std::string name, std::string baseName);
 	ExternalClass* addExternalClass(std::string name, std::string baseName);
@@ -68,6 +76,5 @@ public:
 
 	std::vector<InternalClass*> getInternalClasses();
 	
-	// myclass.addToConstanTable(findClass(className).findField(name, descriptor))
 };
 

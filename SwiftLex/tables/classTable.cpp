@@ -13,6 +13,18 @@ ExternalField* ClassTable::findField(std::string name, std::string descriptor, s
 	return nullptr;
 }
 
+ExternalMethod* ClassTable::findMethod(std::string name, std::string descriptor, std::string className)
+{
+	auto myClass = this->findClass(className);
+	if (myClass != nullptr)
+	{
+		auto externalMethod = myClass->findMethod(name);
+		if (externalMethod != nullptr && externalMethod->getDescriptor() == descriptor)
+			return externalMethod;
+	}
+	return nullptr;
+}
+
 ExternalClass* ClassTable::findClass(std::string name)
 {
 	if (this->_classes.count(name) == 0)
@@ -80,19 +92,56 @@ InternalClass::InternalClass(std::string name, std::string baseName) : ExternalC
 	_classRef = _constTable->findOrAddClassRef(_nameRef);
 }
 
-InternalMethod* InternalClass::addMethod(int accessFlag, std::string name, std::string descriptor, class StmtListNode* body)
+InternalMethod* InternalClass::addInternalMethod(std::string methodName, std::string descriptor, std::vector<MethodAccessFlag> flags, StmtListNode* body, LocalVariableTable* varTable)
 {
-	auto newMethod = new InternalMethod();
-	newMethod->accessFlag = accessFlag;
-	newMethod->_name = name;
-	newMethod->_descriptor = descriptor;
-	newMethod->_body = body;
-	newMethod->_nameRef = _constTable->findOrAddUTF8(name);
-	newMethod->_descriptorRef = _constTable->findOrAddUTF8(descriptor);
-	auto nameAndTypeRef = _constTable->findOrAddNameAndType(newMethod->_nameRef, newMethod->_descriptorRef);
-	newMethod->_methodRef = _constTable->findOrAddMethodRef(newMethod->_nameRef, this->_classRef);
-	_methodMap[name] = newMethod;
+	auto newMethod = new InternalMethod(_constTable, body, methodName, descriptor, getClassName(), flags, varTable);
+
+	if (this->_methodMap.count(methodName) != 0)
+		throw std::runtime_error("Method " + methodName + " already exists in class " + getClassName() + LINE_AND_FILE);
+
+	this->_methodMap[methodName] = newMethod;
+
 	return newMethod;
+}
+
+InternalMethod* InternalClass::addExternalClassMethodToConstantTable(ExternalMethod* externalMethod)
+{
+	std::string methodName = externalMethod->getMethodName();
+	std::string className = externalMethod->getClassName();
+
+	if (findExternalClassMethod(methodName, className) != nullptr)
+		throw std::runtime_error("Method " + methodName + " already exists in class " + getClassName() + LINE_AND_FILE);
+
+	auto internalMethod = new InternalMethod(
+		_constTable, 
+		nullptr, 
+		externalMethod->getMethodName(), 
+		externalMethod->getDescriptor(), 
+		externalMethod->getClassName(), 
+		externalMethod->getFlags(), 
+		externalMethod->getVarTable()
+	);
+
+	_externalClassMethodMap.push_back(internalMethod);
+
+	return internalMethod;
+}
+
+InternalMethod* InternalClass::findInternalMethod(std::string methodName)
+{
+	if (this->_methodMap.count(methodName) == 0)
+		return nullptr;
+	return dynamic_cast<InternalMethod*>(this->_methodMap[methodName]);
+}
+
+InternalMethod* InternalClass::findExternalClassMethod(std::string methodName, std::string className)
+{
+	for (auto& externalField : this->_externalClassMethodMap)
+	{
+		if (externalField->getMethodName() == methodName && externalField->getClassName() == className)
+			return externalField;
+	}
+	return nullptr;
 }
 
 InternalField* InternalClass::addInternalField(std::string varName, std::string descriptor, std::vector<FieldAccessFlag> flags, ExprNode* constValue)
@@ -141,24 +190,32 @@ InternalField* InternalClass::findExternalClassField(std::string varName, std::s
 		if (externalField->getVarName() == varName && externalField->getClassName() == className)
 			return externalField;
 	}
+	return nullptr;
 }
 
-ExternalMethod* ExternalClass::addMethod(std::string name, std::string descriptor)
+ExternalMethod* ExternalClass::addMethod(std::string methodName, std::string descriptor, std::vector<MethodAccessFlag> flags, LocalVariableTable* varTable)
 {
-	auto newMethod = new ExternalMethod();
-	newMethod->_class = this;
-	newMethod->_name = name;
-	newMethod->_descriptor = descriptor;
-
+	if (this->_methodMap.count(methodName) != 0)
+		throw std::runtime_error("Method " + methodName + " already exists in class " + this->_name + LINE_AND_FILE);
+	
+	auto newMethod = new ExternalMethod(methodName, descriptor, getClassName(), flags, varTable);
+	this->_methodMap[methodName] = newMethod;
 	return newMethod;
 }
 
-ExternalField* ExternalClass::addField(std::string varName, std::string descriptor, std::string className, std::vector<FieldAccessFlag> flags, ExprNode* constValue)
+ExternalMethod* ExternalClass::findMethod(std::string name)
+{
+	if (this->_methodMap.count(name) == 0)
+		return nullptr;
+	return this->_methodMap[name];
+}
+
+ExternalField* ExternalClass::addField(std::string varName, std::string descriptor, std::vector<FieldAccessFlag> flags, ExprNode* constValue)
 {
 	if (this->_fieldMap.count(varName) != 0)
 		throw std::runtime_error("Field " + varName + " already exists in class " + this->_name + LINE_AND_FILE);
 
-	auto newField = new ExternalField(varName, descriptor, this->_name, flags, constValue);
+	auto newField = new ExternalField(varName, descriptor, getClassName(), flags, constValue);
 	this->_fieldMap[varName] = newField;
 	return newField;
 }
