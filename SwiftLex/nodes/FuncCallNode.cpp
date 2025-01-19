@@ -3,6 +3,7 @@
 #include "ExprNode.h"
 #include "../generation/generationHelpers.h"
 #include "../ExceptionHelper.h"
+#include "TypeNode.h"
 
 FuncCallNode* FuncCallNode::createFuncCall(std::string funcName, FuncCallArgListNode* funcArgs)
 {
@@ -106,62 +107,59 @@ void FuncCallNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 	if (currentMethod == nullptr)
 		throw std::runtime_error("Function call must be inside a method!");
 
-	if (this->_scopeType == normalCall)
-	{	
-		/*
-		bool isInternal = currentClass->findInternalMethod(this->_funcName) != nullptr;
 
-		//this node should know class type of method
-		//bool isExternal = currentClass->externalMethods->methods.count(this->_funcName) != 0;
-		bool isExternal = currentClass->findOrAddInternalMethod(classTable->findClass(classname)->findMethod())
-
-		if (isInternal)
-		{
-			this->_methodRef = currentClass->findInternalMethod(this->_funcName)->_methodRef;
-		}
-		else if (isExternal)
-		{
-			throw std::runtime_error("Unsupported external method call" + LINE_AND_FILE);
-			//auto externalMethod = currentClass->externalMethods->methods[this->_funcName];
-			//this->_methodRef = externalMethod->_methodRef;
-		}
-		else
-		{
-			throw std::runtime_error("Method \"" + this->_funcName + "\" is not found in the method table!");
-		}
-		*/
-
-		//TODO add arg type checking
-		/*
-		std::string funcDesc = "(";
-		for (auto& callArg : this->_funcArgs->_vec)
-		{
-			callArg->fillTable(classTable, currentClass, currentMethod);
-			funcDesc += descriptorForType(callArg->_argType);
-		}
-		funcDesc += ")";
-		*/
-
-		if (this->_funcName == "print")
-		{
-			auto method = classTable->findMethod("print", "(I)V", "InputOutput");
-			this->_methodRef = currentClass->getMethodRefForExternalMethod(method);
-		}
-		else
-		{
-			throw std::runtime_error("Implement me!" + LINE_AND_FILE);
-		}
-
-
-		if (this->_hasArgs) {
-			this->_funcArgs->fillTable(classTable, currentClass, currentMethod);
-		}
-
-		
+	//FIXME IN SEMANTICS
+	if (this->_funcName == "print")
+	{
+		auto method = classTable->findMethod("print", "(I)V", "InputOutput");
+		this->_methodRef = currentClass->getMethodRefForExternalMethod(method);
+		this->_methodFlags = { MethodAccessFlag::M_ACC_STATIC, MethodAccessFlag::M_ACC_PUBLIC };
 	}
 	else
 	{
-		throw std::runtime_error("Unsupported function call scope with enum type " + std::to_string(this->_scopeType) + "!");
+		if (this->_scopeType == normalCall)
+		{
+			auto methodInThisClass = currentClass->findInternalMethod(this->_funcName);
+
+			if (methodInThisClass == nullptr)
+				throw std::runtime_error("Method \"" + this->_funcName + "\" is not defined in class \"" + currentClass->getClassName() + "\"" + LINE_AND_FILE);
+
+			this->_methodRef = methodInThisClass->_methodRef;
+			this->_methodFlags = methodInThisClass->getFlags();
+			this->_isConstructor = false;
+		}
+		else if (this->_scopeType == exprAccessCall)
+		{
+			auto leftDesc = this->_exprAccess->evaluateType(classTable, currentClass, currentMethod)->toDescriptor(classTable, currentClass, currentMethod);
+			if (leftDesc[0] != 'L')
+				throw std::runtime_error("Primitive types don't have methods!" + LINE_AND_FILE);
+
+			auto className = classnameFromDescriptor(leftDesc);
+
+			auto classElem = classTable->findClass(className);
+			if (classElem == nullptr)
+				throw std::runtime_error("Critical error! Class \"" + className + "\" is not found!" + LINE_AND_FILE);
+
+			auto method = classElem->findMethod(this->_funcName);
+			if (method == nullptr)
+				throw std::runtime_error("Method \"" + this->_funcName + "\" is not defined in class \"" + className + "\"!" + LINE_AND_FILE);
+
+			bool isCallStatic = this->_exprAccess->_type == ExprType::Id && classTable->findClass(this->_exprAccess->_stringValue) != nullptr;
+			if (!isCallStatic)
+				throw std::runtime_error("Non-static calls are not supported!" + LINE_AND_FILE);
+
+			this->_methodRef = currentClass->getMethodRefForExternalMethod(method);
+			this->_methodFlags = method->getFlags();
+			this->_isConstructor = false;
+		}
+		else
+		{
+			throw std::runtime_error("Unsupported function call type!" + LINE_AND_FILE);
+		}
+	}
+
+	if (this->_hasArgs) {
+		this->_funcArgs->fillTable(classTable, currentClass, currentMethod);
 	}
 	
 }
@@ -169,18 +167,26 @@ void FuncCallNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 std::vector<char> FuncCallNode::generateCode(InternalClass* currentClass, InternalMethod* currentMethod)
 {
 	std::vector<char> code = {};
-	if (this->_scopeType == normalCall)
+	if (this->_isConstructor)
 	{
-		// appendVecToVec(code, jvm::aload(0));
-		// Static call
-		if (this->_hasArgs) {
-			appendVecToVec(code, this->_funcArgs->generateCode(currentClass, currentMethod));
-		}
-		appendVecToVec(code, jvm::invokestatic(this->_methodRef));
+		throw std::runtime_error("Constructor calls are not supported!" + LINE_AND_FILE);
 	}
 	else
 	{
-		throw std::runtime_error("Can't generate code for function call \"" + this->_funcName + "\" of enum type " + std::to_string(this->_scopeType) + "!");
+		//FIXME
+		bool isStatic = std::set<MethodAccessFlag>(this->_methodFlags.begin(), this->_methodFlags.end()).count(MethodAccessFlag::M_ACC_STATIC) != 0;
+		if (isStatic)
+		{
+			if (this->_hasArgs) {
+				appendVecToVec(code, this->_funcArgs->generateCode(currentClass, currentMethod));
+			}
+			appendVecToVec(code, jvm::invokestatic(this->_methodRef));
+		}
+		else
+		{
+			throw std::runtime_error("Non-static calls are not supported!" + LINE_AND_FILE);
+		}
 	}
+	
 	return code;
 }

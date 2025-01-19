@@ -3,6 +3,7 @@
 #include <vector>
 #include "SemanticsBase.h"
 #include "../tables/tables.h"
+#include <set>
 
 class FuncCallArgListNode;
 class ExprNode;
@@ -27,6 +28,8 @@ public:
 	ExprNode* _exprAccess;
 
 	int _methodRef = -1;
+	std::vector<MethodAccessFlag> _methodFlags = {};
+	bool _isConstructor = false;
 
 	static FuncCallNode* createFuncCall(std::string funcName, FuncCallArgListNode* funcArgs);
 

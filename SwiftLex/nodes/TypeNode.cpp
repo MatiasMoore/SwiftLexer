@@ -1,4 +1,6 @@
 #include "TypeNode.h"
+#include "ExprNode.h"
+#include "../ExceptionHelper.h"
 
 TypeNode* TypeNode::createType(TypeType type)
 {
@@ -150,8 +152,11 @@ std::string TypeNode::toDescriptor(ClassTable* classTable, InternalClass* curren
 		desc += "["; // JVM descriptor for array
 		desc += this->_arrayType->toDescriptor(classTable, currentClass, currentMethod);
 		break;
+	case DynamicT:
+		desc += this->_exprForDynamicT->evaluateType(classTable, currentClass, currentMethod)->toDescriptor(classTable, currentClass, currentMethod);
+		break;
 	default:
-		throw std::runtime_error("Unsupported type for descriptor!");
+		throw std::runtime_error("Unsupported type for descriptor!" + LINE_AND_FILE);
 		break;
 	}
 

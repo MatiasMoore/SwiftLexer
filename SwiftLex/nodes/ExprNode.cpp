@@ -492,6 +492,24 @@ TypeNode* ExprNode::evaluateType(ClassTable* classTable, InternalClass* currentC
 	{
 		return TypeNode::createType(TypeType::IntT);
 	}
+	else if (this->_type == ExprType::Id)
+	{
+		auto localVar = currentMethod->getVarTable()->findLocalVar(this->_stringValue);
+		bool isLocalVar = localVar != nullptr;
+		if (isLocalVar)
+		{
+			return TypeNode::createFromDescriptor(localVar->_descriptor);
+		}
+		else
+		{
+			auto classElem = classTable->findClass(this->_stringValue);
+			bool isClass = classElem != nullptr;
+			if (!isClass)
+				throw std::runtime_error("Unknown identifier \"" + this->_stringValue + "\"!" + LINE_AND_FILE);
+
+			return TypeNode::createIdType(this->_stringValue);
+		}
+	}
 	else if (this->_type == ExprType::FieldAccess)
 	{
 		throw std::runtime_error("Unsupported" + LINE_AND_FILE);

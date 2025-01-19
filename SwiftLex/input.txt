@@ -1,1 +1,18 @@
-print(1)
+class Test2
+{
+	static public func testFunc()
+	{
+		print(2)
+	}
+}
+
+class Test
+{
+	static public func testFunc(i : Int)
+	{
+		print(i)
+		Test2.testFunc()
+	}
+}
+var Test = 5
+Test.testFunc(2)
