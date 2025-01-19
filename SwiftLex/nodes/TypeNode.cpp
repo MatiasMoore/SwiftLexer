@@ -122,7 +122,7 @@ void TypeNode::generateDot(std::ofstream& file)
 	}
 }
 
-std::string TypeNode::toDescriptor(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod)
+std::string TypeNode::toDescriptor(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
 {
 	std::string desc = "";
 	switch (this->_type)

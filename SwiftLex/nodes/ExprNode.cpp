@@ -481,7 +481,7 @@ SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 	return this;
 }
 
-TypeNode* ExprNode::evaluateType(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod)
+TypeNode* ExprNode::evaluateType(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
 {
 	if (this->_type == ExprType::String)
 	{
@@ -493,16 +493,12 @@ TypeNode* ExprNode::evaluateType(ClassTable* classTable, ClassTableElement* curr
 	}
 	else if (this->_type == ExprType::FieldAccess)
 	{
-
+		throw std::runtime_error("Unsupported" + LINE_AND_FILE);
+		
 		/*
-		class A
-		{
-			public static var a : Int = 5
-		}
 
-		print(A.a)
-		*/
-
+		
+		
 		std::string classId = "";
 
 		bool isLeftSideComplex = this->_fieldAccessExpr->_type != ExprType::Id;
@@ -549,6 +545,7 @@ TypeNode* ExprNode::evaluateType(ClassTable* classTable, ClassTableElement* curr
 		auto field = classTable->items[classId]->fields->items[this->_fieldAccessFieldName];
 
 		return TypeNode::createFromDescriptor(field->_descriptor);
+		*/
 	}
 	else
 	{
@@ -556,9 +553,9 @@ TypeNode* ExprNode::evaluateType(ClassTable* classTable, ClassTableElement* curr
 	}
 }
 
-void ExprNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod, bool forceToConstTable)
+void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, bool forceToConstTable)
 {
-	ExternalFieldTableElement* field;
+	ExternalField* field;
 	if (currentClass == nullptr)
 		throw std::runtime_error("Expression must be associated with a class!");
 /*  It is class Field
@@ -572,7 +569,9 @@ void ExprNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass
 		break;
 
 	case ExprType::FieldAccess:
+		throw std::runtime_error("Unsupported" + LINE_AND_FILE);
 		//TODO non static field access; for reference see ExprNode::evaluateType
+		/*
 		if (this->_fieldAccessExpr->_type != Id)
 		{
 			throw std::runtime_error("Unsupported field access with left part" + std::to_string(_fieldAccessExpr->_type) + "!" + "Field access only support \"ID\" at left part! ");
@@ -583,11 +582,13 @@ void ExprNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass
 		{
 			throw std::runtime_error("Unsupported forceToConstTable flag for FieldAccess" + this->_fieldAccessFieldName);
 		}
+		*/
 		break;
 	case ExprType::Int:
 		if (forceToConstTable)
 		{
-			this->_constTableValueRef = currentClass->constants->findOrAddConstant(Integer_C, "", this->_intValue);
+			throw std::runtime_error("Unsupported" + LINE_AND_FILE);
+			//this->_constTableValueRef = currentClass->constants->findOrAddConstant(Integer_C, "", this->_intValue);
 		}
 		break;
 	case ExprType::Id:

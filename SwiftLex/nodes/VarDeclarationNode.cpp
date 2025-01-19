@@ -67,15 +67,17 @@ void VarDeclarationNode::generateDot(std::ofstream& file)
 	}
 }
 
-void VarDeclarationNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod)
+void VarDeclarationNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
 {
 	// Class Field
 	int constantValueIndex;
 	if (currentMethod == nullptr)
 	{
+		throw std::runtime_error("Usupported" + LINE_AND_FILE);
+		/*
 		if (_modifiers == nullptr)
 		{
-			throw std::runtime_error("Modifier missing for field: \"" + _varName + "\" for class \"" + currentClass->nameStr + "\"");
+			throw std::runtime_error("Modifier missing for field: \"" + _varName + "\" for class \"" + currentClass->getClassName() + "\"");
 		}
 
 		if (this->_type == ValueAndTypeKnown)
@@ -93,8 +95,7 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, ClassTableElement* cu
 			if (!isStatic)
 				throw std::runtime_error("Non static field does not support for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\"");
 
-			// Create name for attribute
-			currentClass->constants->findOrAddConstant(Utf8_C, "ConstantValue");
+			
 			/* Ёто плохо и ужасно. Ќадо здесь вызывать fillTable у _valueNode и туда добавить аргумент типа там forceToConstTable (по умолчанию задать false)
 			* чтобы не добавл€ть это во всех предыдущих вызовах. ¬нутри filltable когда forceToConstTable == true надо пытатьс€ записать значение в таблицу констант
 			* если это невозможно (например вызов функци) кидаешь ошибку. ≈сли возможно, то записываешь в таблицу констант и сохран€ешь номер строки в новое поле
@@ -102,17 +103,24 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, ClassTableElement* cu
 			* —оответсвенно здесь ты просто будешь делать:
 			* currentClass->addStaticField(this->_modifiers->getFieldAccessFlags(), this->_varName, this->_typeNode->toDescriptor(classTable, currentClass, currentMethod), _valueNode->_constTableValueRef)
 			* */
-			//TODO: add method to assign non constant static variables
+			/*//TODO: add method to assign non constant static variables
 			this->_valueNode->fillTable(classTable, currentClass, currentMethod, true);
 			//≈сли есть желание можно на вс€кий проверить наличие этого индекса в таблице еще и тут
 
 			// Create field
+			currentClass->addInternalFieldToConstantTable(
+				this->_varName, 
+				this->_typeNode->toDescriptor(classTable, currentClass, currentMethod),
+				this->_modifiers->getFieldAccessFlags(),
+				// TODO
+			)
 			currentClass->addStaticField(this->_modifiers->getFieldAccessFlags(), this->_varName, this->_typeNode->toDescriptor(classTable, currentClass, currentMethod), _valueNode->_constTableValueRef);
 		}
 		else if (this->_type == TypeKnown)
 		{
 			/* ћаксимум можешь проверить что не dynamicT и то тут надо подумать, но лучше пока провер€ть */
 			// Check if field type is INT
+		/*
 			if (this->_typeNode->_type != IntT)
 				throw std::runtime_error("Type " + std::to_string(this->_typeNode->_type) + " does not support for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\"");
 			
@@ -125,9 +133,9 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, ClassTableElement* cu
 
 			/* “ут не надо никакое дефолтное значение задавать, в джаве же можно поле без значени€ иметь, если тип указан */
 			// Create name for attribute
-			currentClass->constants->findOrAddConstant(Utf8_C, "ConstantValue");
 
 			// Create field
+			/*
 			constantValueIndex = currentClass->constants->findOrAddConstant(Integer_C, "", 0); // DEFAULT INTEGER = 0
 			currentClass->addStaticField(this->_modifiers->getFieldAccessFlags(), this->_varName, this->_typeNode->toDescriptor(classTable, currentClass, currentMethod), constantValueIndex);
 		}
@@ -139,6 +147,7 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, ClassTableElement* cu
 		{
 			throw std::runtime_error("Declaration usupported for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\"");
 		}
+	*/
 	}
 
 	// Local Variable
@@ -149,7 +158,7 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, ClassTableElement* cu
 		case ValueAndTypeKnown:
 			break;
 		case TypeKnown:
-			currentMethod->varTable->addLocalVar(this->_varName, this->_typeNode->toDescriptor(classTable, currentClass, currentMethod), currentClass->constants);
+			currentMethod->addLocalVarToConstantTable(this->_varName, this->_typeNode->toDescriptor(classTable, currentClass, currentMethod));
 			break;
 		case ValueKnown:
 			break;
@@ -264,7 +273,7 @@ bool VarDeclarationListNode::isFieldDecl()
 	return false;
 }
 
-void VarDeclarationListNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod)
+void VarDeclarationListNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
 {
 	for (auto& elem : _vec)
 	{

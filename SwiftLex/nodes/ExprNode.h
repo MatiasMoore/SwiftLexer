@@ -2,6 +2,7 @@
 #include "dottable.h"
 #include "GenericListNode.h"
 #include "SemanticsBase.h"
+#include "../tables/tables.h"
 
 class ExprNode;
 class TypeNode;
@@ -139,9 +140,9 @@ public:
 
 	SemanticsBase* semanticsTransform(SemanticsStack stack) override;
 
-	TypeNode* evaluateType(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod);
+	TypeNode* evaluateType(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
 
-	void fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod, bool forceToConstTable = false);
+	void fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, bool forceToConstTable = false);
 
 	std::vector<char> generateCode(class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
 };

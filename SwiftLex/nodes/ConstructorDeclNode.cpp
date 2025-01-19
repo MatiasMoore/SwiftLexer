@@ -76,7 +76,7 @@ void ConstructorDeclNode::generateDot(std::ofstream& file)
 	}
 }
 
-void ConstructorDeclNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod)
+void ConstructorDeclNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
 {
 	if (currentClass == nullptr)
 		throw std::runtime_error("Constructor decl must be associated with a class!");
@@ -104,7 +104,7 @@ void ConstructorDeclNode::fillTable(ClassTable* classTable, ClassTableElement* c
 	{
 		for (auto& arg : this->_argList->_vec)
 		{
-			currentMethod->varTable->addLocalVar(arg->_argName, arg->_argType->toDescriptor(classTable, currentClass, currentMethod), currentClass->constants);
+			currentMethod->varTable->addLocalVarToConstantTable(arg->_argName, arg->_argType->toDescriptor(classTable, currentClass, currentMethod), currentClass->constants);
 		}
 	}
 

@@ -40,7 +40,7 @@ SemanticsBase* FuncCallArgNode::semanticsTransform(SemanticsStack stack)
     return this;
 }
 
-void FuncCallArgNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod)
+void FuncCallArgNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
 {
     this->_value->fillTable(classTable, currentClass, currentMethod);
     this->_argType = this->_value->evaluateType(classTable, currentClass, currentMethod);
@@ -68,7 +68,7 @@ SemanticsBase* FuncCallArgListNode::semanticsTransform(SemanticsStack stack)
     return this;
 }
 
-void FuncCallArgListNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod)
+void FuncCallArgListNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
 {
     for (auto& elem : _vec)
     {

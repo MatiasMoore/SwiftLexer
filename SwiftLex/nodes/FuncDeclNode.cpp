@@ -215,7 +215,7 @@ void FuncDeclNode::generateDot(std::ofstream& file)
 
 }
 
-void FuncDeclNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod)
+void FuncDeclNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
 {
 	if (currentClass == nullptr)
 		throw std::runtime_error("Func decl must be associated with a class!");
@@ -249,14 +249,14 @@ void FuncDeclNode::fillTable(ClassTable* classTable, ClassTableElement* currentC
 
 	if (!isStatic)
 	{
-		currentMethod->varTable->addLocalVar("self", TypeNode::createIdType(currentClass->nameStr)->toDescriptor(classTable, currentClass, currentMethod), currentClass->constants);
+		currentMethod->varTable->addLocalVarToConstantTable("self", TypeNode::createIdType(currentClass->nameStr)->toDescriptor(classTable, currentClass, currentMethod), currentClass->constants);
 	}
 
 	if (this->_hasArgs)
 	{
 		for (auto& arg : this->_argList->_vec)
 		{
-			currentMethod->varTable->addLocalVar(arg->_argName, arg->_argType->toDescriptor(classTable, currentClass, currentMethod), currentClass->constants);
+			currentMethod->varTable->addLocalVarToConstantTable(arg->_argName, arg->_argType->toDescriptor(classTable, currentClass, currentMethod), currentClass->constants);
 		}
 	}
 

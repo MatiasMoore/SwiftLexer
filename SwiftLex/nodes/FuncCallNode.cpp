@@ -98,7 +98,7 @@ SemanticsBase* FuncCallNode::semanticsTransform(SemanticsStack stack)
 	return this;
 }
 
-void FuncCallNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod)
+void FuncCallNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
 {
 	if (currentClass == nullptr)
 		throw std::runtime_error("Function call must be associated with a class!");
@@ -108,19 +108,22 @@ void FuncCallNode::fillTable(ClassTable* classTable, ClassTableElement* currentC
 
 	if (this->_scopeType == normalCall)
 	{	
-		bool isInternal = currentClass->methods->methods.count(this->_funcName) != 0;
-		bool isExternal = currentClass->externalMethods->methods.count(this->_funcName) != 0;
+		
+		bool isInternal = currentClass->findInternalMethod(this->_funcName) != nullptr;
+
+		//this node should know class type of method
+		//bool isExternal = currentClass->externalMethods->methods.count(this->_funcName) != 0;
+		bool isExternal = currentClass->findOrAddInternalMethod(classTable->findClass(classname)->findMethod())
+
 		if (isInternal)
 		{
-			auto method = currentClass->methods->methods[this->_funcName];
-			auto funcNameAndTypeRef = currentClass->constants->findOrAddConstant(NameAndType_C, "", 0, 0, method->methodName, method->descriptor);
-			auto funcMethodrefRef = currentClass->constants->findOrAddConstant(MethodRef_C, "", 0, 0, currentClass->thisClass, funcNameAndTypeRef);
-			this->_methodRef = funcMethodrefRef;
+			this->_methodRef = currentClass->findInternalMethod(this->_funcName)->_methodRef;
 		}
 		else if (isExternal)
 		{
-			auto externalMethod = currentClass->externalMethods->methods[this->_funcName];
-			this->_methodRef = externalMethod->_methodRef;
+			throw std::runtime_error("Unsupported external method call" + LINE_AND_FILE);
+			//auto externalMethod = currentClass->externalMethods->methods[this->_funcName];
+			//this->_methodRef = externalMethod->_methodRef;
 		}
 		else
 		{

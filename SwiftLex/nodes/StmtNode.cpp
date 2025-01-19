@@ -370,7 +370,7 @@ SemanticsBase* StmtNode::semanticsTransform(SemanticsStack stack)
 	return this;
 }
 
-void StmtNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod)
+void StmtNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
 {
 	switch (this->_type)
 	{
@@ -399,7 +399,7 @@ void StmtNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass
 		if (currentMethod != nullptr)
 			throw std::runtime_error("Class declaration inside methods is not supported!");
 
-		currentClass = classTable->addClass(this->_classDecl->_name, this->_classDecl->_type == ClassDeclType::HasBaseClass ? this->_classDecl->_baseClassName : "java/lang/Object");
+		currentClass = classTable->addInternalClass(this->_classDecl->_name, this->_classDecl->_type == ClassDeclType::HasBaseClass ? this->_classDecl->_baseClassName : "java/lang/Object");
 
 		if (this->_classDecl->_hasBody)
 		{
@@ -507,7 +507,7 @@ SemanticsBase* StmtListNode::semanticsTransform(SemanticsStack stack)
 	return this;
 }
 
-void StmtListNode::fillTable(ClassTable* classTable, ClassTableElement* currentClass, MethodTableElement* currentMethod)
+void StmtListNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
 {
 	for (auto& elem : _vec)
 	{

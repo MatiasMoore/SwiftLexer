@@ -62,7 +62,7 @@ public:
 
 	void generateDot(std::ofstream& file) override;
 
-	void fillTable(class ClassTable* classTable, class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
+	void fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
 
 	SemanticsBase* semanticsTransform(SemanticsStack stack) override;
 };

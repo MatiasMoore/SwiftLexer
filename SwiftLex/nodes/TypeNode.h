@@ -1,5 +1,6 @@
 #pragma once
 #include "dottable.h"
+#include "../tables/tables.h"
 
 class ExprNode;
 
@@ -40,6 +41,6 @@ public:
 
 	void generateDot(std::ofstream& file) override;
 
-	std::string toDescriptor(class ClassTable* classTable, class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
+	std::string toDescriptor(class ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
 };
 
