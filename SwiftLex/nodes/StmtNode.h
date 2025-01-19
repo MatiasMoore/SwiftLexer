@@ -122,7 +122,7 @@ public:
 
 	SemanticsBase* semanticsTransform(SemanticsStack stack) override;
 
-	void fillTable(class ClassTable* classTable, class InternalClass* currentClass, class InternalMethod* currentMethod);
+	void fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
 
 	std::vector<char> generateCode(InternalClass* currentClass, InternalMethod* currentMethod);
 };

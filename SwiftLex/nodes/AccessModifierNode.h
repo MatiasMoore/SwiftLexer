@@ -2,6 +2,7 @@
 #include "dottable.h"
 #include "GenericListNode.h"
 #include "SemanticsBase.h"
+#include "../tables/tables.h"
 
 enum AccessModifierType
 {
@@ -30,9 +31,9 @@ public:
 
 	SemanticsBase* semanticsTransform(SemanticsStack stack) override;
 	
-	std::vector<enum MethodAccessFlag> getMethodAccessFlags();
+	std::vector<MethodAccessFlag> getMethodAccessFlags();
 
-	std::vector<enum FieldAccessFlag> getFieldAccessFlags();
+	std::vector<FieldAccessFlag> getFieldAccessFlags();
 };
 
 class AccessModifierListNode : public GenericListNode<AccessModifierNode, AccessModifierListNode>, public SemanticsBase
@@ -42,8 +43,8 @@ public:
 
 	SemanticsBase* semanticsTransform(SemanticsStack stack) override;
 
-	std::vector<enum MethodAccessFlag> getMethodAccessFlags();
+	std::vector<MethodAccessFlag> getMethodAccessFlags();
 
-	std::vector<enum FieldAccessFlag> getFieldAccessFlags();
+	std::vector<FieldAccessFlag> getFieldAccessFlags();
 };
 

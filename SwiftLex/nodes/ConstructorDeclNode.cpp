@@ -3,7 +3,6 @@
 #include "StmtNode.h"
 #include "AccessModifierNode.h"
 #include "TypeNode.h"
-#include "../tables/tables.h"
 #include "../generation/generationHelpers.h"
 
 ConstructorDeclNode* ConstructorDeclNode::createConstructor(FuncDeclArgListNode* argList, StmtListNode* body, bool throwsException)

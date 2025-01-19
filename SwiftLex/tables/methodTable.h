@@ -2,8 +2,7 @@
 #include <string>
 #include <vector>
 #include "localVarTable.h"
-#include "constTable.h"
-#include "../nodes/StmtNode.h"
+
 class StmtListNode;
 
 enum MethodAccessFlag {

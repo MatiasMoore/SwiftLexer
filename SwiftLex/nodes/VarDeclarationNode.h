@@ -2,6 +2,7 @@
 #include "dottable.h"
 #include "GenericListNode.h"
 #include "SemanticsBase.h"
+#include "../tables/tables.h"
 
 class ExprNode;
 class TypeNode;
@@ -47,9 +48,9 @@ public:
 
 	bool isFieldDecl();
 
-	void fillTable(class ClassTable* classTable, class InternalClass* currentClass, class InternalMethod* currentMethod);
+	void fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
 
-	std::vector<char> generateCode(class InternalClass* currentClass, class InternalMethod* currentMethod);
+	std::vector<char> generateCode(InternalClass* currentClass, InternalMethod* currentMethod);
 
 	SemanticsBase* semanticsTransform(SemanticsStack stack) override;
 };

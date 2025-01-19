@@ -2,9 +2,9 @@
 #include "FuncCallNode.h"
 #include "FuncCallArgNode.h"
 #include "TypeNode.h"
-#include "../tables/tables.h"
 #include "../generation/generationHelpers.h"
 #include <set>
+#include "../ExceptionHelper.h"
 
 ExprNode* ExprNode::createBool(bool value)
 {

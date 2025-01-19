@@ -3,8 +3,8 @@
 #include <map>
 #include <vector>
 #include "constTable.h"
-#include "../nodes/VarDeclarationNode.h"
-#include "../nodes/AccessModifierNode.h"
+
+class ExprNode;
 
 enum FieldAccessFlag {
     F_ACC_PUBLIC = 0x0001,         //	Declared public; may be accessed from outside its package.

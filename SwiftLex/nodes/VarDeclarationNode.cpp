@@ -3,8 +3,8 @@
 #include "ExprNode.h"
 #include "AccessModifierNode.h"
 #include "StmtNode.h"
-#include "../tables/tables.h"
 #include "../generation/generationHelpers.h"
+#include "../ExceptionHelper.h"
 
 VarDeclarationNode* VarDeclarationNode::createFromValue(std::string varName, ExprNode* value)
 {

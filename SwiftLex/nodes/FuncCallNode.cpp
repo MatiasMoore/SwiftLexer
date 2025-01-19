@@ -1,7 +1,6 @@
 #include "FuncCallNode.h"
 #include "FuncCallArgNode.h"
 #include "ExprNode.h"
-#include "../tables/tables.h"
 #include "../generation/generationHelpers.h"
 
 FuncCallNode* FuncCallNode::createFuncCall(std::string funcName, FuncCallArgListNode* funcArgs)

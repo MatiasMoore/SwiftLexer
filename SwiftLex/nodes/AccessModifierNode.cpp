@@ -1,5 +1,4 @@
 #include "AccessModifierNode.h"
-#include "../tables/tables.h"
 #include "../generation/generationHelpers.h"
 #include <set>
 

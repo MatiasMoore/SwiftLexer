@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include "../nodes/ExprNode.h"
 
 char _magicConstant[4] = { 0xCA, 0xFE, 0xBA, 0xBE };
 char _smallVersion[2] = { 0x00, 0x00 };

@@ -1,6 +1,7 @@
 #pragma once
 #include "dottable.h"
 #include "SemanticsBase.h"
+#include "../tables/tables.h"
 
 class StmtListNode;
 class FuncDeclArgListNode;
@@ -62,7 +63,7 @@ public:
 
 	void generateDot(std::ofstream& file) override;
 
-	void fillTable(class ClassTable* classTable, class InternalClass* currentClass, class InternalMethod* currentMethod);
+	void fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
 
 	SemanticsBase* semanticsTransform(SemanticsStack stack) override;
 };

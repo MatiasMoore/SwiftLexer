@@ -1,5 +1,6 @@
 #pragma once
 #include "dottable.h"
+#include "../tables/tables.h"
 
 class FuncDeclArgListNode;
 class StmtListNode;
@@ -25,6 +26,6 @@ public:
 
 	void generateDot(std::ofstream& file) override;
 
-	void fillTable(class ClassTable* classTable, class InternalClass* currentClass, class InternalMethod* currentMethod);
+	void fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
 };
 

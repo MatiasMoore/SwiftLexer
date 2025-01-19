@@ -16,7 +16,6 @@
 #include "DestructorDeclNode.h"
 #include "ClassDeclNode.h"
 #include "TypeNode.h"
-#include "../tables/tables.h"
 #include "../generation/generationHelpers.h"
 #include <set>
 

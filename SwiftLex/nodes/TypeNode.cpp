@@ -1,5 +1,4 @@
 #include "TypeNode.h"
-#include "../tables/tables.h"
 
 TypeNode* TypeNode::createType(TypeType type)
 {

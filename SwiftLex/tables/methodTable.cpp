@@ -1,5 +1,6 @@
 #include "methodTable.h"
 #include "classTable.h"
+#include "../ExceptionHelper.h"
 
 ExternalMethod::ExternalMethod(std::string methodName, std::string descriptor, std::string className, std::vector<MethodAccessFlag> flags)
 {

@@ -1,21 +1,8 @@
 #pragma once
 #include <string>
 #include <map>
-#include "constTable.h"
 #include "methodTable.h"
-#include "../ExceptionHelper.h"
-#include "../tables/fieldTable.h"
-#include "../tables/constTable.h"
-#include "../tables/methodTable.h"
-#include "../tables/localVarTable.h"
-#include "../nodes/ExprNode.h"
-#include "../nodes/StmtNode.h"
-
-class ExternalField;
-enum FieldAccessFlag;
-enum MethodAccessFlag;
-class ExternalMethod;
-class StmtListNode;
+#include "fieldTable.h"
 
 class ExternalClass
 {
