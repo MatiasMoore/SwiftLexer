@@ -28,7 +28,7 @@
     <ClCompile Include="tables\InternalField.cpp" />
     <ClCompile Include="tables\LocalVariableTable.cpp" />
     <ClCompile Include="tables\InternalMethod.cpp" />
-    <ClCompile Include="tables\ConstTable.cpp" />
+    <ClCompile Include="tables\ConstantTable.cpp" />
     <ClCompile Include="tables\InternalClass.cpp" />
     <ClCompile Include="generation\generationHelpers.cpp" />
     <ClCompile Include="generation\classFileGeneration.cpp" />
