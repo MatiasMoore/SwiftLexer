@@ -1,7 +1,9 @@
 #pragma once
 #include <string>
+#include <vector>
 #include "localVarTable.h"
 #include "constTable.h"
+#include "../nodes/StmtNode.h"
 
 enum MethodAccessFlag {
     M_ACC_PUBLIC = 0x0001,        //	Declared public; may be accessed from outside its package.
@@ -21,28 +23,41 @@ enum MethodAccessFlag {
 class ExternalMethod
 {
 public:
-    class ExternalClass* _class;
+    ExternalMethod(std::string methodName, std::string descriptor, std::string className, std::vector<MethodAccessFlag> flags, class LocalVariableTable* _varTable);
 
-    std::string _name;
+    virtual int addMethodRefToConstTable(ConstantTable* constTable);
+    int findMethodRef(ConstantTable* constTable);
+    std::string getMethodName();
+    std::string getDescriptor();
+    std::string getClassName();
+    std::vector<MethodAccessFlag> getFlags();
+    class LocalVariableTable* getVarTable();
 
+protected:
+    std::string _methodName;
     std::string _descriptor;
-
-    int addMethodRefToConstTable(ConstantTable* constTable);
+    std::string _className;
+    std::vector<MethodAccessFlag> _flags;
+    class LocalVariableTable* _varTable;
 };
 
 class InternalMethod : public ExternalMethod
 {
 public:
-    InternalMethod();
+    InternalMethod(ConstantTable* constTable, StmtListNode* body, std::string methodName, std::string descriptor, std::string className, std::vector<MethodAccessFlag> flags, LocalVariableTable* varTable);
+    
+    int accessFlagsToInt(std::vector<MethodAccessFlag> flags);
 
+    bool isStatic();
+
+    int _methodRef;
     int _nameRef;
     int _descriptorRef;
-    int _methodRef;
+    int _classRef;
+    int _nameAndTypeRef;
 
     class StmtListNode* _body;
 
-    class LocalVariableTable* _varTable;
-
-
-    int accessFlag;
+private:
+    ConstantTable* _constTable; // Не знаю понадобится потом или нет
 };

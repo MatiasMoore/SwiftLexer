@@ -1,18 +1,99 @@
 #include "methodTable.h"
 #include "classTable.h"
 
-InternalMethod::InternalMethod()
+ExternalMethod::ExternalMethod(std::string methodName, std::string descriptor, std::string className, std::vector<MethodAccessFlag> flags, LocalVariableTable* varTable)
 {
-	_varTable = new LocalVariableTable();
+	this->_methodName = methodName;
+	this->_descriptor = descriptor;
+	this->_className = className;
+	this->_flags = flags;
+	this->_varTable = varTable;
 }
 
 int ExternalMethod::addMethodRefToConstTable(ConstantTable* constTable)
 {
-	auto nameRef = constTable->findOrAddUTF8(this->_name);
-	auto descriptorRef = constTable->findOrAddUTF8(this->_descriptor);
-	auto nameAndTypeRef = constTable->findOrAddNameAndType(nameRef, descriptorRef);
-	auto classNameRef = constTable->findOrAddUTF8(this->_class->getClassName());
-	auto classRef = constTable->findOrAddClassRef(classNameRef);
-	auto methodRef = constTable->findOrAddMethodRef(classRef, nameAndTypeRef);
+	if (this->findMethodRef(constTable) != -1)
+		throw std::runtime_error("Equal method with name " + this->_methodName + " and descriptor " + this->_descriptor + " already exists in this class!" + LINE_AND_FILE);
+
+	int varNameRef = constTable->addUTF8(this->_methodName);
+	int descriptorRef = constTable->addUTF8(this->_descriptor);
+	int nameAndTypeRef = constTable->addNameAndType(varNameRef, descriptorRef);
+
+	int classNameRef = constTable->addUTF8(this->_className);
+	int classRef = constTable->addClassRef(classNameRef);
+
+	int methodRef = constTable->addMethodRef(classRef, nameAndTypeRef);
+
 	return methodRef;
+}
+
+int ExternalMethod::findMethodRef(ConstantTable* constTable)
+{
+	int nameRef = constTable->findUTF8(this->_methodName);
+	int descriptorRef = constTable->findUTF8(this->_descriptor);
+	int classNameRef = constTable->findUTF8(this->_className);
+	if (nameRef == -1 || descriptorRef == -1 || classNameRef == -1)
+		return -1;
+
+	int nameAndTypeRef = constTable->findNameAndType(nameRef, descriptorRef);
+	int classRef = constTable->findClassRef(classNameRef);
+
+	if (nameAndTypeRef == -1 || classRef == -1)
+		return -1;
+
+	return constTable->findMethodRef(classRef, nameAndTypeRef);
+}
+
+std::string ExternalMethod::getMethodName()
+{
+	return _methodName;
+}
+
+std::string ExternalMethod::getDescriptor()
+{
+	return _descriptor;
+}
+
+std::string ExternalMethod::getClassName()
+{
+	return _className;
+}
+
+std::vector<MethodAccessFlag> ExternalMethod::getFlags()
+{
+	return _flags;
+}
+
+LocalVariableTable* ExternalMethod::getVarTable()
+{
+	return _varTable;
+}
+
+InternalMethod::InternalMethod(ConstantTable* constTable, StmtListNode* body, std::string methodName, std::string descriptor, std::string className, std::vector<MethodAccessFlag> flags, LocalVariableTable* varTable)
+	: ExternalMethod(methodName, descriptor, className, flags, varTable)
+{
+	_constTable = constTable;
+
+	_nameRef = constTable->findOrAddUTF8(methodName);
+	_descriptorRef = constTable->findOrAddUTF8(descriptor);
+	_classRef = constTable->findOrAddClassRef(_nameRef);
+	_nameAndTypeRef = constTable->findOrAddNameAndType(_nameRef, _descriptorRef);
+	_methodRef = constTable->findOrAddMethodRef(_classRef, _nameAndTypeRef);
+
+	_body = body;
+}
+
+int InternalMethod::accessFlagsToInt(std::vector<MethodAccessFlag> flags)
+{
+	int accessFlag = 0;
+	for (auto& flag : flags)
+	{
+		accessFlag += (int)flag;
+	}
+	return accessFlag;
+}
+
+bool InternalMethod::isStatic()
+{
+	return std::find(this->_flags.begin(), this->_flags.end(), F_ACC_STATIC) != this->_flags.end();
 }
