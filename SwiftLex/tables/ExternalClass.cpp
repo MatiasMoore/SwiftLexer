@@ -1,6 +1,12 @@
 #include "ExternalClass.h"
 #include "../ExceptionHelper.h"
 
+ExternalClass::ExternalClass(std::string name, std::string baseName)
+{
+	this->_name = name;
+	this->_baseName = baseName;
+}
+
 ExternalMethod* ExternalClass::addMethod(std::string methodName, std::string descriptor, std::vector<MethodAccessFlag> flags)
 {
 	if (this->_methodMap.count(methodName) != 0)

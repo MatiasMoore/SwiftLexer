@@ -1,12 +1,6 @@
 #include "InternalClass.h"
 #include "../ExceptionHelper.h"
 
-ExternalClass::ExternalClass(std::string name, std::string baseName)
-{
-	this->_name = name;
-	this->_baseName = baseName;
-}
-
 InternalClass::InternalClass(std::string name, std::string baseName) : ExternalClass(name, baseName)
 {
 	_constTable = new ConstantTable();
