@@ -10,7 +10,9 @@ public:
     /// Контейнер элементов.
     std::map<std::string, class LocalVariableElement*> items = {};
 
-    LocalVariableElement* addLocalVar(std::string name, std::string descriptor, ConstantTable* constantTable);
+    LocalVariableElement* addLocalVar(std::string name, std::string descriptor);
+
+    LocalVariableElement* addLocalVarToConstantTable(std::string name, std::string descriptor, ConstantTable* constantTable);
 
     LocalVariableElement* findLocalVar(std::string name);
 };
@@ -27,5 +29,6 @@ public:
     int nameIndex;
     int descriptorIndex;
 
-    LocalVariableElement(int localId, std::string name, std::string descriptor, ConstantTable* constantTable);
+    LocalVariableElement(int localId, std::string name, std::string descriptor);
+    int toConstantTable(ConstantTable* constantTable);
 };

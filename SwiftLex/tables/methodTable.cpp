@@ -44,6 +44,14 @@ int ExternalMethod::findMethodRef(ConstantTable* constTable)
 	return constTable->findMethodRef(classRef, nameAndTypeRef);
 }
 
+int ExternalMethod::findOrAddMethodRef(ConstantTable* constTable)
+{
+	if (findMethodRef(constTable) == -1)
+		return addMethodRefToConstTable(constTable);
+	else
+		return findMethodRef(constTable);
+}
+
 std::string ExternalMethod::getMethodName()
 {
 	return _methodName;
@@ -67,6 +75,21 @@ std::vector<MethodAccessFlag> ExternalMethod::getFlags()
 LocalVariableTable* ExternalMethod::getVarTable()
 {
 	return _varTable;
+}
+
+LocalVariableElement* ExternalMethod::findLocalVar(std::string varName)
+{
+	return _varTable->findLocalVar(varName);
+}
+
+LocalVariableElement* ExternalMethod::addLocalVar(std::string varName, std::string descriptor)
+{
+	_varTable->addLocalVar(varName, descriptor);
+}
+
+LocalVariableElement* InternalMethod::addLocalVar(std::string varName, std::string descriptor)
+{
+	_varTable->addLocalVarToConstantTable(varName, descriptor, this->_constTable);
 }
 
 InternalMethod::InternalMethod(ConstantTable* constTable, StmtListNode* body, std::string methodName, std::string descriptor, std::string className, std::vector<MethodAccessFlag> flags, LocalVariableTable* varTable)

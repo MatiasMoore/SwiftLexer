@@ -8,6 +8,8 @@ ConstantTable::ConstantTable()
 
     this->findOrAddConstant(Utf8_C, "Code");
     this->findOrAddConstant(Utf8_C, "LocalVariableTable");
+    this->findOrAddConstant(Utf8_C, "ConstantValue");
+
 }
 
 int ConstantTable::addConstant(ConstantType type, std::string utf8string, int intVal, double dVal, int fRef, int sRef)

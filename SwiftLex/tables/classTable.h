@@ -4,9 +4,18 @@
 #include "constTable.h"
 #include "methodTable.h"
 #include "../ExceptionHelper.h"
-#include "fieldTable.h"
+#include "../tables/fieldTable.h"
+#include "../tables/constTable.h"
+#include "../tables/methodTable.h"
 #include "../tables/localVarTable.h"
+#include "../nodes/ExprNode.h"
+#include "../nodes/StmtNode.h"
 
+class ExternalField;
+enum FieldAccessFlag;
+enum MethodAccessFlag;
+class ExternalMethod;
+class StmtListNode;
 class ExternalClass
 {
 public:
@@ -61,31 +70,19 @@ public:
 	* \return InternalMethod - The internal method created
 	*/
 	InternalMethod* addInternalMethodToConstantTable(std::string methodName, std::string descriptor, std::vector<MethodAccessFlag> flags, StmtListNode* body, LocalVariableTable* varTable);
+	
 	/*!
 	* \brief Add an external class (not this class) method to the constant table
 	* \param ExternalMethod - The external method from another class to add
 	* \return InternalMethod - The internal method created
 	*/
-	InternalMethod* addExternalClassMethodToConstantTable(ExternalMethod* externalMethod);
+	int findOrAddExternalClassMethod(ExternalMethod* externalMethod);
 
 	/*!
 	* \brief Search for this class methods
 	* \return InternalMethod - The internal method
 	*/
 	InternalMethod* findInternalMethod(std::string methodName);
-
-	/*!
-	* \brief Finds another class method that is in the constant table of that class.
-	* \return InternalMethod - The internal method
-	*/
-	InternalMethod* findExternalClassMethod(std::string methodName, std::string className);
-	
-	// Fields
-	/*!
-	* \brief Add this class field to the constant table
-	* \return InternalField - The internal field created
-	*/
-	InternalField* addInternalFieldToConstantTable(std::string varName, std::string descriptor, std::vector<FieldAccessFlag> flags, ExprNode* constValue = nullptr);
 	
 	/*!
 	* \brief Add an external class (not this class) field to the constant table

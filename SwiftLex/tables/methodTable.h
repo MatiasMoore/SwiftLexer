@@ -4,6 +4,7 @@
 #include "localVarTable.h"
 #include "constTable.h"
 #include "../nodes/StmtNode.h"
+class StmtListNode;
 
 enum MethodAccessFlag {
     M_ACC_PUBLIC = 0x0001,        //	Declared public; may be accessed from outside its package.
@@ -27,11 +28,14 @@ public:
 
     virtual int addMethodRefToConstTable(ConstantTable* constTable);
     int findMethodRef(ConstantTable* constTable);
+    int findOrAddMethodRef(ConstantTable* constTable);
     std::string getMethodName();
     std::string getDescriptor();
     std::string getClassName();
     std::vector<MethodAccessFlag> getFlags();
     class LocalVariableTable* getVarTable();
+    LocalVariableElement* findLocalVar(std::string varName);
+    virtual LocalVariableElement* addLocalVar(std::string varName, std::string descriptor);
 
 protected:
     std::string _methodName;
@@ -47,7 +51,7 @@ public:
     InternalMethod(ConstantTable* constTable, StmtListNode* body, std::string methodName, std::string descriptor, std::string className, std::vector<MethodAccessFlag> flags, LocalVariableTable* varTable);
     
     int accessFlagsToInt(std::vector<MethodAccessFlag> flags);
-
+    virtual LocalVariableElement* addLocalVar(std::string varName, std::string descriptor);
     bool isStatic();
 
     int _methodRef;
