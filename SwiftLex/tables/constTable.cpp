@@ -229,3 +229,8 @@ int ConstantTable::addStringRef(int utf8Ref)
 {
 	return this->addConstant(String_C, "", 0, 0, utf8Ref);
 }
+
+int ConstantTable::size()
+{
+    return this->constants.size();
+}

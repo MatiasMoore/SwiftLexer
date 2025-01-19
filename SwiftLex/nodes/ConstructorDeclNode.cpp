@@ -96,20 +96,20 @@ void ConstructorDeclNode::fillTable(ClassTable* classTable, InternalClass* curre
 	strDesc += ")V";
 	
 	if (!this->_hasModifiers)
-		throw std::runtime_error("Constructor decl for class \"" + currentClass->nameStr + "\" must have access modifiers!");
+		throw std::runtime_error("Constructor decl for class \"" + currentClass->getClassName() + "\" must have access modifiers!");
 
-	currentMethod = currentClass->addMethod("<init>", this->_body, strDesc, this->_modifiers->getMethodAccessFlags());
+	currentMethod = currentClass->addInternalMethodToConstantTable("<init>", strDesc, this->_modifiers->getMethodAccessFlags(), this->_body);
 
 	if (this->_hasArgs)
 	{
 		for (auto& arg : this->_argList->_vec)
 		{
-			currentMethod->varTable->addLocalVarToConstantTable(arg->_argName, arg->_argType->toDescriptor(classTable, currentClass, currentMethod), currentClass->constants);
+			currentMethod->getVarTable()->addLocalVar(arg->_argName, arg->_argType->toDescriptor(classTable, currentClass, currentMethod));
 		}
 	}
 
 	if (!this->_hasBody)
-		throw std::runtime_error("Constructor decl for class \"" + currentClass->nameStr + "\" must have a body!");
+		throw std::runtime_error("Constructor decl for class \"" + currentClass->getClassName() + "\" must have a body!");
 
 	this->_body->fillTable(classTable, currentClass, currentMethod);
 }

@@ -1,4 +1,5 @@
 #pragma once
 #include <string>
+#include "../tables/tables.h"
 
-void generateClassFile(class ClassTableElement* classElem, std::string pathToFolder);
+void generateClassFile(InternalClass* classElem, std::string pathToFolder);

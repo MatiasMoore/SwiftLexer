@@ -12,11 +12,11 @@ char _smallVersion[2] = { 0x00, 0x00 };
 char _bigVersion[2] = { 0x00, 0x3E };
 int _stackSize = 1000;
 
-std::vector<char> generateFieldConstantAttribute(class FieldElement* fieldElement, ClassTableElement* classElement)
+std::vector<char> generateFieldConstantAttribute(InternalField* fieldElement, InternalClass* classElement)
 {
 	std::vector<char> res;
 
-	int attributeNameIndex = classElement->constants->findOrAddConstant(Utf8_C, "ConstantValue");
+	int attributeNameIndex = classElement->getConstTable()->findOrAddUTF8("ConstantValue");
 
 	/*
 		u2 attribute_name_index;
@@ -25,27 +25,28 @@ std::vector<char> generateFieldConstantAttribute(class FieldElement* fieldElemen
 	*/
 	appendVecToVec(res, intToByteVector(attributeNameIndex, 2));
 	appendVecToVec(res, intToByteVector(2, 4)); //The value of the attribute_length item must be two.
-	appendVecToVec(res, intToByteVector(fieldElement->constantValueIndex, 2));
+	//FIXME
+	appendVecToVec(res, intToByteVector(fieldElement->getConstValue()->_constTableValueRef, 2));
 	return res;
 }
 
-std::vector<char> generateFieldCode(class FieldElement* fieldElement, class ClassTableElement* classElement)
+std::vector<char> generateFieldCode(InternalField* fieldElement, InternalClass* classElement)
 {
 
 
 	std::vector<char> res;
-
-	std::vector<char> accessFlags = intToByteVector(fieldElement->accessFlag, 2);
+	//FIXME
+	std::vector<char> accessFlags = intToByteVector(fieldElement->accessFlagsToInt(fieldElement->_flags), 2);
 	
 
-	std::vector<char> nameIndex = intToByteVector(fieldElement->nameIndex, 2);
-	std::vector<char> descriptorIndex = intToByteVector(fieldElement->descriptorIndex, 2);
+	std::vector<char> nameIndex = intToByteVector(fieldElement->_nameRef, 2);
+	std::vector<char> descriptorIndex = intToByteVector(fieldElement->_descriptorRef, 2);
 
 
 	std::vector<char> attributesCount = intToByteVector(0, 2);
 	std::vector<char> attributesBytes = {};
 
-	if (fieldElement->isStatic)
+	if (fieldElement->isStatic())
 	{
 		attributesCount = intToByteVector(1, 2);
 		attributesBytes = generateFieldConstantAttribute(fieldElement, classElement);
@@ -67,16 +68,16 @@ std::vector<char> generateFieldCode(class FieldElement* fieldElement, class Clas
 	return res;
 }
 
-std::vector<char> generateLocalVariableTable(MethodTableElement* mElem, ClassTableElement* cElem) {
+std::vector<char> generateLocalVariableTable(InternalMethod* mElem, InternalClass* cElem) {
 	std::vector<char> tableBytes;
 
 	// Add constant pool index for "LocalVariableTable"
-	int localVarTableIndex = cElem->constants->findOrAddConstant(Utf8_C, "LocalVariableTable");
+	int localVarTableIndex = cElem->getConstTable()->findOrAddUTF8("LocalVariableTable");
 	appendVecToVec(tableBytes, intToByteVector(localVarTableIndex, 2));
 
 	// Calculate the local variable table entries
 	std::vector<char> localVariableEntries;
-	for (const auto& var : mElem->varTable->items) {
+	for (const auto& var : mElem->getVarTable()->items) {
 		// Start PC, Length, Name Index, Descriptor Index, Index
 		auto localVar = var.second;
 		// Assuming variables have start_pc and length initialized properly
@@ -94,11 +95,11 @@ std::vector<char> generateLocalVariableTable(MethodTableElement* mElem, ClassTab
 	return tableBytes;
 }
 
-std::vector<char> generateMethodAttribute(class MethodTableElement* mElem, ClassTableElement* cElem)
+std::vector<char> generateMethodAttribute(InternalMethod* mElem, InternalClass* cElem)
 {
 	std::vector<char> res;
 
-	int cd = cElem->constants->findOrAddConstant(Utf8_C, "Code");
+	int cd = cElem->getConstTable()->findOrAddUTF8("Code");
 	std::vector<char> codeAttributeSizeBytes = intToByteVector(cd, 2);
 	appendVecToVec(res, codeAttributeSizeBytes);
 
@@ -110,7 +111,7 @@ std::vector<char> generateMethodAttribute(class MethodTableElement* mElem, Class
 	//TODO generate code from body
 	
 	if (mElem->_body == nullptr)
-		throw std::runtime_error("Method \"" + mElem->strName + "\" must have a body!");
+		throw std::runtime_error("Method \"" + mElem->getMethodName() + "\" must have a body!");
 
 	for (auto& stmt : mElem->_body->_vec)
 	{
@@ -134,7 +135,7 @@ std::vector<char> generateMethodAttribute(class MethodTableElement* mElem, Class
 	appendVecToVec(res, stackSizeBytes);
 
 	//Добавление количества локальных переменных
-	int localsSize = mElem->varTable->items.size();
+	int localsSize = mElem->getVarTable()->items.size();
 	std::vector<char> localsSizeBytes = intToByteVector(localsSize, 2);
 	appendVecToVec(res, localsSizeBytes);
 
@@ -164,19 +165,19 @@ std::vector<char> generateMethodAttribute(class MethodTableElement* mElem, Class
 	return res;
 }
 
-std::vector<char> generateMethodCode(class MethodTableElement* mElem, class ClassTableElement* cElem)
+std::vector<char> generateMethodCode(InternalMethod* mElem, InternalClass* cElem)
 {
 	std::vector<char> res;
 
-	std::vector<char> accessFlag = intToByteVector(mElem->accessFlag, 2);
+	std::vector<char> accessFlag = intToByteVector(mElem->accessFlagsToInt(mElem->getFlags()), 2);
 	appendVecToVec(res, accessFlag);
 
 	//Добавление имени метода
-	std::vector<char> nameBytes = intToByteVector(mElem->methodName, 2);
+	std::vector<char> nameBytes = intToByteVector(mElem->_nameRef, 2);
 	appendVecToVec(res, nameBytes);
 
 	// Добавление дескриптора метода
-	std::vector<char> typeBytes = intToByteVector(mElem->descriptor, 2);
+	std::vector<char> typeBytes = intToByteVector(mElem->_descriptorRef, 2);
 	appendVecToVec(res, typeBytes);
 
 	//Добавление атрибутов TODO:Code
@@ -188,7 +189,7 @@ std::vector<char> generateMethodCode(class MethodTableElement* mElem, class Clas
 	return res;
 }
 
-void generateClassFile(ClassTableElement* classElem, std::string pathToFolder)
+void generateClassFile(InternalClass* classElem, std::string pathToFolder)
 {
 	/*
     u4             magic;
@@ -210,9 +211,9 @@ void generateClassFile(ClassTableElement* classElem, std::string pathToFolder)
 	*/
 
 	// Инициализация.
-	std::string fileName = pathToFolder + classElem->nameStr + ".class";
+	std::string fileName = pathToFolder + classElem->getClassName() + ".class";
 
-	std::cout << "Generating class \"" + classElem->nameStr + "\" to file \"" + fileName + "\"" << std::endl;
+	std::cout << "Generating class \"" + classElem->getClassName() + "\" to file \"" + fileName + "\"" << std::endl;
 
 	std::ofstream out(fileName, std::ios::out | std::ios::binary);
 
@@ -221,7 +222,7 @@ void generateClassFile(ClassTableElement* classElem, std::string pathToFolder)
 	out.write(_smallVersion, 2);
 	out.write(_bigVersion, 2);
 
-	auto constantCount = classElem->constants->constants.size();
+	auto constantCount = classElem->getConstTable()->size();
 
 	std::cout << "Constants count: " << constantCount << std::endl;
 
@@ -229,14 +230,14 @@ void generateClassFile(ClassTableElement* classElem, std::string pathToFolder)
 
 	out.write(tableLen.data(), tableLen.size());
 
-	std::vector<char> data = generateBytesForConstantTable(classElem->constants);
+	std::vector<char> data = generateBytesForConstantTable(classElem->getConstTable());
 
 	//TODO add correct class modifiers
 	data.push_back(0x00);
 	data.push_back(0x21);
 
-	std::vector<char> thisCls = intToByteVector(classElem->thisClass, 2);
-	std::vector<char> parentCls = intToByteVector(classElem->superClass, 2);
+	std::vector<char> thisCls = intToByteVector(classElem->getClassRef(), 2);
+	std::vector<char> parentCls = intToByteVector(classElem->getBaseClassRef(), 2);
 	appendVecToVec(data, thisCls);
 	appendVecToVec(data, parentCls);
 	std::vector<char> interfaceCount = intToByteVector(0, 2);
@@ -244,9 +245,8 @@ void generateClassFile(ClassTableElement* classElem, std::string pathToFolder)
 	int fieldCount = 0;
 	std::vector<char> fieldsCodeData = {};
 
-	for (auto fieldItem = classElem->fields->items.begin(); fieldItem != classElem->fields->items.end(); ++fieldItem)
+	for (auto& field : classElem->getInternalFields())
 	{
-		auto field = fieldItem->second;
 		fieldCount++;
 		std::vector<char> fieldCodeData = generateFieldCode(field, classElem);
 		appendVecToVec(fieldsCodeData, fieldCodeData);
@@ -259,24 +259,12 @@ void generateClassFile(ClassTableElement* classElem, std::string pathToFolder)
 	std::vector<char> codeData;
 
 	// Для каждого метода
-	for (auto i = classElem->methods->methods.begin(); i != classElem->methods->methods.end(); ++i)
+	for (auto& method : classElem->getInternalMethods())
 	{
-		auto method = i->second;
 		mCount++;
 		std::vector<char> methodCodeData = generateMethodCode(method, classElem);
 		appendVecToVec(codeData, methodCodeData);
 	}
-	/*
-	if (elem->methods->methods.count("main") != 0)
-	{
-		if (elem->methods->methods["main"].count("()") != 0)
-		{
-			mCount++;
-			std::vector<char> mainCodeData = generateMain(elem, elem->methods->methods["main"]["()"]);
-			appendArrayToByteVector(&codeData, mainCodeData.data(), mainCodeData.size());
-		}
-	}
-	*/
 
 	std::cout << "Method count: " << mCount << std::endl;
 

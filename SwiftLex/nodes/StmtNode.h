@@ -22,10 +22,6 @@ class ConstructorDeclNode;
 class DestructorDeclNode;
 class ClassDeclNode;
 
-class ClassTable;
-class ExternalClass;
-class InternalClass;
-
 enum StmtType
 {
 	Expr,
@@ -126,9 +122,9 @@ public:
 
 	SemanticsBase* semanticsTransform(SemanticsStack stack) override;
 
-	void fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
+	void fillTable(class ClassTable* classTable, class InternalClass* currentClass, class InternalMethod* currentMethod);
 
-	std::vector<char> generateCode(class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
+	std::vector<char> generateCode(InternalClass* currentClass, InternalMethod* currentMethod);
 };
 
 class StmtListNode : public GenericListNode<StmtNode, StmtListNode>, public SemanticsBase

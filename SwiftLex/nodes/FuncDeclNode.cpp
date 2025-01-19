@@ -4,7 +4,6 @@
 #include "TypeNode.h"
 #include "AccessModifierNode.h"
 #include "ReturnNode.h"
-#include "../tables/tables.h"
 #include "../generation/generationHelpers.h"
 
 FuncDeclNode* FuncDeclNode::createRegular(std::string idName, FuncDeclArgListNode* argList, StmtListNode* body, TypeNode* returnType, bool throwsException)
@@ -243,20 +242,20 @@ void FuncDeclNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 		throw std::runtime_error("Func decl \"" + this->_idName + "\" must have access modifiers!");
 
 	auto accessFlags = this->_modifiers->getMethodAccessFlags();
-	currentMethod = currentClass->addMethod(this->_idName, this->_body, strDesc, accessFlags);
+	currentMethod = currentClass->addInternalMethodToConstantTable(this->_idName, strDesc, accessFlags, this->_body);
 
 	bool isStatic = std::find(accessFlags.begin(), accessFlags.end(), M_ACC_STATIC) != accessFlags.end();
 
 	if (!isStatic)
 	{
-		currentMethod->varTable->addLocalVarToConstantTable("self", TypeNode::createIdType(currentClass->nameStr)->toDescriptor(classTable, currentClass, currentMethod), currentClass->constants);
+		currentMethod->getVarTable()->addLocalVar("self", TypeNode::createIdType(currentClass->getClassName())->toDescriptor(classTable, currentClass, currentMethod));
 	}
 
 	if (this->_hasArgs)
 	{
 		for (auto& arg : this->_argList->_vec)
 		{
-			currentMethod->varTable->addLocalVarToConstantTable(arg->_argName, arg->_argType->toDescriptor(classTable, currentClass, currentMethod), currentClass->constants);
+			currentMethod->getVarTable()->addLocalVar(arg->_argName, arg->_argType->toDescriptor(classTable, currentClass, currentMethod));
 		}
 	}
 

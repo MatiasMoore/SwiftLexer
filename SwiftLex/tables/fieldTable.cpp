@@ -76,6 +76,7 @@ InternalField::InternalField(ConstantTable* constantTable, std::string varName, 
 	this->_descriptorRef = constantTable->findUTF8(descriptor);
 	this->_classRef = constantTable->findUTF8(className);
 	this->_nameAndTypeRef = constantTable->findNameAndType(this->_nameRef, this->_descriptorRef);
+	this->_flags = flags;
 }
 
 int InternalField::accessFlagsToInt(std::vector<FieldAccessFlag> flags)

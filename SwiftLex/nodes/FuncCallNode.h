@@ -42,6 +42,6 @@ public:
 
 	void fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
 
-	std::vector<char> generateCode(class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
+	std::vector<char> generateCode(InternalClass* currentClass, InternalMethod* currentMethod);
 };
 

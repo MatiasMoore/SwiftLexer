@@ -57,5 +57,6 @@ public:
     int _descriptorRef;
     int _classRef;
     int _nameAndTypeRef;
+    std::vector<FieldAccessFlag> _flags;
 
 };

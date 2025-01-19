@@ -41,6 +41,6 @@ public:
 
 	void generateDot(std::ofstream& file) override;
 
-	std::string toDescriptor(class ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
+	std::string toDescriptor(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
 };
 

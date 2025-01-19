@@ -12,8 +12,6 @@ public:
 
     LocalVariableElement* addLocalVar(std::string name, std::string descriptor);
 
-    LocalVariableElement* addLocalVarToConstantTable(std::string name, std::string descriptor, ConstantTable* constantTable);
-
     LocalVariableElement* findLocalVar(std::string name);
 };
 
@@ -30,5 +28,4 @@ public:
     int descriptorIndex;
 
     LocalVariableElement(int localId, std::string name, std::string descriptor);
-    int toConstantTable(ConstantTable* constantTable);
 };

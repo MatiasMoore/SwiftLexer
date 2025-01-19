@@ -16,6 +16,7 @@ enum FieldAccessFlag;
 enum MethodAccessFlag;
 class ExternalMethod;
 class StmtListNode;
+
 class ExternalClass
 {
 public:
@@ -25,7 +26,7 @@ public:
 	* \brief Add an EXTERNAL method (this method does not write anything to the constant table) 
 	* \return ExternalMethod - The ExternalMethod method created
 	*/
-	virtual ExternalMethod* addMethod(std::string methodName, std::string descriptor, std::vector<MethodAccessFlag> flags, LocalVariableTable* varTable);
+	virtual ExternalMethod* addMethod(std::string methodName, std::string descriptor, std::vector<MethodAccessFlag> flags);
 	
 	/*!
 	* \brief find an External method in map
@@ -61,15 +62,12 @@ class InternalClass : public ExternalClass
 public:
 	InternalClass(std::string name, std::string baseName);
 
-    std::vector<class InternalMethod*> _externalClassMethodMap = {};
-	std::vector<class InternalField*> _externalClassFieldMap = {};
-
 	// Methods
 	/*!
 	* \brief Add this class method to the constant table
 	* \return InternalMethod - The internal method created
 	*/
-	InternalMethod* addInternalMethodToConstantTable(std::string methodName, std::string descriptor, std::vector<MethodAccessFlag> flags, StmtListNode* body, LocalVariableTable* varTable);
+	InternalMethod* addInternalMethodToConstantTable(std::string methodName, std::string descriptor, std::vector<MethodAccessFlag> flags, StmtListNode* body);
 	
 	/*!
 	* \brief Add an external class (not this class) method to the constant table
@@ -85,30 +83,32 @@ public:
 	InternalMethod* findInternalMethod(std::string methodName);
 	
 	/*!
-	* \brief Add an external class (not this class) field to the constant table
-	* \param ExternalField - The external field from another class to add
-	* \return InternalField - The internal field created
-	*/
-	InternalField* addExternalClassFieldToConstantTable(ExternalField* externalField);
-
-	/*!
 	* \brief Search for this class fields
 	* \return InternalField - The internal field
 	*/
 	InternalField* findInternalField(std::string varName);
 
-	/*!
-	* \brief Search for another class field that is in the constant table of that class.
-	* \return InternalField - The internal field
-	*/
-	InternalField* findExternalClassField(std::string varName, std::string className);
+	std::vector<InternalMethod*> getInternalMethods();
+
+	std::vector<InternalField*> getInternalFields();
+
+	ConstantTable* getConstTable();
+
+	int getNameRef();
+
+	int getBaseNameRef();
+
+	int getBaseClassRef();
+
+	int getClassRef();
 
 private:
 	ConstantTable* _constTable;
 
 	int _classRef;
+	int _baseClassRef;
 	int _nameRef;
-	int _baseRef;
+	int _baseNameRef;
 };
 
 class ClassTable

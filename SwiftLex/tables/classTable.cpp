@@ -88,13 +88,14 @@ InternalClass::InternalClass(std::string name, std::string baseName) : ExternalC
 {
 	_constTable = new ConstantTable();
 	_nameRef = _constTable->findOrAddUTF8(name);
-	_baseRef = _constTable->findOrAddUTF8(baseName);
+	_baseNameRef = _constTable->findOrAddUTF8(baseName);
 	_classRef = _constTable->findOrAddClassRef(_nameRef);
+	_baseClassRef = _constTable->findOrAddClassRef(_baseNameRef);
 }
 
-InternalMethod* InternalClass::addInternalMethodToConstantTable(std::string methodName, std::string descriptor, std::vector<MethodAccessFlag> flags, StmtListNode* body, LocalVariableTable* varTable)
+InternalMethod* InternalClass::addInternalMethodToConstantTable(std::string methodName, std::string descriptor, std::vector<MethodAccessFlag> flags, StmtListNode* body)
 {
-	auto newMethod = new InternalMethod(_constTable, body, methodName, descriptor, getClassName(), flags, varTable);
+	auto newMethod = new InternalMethod(_constTable, body, methodName, descriptor, getClassName(), flags);
 
 	if (this->_methodMap.count(methodName) != 0)
 		throw std::runtime_error("Method " + methodName + " already exists in class " + getClassName() + LINE_AND_FILE);
@@ -120,20 +121,6 @@ InternalMethod* InternalClass::findInternalMethod(std::string methodName)
 	return dynamic_cast<InternalMethod*>(this->_methodMap[methodName]);
 }
 
-InternalField* InternalClass::addExternalClassFieldToConstantTable(ExternalField* externalField)
-{
-	std::string varName = externalField->getVarName();
-	std::string className = externalField->getClassName();
-
-	if (findExternalClassField(varName, className) != nullptr)
-		throw std::runtime_error("Field " + varName + " already exists in class " + this->_name + LINE_AND_FILE);
-
-	auto internalField = new InternalField(this->_constTable, externalField->getVarName(), externalField->getDescriptor(), externalField->getClassName(), externalField->getFlags(), externalField->getConstValue());
-
-	_externalClassFieldMap.push_back(internalField);
-
-	return internalField;
-}
 
 InternalField* InternalClass::findInternalField(std::string varName)
 {
@@ -147,12 +134,61 @@ InternalField* InternalClass::findInternalField(std::string varName)
 	return internalField;
 }
 
-ExternalMethod* ExternalClass::addMethod(std::string methodName, std::string descriptor, std::vector<MethodAccessFlag> flags, LocalVariableTable* varTable)
+std::vector<InternalMethod*> InternalClass::getInternalMethods()
+{
+	std::vector<InternalMethod*> internalMethods;
+	for (auto& methodPair : this->_methodMap)
+	{
+		auto internalMethod = dynamic_cast<InternalMethod*>(methodPair.second);
+		if (internalMethod != nullptr)
+			internalMethods.push_back(internalMethod);
+	}
+	return internalMethods;
+}
+
+std::vector<InternalField*> InternalClass::getInternalFields()
+{
+	std::vector<InternalField*> internalFields;
+	for (auto& fieldPair : this->_fieldMap)
+	{
+		auto internalField = dynamic_cast<InternalField*>(fieldPair.second);
+		if (internalField != nullptr)
+			internalFields.push_back(internalField);
+	}
+	return internalFields;
+}
+
+ConstantTable* InternalClass::getConstTable()
+{
+	return this->_constTable;
+}
+
+int InternalClass::getNameRef()
+{
+	return this->_nameRef;
+}
+
+int InternalClass::getBaseNameRef()
+{
+	return this->_baseNameRef;
+}
+
+int InternalClass::getBaseClassRef()
+{
+	return this->_baseClassRef;
+}
+
+int InternalClass::getClassRef()
+{
+	return this->_classRef;
+}
+
+ExternalMethod* ExternalClass::addMethod(std::string methodName, std::string descriptor, std::vector<MethodAccessFlag> flags)
 {
 	if (this->_methodMap.count(methodName) != 0)
 		throw std::runtime_error("Method " + methodName + " already exists in class " + this->_name + LINE_AND_FILE);
 	
-	auto newMethod = new ExternalMethod(methodName, descriptor, getClassName(), flags, varTable);
+	auto newMethod = new ExternalMethod(methodName, descriptor, getClassName(), flags);
 	this->_methodMap[methodName] = newMethod;
 	return newMethod;
 }

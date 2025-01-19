@@ -108,7 +108,7 @@ void FuncCallNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 
 	if (this->_scopeType == normalCall)
 	{	
-		
+		/*
 		bool isInternal = currentClass->findInternalMethod(this->_funcName) != nullptr;
 
 		//this node should know class type of method
@@ -129,6 +129,7 @@ void FuncCallNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 		{
 			throw std::runtime_error("Method \"" + this->_funcName + "\" is not found in the method table!");
 		}
+		*/
 
 		//TODO add arg type checking
 		/*
@@ -140,6 +141,16 @@ void FuncCallNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 		}
 		funcDesc += ")";
 		*/
+
+		if (this->_funcName == "print")
+		{
+			this->_methodRef = classTable->findMethod("print", "(I)V", "InputOutput")->addMethodRefToConstTable(currentClass->getConstTable());
+		}
+		else
+		{
+			this->_methodRef = currentClass->findMethod(this->_funcName)->addMethodRefToConstTable(currentClass->getConstTable());
+		}
+
 
 		if (this->_hasArgs) {
 			this->_funcArgs->fillTable(classTable, currentClass, currentMethod);
@@ -154,7 +165,7 @@ void FuncCallNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 	
 }
 
-std::vector<char> FuncCallNode::generateCode(ClassTableElement* currentClass, MethodTableElement* currentMethod)
+std::vector<char> FuncCallNode::generateCode(InternalClass* currentClass, InternalMethod* currentMethod)
 {
 	std::vector<char> code = {};
 	if (this->_scopeType == normalCall)

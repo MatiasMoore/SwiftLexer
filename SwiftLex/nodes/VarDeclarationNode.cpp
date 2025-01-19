@@ -158,7 +158,7 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, InternalClass* curren
 		case ValueAndTypeKnown:
 			break;
 		case TypeKnown:
-			currentMethod->addLocalVarToConstantTable(this->_varName, this->_typeNode->toDescriptor(classTable, currentClass, currentMethod));
+			currentMethod->getVarTable()->addLocalVar(this->_varName, this->_typeNode->toDescriptor(classTable, currentClass, currentMethod));
 			break;
 		case ValueKnown:
 			break;
@@ -169,7 +169,7 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, InternalClass* curren
 
 }
 
-std::vector<char> VarDeclarationNode::generateCode(ClassTableElement * currentClass, MethodTableElement * currentMethod)
+std::vector<char> VarDeclarationNode::generateCode(InternalClass * currentClass, InternalMethod * currentMethod)
 {
 	std::vector<char> code = {};
 	switch (this->_type)
@@ -281,7 +281,7 @@ void VarDeclarationListNode::fillTable(ClassTable* classTable, InternalClass* cu
 	}
 }
 
-std::vector<char> VarDeclarationListNode::generateCode(ClassTableElement* currentClass, MethodTableElement* currentMethod)
+std::vector<char> VarDeclarationListNode::generateCode(InternalClass* currentClass, InternalMethod* currentMethod)
 {
 	std::vector<char> code = {};
 	for (auto& elem : _vec)

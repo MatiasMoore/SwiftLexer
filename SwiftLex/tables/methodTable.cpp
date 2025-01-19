@@ -1,13 +1,12 @@
 #include "methodTable.h"
 #include "classTable.h"
 
-ExternalMethod::ExternalMethod(std::string methodName, std::string descriptor, std::string className, std::vector<MethodAccessFlag> flags, LocalVariableTable* varTable)
+ExternalMethod::ExternalMethod(std::string methodName, std::string descriptor, std::string className, std::vector<MethodAccessFlag> flags)
 {
 	this->_methodName = methodName;
 	this->_descriptor = descriptor;
 	this->_className = className;
 	this->_flags = flags;
-	this->_varTable = varTable;
 }
 
 int ExternalMethod::addMethodRefToConstTable(ConstantTable* constTable)
@@ -72,31 +71,16 @@ std::vector<MethodAccessFlag> ExternalMethod::getFlags()
 	return _flags;
 }
 
-LocalVariableTable* ExternalMethod::getVarTable()
+LocalVariableTable* InternalMethod::getVarTable()
 {
-	return _varTable;
+	return this->_varTable;
 }
 
-LocalVariableElement* ExternalMethod::findLocalVar(std::string varName)
+InternalMethod::InternalMethod(ConstantTable* constTable, StmtListNode* body, std::string methodName, std::string descriptor, std::string className, std::vector<MethodAccessFlag> flags)
+	: ExternalMethod(methodName, descriptor, className, flags)
 {
-	return _varTable->findLocalVar(varName);
-}
 
-LocalVariableElement* ExternalMethod::addLocalVar(std::string varName, std::string descriptor)
-{
-	_varTable->addLocalVar(varName, descriptor);
-}
-
-LocalVariableElement* InternalMethod::addLocalVar(std::string varName, std::string descriptor)
-{
-	_varTable->addLocalVarToConstantTable(varName, descriptor, this->_constTable);
-}
-
-InternalMethod::InternalMethod(ConstantTable* constTable, StmtListNode* body, std::string methodName, std::string descriptor, std::string className, std::vector<MethodAccessFlag> flags, LocalVariableTable* varTable)
-	: ExternalMethod(methodName, descriptor, className, flags, varTable)
-{
-	_constTable = constTable;
-
+	_varTable = new LocalVariableTable();
 	_nameRef = constTable->findOrAddUTF8(methodName);
 	_descriptorRef = constTable->findOrAddUTF8(descriptor);
 	_classRef = constTable->findOrAddClassRef(_nameRef);

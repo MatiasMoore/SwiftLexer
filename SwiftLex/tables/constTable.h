@@ -48,10 +48,12 @@ public:
     int addFieldRef(int classRef, int NameAndTypeRef);
     int addStringRef(int utf8Ref);
 
+    int size();
+
+    std::map<int, class ConstantTableItem*> constants; // Словарь - таблица констант.
 private:
     int maxId = 1; // Текущее максимальное значение номера констант в таблице констант.
     
-    std::map<int, class ConstantTableItem*> constants; // Словарь - таблица констант.
 
     /*! Найти константу в таблице констант или добавить ее в таблицу, если отсутствуюет.
     * \param[in] type Тип константы.

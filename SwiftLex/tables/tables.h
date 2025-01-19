@@ -1,6 +1,6 @@
 #pragma once
-#include "../tables/classTable.h"
-#include "../tables/localVarTable.h"
-#include "../tables/constTable.h"
-#include "../tables/methodTable.h"
-#include "../tables/fieldTable.h"
+#include "classTable.h"
+#include "localVarTable.h"
+#include "constTable.h"
+#include "methodTable.h"
+#include "fieldTable.h"

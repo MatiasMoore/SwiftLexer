@@ -2,6 +2,7 @@
 #include "dottable.h"
 #include "GenericListNode.h"
 #include "SemanticsBase.h"
+#include "../tables/tables.h"
 
 class ExprNode;
 class TypeNode;
@@ -32,7 +33,7 @@ public:
 
 	void fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
 
-	std::vector<char> generateCode(class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
+	std::vector<char> generateCode(InternalClass* currentClass, InternalMethod* currentMethod);
 };
 
 class FuncCallArgListNode : public GenericListNode<FuncCallArgNode, FuncCallArgListNode>, public SemanticsBase
@@ -44,5 +45,5 @@ public:
 
 	void fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
 
-	std::vector<char> generateCode(class ClassTableElement* currentClass, class MethodTableElement* currentMethod);
+	std::vector<char> generateCode(InternalClass* currentClass, InternalMethod* currentMethod);
 };

@@ -176,6 +176,10 @@ int main(int argc, const char* argv[])
 	// Attribution
 	auto classTable = ClassTable();
 
+	// Add external classes
+	auto inputOutput = classTable.addExternalClass("InputOutput", "java/lang/object");
+	inputOutput->addMethod("print", "(I)V", { MethodAccessFlag::M_ACC_PUBLIC, MethodAccessFlag::M_ACC_STATIC });
+
 	try
 	{
 		_root->fillTable(&classTable, nullptr, nullptr);
@@ -203,9 +207,9 @@ int main(int argc, const char* argv[])
 	// Generate .class files based on _root
 	try
 	{
-		for (auto& classElem : classTable.items)
+		for (auto& classElem : classTable.getInternalClasses())
 		{
-			generateClassFile(classElem.second, generatedClassFilesDirectory);
+			generateClassFile(classElem, generatedClassFilesDirectory);
 		}
 	}
 	catch (std::runtime_error error)

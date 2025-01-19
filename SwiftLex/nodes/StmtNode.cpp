@@ -418,7 +418,7 @@ void StmtNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 	case StmtType::VarDeclarationList:
 		if (currentClass == nullptr)
 			throw std::runtime_error("Expr stmt must be associated with a class!");
-		
+
 		// if currentMethod == null - it is class field
 		this->_varDeclList->fillTable(classTable, currentClass, currentMethod);
 		break;
@@ -443,7 +443,7 @@ void StmtNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 	}
 }
 
-std::vector<char> StmtNode::generateCode(ClassTableElement* currentClass, MethodTableElement* currentMethod)
+std::vector<char> StmtNode::generateCode(InternalClass* currentClass, InternalMethod* currentMethod)
 {
 	std::vector<char> code = {};
 	switch (this->_type)
@@ -463,7 +463,7 @@ std::vector<char> StmtNode::generateCode(ClassTableElement* currentClass, Method
 		appendVecToVec(code, this->_assignRight->generateCode(currentClass, currentMethod));
 
 		if (this->_assignLeft->_type == ExprType::Id) {
-			int varNum = currentMethod->varTable->findLocalVar(this->_assignLeft->_stringValue)->localId;
+			int varNum = currentMethod->getVarTable()->findLocalVar(this->_assignLeft->_stringValue)->localId;
 			appendVecToVec(code, jvm::istore(varNum));
 		}
 		else {

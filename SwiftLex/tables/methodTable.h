@@ -24,7 +24,7 @@ enum MethodAccessFlag {
 class ExternalMethod
 {
 public:
-    ExternalMethod(std::string methodName, std::string descriptor, std::string className, std::vector<MethodAccessFlag> flags, class LocalVariableTable* _varTable);
+    ExternalMethod(std::string methodName, std::string descriptor, std::string className, std::vector<MethodAccessFlag> flags);
 
     virtual int addMethodRefToConstTable(ConstantTable* constTable);
     int findMethodRef(ConstantTable* constTable);
@@ -33,26 +33,22 @@ public:
     std::string getDescriptor();
     std::string getClassName();
     std::vector<MethodAccessFlag> getFlags();
-    class LocalVariableTable* getVarTable();
-    LocalVariableElement* findLocalVar(std::string varName);
-    virtual LocalVariableElement* addLocalVar(std::string varName, std::string descriptor);
 
 protected:
     std::string _methodName;
     std::string _descriptor;
     std::string _className;
     std::vector<MethodAccessFlag> _flags;
-    class LocalVariableTable* _varTable;
 };
 
 class InternalMethod : public ExternalMethod
 {
 public:
-    InternalMethod(ConstantTable* constTable, StmtListNode* body, std::string methodName, std::string descriptor, std::string className, std::vector<MethodAccessFlag> flags, LocalVariableTable* varTable);
+    InternalMethod(ConstantTable* constTable, StmtListNode* body, std::string methodName, std::string descriptor, std::string className, std::vector<MethodAccessFlag> flags);
     
     int accessFlagsToInt(std::vector<MethodAccessFlag> flags);
-    virtual LocalVariableElement* addLocalVar(std::string varName, std::string descriptor);
     bool isStatic();
+    class LocalVariableTable* getVarTable();
 
     int _methodRef;
     int _nameRef;
@@ -63,5 +59,5 @@ public:
     class StmtListNode* _body;
 
 private:
-    ConstantTable* _constTable; // Не знаю понадобится потом или нет
+    class LocalVariableTable* _varTable;
 };

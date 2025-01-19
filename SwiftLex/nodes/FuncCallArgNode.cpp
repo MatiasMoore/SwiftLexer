@@ -46,7 +46,7 @@ void FuncCallArgNode::fillTable(ClassTable* classTable, InternalClass* currentCl
     this->_argType = this->_value->evaluateType(classTable, currentClass, currentMethod);
 }
 
-std::vector<char> FuncCallArgNode::generateCode(ClassTableElement* currentClass, MethodTableElement* currentMethod)
+std::vector<char> FuncCallArgNode::generateCode(InternalClass* currentClass, InternalMethod* currentMethod)
 {
     std::vector<char> code = {};
     appendVecToVec(code, this->_value->generateCode(currentClass, currentMethod));
@@ -76,7 +76,7 @@ void FuncCallArgListNode::fillTable(ClassTable* classTable, InternalClass* curre
     }
 }
 
-std::vector<char> FuncCallArgListNode::generateCode(ClassTableElement* currentClass, MethodTableElement* currentMethod)
+std::vector<char> FuncCallArgListNode::generateCode(InternalClass* currentClass, InternalMethod* currentMethod)
 {
     std::vector<char> code = {};
     for (auto& elem : _vec) {

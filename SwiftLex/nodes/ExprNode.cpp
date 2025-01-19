@@ -446,8 +446,9 @@ SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 
 	if (this->_type == ExprType::Int)
 	{
-		auto args = FuncCallArgListNode::createListNode(FuncCallArgNode::createFromExpr(ExprNode::createInt(this->_intValue)));
-		return ExprNode::createFuncCall(FuncCallNode::createFuncCall("Integer", args));
+		//auto args = FuncCallArgListNode::createListNode(FuncCallArgNode::createFromExpr(ExprNode::createInt(this->_intValue)));
+		//return ExprNode::createFuncCall(FuncCallNode::createFuncCall("Integer", args));
+		return this;
 	}
 	else if (this->_type == ExprType::Sum)
 	{
@@ -603,7 +604,7 @@ void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 	}
 }
 
-std::vector<char> ExprNode::generateCode(ClassTableElement* currentClass, MethodTableElement* currentMethod)
+std::vector<char> ExprNode::generateCode(InternalClass* currentClass, InternalMethod* currentMethod)
 {
 	
 	LocalVariableElement* localVar;
@@ -622,7 +623,7 @@ std::vector<char> ExprNode::generateCode(ClassTableElement* currentClass, Method
 		break;
 	case ExprType::Id:
 
-		localVar = currentMethod->varTable->findLocalVar(this->_stringValue);
+		localVar = currentMethod->getVarTable()->findLocalVar(this->_stringValue);
 		if (localVar->_descriptor == "I")
 		{
 			appendVecToVec(code, jvm::iload(localVar->localId));
