@@ -21,13 +21,15 @@ enum FieldAccessFlag {
 class ExternalField
 {
 public:
-    ExternalField(std::string varName, std::string descriptor, std::string className);
+    ExternalField(std::string varName, std::string descriptor, std::string className, std::vector<FieldAccessFlag> flags, ExprNode* constValue = nullptr);
 
-    int addFieldRefToConstTable(ConstantTable* constTable);
+    virtual int addFieldRefToConstTable(ConstantTable* constTable);
     int findFieldRef(ConstantTable* constTable);
     std::string getVarName();
     std::string getDescriptor();
     std::string getClassName();
+    std::vector<FieldAccessFlag> getFlags();
+    ExprNode* getConstValue();
 
 protected:
     std::string _varName;
@@ -35,19 +37,25 @@ protected:
     std::string _descriptor;
 
     std::string _className;
+
+    std::vector<FieldAccessFlag> _flags;
+
+    ExprNode* _constValue;
 };
 
 class InternalField : public ExternalField
 {
 public:
-    InternalField(std::string name, std::string descriptorr, std::string className, std::vector<FieldAccessFlag> flags, ExprNode* constValue = nullptr);
+    InternalField(ConstantTable* constantTable, std::string varName, std::string descriptor, std::string className, std::vector<FieldAccessFlag> flags, ExprNode* constValue = nullptr);
     
     int accessFlagsToInt(std::vector<FieldAccessFlag> flags);
 
     bool isStatic();
 
-private:
-    std::vector<FieldAccessFlag> _flags;
+    int _fieldRef;
+    int _nameRef;
+    int _descriptorRef;
+    int _classRef;
+    int _nameAndTypeRef;
 
-    ExprNode* _constValue;
 };

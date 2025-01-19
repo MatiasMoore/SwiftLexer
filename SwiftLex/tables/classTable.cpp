@@ -1,38 +1,69 @@
 #include "classTable.h"
 #include "../ExceptionHelper.h"
 
-InternalClass* ClassTable::addInternalClass(std::string name, std::string baseName) 
+ExternalField* ClassTable::findField(std::string name, std::string descriptor, std::string className)
 {
-	if (this->_internalClasses.count(name) != 0)
+	auto myClass = this->findClass(className);
+	if (myClass != nullptr)
+	{
+		auto externalField = myClass->findField(name);
+		if (externalField != nullptr && externalField->getDescriptor() == descriptor)
+			return externalField;
+	}
+	return nullptr;
+}
+
+ExternalClass* ClassTable::findClass(std::string name)
+{
+	if (this->_classes.count(name) == 0)
+		return nullptr;
+	return this->_classes[name];
+}
+
+InternalClass* ClassTable::addInternalClass(std::string name, std::string baseName)
+{
+	if (this->_classes.count(name) != 0)
 		throw std::runtime_error("Class " + name + " already exists!" + LINE_AND_FILE);
 
-	auto newClass = new InternalClass(name, baseName, this);
-	_internalClasses[name] = newClass;
+	auto newClass = new InternalClass(name, baseName);
+	_classes[name] = newClass;
 	return newClass;
 }
 
 ExternalClass* ClassTable::addExternalClass(std::string name, std::string baseName)
 {
-	if (this->_externalClasses.count(name) != 0)
+	if (this->_classes.count(name) != 0)
 		throw std::runtime_error("Class " + name + " already exists!" + LINE_AND_FILE);
 
 	auto newClass = new ExternalClass(name, baseName);
-	_externalClasses[name] = newClass;
+	_classes[name] = newClass;
 	return newClass;
 }
 
 InternalClass* ClassTable::findInternalClass(std::string name)
 {
-	if (this->_internalClasses.count(name) == 0)
-		return nullptr;
-	return this->_internalClasses[name];
+	return dynamic_cast<InternalClass*>(findClass(name));
 }
 
-ExternalClass* ClassTable::findExternalClass(std::string name)
+ExternalClass* ClassTable::findNotInternalClass(std::string name)
 {
-	if (this->_externalClasses.count(name) == 0)
-		return nullptr;
-	return this->_externalClasses[name];
+	auto myClass = findClass(name);
+	InternalClass* internalClass = dynamic_cast<InternalClass*>(myClass);
+	if (internalClass == nullptr)
+		return myClass;
+	return nullptr;
+}
+
+std::vector<InternalClass*> ClassTable::getInternalClasses()
+{
+	std::vector<InternalClass*> internalClasses;
+	for (auto& classPair : this->_classes)
+	{
+		auto internalClass = dynamic_cast<InternalClass*>(classPair.second);
+		if (internalClass != nullptr)
+			internalClasses.push_back(internalClass);
+	}
+	return internalClasses;
 }
 
 ExternalClass::ExternalClass(std::string name, std::string baseName)
@@ -41,10 +72,8 @@ ExternalClass::ExternalClass(std::string name, std::string baseName)
 	this->_baseName = baseName;
 }
 
-InternalClass::InternalClass(std::string name, std::string baseName, ClassTable* _classTable) : ExternalClass(name, baseName)
+InternalClass::InternalClass(std::string name, std::string baseName) : ExternalClass(name, baseName)
 {
-	_constTable = new ConstantTable();
-	this->_classTable = _classTable;
 	_constTable = new ConstantTable();
 	_nameRef = _constTable->findOrAddUTF8(name);
 	_baseRef = _constTable->findOrAddUTF8(baseName);
@@ -62,162 +91,56 @@ InternalMethod* InternalClass::addMethod(int accessFlag, std::string name, std::
 	newMethod->_descriptorRef = _constTable->findOrAddUTF8(descriptor);
 	auto nameAndTypeRef = _constTable->findOrAddNameAndType(newMethod->_nameRef, newMethod->_descriptorRef);
 	newMethod->_methodRef = _constTable->findOrAddMethodRef(newMethod->_nameRef, this->_classRef);
-	_internalMethodMap[name] = newMethod;
+	_methodMap[name] = newMethod;
 	return newMethod;
 }
 
-InternalField* InternalClass::addInternalField(std::string varName, std::string descriptor, std::vector<FieldAccessFlag> flags, ExprNode* constValue, std::string className)
+InternalField* InternalClass::addInternalField(std::string varName, std::string descriptor, std::vector<FieldAccessFlag> flags, ExprNode* constValue)
 {
-	className = className == "" ? this->_name : className;
-	auto newField = new InternalField(varName, descriptor, this->_name, flags, constValue);
+	auto newField = new InternalField(this->_constTable, varName, descriptor, this->_name, flags, constValue);
 
-	if (this->_currentInternalFieldMap.count(varName) != 0)
+	if (this->_fieldMap.count(varName) != 0)
 		throw std::runtime_error("Field " + varName + " already exists in class " + this->_name + LINE_AND_FILE);
 
-	this->_currentInternalFieldMap[varName] = newField;
-
-	newField->addFieldRefToConstTable(this->_constTable);
+	this->_fieldMap[varName] = newField;
 
 	return newField;
 }
 
-InternalField* InternalClass::addCompilatedClassInternalField(InternalField* internalField)
+InternalField* InternalClass::addExternalClassFieldToConstantTable(ExternalField* externalField)
 {
-	std::string varName = internalField->getVarName();
-	std::string className = internalField->getClassName();
+	std::string varName = externalField->getVarName();
+	std::string className = externalField->getClassName();
 
-	if (this->_usedCompilatedClassFieldMap.count(className) == 0)
-		this->_usedCompilatedClassFieldMap[className] = {};
+	if (findExternalClassField(varName, className) != nullptr)
+		throw std::runtime_error("Field " + varName + " already exists in class " + this->_name + LINE_AND_FILE);
 
-	if (this->_usedCompilatedClassFieldMap[className].count(varName) != 0)
-		throw std::runtime_error("Something went wrong! We should not be there! For field" + varName + " compilated class " + className + " for class " + this->_name + LINE_AND_FILE);
+	auto internalField = new InternalField(this->_constTable, externalField->getVarName(), externalField->getDescriptor(), externalField->getClassName(), externalField->getFlags(), externalField->getConstValue());
 
-	this->_usedCompilatedClassFieldMap[className][varName] = internalField;
-
-	internalField->addFieldRefToConstTable(this->_constTable);
+	_externalClassFieldMap.push_back(internalField);
 
 	return internalField;
 }
 
-InternalField* InternalClass::findCurrentInternalField(std::string varName)
+InternalField* InternalClass::findInternalField(std::string varName)
 {
-	if (this->_currentInternalFieldMap.count(varName) == 0)
-		return nullptr;
-	return this->_currentInternalFieldMap[varName];
+	auto field = this->findField(varName);
+
+	auto internalField = dynamic_cast<InternalField*>(field);
+
+	if (internalField == nullptr)
+		std::runtime_error("Something went wrong! We should not be there! For field" + varName + " in class " + this->_name + LINE_AND_FILE);
+
+	return internalField;
 }
 
-InternalField* InternalClass::findUsedCompilatedClassInternalField(std::string varName, std::string className)
+InternalField* InternalClass::findExternalClassField(std::string varName, std::string className)
 {
-	if (this->_usedCompilatedClassFieldMap.count(className) == 0)
-		return nullptr;
-	auto classFieldMap = this->_usedCompilatedClassFieldMap[className];
-	if (classFieldMap.count(varName) == 0)
-		return nullptr;
-	return classFieldMap[varName];
-}
-
-InternalField* InternalClass::findInternalField(std::string varName, std::string className)
-{
-	if (className == "")
+	for (auto& externalField : this->_externalClassFieldMap)
 	{
-		return this->findCurrentInternalField(varName);
+		if (externalField->getVarName() == varName && externalField->getClassName() == className)
+			return externalField;
 	}
-	else 
-	{
-		return this->findUsedCompilatedClassInternalField(varName, className);
-	}
-
-}
-
-ExternalField* InternalClass::addExternalField(std::string varName, std::string descriptor, std::string className)
-{
-	auto newField = new ExternalField(varName, descriptor, this->_name);
-	if (_usedExternalClassFieldMap.count(className) == 0)
-		_usedExternalClassFieldMap[className] = {};
-	_usedExternalClassFieldMap[className][varName] = newField;
-	newField->addFieldRefToConstTable(this->_constTable);
-	return newField;
-}
-
-ExternalField* InternalClass::addExternalField(ExternalField* externalField)
-{
-	std::string varName = externalField->getVarName();
-	std::string className = externalField->getClassName();
-	if (_usedExternalClassFieldMap.count(className) == 0)
-		_usedExternalClassFieldMap[className] = {};
-	_usedExternalClassFieldMap[className][varName] = externalField;
-	externalField->addFieldRefToConstTable(this->_constTable);
-	return externalField;
-}
-
-ExternalField* InternalClass::findCurrentExternalField(std::string varName, std::string className)
-{
-	if (_usedExternalClassFieldMap.count(className) == 0)
-		return nullptr;
-	auto classFieldMap = _usedExternalClassFieldMap[className];
-	if (classFieldMap.count(varName) == 0)
-		return nullptr;
-	return classFieldMap[varName];
-}
-
-int InternalClass::findOrAddFieldRef(std::string varName, std::string className)
-{
-	// Search in my fields
-	if (className == "")
-	{
-		InternalField* field = this->findCurrentInternalField(varName);
-		if (field != nullptr)
-		{
-			int fieldRef = field->findFieldRef(_constTable);
-			if (fieldRef == -1)
-				throw std::runtime_error("Something went wrong! We should not be there! For field" + varName + " in class " + this->_name + LINE_AND_FILE);
-			return fieldRef;
-		}
-		return -1;
-	}
-
-	// Search in compiled internal classes field
-	// Search if field already used
-	InternalField* field = this->findUsedCompilatedClassInternalField(varName, className);
-	if (field != nullptr)
-	{
-		int fieldRef = field->findFieldRef(_constTable);
-		if (fieldRef == -1)
-			throw std::runtime_error("Something went wrong! We should not be there! For field" + varName + " compilated class " + className + " in class " + this->_name + LINE_AND_FILE);
-		return fieldRef;
-	}
-
-	// If not used, search in compiled internal classes field
-	InternalClass* compiledInternalClass = this->_classTable->findInternalClass(className);
-	if (compiledInternalClass != nullptr)
-	{
-		InternalField* field = compiledInternalClass->findInternalField(varName);
-		if (field != nullptr)
-			// inf exist -> add field to our constant pool
-			return this->addCompilatedClassInternalField(field)->findFieldRef(this->_constTable);
-	}
-
-	// Search in rtl classes field
-	// Search if field already used 
-	ExternalField* externalField = this->findCurrentExternalField(varName, className);
-	if (externalField != nullptr)
-	{
-		int fieldRef = externalField->findFieldRef(_constTable);
-		if (fieldRef == -1)
-			throw std::runtime_error("Something went wrong! We should not be there! For field" + varName + " external class " + className + " in class " + this->_name + LINE_AND_FILE);
-		return fieldRef;
-	}
-
-	// If not used, search in rtl classes field
-	ExternalClass* externalClass = this->_classTable->findExternalClass(className);
-	if (externalClass == nullptr)
-		return -1;
-
-	externalField = externalClass->findExternalField(varName);
-	if (externalField != nullptr)
-		return this->addExternalField(externalField)->findFieldRef(_constTable);
-
-	return -1;
 }
 
 ExternalMethod* ExternalClass::addMethod(std::string name, std::string descriptor)
@@ -230,22 +153,29 @@ ExternalMethod* ExternalClass::addMethod(std::string name, std::string descripto
 	return newMethod;
 }
 
-ExternalField* ExternalClass::addExternalField(std::string varName, std::string descriptor)
+ExternalField* ExternalClass::addField(std::string varName, std::string descriptor, std::string className, std::vector<FieldAccessFlag> flags, ExprNode* constValue)
 {
-	auto newField = new ExternalField(varName, descriptor, this->_name);
-	this->_externalFieldMap[varName] = newField;
+	if (this->_fieldMap.count(varName) != 0)
+		throw std::runtime_error("Field " + varName + " already exists in class " + this->_name + LINE_AND_FILE);
+
+	auto newField = new ExternalField(varName, descriptor, this->_name, flags, constValue);
+	this->_fieldMap[varName] = newField;
 	return newField;
 }
 
-ExternalField* ExternalClass::addExternalField(ExternalField* externalField)
+ExternalField* ExternalClass::findField(std::string varName)
 {
-	this->_externalFieldMap[externalField->getVarName()] = externalField;
-	return externalField;
+	if (this->_fieldMap.count(varName) == 0)
+		return nullptr;
+	return this->_fieldMap[varName];
 }
 
-ExternalField* ExternalClass::findExternalField(std::string varName)
+std::string ExternalClass::getClassName()
 {
-	if (this->_externalFieldMap.count(varName) == 0)
-		return nullptr;
-	return this->_externalFieldMap[varName];
+	return _name;
+}
+
+std::string ExternalClass::getBaseClassName()
+{
+	return _baseName;
 }

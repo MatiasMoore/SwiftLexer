@@ -1,11 +1,13 @@
 #include "fieldTable.h"
 #include "../ExceptionHelper.h"
 
-ExternalField::ExternalField(std::string varName, std::string descriptor, std::string className)
+ExternalField::ExternalField(std::string varName, std::string descriptor, std::string className, std::vector<FieldAccessFlag> flags, ExprNode* constValue)
 {
 	this->_varName = varName;
 	this->_descriptor = descriptor;
 	this->_className = className;
+	this->_flags = flags;
+	this->_constValue = constValue;
 }
 
 int ExternalField::addFieldRefToConstTable(ConstantTable* constTable)
@@ -52,15 +54,28 @@ std::string ExternalField::getClassName()
 	return this->_className;
 }
 
+std::vector<FieldAccessFlag> ExternalField::getFlags()
+{
+	return _flags;
+}
+
+ExprNode* ExternalField::getConstValue()
+{
+	return _constValue;
+}
+
 std::string ExternalField::getDescriptor()
 {
 	return this->_descriptor;
 }
 
-InternalField::InternalField(std::string varName, std::string descriptor, std::string className, std::vector<FieldAccessFlag> flags, ExprNode* constValue) : ExternalField(varName, descriptor, className)
+InternalField::InternalField(ConstantTable* constantTable, std::string varName, std::string descriptor, std::string className, std::vector<FieldAccessFlag> flags, ExprNode* constValue) : ExternalField(varName, descriptor, className, flags, constValue)
 {
-	this->_constValue = constValue;
-	this->_flags = flags;
+	this->_fieldRef = this->addFieldRefToConstTable(constantTable);
+	this->_nameRef = constantTable->findUTF8(varName);
+	this->_descriptorRef = constantTable->findUTF8(descriptor);
+	this->_classRef = constantTable->findUTF8(className);
+	this->_nameAndTypeRef = constantTable->findNameAndType(this->_nameRef, this->_descriptorRef);
 }
 
 int InternalField::accessFlagsToInt(std::vector<FieldAccessFlag> flags)
