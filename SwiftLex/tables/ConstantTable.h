@@ -39,6 +39,12 @@ public:
     int findFieldRef(int classRef, int NameAndTypeRef);
     int findStringRef(int utf8Ref);
 
+    int size();
+
+    std::map<int, class ConstantTableItem*> constants; // —ловарь - таблица констант.
+private:
+    int maxId = 1; // “екущее максимальное значение номера констант в таблице констант.
+    
     int addUTF8(std::string utf8string);
     int addClassRef(int utf8Ref);
     int addMethodRef(int classRef, int nameAndTypeRef);
@@ -47,13 +53,6 @@ public:
     int addDoubleRef(double doubleValue);
     int addFieldRef(int classRef, int NameAndTypeRef);
     int addStringRef(int utf8Ref);
-
-    int size();
-
-    std::map<int, class ConstantTableItem*> constants; // —ловарь - таблица констант.
-private:
-    int maxId = 1; // “екущее максимальное значение номера констант в таблице констант.
-    
 
     /*! Ќайти константу в таблице констант или добавить ее в таблицу, если отсутствуюет.
     * \param[in] type “ип константы.

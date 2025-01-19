@@ -23,14 +23,14 @@ int ExternalField::addFieldRefToConstTable(ConstantTable* constTable)
 	if (this->findFieldRef(constTable) != -1)
 		throw std::runtime_error("Equal field with name " + this->_varName + " and descriptor " + this->_descriptor + " already exists in this class!" + LINE_AND_FILE);
 
-	int varNameRef = constTable->addUTF8(this->_varName);
-	int descriptorRef = constTable->addUTF8(this->_descriptor);
-	int nameAndTypeRef = constTable->addNameAndType(varNameRef, descriptorRef);
+	int varNameRef = constTable->findOrAddUTF8(this->_varName);
+	int descriptorRef = constTable->findOrAddUTF8(this->_descriptor);
+	int nameAndTypeRef = constTable->findOrAddNameAndType(varNameRef, descriptorRef);
 
-	int classNameRef = constTable->addUTF8(this->_className);
-	int classRef = constTable->addClassRef(classNameRef);
+	int classNameRef = constTable->findOrAddUTF8(this->_className);
+	int classRef = constTable->findOrAddClassRef(classNameRef);
 
-	int fieldRef = constTable->addFieldRef(classRef, nameAndTypeRef);
+	int fieldRef = constTable->findOrAddFieldRef(classRef, nameAndTypeRef);
 
 	return fieldRef;
 }

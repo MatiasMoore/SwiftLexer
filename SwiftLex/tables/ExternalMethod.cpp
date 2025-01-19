@@ -14,14 +14,14 @@ int ExternalMethod::addMethodRefToConstTable(ConstantTable* constTable)
 	if (this->findMethodRef(constTable) != -1)
 		throw std::runtime_error("Equal method with name " + this->_methodName + " and descriptor " + this->_descriptor + " already exists in this class!" + LINE_AND_FILE);
 
-	int varNameRef = constTable->addUTF8(this->_methodName);
-	int descriptorRef = constTable->addUTF8(this->_descriptor);
-	int nameAndTypeRef = constTable->addNameAndType(varNameRef, descriptorRef);
+	int varNameRef = constTable->findOrAddUTF8(this->_methodName);
+	int descriptorRef = constTable->findOrAddUTF8(this->_descriptor);
+	int nameAndTypeRef = constTable->findOrAddNameAndType(varNameRef, descriptorRef);
 
-	int classNameRef = constTable->addUTF8(this->_className);
-	int classRef = constTable->addClassRef(classNameRef);
+	int classNameRef = constTable->findOrAddUTF8(this->_className);
+	int classRef = constTable->findOrAddClassRef(classNameRef);
 
-	int methodRef = constTable->addMethodRef(classRef, nameAndTypeRef);
+	int methodRef = constTable->findOrAddMethodRef(classRef, nameAndTypeRef);
 
 	return methodRef;
 }
