@@ -11,6 +11,8 @@ public:
 
     std::string getMethodName();
     std::string getDescriptor();
+    std::string getArgsDescriptor();
+    std::string getReturnDescriptor();
     std::string getClassName();
     std::vector<MethodAccessFlag> getFlags();
     int accessFlagsToInt();

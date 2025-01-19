@@ -61,6 +61,16 @@ std::string ExternalMethod::getDescriptor()
 	return _descriptor;
 }
 
+std::string ExternalMethod::getArgsDescriptor()
+{
+	return _descriptor.substr(_descriptor.find('('), _descriptor.find(')') - _descriptor.find('(') + 1);
+}
+
+std::string ExternalMethod::getReturnDescriptor()
+{
+	return _descriptor.substr(_descriptor.find(')') + 1);
+}
+
 std::string ExternalMethod::getClassName()
 {
 	return _className;
