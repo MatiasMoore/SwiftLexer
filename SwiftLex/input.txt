@@ -1,5 +1,6 @@
 class Test2
 {
+	public static var testVariable : Int; 
 	static public func testFunc()
 	{
 		print(2)
@@ -11,8 +12,16 @@ class Test
 	static public func testFunc(i : Int)
 	{
 		print(i)
-		Test2.testFunc()
 	}
+
+	static public func changeVariable(i : Int)
+	{
+		Test2.testVariable = i;
+	}
+
+
 }
-var Test = 5
-Test.testFunc(2)
+Test2.testVariable = 99;
+Test.testFunc(Test2.testVariable)
+Test.changeVariable(123456789)
+Test.testFunc(Test2.testVariable)

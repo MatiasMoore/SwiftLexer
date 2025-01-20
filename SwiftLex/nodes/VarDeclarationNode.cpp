@@ -72,9 +72,7 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, InternalClass* curren
 	// Class Field
 	int constantValueIndex;
 	if (currentMethod == nullptr)
-	{
-		throw std::runtime_error("Usupported" + LINE_AND_FILE);
-		/*
+	{	
 		if (_modifiers == nullptr)
 		{
 			throw std::runtime_error("Modifier missing for field: \"" + _varName + "\" for class \"" + currentClass->getClassName() + "\"");
@@ -82,72 +80,69 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, InternalClass* curren
 
 		if (this->_type == ValueAndTypeKnown)
 		{
+			throw std::runtime_error("Field with initialization does not support for field \"" + this->_varName + "\" in class \"" + currentClass->getClassName() + "\" REQUIRED TO ADD <init> OR <clinit>" + LINE_AND_FILE);
+
+			// All done, required to add assign to <clinit> (if static) or <init> (if not static)
+			this->_valueNode->fillTable(classTable, currentClass, currentMethod);
+
 			// Check if var type and assignable type is equal
 			auto varTypeDescriptor = this->_typeNode->toDescriptor(classTable, currentClass, currentMethod);
 			auto assignableValueType = this->_valueNode->evaluateType(classTable, currentClass, currentMethod);
 			auto assignableValueDescriptor = assignableValueType->toDescriptor(classTable, currentClass, currentMethod);
-			if (varTypeDescriptor != assignableValueDescriptor)
-				throw std::runtime_error("Variable descriptor\"" + varTypeDescriptor + "\" does not match with assignable descriptor \"" + assignableValueDescriptor + "\" for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\"");
-			
-			// Check if field is static
-			auto accessFlags = this->_modifiers->getMethodAccessFlags();
-			bool isStatic = std::find(accessFlags.begin(), accessFlags.end(), M_ACC_STATIC) != accessFlags.end();
-			if (!isStatic)
-				throw std::runtime_error("Non static field does not support for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\"");
-
-			
-			/* Ёто плохо и ужасно. Ќадо здесь вызывать fillTable у _valueNode и туда добавить аргумент типа там forceToConstTable (по умолчанию задать false)
-			* чтобы не добавл€ть это во всех предыдущих вызовах. ¬нутри filltable когда forceToConstTable == true надо пытатьс€ записать значение в таблицу констант
-			* если это невозможно (например вызов функци) кидаешь ошибку. ≈сли возможно, то записываешь в таблицу констант и сохран€ешь номер строки в новое поле
-			* exprNode (какой-нибудь там _constTableValueRef).
-			* —оответсвенно здесь ты просто будешь делать:
-			* currentClass->addStaticField(this->_modifiers->getFieldAccessFlags(), this->_varName, this->_typeNode->toDescriptor(classTable, currentClass, currentMethod), _valueNode->_constTableValueRef)
-			* */
-			/*//TODO: add method to assign non constant static variables
-			this->_valueNode->fillTable(classTable, currentClass, currentMethod, true);
-			//≈сли есть желание можно на вс€кий проверить наличие этого индекса в таблице еще и тут
+			if (varTypeDescriptor != assignableValueDescriptor) //maybe override "==" for TypeNode???
+				throw std::runtime_error("Variable descriptor\"" + varTypeDescriptor + "\" does not match with assignable descriptor \"" + assignableValueDescriptor + "\" for field \"" + this->_varName + "\" in class \"" + currentClass->getClassName() + "\"" + LINE_AND_FILE);
 
 			// Create field
 			currentClass->addInternalFieldToConstantTable(
-				this->_varName, 
+				this->_varName,
 				this->_typeNode->toDescriptor(classTable, currentClass, currentMethod),
-				this->_modifiers->getFieldAccessFlags(),
-				// TODO
-			)
-			currentClass->addStaticField(this->_modifiers->getFieldAccessFlags(), this->_varName, this->_typeNode->toDescriptor(classTable, currentClass, currentMethod), _valueNode->_constTableValueRef);
+				this->_modifiers->getFieldAccessFlags()
+				);
 		}
 		else if (this->_type == TypeKnown)
 		{
-			/* ћаксимум можешь проверить что не dynamicT и то тут надо подумать, но лучше пока провер€ть */
-			// Check if field type is INT
-		/*
-			if (this->_typeNode->_type != IntT)
-				throw std::runtime_error("Type " + std::to_string(this->_typeNode->_type) + " does not support for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\"");
 			
-			// Check if field is static
+			//Check if field not final (needs to be initialized)
 			auto accessFlags = this->_modifiers->getMethodAccessFlags();
+			bool isFinal = std::find(accessFlags.begin(), accessFlags.end(), M_ACC_FINAL) != accessFlags.end();
 			bool isStatic = std::find(accessFlags.begin(), accessFlags.end(), M_ACC_STATIC) != accessFlags.end();
-			if (!isStatic)
-				throw std::runtime_error("Non static field does not support for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\"");
-
-
-			/* “ут не надо никакое дефолтное значение задавать, в джаве же можно поле без значени€ иметь, если тип указан */
-			// Create name for attribute
-
+			if (isFinal)
+				throw std::runtime_error("Final field needs to be initialized for field \"" + this->_varName + "\" in class \"" + currentClass->getClassName() + "\"");
+			//TODO: remove after testing
+			if (isStatic)
+			{
+				std::string warning = "WARNING: Field declaration for field \"" + this->_varName + "\" in class \"" + currentClass->getClassName() + "\" is missing initialization and not possible in swift. Remove after testing" + LINE_AND_FILE;
+				std::cout << warning;
+			}
 			// Create field
-			/*
-			constantValueIndex = currentClass->constants->findOrAddConstant(Integer_C, "", 0); // DEFAULT INTEGER = 0
-			currentClass->addStaticField(this->_modifiers->getFieldAccessFlags(), this->_varName, this->_typeNode->toDescriptor(classTable, currentClass, currentMethod), constantValueIndex);
+			currentClass->addInternalFieldToConstantTable(
+				this->_varName,
+				this->_typeNode->toDescriptor(classTable, currentClass, currentMethod),
+				this->_modifiers->getFieldAccessFlags()
+				);
 		}
 		else if (this->_type == ValueKnown) 
 		{
-			throw std::runtime_error("Declaration usupported for type " + std::to_string(this->_type) + " for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\"");
+			throw std::runtime_error("Field with initialization does not support for field \"" + this->_varName + "\" in class \"" + currentClass->getClassName() + "\" REQUIRED TO ADD <init> OR <clinit>" + LINE_AND_FILE);
+
+			// All done, required to add assign to <clinit> (if static) or <init> (if not static)
+			this->_valueNode->fillTable(classTable, currentClass, currentMethod);
+
+			// Get type from assignable value
+			this->_typeNode = this->_valueNode->evaluateType(classTable, currentClass, currentMethod);
+			auto varTypeDescriptor = this->_typeNode->toDescriptor(classTable, currentClass, currentMethod); 
+
+			// Create field
+			currentClass->addInternalFieldToConstantTable(
+				this->_varName,
+				this->_typeNode->toDescriptor(classTable, currentClass, currentMethod),
+				this->_modifiers->getFieldAccessFlags()
+			);
 		}
 		else
 		{
-			throw std::runtime_error("Declaration usupported for field \"" + this->_varName + "\" in class \"" + currentClass->nameStr + "\"");
+			throw std::runtime_error("Declaration usupported for field \"" + this->_varName + "\" in class \"" + currentClass->getClassName() + "\"" + LINE_AND_FILE);
 		}
-	*/
 	}
 
 	// Local Variable

@@ -96,6 +96,7 @@ public:
 
 	FuncCallNode* _funcCall;
 
+	bool _isStaticFieldAccess;
 	int _staticFieldRef;
 	int _constTableValueRef;
 
@@ -139,7 +140,7 @@ public:
 
 	TypeNode* evaluateType(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
 
-	void fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, bool forceToConstTable = false);
+	void fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
 
 	std::vector<char> generateCode(InternalClass* currentClass, InternalMethod* currentMethod);
 };

@@ -13,46 +13,13 @@ char _smallVersion[2] = { 0x00, 0x00 };
 char _bigVersion[2] = { 0x00, 0x3E };
 int _stackSize = 1000;
 
-std::vector<char> generateFieldConstantAttribute(InternalField* fieldElement, InternalClass* classElement)
-{
-	std::vector<char> res;
-
-	int attributeNameIndex = classElement->getConstTable()->findOrAddUTF8("ConstantValue");
-
-	/*
-		u2 attribute_name_index;
-		u4 attribute_length;
-		u2 constantvalue_index;
-	*/
-	appendVecToVec(res, intToByteVector(attributeNameIndex, 2));
-	appendVecToVec(res, intToByteVector(2, 4)); //The value of the attribute_length item must be two.
-	//FIXME
-	appendVecToVec(res, intToByteVector(fieldElement->getConstValue()->_constTableValueRef, 2));
-	return res;
-}
-
 std::vector<char> generateFieldCode(InternalField* fieldElement, InternalClass* classElement)
 {
-
-
 	std::vector<char> res;
-	//FIXME
 	std::vector<char> accessFlags = intToByteVector(fieldElement->accessFlagsToInt(), 2);
-	
-
 	std::vector<char> nameIndex = intToByteVector(fieldElement->_nameRef, 2);
 	std::vector<char> descriptorIndex = intToByteVector(fieldElement->_descriptorRef, 2);
-
-
 	std::vector<char> attributesCount = intToByteVector(0, 2);
-	std::vector<char> attributesBytes = {};
-
-	if (fieldElement->isStatic())
-	{
-		attributesCount = intToByteVector(1, 2);
-		attributesBytes = generateFieldConstantAttribute(fieldElement, classElement);
-	}
-
 	/*
 		u2             access_flags;
 		u2             name_index;
@@ -63,9 +30,7 @@ std::vector<char> generateFieldCode(InternalField* fieldElement, InternalClass* 
 	appendVecToVec(res, accessFlags);
 	appendVecToVec(res, nameIndex);
 	appendVecToVec(res, descriptorIndex);
-	// Only for constants
 	appendVecToVec(res, attributesCount);
-	appendVecToVec(res, attributesBytes);
 	return res;
 }
 

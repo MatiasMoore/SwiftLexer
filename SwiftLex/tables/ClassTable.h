@@ -12,10 +12,10 @@ public:
 	std::map<std::string, ExternalClass*> _classes = {};
 
 	/*!
-	* \brief Search a field across all classes
+	* \brief Search a field in class
 	* \return ExternalField - The ExternalField field
 	*/
-	ExternalField* findField(std::string name, std::string descriptor, std::string className);
+	ExternalField* findField(std::string name, std::string className);
 
 	/*!
 	* \brief Search a method across all classes

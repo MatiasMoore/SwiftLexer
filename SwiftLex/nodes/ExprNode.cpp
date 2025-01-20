@@ -5,6 +5,8 @@
 #include "../generation/generationHelpers.h"
 #include <set>
 #include "../ExceptionHelper.h"
+#include "../tables/tables.h"
+#include "../tables/FieldAccessFlag.h"
 
 ExprNode* ExprNode::createBool(bool value)
 {
@@ -512,16 +514,10 @@ TypeNode* ExprNode::evaluateType(ClassTable* classTable, InternalClass* currentC
 	}
 	else if (this->_type == ExprType::FieldAccess)
 	{
-		throw std::runtime_error("Unsupported" + LINE_AND_FILE);
-		
-		/*
-
-		
-		
 		std::string classId = "";
 
 		bool isLeftSideComplex = this->_fieldAccessExpr->_type != ExprType::Id;
-		bool isLocalVar = !isLeftSideComplex && currentMethod->varTable->items.count(this->_fieldAccessExpr->_stringValue);
+		bool isLocalVar = !isLeftSideComplex && currentMethod->getVarTable()->items.count(this->_fieldAccessExpr->_stringValue);
 		bool isStatic = !isLeftSideComplex && !isLocalVar;
 
 		if (isLeftSideComplex)
@@ -536,7 +532,14 @@ TypeNode* ExprNode::evaluateType(ClassTable* classTable, InternalClass* currentC
 		// Static field
 		if (isStatic)
 		{
-			bool isStaticFieldFound = this->_fieldAccessExpr->_type == ExprType::Id && classTable->items.count(this->_fieldAccessExpr->_stringValue) != 0;
+
+			bool isStaticFieldFound = false;
+			if (this->_fieldAccessExpr->_type == ExprType::Id) {
+				auto field = classTable->findClass(this->_fieldAccessExpr->_stringValue)->findField(this->_fieldAccessFieldName);
+				if (field != nullptr) {
+					isStaticFieldFound = field->isHasFlag(FieldAccessFlag::F_ACC_STATIC);
+				}
+			}
 
 			if (!isStaticFieldFound)
 				throw std::runtime_error("Critical error! Field access is neither static or non-static!");
@@ -545,26 +548,27 @@ TypeNode* ExprNode::evaluateType(ClassTable* classTable, InternalClass* currentC
 		}
 		else if (classId.empty())// Non-static field with unknown class id
 		{
-			auto localVar = currentMethod->varTable->findLocalVar(this->_fieldAccessExpr->_stringValue);
+			auto localVar = currentMethod->getVarTable()->findLocalVar(this->_fieldAccessExpr->_stringValue);
 			if (localVar->_descriptor.size() == 1)
 				throw std::runtime_error("Primitive types can't be used with field access!");
 
 			classId = classnameFromDescriptor(localVar->_descriptor);
 		}
 
-		bool classFound = classTable->items.count(classId) != 0;
+		bool classFound = classTable->findClass(classId) != nullptr;
 
 		if (!classFound)
 			throw std::runtime_error("Class \"" + classId + "\" is not found for field access!");
 
-		bool fieldFound = classTable->items[classId]->fields->items.count(this->_fieldAccessFieldName) != 0;
+		bool fieldFound = classTable->findClass(classId)->findField(this->_fieldAccessFieldName) != nullptr; // TODO: add descriptor
+		std::string warning = "WARNING: search for field \"" + this->_fieldAccessFieldName + "\" without descriptor!" + LINE_AND_FILE;
+		std::cout << warning;
 		if (!fieldFound)
 			throw std::runtime_error("Field \"" + this->_fieldAccessFieldName + "\" is not found in class \"" + classId + "\"!");
 
-		auto field = classTable->items[classId]->fields->items[this->_fieldAccessFieldName];
+		auto field = classTable->findClass(classId)->findField(this->_fieldAccessFieldName);
 
-		return TypeNode::createFromDescriptor(field->_descriptor);
-		*/
+		return TypeNode::createFromDescriptor(field->getDescriptor());
 	}
 	else
 	{
@@ -572,7 +576,7 @@ TypeNode* ExprNode::evaluateType(ClassTable* classTable, InternalClass* currentC
 	}
 }
 
-void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, bool forceToConstTable)
+void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
 {
 	ExternalField* field;
 	if (currentClass == nullptr)
@@ -588,33 +592,31 @@ void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 		break;
 
 	case ExprType::FieldAccess:
-		throw std::runtime_error("Unsupported" + LINE_AND_FILE);
 		//TODO non static field access; for reference see ExprNode::evaluateType
-		/*
 		if (this->_fieldAccessExpr->_type != Id)
 		{
 			throw std::runtime_error("Unsupported field access with left part" + std::to_string(_fieldAccessExpr->_type) + "!" + "Field access only support \"ID\" at left part! ");
 		}
-		field = currentClass->addExternalField(_fieldAccessExpr->_stringValue, this->_fieldAccessFieldName, this->evaluateType(classTable, currentClass, currentMethod)->toDescriptor(classTable, currentClass, currentMethod));
-		this->_staticFieldRef = field->_fieldRef;
-		if (forceToConstTable)
-		{
-			throw std::runtime_error("Unsupported forceToConstTable flag for FieldAccess" + this->_fieldAccessFieldName);
+		{ // wtf if works?
+			std::string warning = "WARNING: search for field \"" + this->_fieldAccessFieldName + "\" without descriptor!" + LINE_AND_FILE;
+			std::cout << warning;
 		}
-		*/
+		this->_staticFieldRef = currentClass->getFieldRefForExternalField(
+			classTable->findField(
+				this->_fieldAccessFieldName,
+				// this->evaluateType(classTable, currentClass, currentMethod)->toDescriptor(classTable, currentClass, currentMethod),
+				_fieldAccessExpr->_stringValue
+			)
+		);
+		this->_isStaticFieldAccess = true;
 		break;
 	case ExprType::Int:
-		if (forceToConstTable)
+		if (this->_intValue < -32767 || this->_intValue > 32767)
 		{
-			throw std::runtime_error("Unsupported" + LINE_AND_FILE);
-			//this->_constTableValueRef = currentClass->constants->findOrAddConstant(Integer_C, "", this->_intValue);
+			currentClass->getConstTable()->findOrAddInteger(this->_intValue);
 		}
 		break;
 	case ExprType::Id:
-		if (forceToConstTable)
-		{
-			throw std::runtime_error("Unsupported forceToConstTable flag for id" + this->_stringValue);
-		}
 		break;
 	default:
 		throw std::runtime_error("Unsupported expr with enum type " + std::to_string(this->_type) + "!");
@@ -635,9 +637,11 @@ std::vector<char> ExprNode::generateCode(InternalClass* currentClass, InternalMe
 		break;
 	case ExprType::Int:
 		if (this->_intValue < -32767 || this->_intValue > 32767) {
-			throw std::runtime_error("Doesn't support int with >2 bytes: " + std::to_string(this->_intValue));
+			appendVecToVec(code, jvm::ldc(currentClass->getConstTable()->findIntegerRef(this->_intValue)));
 		}
-		appendVecToVec(code, jvm::iconstBipushSipush(this->_intValue));
+		else {
+			appendVecToVec(code, jvm::iconstBipushSipush(this->_intValue));
+		}
 		break;
 	case ExprType::Id:
 

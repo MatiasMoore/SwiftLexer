@@ -18,6 +18,7 @@
 #include "TypeNode.h"
 #include "../generation/generationHelpers.h"
 #include <set>
+#include "../ExceptionHelper.h"
 
 StmtNode* StmtNode::createStmtExpr(ExprNode* expr)
 {
@@ -431,6 +432,8 @@ void StmtNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 		this->_assignLeft->fillTable(classTable, currentClass, currentMethod);
 		this->_assignRight->fillTable(classTable, currentClass, currentMethod);
 
+		if (this->_assignLeft->evaluateType(classTable, currentClass, currentMethod)->toDescriptor(classTable, currentClass, currentMethod) != _assignRight->evaluateType(classTable, currentClass, currentMethod)->toDescriptor(classTable, currentClass, currentMethod))
+			throw std::runtime_error("Assignment types do not match!" + LINE_AND_FILE);
 		break;
 	case StmtType::Return:
 		//TODO maybe do something here
@@ -464,6 +467,13 @@ std::vector<char> StmtNode::generateCode(InternalClass* currentClass, InternalMe
 		if (this->_assignLeft->_type == ExprType::Id) {
 			int varNum = currentMethod->getVarTable()->findLocalVar(this->_assignLeft->_stringValue)->localId;
 			appendVecToVec(code, jvm::istore(varNum));
+		}
+		else if(this->_assignLeft->_type == ExprType::FieldAccess) {
+			if (!this->_assignLeft->_isStaticFieldAccess)
+				throw std::runtime_error("Non static field access is not supported for field + \"" + _assignLeft->_fieldAccessFieldName + "\"" + LINE_AND_FILE);
+			this->_assignLeft->generateCode(currentClass, currentMethod); // Do not append bytes
+			appendVecToVec(code, this->_assignRight->generateCode(currentClass, currentMethod));
+			appendVecToVec(code, jvm::putStatic(this->_assignLeft->_staticFieldRef));
 		}
 		else {
 			throw std::runtime_error("Unsupported assignment with left operand type: " + std::to_string(this->_assignLeft->_type) + "!");
