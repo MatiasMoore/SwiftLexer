@@ -281,6 +281,11 @@ SemanticsBase* FuncDeclNode::semanticsTransform(SemanticsStack stack)
 	//Check modifiers
 	this->_modifiers = this->_modifiers->semanticsTransform(stack)->typecast<AccessModifierListNode>();
 
+	if (this->_hasArgs)
+	{
+		this->_argList = this->_argList->semanticsTransform(stack)->typecast<FuncDeclArgListNode>();
+	}
+
 	//Function may not have a body if it has a void return which is checked later
 	if (this->_hasBody)
 		this->_body = this->_body->semanticsTransform(stack)->typecast<StmtListNode>();

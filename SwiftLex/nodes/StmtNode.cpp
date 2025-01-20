@@ -360,9 +360,6 @@ SemanticsBase* StmtNode::semanticsTransform(SemanticsStack stack)
 	}
 	else if (this->_type == StmtType::ClassDecl)
 	{
-		if (!this->_classDecl->_hasBody)
-			throw std::runtime_error("Classes must have a body!");
-
 		this->_classDecl = this->_classDecl->semanticsTransform(stack)->typecast<ClassDeclNode>();
 	}
 	else if (this->_type == StmtType::FuncDecl)

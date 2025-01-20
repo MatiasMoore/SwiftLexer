@@ -64,7 +64,34 @@ void FuncDeclArgNode::generateDot(std::ofstream& file)
 	}
 }
 
+SemanticsBase* FuncDeclArgNode::semanticsTransform(SemanticsStack stack)
+{
+	stack.push(this);
+	if (this->_isAlreadyTransformed)
+		return this;
+
+	this->_argType = this->_argType->semanticsTransform(stack)->typecast<TypeNode>();
+	if (this->_hasDefaultValue)
+		this->_argDefaultValue = this->_argDefaultValue->semanticsTransform(stack)->typecast<ExprNode>();
+
+	return this;
+}
+
 std::string FuncDeclArgListNode::getName()
 {
 	return "FuncDeclArgList";
+}
+
+SemanticsBase* FuncDeclArgListNode::semanticsTransform(SemanticsStack stack)
+{
+	stack.push(this);
+	if (this->_isAlreadyTransformed)
+		return this;
+
+	for (int i = 0; i < _vec.size(); i++)
+	{
+		_vec[i] = _vec[i]->semanticsTransform(stack)->typecast<FuncDeclArgNode>();
+	}
+
+	return this;
 }

@@ -1,6 +1,7 @@
 #include "ClassDeclNode.h"
 #include "AccessModifierNode.h"
 #include "StmtNode.h"
+#include "ConstructorDeclNode.h"
 
 ClassDeclNode* ClassDeclNode::createClass(std::string name, StmtListNode* body)
 {
@@ -83,6 +84,34 @@ SemanticsBase* ClassDeclNode::semanticsTransform(SemanticsStack stack)
     stack.push(this);
     if (this->_isAlreadyTransformed)
         return this;
+
+    bool hasConstructor = false;
+    if (this->_hasBody)
+    {
+        for (auto& stmt : this->_body->_vec)
+        {
+            if (stmt->_type == StmtType::ConstructorDecl)
+            {
+                hasConstructor = true;
+                break;
+            }
+        }
+    }
+
+    if (!hasConstructor)
+    {
+        auto constructorStmt = StmtNode::createStmtConstructorDecl(ConstructorDeclNode::createConstructor(nullptr, nullptr, false));
+
+        if (this->_hasBody)
+        {
+            this->_body->appendNode(constructorStmt);
+        }
+        else
+        {
+            this->_body = StmtListNode::createListNode(constructorStmt);
+            this->_hasBody = true;
+        }
+    }
 
     this->_body = this->_body->semanticsTransform(stack)->typecast<StmtListNode>();
     return this;

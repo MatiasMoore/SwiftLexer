@@ -120,6 +120,7 @@ SemanticsBase* TypeNode::semanticsTransform(SemanticsStack stack)
 
 	std::map<TypeType, std::string> primitiveToClass = {
 		{ TypeType::IntT, "rtl/Integer"},
+		{ TypeType::StringT, "rtl/String"}
 	};
 
 	if (primitiveToClass.count(this->_type) != 0)

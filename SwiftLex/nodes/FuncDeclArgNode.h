@@ -1,6 +1,7 @@
 #pragma once
 #include "dottable.h"
 #include "GenericListNode.h"
+#include "SemanticsBase.h"
 
 class TypeNode;
 class ExprNode;
@@ -11,7 +12,7 @@ enum FuncDeclArgType
 	requiresLabel
 };
 
-class FuncDeclArgNode : public Dottable
+class FuncDeclArgNode : public Dottable, public SemanticsBase
 {
 public:
 	FuncDeclArgType _type;
@@ -27,11 +28,15 @@ public:
 	static FuncDeclArgNode* createLabeledArg(std::string argName, TypeNode* argType, ExprNode* argValue);
 
 	void generateDot(std::ofstream& file) override;
+
+	SemanticsBase* semanticsTransform(SemanticsStack stack) override;
 };
 
-class FuncDeclArgListNode : public GenericListNode<FuncDeclArgNode, FuncDeclArgListNode>
+class FuncDeclArgListNode : public GenericListNode<FuncDeclArgNode, FuncDeclArgListNode>, public SemanticsBase
 {
 public:
 	std::string getName() override;
+
+	SemanticsBase* semanticsTransform(SemanticsStack stack) override;
 };
 
