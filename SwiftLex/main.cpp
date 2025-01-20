@@ -187,6 +187,7 @@ int main(int argc, const char* argv[])
 	inputOutput->addMethod("print", "(I)V", publicStaticFlag);
 	inputOutput->addMethod("print", "(Lrtl/Integer;)V", publicStaticFlag);
 	inputOutput->addMethod("print", "(Lrtl/String;)V", publicStaticFlag);
+	inputOutput->addMethod("readLine", "()Lrtl/String;", publicStaticFlag);
 
 	auto integer = classTable.addExternalClass("rtl/Integer", "java/lang/object");
 	integer->addMethod("<init>", "(I)V", publicFlag);

@@ -1,4 +1,7 @@
 package rtl;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class InputOutput {
 
@@ -10,6 +13,19 @@ public class InputOutput {
     public static void print(Integer integer)
     {
         System.out.println(integer._value);
+    }
+    
+    public static String readLine()
+    {
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            java.lang.String s = br.readLine();
+            return new String(s);
+        }
+        catch(IOException e) {
+            e.printStackTrace();
+        }
+        return new String("Error!");
     }
 
     public static void print(String string)

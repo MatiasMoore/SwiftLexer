@@ -218,9 +218,16 @@ SemanticsBase* FuncCallNode::semanticsTransform(SemanticsStack stack)
 	if (this->_isAlreadyTransformed)
 		return this;
 
-	if (this->_funcName == "print")
+	std::set<std::string> normalCallToInputOutputCall = { "print", "readLine"};
+
+	if (normalCallToInputOutputCall.count(this->_funcName) != 0)
 	{
-		auto newCall = FuncCallNode::createFuncCall(this->_funcName, this->_funcArgs);
+		FuncCallNode* newCall;
+		if (this->_hasArgs)
+			newCall = FuncCallNode::createFuncCall(this->_funcName, this->_funcArgs);
+		else
+			newCall = FuncCallNode::createFuncCallNoArgs(this->_funcName);
+
 		newCall->setAsExprAccess(ExprNode::createId("rtl/InputOutput"));
 		if (newCall->_scopeType == FuncCallScopeType::exprAccessCall)
 			newCall->_exprAccess = newCall->_exprAccess->semanticsTransform(stack)->typecast<ExprNode>();

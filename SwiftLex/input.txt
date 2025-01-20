@@ -1,3 +1,4 @@
+/*
 var a = "Hello"
 var b = " world!"
 
@@ -31,3 +32,17 @@ func testFunc2()
 }
 
 testFunc()
+*/
+
+print(
+"""
+Hello!
+	Enter\
+		 your\
+			 name\
+				 please!
+"""
+)
+var name = readLine()
+print("Hello \"" + name + "\" !")
+
