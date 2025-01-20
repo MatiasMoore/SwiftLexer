@@ -2,6 +2,7 @@
 #include <string>
 #include "ExternalField.h"
 #include "ExternalMethod.h"
+#include "MethodContainer.h"
 
 class ExternalClass
 {
@@ -18,7 +19,7 @@ public:
 	* \brief find an External method in map
 	* \return ExternalMethod - The ExternalMethod method
 	*/
-	ExternalMethod* findMethod(std::string name, std::string argDescriptor);
+	ExternalMethod* findMethod(std::string name, std::string argDescriptor, bool isStatic);
 
 	/*!
 	* \brief Add an EXTERNAL field (this method does not write anything to the constant table)
@@ -41,8 +42,8 @@ protected:
 	std::string _name;
 	std::string _baseName;
 
-	std::map<std::string, 
-		std::map<std::string, class ExternalMethod*>> _nameAndArgDescToMethod = {};
+	MethodContainer _methodContainer;
+
 	std::map<std::string, class ExternalField*> _fieldMap = {};
 };
 

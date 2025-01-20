@@ -15,11 +15,7 @@ InternalMethod* InternalClass::addInternalMethodToConstantTable(std::string meth
 {
 	auto newMethod = new InternalMethod(_constTable, body, methodName, descriptor, getClassName(), flags);
 
-	if (this->_nameAndArgDescToMethod.count(methodName) != 0)
-		throw std::runtime_error("Method " + methodName + " already exists in class " + getClassName() + LINE_AND_FILE);
-
-	auto argDescriptor = getArgDescFromFullDesc(descriptor);
-	this->_nameAndArgDescToMethod[methodName][argDescriptor] = newMethod;
+	this->_methodContainer.addMethod(newMethod);
 
 	return newMethod;
 }
@@ -46,15 +42,10 @@ int InternalClass::getFieldRefForExternalField(ExternalField* externalField)
 	return externalField->findOrAddFieldRef(_constTable);
 }
 
-InternalMethod* InternalClass::findInternalMethod(std::string methodName, std::string argDescriptor)
+InternalMethod* InternalClass::findInternalMethod(std::string methodName, std::string argDescriptor, bool isStatic)
 {
-	if (this->_nameAndArgDescToMethod.count(methodName) == 0)
-		return nullptr;
-
-	if (this->_nameAndArgDescToMethod[methodName].count(argDescriptor) == 0)
-		return nullptr;
-
-	return dynamic_cast<InternalMethod*>(this->_nameAndArgDescToMethod[methodName][argDescriptor]);
+	auto externalMethod = this->_methodContainer.findMethod(methodName, argDescriptor, isStatic);
+	return dynamic_cast<InternalMethod*>(externalMethod);
 }
 
 
@@ -73,16 +64,12 @@ InternalField* InternalClass::findInternalField(std::string varName)
 std::vector<InternalMethod*> InternalClass::getInternalMethods()
 {
 	std::vector<InternalMethod*> internalMethods;
-	for (auto& methodMapPair : this->_nameAndArgDescToMethod)
+	auto allMethods = this->_methodContainer.getAll();
+	for (auto& externalMethod : allMethods)
 	{
-		auto methodMap = methodMapPair.second;
-		for (auto& methodPair : methodMap)
-		{
-			auto externalMethod = methodPair.second;
-			auto internalMethod = dynamic_cast<InternalMethod*>(externalMethod);
-			if (internalMethod != nullptr)
-				internalMethods.push_back(internalMethod);
-		}
+		auto internalMethod = dynamic_cast<InternalMethod*>(externalMethod);
+		if (internalMethod != nullptr)
+			internalMethods.push_back(internalMethod);
 	}
 	return internalMethods;
 }

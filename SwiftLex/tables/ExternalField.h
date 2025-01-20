@@ -15,7 +15,7 @@ public:
     std::string getDescriptor();
     std::string getClassName();
     std::vector<FieldAccessFlag> getFlags();
-    bool isHasFlag(FieldAccessFlag flag);
+    bool containsFlag(FieldAccessFlag flag);
 
     virtual ~ExternalField();
 

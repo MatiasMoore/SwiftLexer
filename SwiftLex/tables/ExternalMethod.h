@@ -16,6 +16,7 @@ public:
     std::string getClassName();
     std::vector<MethodAccessFlag> getFlags();
     int accessFlagsToInt();
+    bool containsFlag(MethodAccessFlag flag);
 
     virtual ~ExternalMethod();
 

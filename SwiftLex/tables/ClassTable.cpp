@@ -13,12 +13,12 @@ ExternalField* ClassTable::findField(std::string name, std::string className)
 	return nullptr;
 }
 
-ExternalMethod* ClassTable::findMethod(std::string name, std::string argDescriptor, std::string className)
+ExternalMethod* ClassTable::findMethod(std::string name, std::string argDescriptor, std::string className, bool isStatic)
 {
 	auto myClass = this->findClass(className);
 	if (myClass != nullptr)
 	{
-		auto externalMethod = myClass->findMethod(name, argDescriptor);
+		auto externalMethod = myClass->findMethod(name, argDescriptor, isStatic);
 		if (externalMethod != nullptr)
 			return externalMethod;
 	}

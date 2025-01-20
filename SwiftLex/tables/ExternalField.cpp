@@ -66,7 +66,7 @@ std::vector<FieldAccessFlag> ExternalField::getFlags()
 	return _flags;
 }
 
-bool ExternalField::isHasFlag(FieldAccessFlag flag)
+bool ExternalField::containsFlag(FieldAccessFlag flag)
 {
 	return std::find(_flags.begin(), _flags.end(), flag) != _flags.end();
 }

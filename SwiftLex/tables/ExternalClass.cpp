@@ -10,24 +10,14 @@ ExternalClass::ExternalClass(std::string name, std::string baseName)
 
 ExternalMethod* ExternalClass::addMethod(std::string methodName, std::string descriptor, std::vector<MethodAccessFlag> flags)
 {
-	if (this->_nameAndArgDescToMethod.count(methodName) != 0)
-		throw std::runtime_error("Method " + methodName + " already exists in class " + this->_name + LINE_AND_FILE);
-
 	auto newMethod = new ExternalMethod(methodName, descriptor, getClassName(), flags);
-	auto argDesc = getArgDescFromFullDesc(descriptor);
-	this->_nameAndArgDescToMethod[methodName][argDesc] = newMethod;
+	this->_methodContainer.addMethod(newMethod);
 	return newMethod;
 }
 
-ExternalMethod* ExternalClass::findMethod(std::string name, std::string argDescriptor)
+ExternalMethod* ExternalClass::findMethod(std::string name, std::string argDescriptor, bool isStatic)
 {
-	if (this->_nameAndArgDescToMethod.count(name) == 0)
-		return nullptr;
-
-	if (this->_nameAndArgDescToMethod[name].count(argDescriptor) == 0)
-		return nullptr;
-
-	return this->_nameAndArgDescToMethod[name][argDescriptor];
+	return this->_methodContainer.findMethod(name, argDescriptor, isStatic);
 }
 
 ExternalField* ExternalClass::addField(std::string varName, std::string descriptor, std::vector<FieldAccessFlag> flags)

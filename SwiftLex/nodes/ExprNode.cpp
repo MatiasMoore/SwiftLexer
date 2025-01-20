@@ -537,7 +537,7 @@ TypeNode* ExprNode::evaluateType(ClassTable* classTable, InternalClass* currentC
 			if (this->_fieldAccessExpr->_type == ExprType::Id) {
 				auto field = classTable->findClass(this->_fieldAccessExpr->_stringValue)->findField(this->_fieldAccessFieldName);
 				if (field != nullptr) {
-					isStaticFieldFound = field->isHasFlag(FieldAccessFlag::F_ACC_STATIC);
+					isStaticFieldFound = field->containsFlag(FieldAccessFlag::F_ACC_STATIC);
 				}
 			}
 

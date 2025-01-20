@@ -91,6 +91,11 @@ int ExternalMethod::accessFlagsToInt()
 	return accessFlag;
 }
 
+bool ExternalMethod::containsFlag(MethodAccessFlag flag)
+{
+	return std::find(_flags.begin(), _flags.end(), flag) != _flags.end();
+}
+
 ExternalMethod::~ExternalMethod()
 {
 }

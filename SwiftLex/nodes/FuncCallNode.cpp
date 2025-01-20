@@ -120,7 +120,7 @@ void FuncCallNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 	//FIXME IN SEMANTICS
 	if (this->_funcName == "print")
 	{
-		auto method = classTable->findMethod("print", "(I)", "InputOutput");
+		auto method = classTable->findMethod("print", "(I)", "InputOutput", true);
 		this->_methodRef = currentClass->getMethodRefForExternalMethod(method);
 		this->_methodFlags = { MethodAccessFlag::M_ACC_STATIC, MethodAccessFlag::M_ACC_PUBLIC };
 	}
@@ -128,7 +128,16 @@ void FuncCallNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 	{
 		if (this->_scopeType == normalCall)
 		{
-			auto methodInThisClass = currentClass->findInternalMethod(this->_funcName, funcCallArgDescriptor);
+			bool isCurrentMethodStatic = currentMethod->containsFlag(MethodAccessFlag::M_ACC_STATIC);
+
+			bool isCallStatic = isCurrentMethodStatic;
+
+			if (!isCallStatic)
+			{
+				throw std::runtime_error("No dynamic calls yet!" + LINE_AND_FILE);
+			}
+
+			auto methodInThisClass = currentClass->findInternalMethod(this->_funcName, funcCallArgDescriptor, isCallStatic);
 
 			if (methodInThisClass == nullptr)
 				throw std::runtime_error("Method \"" + this->_funcName + "\" with descriptor\"" + funcCallArgDescriptor + "\" is not defined in class \"" + currentClass->getClassName() + "\"" + LINE_AND_FILE);
@@ -136,6 +145,7 @@ void FuncCallNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 			this->_methodRef = methodInThisClass->_methodRef;
 			this->_methodFlags = methodInThisClass->getFlags();
 			this->_isConstructor = false;
+			
 		}
 		else if (this->_scopeType == exprAccessCall)
 		{
@@ -149,14 +159,16 @@ void FuncCallNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 			if (classElem == nullptr)
 				throw std::runtime_error("Critical error! Class \"" + className + "\" is not found!" + LINE_AND_FILE);
 
-			auto method = classElem->findMethod(this->_funcName, funcCallArgDescriptor);
-			if (method == nullptr)
-				throw std::runtime_error("Method \"" + this->_funcName + "\" with descriptor\"" + funcCallArgDescriptor + "\" is not defined in class \"" + className + "\"!" + LINE_AND_FILE);
-
 			bool isCallStatic = this->_exprAccess->_type == ExprType::Id && classTable->findClass(this->_exprAccess->_stringValue) != nullptr;
 			if (!isCallStatic)
 				throw std::runtime_error("Non-static calls are not supported!" + LINE_AND_FILE);
 
+			auto method = classElem->findMethod(this->_funcName, funcCallArgDescriptor, isCallStatic);
+			if (method == nullptr)
+			{
+				std::string prefix = isCallStatic ? "Static" : "Non-static";
+				throw std::runtime_error(prefix + " method \"" + this->_funcName + "\" with descriptor\"" + funcCallArgDescriptor + "\" is not defined in class \"" + className + "\"!" + LINE_AND_FILE);
+			}
 			this->_methodRef = currentClass->getMethodRefForExternalMethod(method);
 			this->_methodFlags = method->getFlags();
 			this->_isConstructor = false;
