@@ -177,6 +177,9 @@ int main(int argc, const char* argv[])
 	auto classTable = ClassTable();
 
 	// Add external classes
+	auto javaObject = classTable.addExternalClass("java/lang/Object", "");
+	javaObject->addMethod("<init>", "()V", { MethodAccessFlag::M_ACC_PUBLIC });
+
 	auto inputOutput = classTable.addExternalClass("InputOutput", "java/lang/object");
 	inputOutput->addMethod("print", "(I)V", { MethodAccessFlag::M_ACC_PUBLIC, MethodAccessFlag::M_ACC_STATIC });
 

@@ -4,6 +4,12 @@
 #include "AccessModifierNode.h"
 #include "TypeNode.h"
 #include "../generation/generationHelpers.h"
+#include "ReturnNode.h"
+#include "ClassDeclNode.h"
+#include "../ExceptionHelper.h"
+#include "ExprNode.h"
+#include "FuncCallNode.h"
+#include "FuncCallArgNode.h"
 
 ConstructorDeclNode* ConstructorDeclNode::createConstructor(FuncDeclArgListNode* argList, StmtListNode* body, bool throwsException)
 {
@@ -75,6 +81,88 @@ void ConstructorDeclNode::generateDot(std::ofstream& file)
 	}
 }
 
+SemanticsBase* ConstructorDeclNode::semanticsTransform(SemanticsStack stack)
+{
+	stack.push(this);
+
+	if (!this->_hasModifiers)
+	{
+		//Add default modifiers
+		this->_modifiers = AccessModifierListNode::createListNode(AccessModifierNode::createModifier(AccessModifierType::Public));
+		this->_hasModifiers = true;
+	}
+
+	this->_modifiers = this->_modifiers->semanticsTransform(stack)->typecast<AccessModifierListNode>();
+	
+	//FIXME
+	std::set<SemanticsBase*> ignore = {};
+
+	StmtNode* parentClass = nullptr;
+	while (parentClass == nullptr)
+	{
+		auto stmt = stack.getClosest<StmtNode>(ignore);
+		if (stmt == nullptr)
+			break;
+
+		if (stmt->_type != StmtType::ClassDecl)
+		{
+			ignore.emplace(stmt);
+		}
+		else
+		{
+			parentClass = stmt;
+			break;
+		}
+	}
+
+	if (parentClass == nullptr)
+		throw std::runtime_error("Critical error! Constructor has no parent class!" + LINE_AND_FILE);
+
+	auto baseClassName = parentClass->_classDecl->_baseClassName;
+	//Set default basename
+	baseClassName = baseClassName.empty() ? "java/lang/Object" : baseClassName;
+
+	//FIXME
+	//auto selfId = ExprNode::createId("self");
+	//auto baseConstructorArgs = FuncCallArgListNode::createListNode(FuncCallArgNode::createFromExpr(selfId));
+	//auto baseConstructor = ExprNode::createFuncCall(FuncCallNode::createFuncCall(baseClassName, baseConstructorArgs));
+	auto constructorCallStmt = StmtNode::createDefaultClassConstructor(baseClassName);
+
+	//Add default constructor call
+	if (this->_hasBody)
+	{
+		this->_body->appendNodeAtIndex(constructorCallStmt, 0);
+	}
+	else
+	{
+		this->_body = StmtListNode::createListNode(constructorCallStmt);
+		this->_hasBody = true;
+	}
+
+	//Check if function ends with a return
+	bool hasReturnStmt = this->_hasBody
+		&& this->_body->_vec.back()->_type == StmtType::Return; //last stmt is a return
+
+	if (!hasReturnStmt)
+	{
+		//Add void return
+		auto returnStmt = StmtNode::createStmtReturn(ReturnNode::createVoidReturn());
+
+		if (this->_hasBody)
+		{
+			this->_body->appendNode(returnStmt);
+		}
+		else {
+			this->_body = StmtListNode::createListNode(returnStmt);
+			this->_hasBody = true;
+		}
+	}
+
+	this->_body = this->_body->semanticsTransform(stack)->typecast<StmtListNode>();
+
+	return this;
+}
+
 void ConstructorDeclNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
 {
 	if (currentClass == nullptr)
@@ -98,6 +186,9 @@ void ConstructorDeclNode::fillTable(ClassTable* classTable, InternalClass* curre
 		throw std::runtime_error("Constructor decl for class \"" + currentClass->getClassName() + "\" must have access modifiers!");
 
 	currentMethod = currentClass->addInternalMethodToConstantTable("<init>", strDesc, this->_modifiers->getMethodAccessFlags(), this->_body);
+
+	//Default local var for constructors
+	currentMethod->getVarTable()->addLocalVar("self", TypeNode::createIdType(currentClass->getClassName())->toDescriptor(classTable, currentClass, currentMethod));
 
 	if (this->_hasArgs)
 	{

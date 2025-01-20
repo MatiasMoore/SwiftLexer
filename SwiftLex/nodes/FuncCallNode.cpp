@@ -5,6 +5,91 @@
 #include "../ExceptionHelper.h"
 #include "TypeNode.h"
 
+ExternalMethod* FuncCallNode::findMethodForCall(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
+{
+	std::string funcCallArgDescriptor = "(";
+	if (this->_hasArgs) {
+		this->_funcArgs->fillTable(classTable, currentClass, currentMethod);
+		for (auto arg : this->_funcArgs->getArgsTypes())
+		{
+			funcCallArgDescriptor += arg->toDescriptor(classTable, currentClass, currentMethod);
+		}
+	}
+	funcCallArgDescriptor += ")";
+
+	//FIXME IN SEMANTICS
+	if (this->_funcName == "print")
+	{
+		auto method = classTable->findMethod("print", "(I)", "InputOutput", true);
+		return method;
+	}
+	else
+	{
+		if (this->_scopeType == normalCall)
+		{
+			auto classWithFuncName = classTable->findClass(this->_funcName);
+			bool isConstructorCall = classWithFuncName != nullptr;
+
+			if (isConstructorCall)
+			{
+				auto constructorMethod = classWithFuncName->findMethod("<init>", funcCallArgDescriptor, false);
+
+				if (constructorMethod == nullptr)
+					throw std::runtime_error("Class \"" + this->_funcName + "\" has no constructor with descriptor \"" + funcCallArgDescriptor + "\"!" + LINE_AND_FILE);
+
+				return constructorMethod;
+			}
+
+			bool isCurrentMethodStatic = currentMethod->containsFlag(MethodAccessFlag::M_ACC_STATIC);
+
+			bool isCallStatic = isCurrentMethodStatic;
+
+			if (!isCallStatic)
+			{
+				throw std::runtime_error("No dynamic calls yet!" + LINE_AND_FILE);
+			}
+
+			auto methodInThisClass = currentClass->findInternalMethod(this->_funcName, funcCallArgDescriptor, isCallStatic);
+
+			if (methodInThisClass == nullptr)
+			{
+				if (!isConstructorCall)
+					throw std::runtime_error("Method \"" + this->_funcName + "\" with descriptor\"" + funcCallArgDescriptor + "\" is not defined in class \"" + currentClass->getClassName() + "\"" + LINE_AND_FILE);
+			}
+
+			return methodInThisClass;
+		}
+		else if (this->_scopeType == exprAccessCall)
+		{
+			auto leftDesc = this->_exprAccess->evaluateType(classTable, currentClass, currentMethod)->toDescriptor(classTable, currentClass, currentMethod);
+			if (leftDesc[0] != 'L')
+				throw std::runtime_error("Primitive types don't have methods!" + LINE_AND_FILE);
+
+			auto className = classnameFromDescriptor(leftDesc);
+
+			auto classElem = classTable->findClass(className);
+			if (classElem == nullptr)
+				throw std::runtime_error("Critical error! Class \"" + className + "\" is not found!" + LINE_AND_FILE);
+
+			bool isCallStatic = this->_exprAccess->_type == ExprType::Id && classTable->findClass(this->_exprAccess->_stringValue) != nullptr;
+			if (!isCallStatic)
+				throw std::runtime_error("Non-static calls are not supported!" + LINE_AND_FILE);
+
+			auto method = classElem->findMethod(this->_funcName, funcCallArgDescriptor, isCallStatic);
+			if (method == nullptr)
+			{
+				std::string prefix = isCallStatic ? "Static" : "Non-static";
+				throw std::runtime_error(prefix + " method \"" + this->_funcName + "\" with descriptor\"" + funcCallArgDescriptor + "\" is not defined in class \"" + className + "\"!" + LINE_AND_FILE);
+			}
+			return method;
+		}
+		else
+		{
+			throw std::runtime_error("Unsupported function call type!" + LINE_AND_FILE);
+		}
+	}
+}
+
 FuncCallNode* FuncCallNode::createFuncCall(std::string funcName, FuncCallArgListNode* funcArgs)
 {
 	auto node = new FuncCallNode();
@@ -99,6 +184,21 @@ SemanticsBase* FuncCallNode::semanticsTransform(SemanticsStack stack)
 	return this;
 }
 
+TypeNode* FuncCallNode::evaluateType(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
+{
+	auto method = this->findMethodForCall(classTable, currentClass, currentMethod);
+	bool isConstructor = method->getMethodName() == "<init>";
+	if (isConstructor)
+	{
+		return TypeNode::createIdType(this->_funcName);
+	}
+	else
+	{
+		auto returnDesc = method->getReturnDescriptor();
+		return TypeNode::createFromDescriptor(returnDesc);
+	}
+}
+
 void FuncCallNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
 {
 	if (currentClass == nullptr)
@@ -107,77 +207,16 @@ void FuncCallNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 	if (currentMethod == nullptr)
 		throw std::runtime_error("Function call must be inside a method!");
 
-	std::string funcCallArgDescriptor = "(";
-	if (this->_hasArgs) {
-		this->_funcArgs->fillTable(classTable, currentClass, currentMethod);
-		for (auto arg : this->_funcArgs->getArgsTypes())
-		{
-			funcCallArgDescriptor += arg->toDescriptor(classTable, currentClass, currentMethod);
-		}
-	}
-	funcCallArgDescriptor += ")";
-
-	//FIXME IN SEMANTICS
-	if (this->_funcName == "print")
+	auto method = this->findMethodForCall(classTable, currentClass, currentMethod);
+	this->_methodRef = currentClass->getMethodRefForExternalMethod(method);
+	this->_methodFlags = method->getFlags();
+	bool isContructor = method->getMethodName() == "<init>";
+	this->_isConstructor = isContructor;
+	if (isContructor)
 	{
-		auto method = classTable->findMethod("print", "(I)", "InputOutput", true);
-		this->_methodRef = currentClass->getMethodRefForExternalMethod(method);
-		this->_methodFlags = { MethodAccessFlag::M_ACC_STATIC, MethodAccessFlag::M_ACC_PUBLIC };
+		auto constructorClass = classTable->findClass(this->_funcName);
+		this->_classRefForConstructor = currentClass->getClassRefForExternalClass(constructorClass);
 	}
-	else
-	{
-		if (this->_scopeType == normalCall)
-		{
-			bool isCurrentMethodStatic = currentMethod->containsFlag(MethodAccessFlag::M_ACC_STATIC);
-
-			bool isCallStatic = isCurrentMethodStatic;
-
-			if (!isCallStatic)
-			{
-				throw std::runtime_error("No dynamic calls yet!" + LINE_AND_FILE);
-			}
-
-			auto methodInThisClass = currentClass->findInternalMethod(this->_funcName, funcCallArgDescriptor, isCallStatic);
-
-			if (methodInThisClass == nullptr)
-				throw std::runtime_error("Method \"" + this->_funcName + "\" with descriptor\"" + funcCallArgDescriptor + "\" is not defined in class \"" + currentClass->getClassName() + "\"" + LINE_AND_FILE);
-
-			this->_methodRef = methodInThisClass->_methodRef;
-			this->_methodFlags = methodInThisClass->getFlags();
-			this->_isConstructor = false;
-			
-		}
-		else if (this->_scopeType == exprAccessCall)
-		{
-			auto leftDesc = this->_exprAccess->evaluateType(classTable, currentClass, currentMethod)->toDescriptor(classTable, currentClass, currentMethod);
-			if (leftDesc[0] != 'L')
-				throw std::runtime_error("Primitive types don't have methods!" + LINE_AND_FILE);
-
-			auto className = classnameFromDescriptor(leftDesc);
-
-			auto classElem = classTable->findClass(className);
-			if (classElem == nullptr)
-				throw std::runtime_error("Critical error! Class \"" + className + "\" is not found!" + LINE_AND_FILE);
-
-			bool isCallStatic = this->_exprAccess->_type == ExprType::Id && classTable->findClass(this->_exprAccess->_stringValue) != nullptr;
-			if (!isCallStatic)
-				throw std::runtime_error("Non-static calls are not supported!" + LINE_AND_FILE);
-
-			auto method = classElem->findMethod(this->_funcName, funcCallArgDescriptor, isCallStatic);
-			if (method == nullptr)
-			{
-				std::string prefix = isCallStatic ? "Static" : "Non-static";
-				throw std::runtime_error(prefix + " method \"" + this->_funcName + "\" with descriptor\"" + funcCallArgDescriptor + "\" is not defined in class \"" + className + "\"!" + LINE_AND_FILE);
-			}
-			this->_methodRef = currentClass->getMethodRefForExternalMethod(method);
-			this->_methodFlags = method->getFlags();
-			this->_isConstructor = false;
-		}
-		else
-		{
-			throw std::runtime_error("Unsupported function call type!" + LINE_AND_FILE);
-		}
-	}	
 }
 
 std::vector<char> FuncCallNode::generateCode(InternalClass* currentClass, InternalMethod* currentMethod)
@@ -185,7 +224,13 @@ std::vector<char> FuncCallNode::generateCode(InternalClass* currentClass, Intern
 	std::vector<char> code = {};
 	if (this->_isConstructor)
 	{
-		throw std::runtime_error("Constructor calls are not supported!" + LINE_AND_FILE);
+		appendVecToVec(code, jvm::_new(this->_classRefForConstructor));
+		appendVecToVec(code, jvm::dup());
+
+		if (this->_hasArgs)
+			appendVecToVec(code, this->_funcArgs->generateCode(currentClass, currentMethod));
+
+		appendVecToVec(code, jvm::invokespecial(this->_methodRef));
 	}
 	else
 	{

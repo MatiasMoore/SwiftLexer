@@ -18,6 +18,8 @@ std::string classnameFromDescriptor(std::string descriptor);
 
 std::string getArgDescFromFullDesc(std::string descriptor);
 
+std::string getReturnDescFromFullDesc(std::string descriptor);
+
 enum IfCommandType {
 	EQ_if,
 	NE_if,

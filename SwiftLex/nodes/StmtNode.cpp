@@ -174,6 +174,14 @@ StmtNode* StmtNode::createClassDecl(ClassDeclNode* classDecl)
 	return node;
 }
 
+StmtNode* StmtNode::createDefaultClassConstructor(std::string baseClassName)
+{
+	auto node = new StmtNode();
+	node->_type = StmtType::DefaultConstructor;
+	node->_defaultConstructorBaseName = baseClassName;
+	return node;
+}
+
 void StmtNode::generateDot(std::ofstream& file)
 {
 	switch (this->_type)
@@ -265,6 +273,9 @@ void StmtNode::generateDot(std::ofstream& file)
 		file << dotConnection(this->_id, this->_classDecl->_id);
 		this->_classDecl->generateDot(file);
 		break;
+	case StmtType::DefaultConstructor:
+		file << dotLabel(this->_id, "DefaultConstructor for class " + this->_defaultConstructorBaseName);
+		break;
 	default:
 		throw std::runtime_error("Unknown type!");
 		break;
@@ -280,8 +291,8 @@ SemanticsBase* StmtNode::semanticsTransform(SemanticsStack stack)
 	bool isTopLevel = topLevelStmtTypes.count(this->_type) != 0;
 	if (!isTopLevel)
 	{
-		// For functions and field declarations
-		if (this->_type == StmtType::FuncDecl || (this->_type == StmtType::VarDeclarationList && this->_varDeclList->isFieldDecl()))
+		// For functions, constructors and field declarations
+		if (this->_type == StmtType::FuncDecl || this->_type == StmtType::ConstructorDecl || (this->_type == StmtType::VarDeclarationList && this->_varDeclList->isFieldDecl()))
 		{
 			std::set<SemanticsBase*> ignore = {};
 
@@ -319,7 +330,7 @@ SemanticsBase* StmtNode::semanticsTransform(SemanticsStack stack)
 				if (stmt == nullptr)
 					break;
 
-				if (stmt->_type != StmtType::FuncDecl)
+				if (stmt->_type != StmtType::FuncDecl && stmt->_type != StmtType::ConstructorDecl)
 				{
 					ignore.emplace(stmt);
 				}
@@ -350,15 +361,23 @@ SemanticsBase* StmtNode::semanticsTransform(SemanticsStack stack)
 		if (!this->_classDecl->_hasBody)
 			throw std::runtime_error("Classes must have a body!");
 
-		this->_classDecl->_body->semanticsTransform(stack);
+		this->_classDecl = this->_classDecl->semanticsTransform(stack)->typecast<ClassDeclNode>();
 	}
 	else if (this->_type == StmtType::FuncDecl)
 	{
 		this->_funcDecl->semanticsTransform(stack);
 	}
+	else if (this->_type == StmtType::ConstructorDecl)
+	{
+		this->_constructorDecl = this->_constructorDecl->semanticsTransform(stack)->typecast<ConstructorDeclNode>();
+	}
 	else if (this->_type == StmtType::VarDeclarationList)
 	{
 		this->_varDeclList->semanticsTransform(stack);
+	}
+	else if (this->_type == StmtType::DefaultConstructor)
+	{
+		//do nothing
 	}
 	else if (this->_type == StmtType::Return)
 	{
@@ -423,17 +442,42 @@ void StmtNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 		this->_varDeclList->fillTable(classTable, currentClass, currentMethod);
 		break;
 	case StmtType::Assignment:
-		if (currentClass == nullptr)
-			throw std::runtime_error("Expr stmt must be associated with a class!");
+		//FIXME
+		{
+			if (currentClass == nullptr)
+				throw std::runtime_error("Expr stmt must be associated with a class!");
 
-		if (currentMethod == nullptr)
-			throw std::runtime_error("Expr stmt must be inside a method!");
+			if (currentMethod == nullptr)
+				throw std::runtime_error("Expr stmt must be inside a method!");
 
-		this->_assignLeft->fillTable(classTable, currentClass, currentMethod);
-		this->_assignRight->fillTable(classTable, currentClass, currentMethod);
+			bool leftIsId = this->_assignLeft->_type == ExprType::Id;
+			bool leftIsField = this->_assignLeft->_type == ExprType::FieldAccess;
 
-		if (this->_assignLeft->evaluateType(classTable, currentClass, currentMethod)->toDescriptor(classTable, currentClass, currentMethod) != _assignRight->evaluateType(classTable, currentClass, currentMethod)->toDescriptor(classTable, currentClass, currentMethod))
-			throw std::runtime_error("Assignment types do not match!" + LINE_AND_FILE);
+			if (!leftIsId && !leftIsField)
+				throw std::runtime_error("Assignment can't be used with left side expr of enum type" + std::to_string(this->_assignLeft->_type) + "!" + LINE_AND_FILE);
+
+			this->_assignLeft->fillTable(classTable, currentClass, currentMethod);
+			this->_assignRight->fillTable(classTable, currentClass, currentMethod);
+
+			auto leftDesc = this->_assignLeft->evaluateType(classTable, currentClass, currentMethod)->toDescriptor(classTable, currentClass, currentMethod);
+			auto rightDesc = _assignRight->evaluateType(classTable, currentClass, currentMethod)->toDescriptor(classTable, currentClass, currentMethod);
+
+			//FIXME
+			bool bothClassObjects = leftDesc[0] == 'L' && rightDesc[0] == 'L';
+
+			if (!bothClassObjects && leftDesc != rightDesc)
+				throw std::runtime_error("Assignment types do not match!" + LINE_AND_FILE);
+
+			this->_assignDesc = rightDesc;
+		}
+		break;
+	case StmtType::DefaultConstructor:
+	{
+		auto class_ = classTable->findClass(this->_defaultConstructorBaseName);
+		this->_defaultConstructorClassRef = currentClass->getClassRefForExternalClass(class_);
+		auto method = class_->findMethod("<init>", "()", false);
+		this->_defaultConstructorMethodRef = currentClass->getMethodRefForExternalMethod(method);
+	}
 		break;
 	case StmtType::Return:
 		//TODO maybe do something here
@@ -466,12 +510,24 @@ std::vector<char> StmtNode::generateCode(InternalClass* currentClass, InternalMe
 
 		if (this->_assignLeft->_type == ExprType::Id) {
 			int varNum = currentMethod->getVarTable()->findLocalVar(this->_assignLeft->_stringValue)->localId;
-			appendVecToVec(code, jvm::istore(varNum));
+
+			if (this->_assignDesc == "I")
+			{
+				appendVecToVec(code, jvm::istore(varNum));
+			}
+			else if (this->_assignDesc[0] == 'L')
+			{
+				appendVecToVec(code, jvm::astore(varNum));
+			}
+			else
+			{
+				throw std::runtime_error("Can't assign descriptor " + this->_assignDesc + "!" + LINE_AND_FILE);
+			}
+
 		}
 		else if(this->_assignLeft->_type == ExprType::FieldAccess) {
 			if (!this->_assignLeft->_isStaticFieldAccess)
 				throw std::runtime_error("Non static field access is not supported for field + \"" + _assignLeft->_fieldAccessFieldName + "\"" + LINE_AND_FILE);
-			this->_assignLeft->generateCode(currentClass, currentMethod); // Do not append bytes
 			appendVecToVec(code, this->_assignRight->generateCode(currentClass, currentMethod));
 			appendVecToVec(code, jvm::putStatic(this->_assignLeft->_staticFieldRef));
 		}
@@ -479,6 +535,10 @@ std::vector<char> StmtNode::generateCode(InternalClass* currentClass, InternalMe
 			throw std::runtime_error("Unsupported assignment with left operand type: " + std::to_string(this->_assignLeft->_type) + "!");
 		}
 
+		break;
+	case StmtType::DefaultConstructor:
+		appendVecToVec(code, jvm::aload(0));
+		appendVecToVec(code, jvm::invokespecial(this->_defaultConstructorMethodRef));
 		break;
 	case StmtType::FuncDecl:
 

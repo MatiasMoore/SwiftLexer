@@ -25,7 +25,7 @@ public:
 	InternalField* addInternalFieldToConstantTable(std::string varName, std::string descriptor, std::vector<FieldAccessFlag> flags);
 
 	/*!
-	* \brief Get the method reference for external class (not this) if not exist, it will create it
+	* \brief Get the method reference for external method (not this) if not exist, it will create it
 	* \return int - methodRef
 	*/
 	int getMethodRefForExternalMethod(ExternalMethod* externalMethod);
@@ -35,6 +35,12 @@ public:
 	* \return int - fieldRef
 	*/
 	int getFieldRefForExternalField(ExternalField* externalField);
+
+	/*!
+	* \brief Get the class reference for external class (not this) if not exist, it will create it
+	* \return int - methodRef
+	*/
+	int getClassRefForExternalClass(ExternalClass* externalClass);
 
 	/*!
 	* \brief Search for this class methods

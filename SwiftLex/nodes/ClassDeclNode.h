@@ -1,5 +1,6 @@
 #pragma once
 #include "dottable.h"
+#include "SemanticsBase.h"
 
 class StmtListNode;
 class TypeForGenericListNode;
@@ -11,7 +12,7 @@ enum ClassDeclType
 	HasBaseClass
 };
 
-class ClassDeclNode : public Dottable
+class ClassDeclNode : public Dottable, public SemanticsBase
 {
 public:
 	ClassDeclType _type;
@@ -32,5 +33,7 @@ public:
 	ClassDeclNode* addModifiers(AccessModifierListNode* modifiers);
 
 	void generateDot(std::ofstream& file);
+
+	SemanticsBase* semanticsTransform(SemanticsStack stack) override;
 };
 

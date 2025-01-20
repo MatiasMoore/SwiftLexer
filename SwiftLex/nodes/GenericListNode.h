@@ -22,6 +22,12 @@ public:
 		return (List*)this;
 	}
 
+	List* appendNodeAtIndex(ListElem* node, int index)
+	{
+		_vec.insert(_vec.begin() + index, node);
+		return (List*)this;
+	}
+
 	List* appendNodeAfterNode(ListElem* toAppend, ListElem* after)
 	{
 		auto afterIter = std::find(_vec.begin(), _vec.end(), after);

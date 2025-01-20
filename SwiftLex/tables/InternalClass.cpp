@@ -42,6 +42,12 @@ int InternalClass::getFieldRefForExternalField(ExternalField* externalField)
 	return externalField->findOrAddFieldRef(_constTable);
 }
 
+int InternalClass::getClassRefForExternalClass(ExternalClass* externalClass)
+{
+	auto nameRef = this->_constTable->findOrAddUTF8(externalClass->getClassName());
+	return this->_constTable->findOrAddClassRef(nameRef);
+}
+
 InternalMethod* InternalClass::findInternalMethod(std::string methodName, std::string argDescriptor, bool isStatic)
 {
 	auto externalMethod = this->_methodContainer.findMethod(methodName, argDescriptor, isStatic);

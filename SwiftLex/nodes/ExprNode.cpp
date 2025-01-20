@@ -570,6 +570,10 @@ TypeNode* ExprNode::evaluateType(ClassTable* classTable, InternalClass* currentC
 
 		return TypeNode::createFromDescriptor(field->getDescriptor());
 	}
+	else if (this->_type == ExprType::FuncCall)
+	{
+		return this->_funcCall->evaluateType(classTable, currentClass, currentMethod);
+	}
 	else
 	{
 		throw std::runtime_error("Can't evaluate type of expr with enum type " + std::to_string(this->_type) + "!");

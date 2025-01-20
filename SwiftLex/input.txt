@@ -1,27 +1,14 @@
-class Test2
-{
-	public static var testVariable : Int; 
-	static public func testFunc()
-	{
-		print(2)
-	}
-}
-
 class Test
 {
+	public init(i: Int)
+	{
+		//self = java/lang/Object(self)
+	}
+
 	static public func testFunc(i : Int)
 	{
 		print(i)
 	}
-
-	static public func changeVariable(i : Int)
-	{
-		Test2.testVariable = i;
-	}
-
-
 }
-Test2.testVariable = 99;
-Test.testFunc(Test2.testVariable)
-Test.changeVariable(123456789)
-Test.testFunc(Test2.testVariable)
+var a = Test(5)
+//Test.testFunc(55)

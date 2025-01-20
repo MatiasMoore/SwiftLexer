@@ -116,6 +116,22 @@ std::string getArgDescFromFullDesc(std::string descriptor)
 	return argDesc;
 }
 
+std::string getReturnDescFromFullDesc(std::string descriptor)
+{
+	std::string returnDesc;
+
+	size_t closeBracket = descriptor.find(')');
+
+	if (closeBracket != std::string::npos) {
+		returnDesc = descriptor.substr(closeBracket);
+	}
+	else {
+		throw std::runtime_error("Can't get return descriptor from descriptor \"" + descriptor + "\"!" + LINE_AND_FILE);
+	}
+
+	return returnDesc;
+}
+
 std::vector<char> jvm::iconstBipushSipush(int num)
 {
 	std::vector<char> res;

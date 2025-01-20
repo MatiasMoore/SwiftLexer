@@ -40,7 +40,8 @@ enum StmtType
 	StructDeclaration,
 	ConstructorDecl,
 	DestructorDecl,
-	ClassDecl
+	ClassDecl,
+	DefaultConstructor
 };
 
 class StmtNode : public Dottable, public SemanticsBase
@@ -84,6 +85,13 @@ public:
 
 	ClassDeclNode* _classDecl;
 
+	std::string _assignDesc;
+
+	std::string _defaultConstructorBaseName;
+
+	int _defaultConstructorClassRef;
+	int _defaultConstructorMethodRef;
+
 	static StmtNode* createStmtExpr(ExprNode* expr);
 
 	static StmtNode* createStmtAssignment(ExprNode* left, ExprNode* right);
@@ -117,6 +125,8 @@ public:
 	static StmtNode* createStmtDestructorDecl(DestructorDeclNode* destructor);
 
 	static StmtNode* createClassDecl(ClassDeclNode* classDecl);
+
+	static StmtNode* createDefaultClassConstructor(std::string baseClassName);
 
 	void generateDot(std::ofstream& file) override;
 
