@@ -10,7 +10,7 @@ class ExprNode;
 class InternalField : public ExternalField
 {
 public:
-    InternalField(ConstantTable* constantTable, std::string varName, std::string descriptor, std::string className, std::vector<FieldAccessFlag> flags, ExprNode* constValue = nullptr);
+    InternalField(ConstantTable* constantTable, std::string varName, std::string descriptor, std::string className, std::vector<FieldAccessFlag> flags);
     
     int accessFlagsToInt();
 

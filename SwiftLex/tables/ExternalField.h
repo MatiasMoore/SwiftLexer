@@ -9,13 +9,13 @@ class ExprNode;
 class ExternalField
 {
 public:
-    ExternalField(std::string varName, std::string descriptor, std::string className, std::vector<FieldAccessFlag> flags, ExprNode* constValue = nullptr);
+    ExternalField(std::string varName, std::string descriptor, std::string className, std::vector<FieldAccessFlag> flags);
 
     std::string getVarName();
     std::string getDescriptor();
     std::string getClassName();
     std::vector<FieldAccessFlag> getFlags();
-    ExprNode* getConstValue();
+    bool isHasFlag(FieldAccessFlag flag);
 
     virtual ~ExternalField();
 
@@ -30,8 +30,6 @@ protected:
     std::string _className;
 
     std::vector<FieldAccessFlag> _flags;
-
-    ExprNode* _constValue;
 
     friend class InternalClass;
 };

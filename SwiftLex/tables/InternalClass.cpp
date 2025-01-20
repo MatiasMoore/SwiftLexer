@@ -22,6 +22,18 @@ InternalMethod* InternalClass::addInternalMethodToConstantTable(std::string meth
 	return newMethod;
 }
 
+InternalField* InternalClass::addInternalFieldToConstantTable(std::string varName, std::string descriptor, std::vector<FieldAccessFlag> flags)
+{
+	auto newField = new InternalField(_constTable, varName, descriptor, getClassName(), flags);
+
+	if (this->_fieldMap.count(varName) != 0)
+		throw std::runtime_error("Field " + varName + " already exists in class " + getClassName() + LINE_AND_FILE);
+
+	this->_fieldMap[varName] = newField;
+
+	return newField;
+}
+
 int InternalClass::getMethodRefForExternalMethod(ExternalMethod* externalMethod)
 {
 	return externalMethod->findOrAddMethodRef(_constTable);
@@ -29,7 +41,7 @@ int InternalClass::getMethodRefForExternalMethod(ExternalMethod* externalMethod)
 
 int InternalClass::getFieldRefForExternalField(ExternalField* externalField)
 {
-	return externalField->addFieldRefToConstTable(_constTable);
+	return externalField->findOrAddFieldRef(_constTable);
 }
 
 InternalMethod* InternalClass::findInternalMethod(std::string methodName, std::string descriptor)

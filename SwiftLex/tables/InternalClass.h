@@ -17,6 +17,13 @@ public:
 	*/
 	InternalMethod* addInternalMethodToConstantTable(std::string methodName, std::string descriptor, std::vector<MethodAccessFlag> flags, StmtListNode* body);
 	
+	// Methods
+	/*!
+	* \brief Add field to the constant table
+	* \return InternalField - The internal field created
+	*/
+	InternalField* addInternalFieldToConstantTable(std::string varName, std::string descriptor, std::vector<FieldAccessFlag> flags);
+
 	/*!
 	* \brief Get the method reference for external class (not this) if not exist, it will create it
 	* \return int - methodRef

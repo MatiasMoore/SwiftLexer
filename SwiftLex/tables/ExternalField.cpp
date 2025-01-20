@@ -1,13 +1,12 @@
 #include "ExternalField.h"
 #include "../ExceptionHelper.h"
 
-ExternalField::ExternalField(std::string varName, std::string descriptor, std::string className, std::vector<FieldAccessFlag> flags, ExprNode* constValue)
+ExternalField::ExternalField(std::string varName, std::string descriptor, std::string className, std::vector<FieldAccessFlag> flags)
 {
 	this->_varName = varName;
 	this->_descriptor = descriptor;
 	this->_className = className;
 	this->_flags = flags;
-	this->_constValue = constValue;
 }
 
 int ExternalField::findOrAddFieldRef(ConstantTable* constTable)
@@ -67,9 +66,9 @@ std::vector<FieldAccessFlag> ExternalField::getFlags()
 	return _flags;
 }
 
-ExprNode* ExternalField::getConstValue()
+bool ExternalField::isHasFlag(FieldAccessFlag flag)
 {
-	return _constValue;
+	return std::find(_flags.begin(), _flags.end(), flag) != _flags.end();
 }
 
 ExternalField::~ExternalField()

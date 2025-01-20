@@ -1,7 +1,7 @@
 #include "InternalField.h"
 #include "../ExceptionHelper.h"
 
-InternalField::InternalField(ConstantTable* constantTable, std::string varName, std::string descriptor, std::string className, std::vector<FieldAccessFlag> flags, ExprNode* constValue) : ExternalField(varName, descriptor, className, flags, constValue)
+InternalField::InternalField(ConstantTable* constantTable, std::string varName, std::string descriptor, std::string className, std::vector<FieldAccessFlag> flags) : ExternalField(varName, descriptor, className, flags)
 {
 	this->_fieldRef = this->addFieldRefToConstTable(constantTable);
 	this->_nameRef = constantTable->findUTF8(varName);

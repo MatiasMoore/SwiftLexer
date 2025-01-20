@@ -24,7 +24,7 @@ public:
 	* \brief Add an EXTERNAL field (this method does not write anything to the constant table)
 	* \return ExternalField - The ExternalField method created
 	*/
-	ExternalField* addField(std::string varName, std::string descriptor, std::vector<FieldAccessFlag> flags, ExprNode* constValue = nullptr);
+	ExternalField* addField(std::string varName, std::string descriptor, std::vector<FieldAccessFlag> flags);
 
 	/*!
 	* \brief find an External field in map
