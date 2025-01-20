@@ -53,6 +53,8 @@ public:
 
 	OverloadableOperatorType _overloadOpearatorType;
 
+	InternalMethod* _scannedMethod;
+
 	static FuncDeclNode* createRegular(std::string idName, FuncDeclArgListNode* argList, StmtListNode* body, TypeNode* returnType, bool throwsException);
 
 	static FuncDeclNode* createRegularOperator(OverloadableOperatorType overloadType, FuncDeclArgListNode* argList, StmtListNode* body, TypeNode* returnType, bool throwsException);
@@ -63,7 +65,7 @@ public:
 
 	void generateDot(std::ofstream& file) override;
 
-	void fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
+	void fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, bool initialScan = false);
 
 	SemanticsBase* semanticsTransform(SemanticsStack stack) override;
 };

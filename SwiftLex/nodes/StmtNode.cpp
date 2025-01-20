@@ -388,8 +388,13 @@ SemanticsBase* StmtNode::semanticsTransform(SemanticsStack stack)
 	return this;
 }
 
-void StmtNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
+void StmtNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, bool initialScan)
 {
+	std::set<StmtType> allowedOnInitialScan = { StmtType::ClassDecl, StmtType::ConstructorDecl, StmtType::FuncDecl, StmtType::VarDeclarationList };
+
+	if (initialScan && allowedOnInitialScan.count(this->_type) == 0)
+		return;
+
 	switch (this->_type)
 	{
 	case StmtType::FuncDecl:
@@ -399,7 +404,7 @@ void StmtNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 		if (currentClass == nullptr)
 			throw std::runtime_error("Methods must be inside a class!");
 
-		this->_funcDecl->fillTable(classTable, currentClass, currentMethod);
+		this->_funcDecl->fillTable(classTable, currentClass, currentMethod, initialScan);
 		break;
 	case StmtType::ConstructorDecl:
 		if (currentMethod != nullptr)
@@ -408,7 +413,7 @@ void StmtNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 		if (currentClass == nullptr)
 			throw std::runtime_error("Constructor must be inside the class!");
 
-		this->_constructorDecl->fillTable(classTable, currentClass, currentMethod);
+		this->_constructorDecl->fillTable(classTable, currentClass, currentMethod, initialScan);
 		break;
 	case StmtType::ClassDecl:
 		if (currentClass != nullptr)
@@ -417,12 +422,7 @@ void StmtNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 		if (currentMethod != nullptr)
 			throw std::runtime_error("Class declaration inside methods is not supported!");
 
-		currentClass = classTable->addInternalClass(this->_classDecl->_name, this->_classDecl->_type == ClassDeclType::HasBaseClass ? this->_classDecl->_baseClassName : "java/lang/Object");
-
-		if (this->_classDecl->_hasBody)
-		{
-			this->_classDecl->_body->fillTable(classTable, currentClass, currentMethod);
-		}
+		this->_classDecl->fillTable(classTable, currentClass, currentMethod, initialScan);
 		break;
 	case StmtType::Expr:
 		if (currentClass == nullptr)
@@ -438,7 +438,7 @@ void StmtNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 			throw std::runtime_error("Expr stmt must be associated with a class!");
 
 		// if currentMethod == null - it is class field
-		this->_varDeclList->fillTable(classTable, currentClass, currentMethod);
+		this->_varDeclList->fillTable(classTable, currentClass, currentMethod, initialScan);
 		break;
 	case StmtType::Assignment:
 		//FIXME
@@ -569,10 +569,10 @@ SemanticsBase* StmtListNode::semanticsTransform(SemanticsStack stack)
 	return this;
 }
 
-void StmtListNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
+void StmtListNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, bool initialScan)
 {
 	for (auto& elem : _vec)
 	{
-		elem->fillTable(classTable, currentClass, currentMethod);
+		elem->fillTable(classTable, currentClass, currentMethod, initialScan);
 	}
 }

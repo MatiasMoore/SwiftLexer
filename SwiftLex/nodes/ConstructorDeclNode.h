@@ -21,6 +21,8 @@ public:
 	FuncDeclArgListNode* _argList;
 	StmtListNode* _body;
 
+	InternalMethod* _scannedConstructor;
+
 	static ConstructorDeclNode* createConstructor(FuncDeclArgListNode* argList, StmtListNode* body, bool throwsException);
 
 	ConstructorDeclNode* addModifiers(AccessModifierListNode* modifiers);
@@ -29,6 +31,6 @@ public:
 
 	SemanticsBase* semanticsTransform(SemanticsStack stack) override;
 
-	void fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
+	void fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, bool initialScan = false);
 };
 

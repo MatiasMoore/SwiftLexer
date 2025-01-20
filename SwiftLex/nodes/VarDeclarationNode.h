@@ -48,7 +48,7 @@ public:
 
 	bool isFieldDecl();
 
-	void fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
+	void fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, bool initialScan = false);
 
 	std::vector<char> generateCode(InternalClass* currentClass, InternalMethod* currentMethod);
 
@@ -80,7 +80,7 @@ public:
 
 	void generateDot(std::ofstream& file) override;
 
-	void fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
+	void fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, bool initialScan = false);
 
 	std::vector<char> generateCode(class InternalClass* currentClass, class InternalMethod* currentMethod);
 	

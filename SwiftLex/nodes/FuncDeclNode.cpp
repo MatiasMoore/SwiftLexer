@@ -5,6 +5,7 @@
 #include "AccessModifierNode.h"
 #include "ReturnNode.h"
 #include "../generation/generationHelpers.h"
+#include "../ExceptionHelper.h"
 
 FuncDeclNode* FuncDeclNode::createRegular(std::string idName, FuncDeclArgListNode* argList, StmtListNode* body, TypeNode* returnType, bool throwsException)
 {
@@ -214,7 +215,7 @@ void FuncDeclNode::generateDot(std::ofstream& file)
 
 }
 
-void FuncDeclNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
+void FuncDeclNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, bool initialScan)
 {
 	if (currentClass == nullptr)
 		throw std::runtime_error("Func decl must be associated with a class!");
@@ -222,47 +223,60 @@ void FuncDeclNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 	if (currentMethod != nullptr)
 		throw std::runtime_error("Func decl can't be inside a method!");
 
-	std::string strDesc = "(";
-
-	if (this->_hasArgs)
+	if (initialScan)
 	{
-		for (auto& arg : this->_argList->_vec)
-		{
-			strDesc += arg->_argType->toDescriptor();
-		}
-	}
-	strDesc += ")";
+		std::string strDesc = "(";
 
-	if (this->_hasNonVoidReturn)
-		strDesc += this->_returnType->toDescriptor();
+		if (this->_hasArgs)
+		{
+			for (auto& arg : this->_argList->_vec)
+			{
+				strDesc += arg->_argType->toDescriptor();
+			}
+		}
+		strDesc += ")";
+
+		if (this->_hasNonVoidReturn)
+			strDesc += this->_returnType->toDescriptor();
+		else
+			strDesc += "V";
+
+		if (!this->_hasModifiers)
+			throw std::runtime_error("Func decl \"" + this->_idName + "\" must have access modifiers!");
+
+		auto accessFlags = this->_modifiers->getMethodAccessFlags();
+		currentMethod = currentClass->addInternalMethodToConstantTable(this->_idName, strDesc, accessFlags, this->_body);
+
+		bool isStatic = std::find(accessFlags.begin(), accessFlags.end(), M_ACC_STATIC) != accessFlags.end();
+
+		if (!isStatic)
+		{
+			currentMethod->getVarTable()->addLocalVar("self", TypeNode::createIdType(currentClass->getClassName())->toDescriptor());
+		}
+
+		if (this->_hasArgs)
+		{
+			for (auto& arg : this->_argList->_vec)
+			{
+				currentMethod->getVarTable()->addLocalVar(arg->_argName, arg->_argType->toDescriptor());
+			}
+		}
+
+		this->_scannedMethod = currentMethod;
+	}
 	else
-		strDesc += "V";
-
-	if (!this->_hasModifiers)
-		throw std::runtime_error("Func decl \"" + this->_idName + "\" must have access modifiers!");
-
-	auto accessFlags = this->_modifiers->getMethodAccessFlags();
-	currentMethod = currentClass->addInternalMethodToConstantTable(this->_idName, strDesc, accessFlags, this->_body);
-
-	bool isStatic = std::find(accessFlags.begin(), accessFlags.end(), M_ACC_STATIC) != accessFlags.end();
-
-	if (!isStatic)
 	{
-		currentMethod->getVarTable()->addLocalVar("self", TypeNode::createIdType(currentClass->getClassName())->toDescriptor());
+		if (!this->_hasBody)
+			throw std::runtime_error("Func decl \"" + this->_idName + "\" must have a body!");
+
+		
+		if (this->_scannedMethod == nullptr)
+			throw std::runtime_error("Critical error! Initial scan failed for method \"" + this->_idName + "\" of class \"" + currentClass->getClassName() + "\"!" + LINE_AND_FILE);
+
+		currentMethod = this->_scannedMethod;
+
+		this->_body->fillTable(classTable, currentClass, currentMethod, initialScan);
 	}
-
-	if (this->_hasArgs)
-	{
-		for (auto& arg : this->_argList->_vec)
-		{
-			currentMethod->getVarTable()->addLocalVar(arg->_argName, arg->_argType->toDescriptor());
-		}
-	}
-
-	if (!this->_hasBody)
-		throw std::runtime_error("Func decl \"" + this->_idName + "\" must have a body!");
-
-	this->_body->fillTable(classTable, currentClass, currentMethod);
 }
 
 SemanticsBase* FuncDeclNode::semanticsTransform(SemanticsStack stack)

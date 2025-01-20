@@ -67,111 +67,117 @@ void VarDeclarationNode::generateDot(std::ofstream& file)
 	}
 }
 
-void VarDeclarationNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
+void VarDeclarationNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, bool initialScan)
 {
-	// Class Field
-	int constantValueIndex;
-	if (currentMethod == nullptr)
-	{	
-		if (_modifiers == nullptr)
-		{
-			throw std::runtime_error("Modifier missing for field: \"" + _varName + "\" for class \"" + currentClass->getClassName() + "\"");
-		}
-
-		if (this->_type == ValueAndTypeKnown)
-		{
-			throw std::runtime_error("Field with initialization does not support for field \"" + this->_varName + "\" in class \"" + currentClass->getClassName() + "\" REQUIRED TO ADD <init> OR <clinit>" + LINE_AND_FILE);
-
-			// All done, required to add assign to <clinit> (if static) or <init> (if not static)
-			this->_valueNode->fillTable(classTable, currentClass, currentMethod);
-
-			// Check if var type and assignable type is equal
-			auto varTypeDescriptor = this->_typeNode->toDescriptor();
-			auto assignableValueType = this->_valueNode->evaluateType(classTable, currentClass, currentMethod);
-			auto assignableValueDescriptor = assignableValueType->toDescriptor();
-			if (varTypeDescriptor != assignableValueDescriptor) //maybe override "==" for TypeNode???
-				throw std::runtime_error("Variable descriptor\"" + varTypeDescriptor + "\" does not match with assignable descriptor \"" + assignableValueDescriptor + "\" for field \"" + this->_varName + "\" in class \"" + currentClass->getClassName() + "\"" + LINE_AND_FILE);
-
-			// Create field
-			currentClass->addInternalFieldToConstantTable(
-				this->_varName,
-				this->_typeNode->toDescriptor(),
-				this->_modifiers->getFieldAccessFlags()
-				);
-		}
-		else if (this->_type == TypeKnown)
-		{
-			
-			//Check if field not final (needs to be initialized)
-			auto accessFlags = this->_modifiers->getMethodAccessFlags();
-			bool isFinal = std::find(accessFlags.begin(), accessFlags.end(), M_ACC_FINAL) != accessFlags.end();
-			bool isStatic = std::find(accessFlags.begin(), accessFlags.end(), M_ACC_STATIC) != accessFlags.end();
-			if (isFinal)
-				throw std::runtime_error("Final field needs to be initialized for field \"" + this->_varName + "\" in class \"" + currentClass->getClassName() + "\"");
-			//TODO: remove after testing
-			if (isStatic)
-			{
-				std::string warning = "WARNING: Field declaration for field \"" + this->_varName + "\" in class \"" + currentClass->getClassName() + "\" is missing initialization and not possible in swift. Remove after testing" + LINE_AND_FILE;
-				std::cout << warning;
-			}
-			// Create field
-			currentClass->addInternalFieldToConstantTable(
-				this->_varName,
-				this->_typeNode->toDescriptor(),
-				this->_modifiers->getFieldAccessFlags()
-				);
-		}
-		else if (this->_type == ValueKnown) 
-		{
-			throw std::runtime_error("Field with initialization does not support for field \"" + this->_varName + "\" in class \"" + currentClass->getClassName() + "\" REQUIRED TO ADD <init> OR <clinit>" + LINE_AND_FILE);
-
-			// All done, required to add assign to <clinit> (if static) or <init> (if not static)
-			this->_valueNode->fillTable(classTable, currentClass, currentMethod);
-
-			// Get type from assignable value
-			this->_typeNode = this->_valueNode->evaluateType(classTable, currentClass, currentMethod);
-			auto varTypeDescriptor = this->_typeNode->toDescriptor(); 
-
-			// Create field
-			currentClass->addInternalFieldToConstantTable(
-				this->_varName,
-				this->_typeNode->toDescriptor(),
-				this->_modifiers->getFieldAccessFlags()
-			);
-		}
-		else
-		{
-			throw std::runtime_error("Declaration usupported for field \"" + this->_varName + "\" in class \"" + currentClass->getClassName() + "\"" + LINE_AND_FILE);
-		}
-	}
-
-	// Local Variable
-	if (currentMethod != nullptr) 
+	if (initialScan)
 	{
-		switch (this->_type)
+		// Class Field
+		int constantValueIndex;
+		if (currentMethod == nullptr)
 		{
-		case ValueAndTypeKnown:
-			currentMethod->getVarTable()->addLocalVar(this->_varName, this->_typeNode->toDescriptor());
-			this->_valueNode->fillTable(classTable, currentClass, currentMethod);
-			break;
-		case TypeKnown:
-			currentMethod->getVarTable()->addLocalVar(this->_varName, this->_typeNode->toDescriptor());
-			break;
-		case ValueKnown:
+			if (_modifiers == nullptr)
 			{
-			auto evaluatedType = this->_valueNode->evaluateType(classTable, currentClass, currentMethod);
-			currentMethod->getVarTable()->addLocalVar(this->_varName, evaluatedType->toDescriptor());
-			this->_valueNode->fillTable(classTable, currentClass, currentMethod);
-			this->_typeNode = evaluatedType;
-			this->_type = ValueAndTypeKnown;
+				throw std::runtime_error("Modifier missing for field: \"" + _varName + "\" for class \"" + currentClass->getClassName() + "\"");
 			}
-			break;
-		default:
-			throw std::runtime_error("Critical error!" + LINE_AND_FILE);
-			break;
+
+			if (this->_type == ValueAndTypeKnown)
+			{
+				throw std::runtime_error("Field with initialization does not support for field \"" + this->_varName + "\" in class \"" + currentClass->getClassName() + "\" REQUIRED TO ADD <init> OR <clinit>" + LINE_AND_FILE);
+
+				// All done, required to add assign to <clinit> (if static) or <init> (if not static)
+				this->_valueNode->fillTable(classTable, currentClass, currentMethod);
+
+				// Check if var type and assignable type is equal
+				auto varTypeDescriptor = this->_typeNode->toDescriptor();
+				auto assignableValueType = this->_valueNode->evaluateType(classTable, currentClass, currentMethod);
+				auto assignableValueDescriptor = assignableValueType->toDescriptor();
+				if (varTypeDescriptor != assignableValueDescriptor) //maybe override "==" for TypeNode???
+					throw std::runtime_error("Variable descriptor\"" + varTypeDescriptor + "\" does not match with assignable descriptor \"" + assignableValueDescriptor + "\" for field \"" + this->_varName + "\" in class \"" + currentClass->getClassName() + "\"" + LINE_AND_FILE);
+
+				// Create field
+				currentClass->addInternalFieldToConstantTable(
+					this->_varName,
+					this->_typeNode->toDescriptor(),
+					this->_modifiers->getFieldAccessFlags()
+				);
+			}
+			else if (this->_type == TypeKnown)
+			{
+
+				//Check if field not final (needs to be initialized)
+				auto accessFlags = this->_modifiers->getMethodAccessFlags();
+				bool isFinal = std::find(accessFlags.begin(), accessFlags.end(), M_ACC_FINAL) != accessFlags.end();
+				bool isStatic = std::find(accessFlags.begin(), accessFlags.end(), M_ACC_STATIC) != accessFlags.end();
+				if (isFinal)
+					throw std::runtime_error("Final field needs to be initialized for field \"" + this->_varName + "\" in class \"" + currentClass->getClassName() + "\"");
+				//TODO: remove after testing
+				if (isStatic)
+				{
+					std::string warning = "WARNING: Field declaration for field \"" + this->_varName + "\" in class \"" + currentClass->getClassName() + "\" is missing initialization and not possible in swift. Remove after testing" + LINE_AND_FILE;
+					std::cout << warning;
+				}
+				// Create field
+				currentClass->addInternalFieldToConstantTable(
+					this->_varName,
+					this->_typeNode->toDescriptor(),
+					this->_modifiers->getFieldAccessFlags()
+				);
+			}
+			else if (this->_type == ValueKnown)
+			{
+				throw std::runtime_error("Field with initialization does not support for field \"" + this->_varName + "\" in class \"" + currentClass->getClassName() + "\" REQUIRED TO ADD <init> OR <clinit>" + LINE_AND_FILE);
+
+				// All done, required to add assign to <clinit> (if static) or <init> (if not static)
+				this->_valueNode->fillTable(classTable, currentClass, currentMethod);
+
+				// Get type from assignable value
+				this->_typeNode = this->_valueNode->evaluateType(classTable, currentClass, currentMethod);
+				auto varTypeDescriptor = this->_typeNode->toDescriptor();
+
+				// Create field
+				currentClass->addInternalFieldToConstantTable(
+					this->_varName,
+					this->_typeNode->toDescriptor(),
+					this->_modifiers->getFieldAccessFlags()
+				);
+			}
+			else
+			{
+				throw std::runtime_error("Declaration usupported for field \"" + this->_varName + "\" in class \"" + currentClass->getClassName() + "\"" + LINE_AND_FILE);
+			}
 		}
 	}
+	else
+	{
 
+		// Local Variable
+		if (currentMethod != nullptr)
+		{
+			switch (this->_type)
+			{
+			case ValueAndTypeKnown:
+				currentMethod->getVarTable()->addLocalVar(this->_varName, this->_typeNode->toDescriptor());
+				this->_valueNode->fillTable(classTable, currentClass, currentMethod);
+				break;
+			case TypeKnown:
+				currentMethod->getVarTable()->addLocalVar(this->_varName, this->_typeNode->toDescriptor());
+				break;
+			case ValueKnown:
+			{
+				auto evaluatedType = this->_valueNode->evaluateType(classTable, currentClass, currentMethod);
+				currentMethod->getVarTable()->addLocalVar(this->_varName, evaluatedType->toDescriptor());
+				this->_valueNode->fillTable(classTable, currentClass, currentMethod);
+				this->_typeNode = evaluatedType;
+				this->_type = ValueAndTypeKnown;
+			}
+			break;
+			default:
+				throw std::runtime_error("Critical error!" + LINE_AND_FILE);
+				break;
+			}
+		}
+
+	}
 }
 
 std::vector<char> VarDeclarationNode::generateCode(InternalClass * currentClass, InternalMethod * currentMethod)
@@ -287,11 +293,11 @@ bool VarDeclarationListNode::isFieldDecl()
 	return false;
 }
 
-void VarDeclarationListNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
+void VarDeclarationListNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, bool initialScan)
 {
 	for (auto& elem : _vec)
 	{
-		elem->fillTable(classTable, currentClass, currentMethod);
+		elem->fillTable(classTable, currentClass, currentMethod, initialScan);
 	}
 }
 

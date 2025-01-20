@@ -201,6 +201,16 @@ int main(int argc, const char* argv[])
 
 	try
 	{
+		_root->fillTable(&classTable, nullptr, nullptr, true);
+	}
+	catch (std::runtime_error error)
+	{
+		std::cout << "Initial table filling error: " << error.what() << std::endl;
+		return 1;
+	}
+
+	try
+	{
 		_root->fillTable(&classTable, nullptr, nullptr);
 	}
 	catch (std::runtime_error error)

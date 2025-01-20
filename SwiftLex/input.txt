@@ -2,8 +2,8 @@ var a = "Hello"
 var b = " world!"
 
 print(a + b)
-
 class A {
+	public static var _a : Int
 	public func test(a : String)
 	{
 		print(a)
@@ -16,3 +16,18 @@ class B : A
 
 var c = B()
 c.test(b + a)
+c._a = 5
+
+testFunc()
+
+func testFunc()
+{
+	testFunc2()
+}
+
+func testFunc2()
+{
+	print(9945)
+}
+
+testFunc()

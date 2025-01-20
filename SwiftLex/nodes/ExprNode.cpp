@@ -617,14 +617,15 @@ void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 			throw std::runtime_error("Unsupported field access with left part" + std::to_string(_fieldAccessExpr->_type) + "!" + "Field access only support \"ID\" at left part! ");
 		}
 
-		this->_staticFieldRef = currentClass->getFieldRefForExternalField(
-			classTable->findField(
-				this->_fieldAccessFieldName,
-				_fieldAccessExpr->_stringValue,
-				true
-			)
-		);
-		this->_isStaticFieldAccess = true;
+		{
+			auto field = classTable->findField(this->_fieldAccessFieldName, _fieldAccessExpr->_stringValue, true);
+
+			if (field == nullptr)
+				throw std::runtime_error("Can't find field \"" + this->_fieldAccessFieldName + "\"!" + LINE_AND_FILE);
+
+			this->_staticFieldRef = currentClass->getFieldRefForExternalField(field);
+			this->_isStaticFieldAccess = true;
+		}
 		break;
 	case ExprType::Int:
 		if (this->_intValue < -32767 || this->_intValue > 32767)

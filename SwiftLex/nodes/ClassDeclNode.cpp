@@ -2,6 +2,7 @@
 #include "AccessModifierNode.h"
 #include "StmtNode.h"
 #include "ConstructorDeclNode.h"
+#include "../ExceptionHelper.h"
 
 ClassDeclNode* ClassDeclNode::createClass(std::string name, StmtListNode* body)
 {
@@ -77,6 +78,33 @@ void ClassDeclNode::generateDot(std::ofstream& file)
         this->_body->generateDot(file);
     }
 
+}
+
+void ClassDeclNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, bool initialScan)
+{
+    if (initialScan)
+    {
+        currentClass = classTable->addInternalClass(this->_name, this->_type == ClassDeclType::HasBaseClass ? this->_baseClassName : "java/lang/Object");
+
+        if (!this->_hasBody)
+            throw std::runtime_error("Class decl can't have an empty body!" + LINE_AND_FILE);
+
+        this->_scannedClass = currentClass;
+
+        this->_body->fillTable(classTable, currentClass, currentMethod, initialScan);
+    }
+    else
+    {
+        if (!this->_hasBody)
+            throw std::runtime_error("Class decl can't have an empty body!" + LINE_AND_FILE);
+
+        if (this->_scannedClass == nullptr)
+            throw std::runtime_error("Critical error! Initial scan failed for class \"" + this->_name + "\"!" + LINE_AND_FILE);
+
+        currentClass = this->_scannedClass;
+
+        this->_body->fillTable(classTable, currentClass, currentMethod, initialScan);
+    }    
 }
 
 SemanticsBase* ClassDeclNode::semanticsTransform(SemanticsStack stack)

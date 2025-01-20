@@ -165,7 +165,7 @@ SemanticsBase* ConstructorDeclNode::semanticsTransform(SemanticsStack stack)
 	return this;
 }
 
-void ConstructorDeclNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
+void ConstructorDeclNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, bool initialScan)
 {
 	if (currentClass == nullptr)
 		throw std::runtime_error("Constructor decl must be associated with a class!");
@@ -173,35 +173,47 @@ void ConstructorDeclNode::fillTable(ClassTable* classTable, InternalClass* curre
 	if (currentMethod != nullptr)
 		throw std::runtime_error("Constructor decl can't be inside a method!");
 
-	std::string strDesc = "(";
-
-	if (this->_hasArgs)
+	if (initialScan)
 	{
-		for (auto& arg : this->_argList->_vec)
+		std::string strDesc = "(";
+
+		if (this->_hasArgs)
 		{
-			strDesc += arg->_argType->toDescriptor();
+			for (auto& arg : this->_argList->_vec)
+			{
+				strDesc += arg->_argType->toDescriptor();
+			}
 		}
+		strDesc += ")V";
+
+		if (!this->_hasModifiers)
+			throw std::runtime_error("Constructor decl for class \"" + currentClass->getClassName() + "\" must have access modifiers!");
+
+		currentMethod = currentClass->addInternalMethodToConstantTable("<init>", strDesc, this->_modifiers->getMethodAccessFlags(), this->_body);
+
+		//Default local var for constructors
+		currentMethod->getVarTable()->addLocalVar("self", TypeNode::createIdType(currentClass->getClassName())->toDescriptor());
+
+		if (this->_hasArgs)
+		{
+			for (auto& arg : this->_argList->_vec)
+			{
+				currentMethod->getVarTable()->addLocalVar(arg->_argName, arg->_argType->toDescriptor());
+			}
+		}
+
+		this->_scannedConstructor = currentMethod;
 	}
-	strDesc += ")V";
-	
-	if (!this->_hasModifiers)
-		throw std::runtime_error("Constructor decl for class \"" + currentClass->getClassName() + "\" must have access modifiers!");
-
-	currentMethod = currentClass->addInternalMethodToConstantTable("<init>", strDesc, this->_modifiers->getMethodAccessFlags(), this->_body);
-
-	//Default local var for constructors
-	currentMethod->getVarTable()->addLocalVar("self", TypeNode::createIdType(currentClass->getClassName())->toDescriptor());
-
-	if (this->_hasArgs)
+	else
 	{
-		for (auto& arg : this->_argList->_vec)
-		{
-			currentMethod->getVarTable()->addLocalVar(arg->_argName, arg->_argType->toDescriptor());
-		}
+		if (!this->_hasBody)
+			throw std::runtime_error("Constructor decl for class \"" + currentClass->getClassName() + "\" must have a body!");
+
+		if (this->_scannedConstructor == nullptr)
+			throw std::runtime_error("Critical error! Initial scan failed for constructor of class \"" + currentClass->getClassName() + "\"!" + LINE_AND_FILE);
+
+		currentMethod = this->_scannedConstructor;
+
+		this->_body->fillTable(classTable, currentClass, currentMethod, initialScan);
 	}
-
-	if (!this->_hasBody)
-		throw std::runtime_error("Constructor decl for class \"" + currentClass->getClassName() + "\" must have a body!");
-
-	this->_body->fillTable(classTable, currentClass, currentMethod);
 }
