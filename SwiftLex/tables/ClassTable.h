@@ -21,7 +21,7 @@ public:
 	* \brief Search a method across all classes
 	* \return ExternalMethod - The ExternalMethod field
 	*/
-	ExternalMethod* findMethod(std::string name, std::string descriptor, std::string className);
+	ExternalMethod* findMethod(std::string name, std::string argDescriptor, std::string className);
 
 	/*!
 	* \brief Create a class that will have the constant table

@@ -1,6 +1,7 @@
 #include "generationHelpers.h"
 #include "../tables/tables.h"
 #include "../nodes/TypeNode.h"
+#include "../ExceptionHelper.h"
 
 std::vector<char> intToByteVector(int num, int arraySize)
 {
@@ -96,6 +97,23 @@ std::string classnameFromDescriptor(std::string descriptor)
 	auto temp = std::string(descriptor.c_str() + 1);
 	temp.pop_back();
 	return temp;
+}
+
+std::string getArgDescFromFullDesc(std::string descriptor)
+{
+	std::string argDesc;
+
+	size_t openBracket = descriptor.find('(');
+	size_t closeBracket = descriptor.find(')', openBracket);
+
+	if (openBracket != std::string::npos && closeBracket != std::string::npos) {
+		argDesc = descriptor.substr(openBracket, closeBracket - openBracket + 1);
+	}
+	else {
+		throw std::runtime_error("Can't get arg descriptor from descriptor \"" + descriptor + "\"!" + LINE_AND_FILE);
+	}
+
+	return argDesc;
 }
 
 std::vector<char> jvm::iconstBipushSipush(int num)

@@ -107,21 +107,20 @@ void FuncCallNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 	if (currentMethod == nullptr)
 		throw std::runtime_error("Function call must be inside a method!");
 
-	std::string funcCallDescriptor = "(";
+	std::string funcCallArgDescriptor = "(";
 	if (this->_hasArgs) {
 		this->_funcArgs->fillTable(classTable, currentClass, currentMethod);
 		for (auto arg : this->_funcArgs->getArgsTypes())
 		{
-			funcCallDescriptor += arg->toDescriptor(classTable, currentClass, currentMethod);
+			funcCallArgDescriptor += arg->toDescriptor(classTable, currentClass, currentMethod);
 		}
 	}
-	funcCallDescriptor += ")";
-	funcCallDescriptor += "V"; // How can i get return type????
+	funcCallArgDescriptor += ")";
 
 	//FIXME IN SEMANTICS
 	if (this->_funcName == "print")
 	{
-		auto method = classTable->findMethod("print", "(I)V", "InputOutput");
+		auto method = classTable->findMethod("print", "(I)", "InputOutput");
 		this->_methodRef = currentClass->getMethodRefForExternalMethod(method);
 		this->_methodFlags = { MethodAccessFlag::M_ACC_STATIC, MethodAccessFlag::M_ACC_PUBLIC };
 	}
@@ -129,10 +128,10 @@ void FuncCallNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 	{
 		if (this->_scopeType == normalCall)
 		{
-			auto methodInThisClass = currentClass->findInternalMethod(this->_funcName, funcCallDescriptor);
+			auto methodInThisClass = currentClass->findInternalMethod(this->_funcName, funcCallArgDescriptor);
 
 			if (methodInThisClass == nullptr)
-				throw std::runtime_error("Method \"" + this->_funcName + "\" with descriptor\"" + funcCallDescriptor + "\" is not defined in class \"" + currentClass->getClassName() + "\"" + LINE_AND_FILE);
+				throw std::runtime_error("Method \"" + this->_funcName + "\" with descriptor\"" + funcCallArgDescriptor + "\" is not defined in class \"" + currentClass->getClassName() + "\"" + LINE_AND_FILE);
 
 			this->_methodRef = methodInThisClass->_methodRef;
 			this->_methodFlags = methodInThisClass->getFlags();
@@ -150,9 +149,9 @@ void FuncCallNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 			if (classElem == nullptr)
 				throw std::runtime_error("Critical error! Class \"" + className + "\" is not found!" + LINE_AND_FILE);
 
-			auto method = classElem->findMethod(this->_funcName, funcCallDescriptor);
+			auto method = classElem->findMethod(this->_funcName, funcCallArgDescriptor);
 			if (method == nullptr)
-				throw std::runtime_error("Method \"" + this->_funcName + "\" with descriptor\"" + funcCallDescriptor + "\" is not defined in class \"" + className + "\"!" + LINE_AND_FILE);
+				throw std::runtime_error("Method \"" + this->_funcName + "\" with descriptor\"" + funcCallArgDescriptor + "\" is not defined in class \"" + className + "\"!" + LINE_AND_FILE);
 
 			bool isCallStatic = this->_exprAccess->_type == ExprType::Id && classTable->findClass(this->_exprAccess->_stringValue) != nullptr;
 			if (!isCallStatic)

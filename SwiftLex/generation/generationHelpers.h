@@ -16,6 +16,8 @@ std::vector<char> generateBytesForConstantTableItem(class ConstantTableItem* ele
 
 std::string classnameFromDescriptor(std::string descriptor);
 
+std::string getArgDescFromFullDesc(std::string descriptor);
+
 enum IfCommandType {
 	EQ_if,
 	NE_if,

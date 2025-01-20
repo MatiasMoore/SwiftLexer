@@ -1,5 +1,6 @@
 #include "InternalClass.h"
 #include "../ExceptionHelper.h"
+#include "../generation/generationHelpers.h"
 
 InternalClass::InternalClass(std::string name, std::string baseName) : ExternalClass(name, baseName)
 {
@@ -14,10 +15,11 @@ InternalMethod* InternalClass::addInternalMethodToConstantTable(std::string meth
 {
 	auto newMethod = new InternalMethod(_constTable, body, methodName, descriptor, getClassName(), flags);
 
-	if (this->_methodMap.count(methodName) != 0)
+	if (this->_nameAndArgDescToMethod.count(methodName) != 0)
 		throw std::runtime_error("Method " + methodName + " already exists in class " + getClassName() + LINE_AND_FILE);
 
-	this->_methodMap[methodName] = newMethod;
+	auto argDescriptor = getArgDescFromFullDesc(descriptor);
+	this->_nameAndArgDescToMethod[methodName][argDescriptor] = newMethod;
 
 	return newMethod;
 }
@@ -44,13 +46,15 @@ int InternalClass::getFieldRefForExternalField(ExternalField* externalField)
 	return externalField->findOrAddFieldRef(_constTable);
 }
 
-InternalMethod* InternalClass::findInternalMethod(std::string methodName, std::string descriptor)
+InternalMethod* InternalClass::findInternalMethod(std::string methodName, std::string argDescriptor)
 {
-	if (this->_methodMap.count(methodName) == 0)
+	if (this->_nameAndArgDescToMethod.count(methodName) == 0)
 		return nullptr;
-	if (this->_methodMap[methodName]->getDescriptor() != descriptor)
+
+	if (this->_nameAndArgDescToMethod[methodName].count(argDescriptor) == 0)
 		return nullptr;
-	return dynamic_cast<InternalMethod*>(this->_methodMap[methodName]);
+
+	return dynamic_cast<InternalMethod*>(this->_nameAndArgDescToMethod[methodName][argDescriptor]);
 }
 
 
@@ -69,11 +73,16 @@ InternalField* InternalClass::findInternalField(std::string varName)
 std::vector<InternalMethod*> InternalClass::getInternalMethods()
 {
 	std::vector<InternalMethod*> internalMethods;
-	for (auto& methodPair : this->_methodMap)
+	for (auto& methodMapPair : this->_nameAndArgDescToMethod)
 	{
-		auto internalMethod = dynamic_cast<InternalMethod*>(methodPair.second);
-		if (internalMethod != nullptr)
-			internalMethods.push_back(internalMethod);
+		auto methodMap = methodMapPair.second;
+		for (auto& methodPair : methodMap)
+		{
+			auto externalMethod = methodPair.second;
+			auto internalMethod = dynamic_cast<InternalMethod*>(externalMethod);
+			if (internalMethod != nullptr)
+				internalMethods.push_back(internalMethod);
+		}
 	}
 	return internalMethods;
 }
