@@ -38,6 +38,18 @@ InternalClass* ClassTable::addInternalClass(std::string name, std::string baseNa
 		throw std::runtime_error("Class " + name + " already exists!" + LINE_AND_FILE);
 
 	auto newClass = new InternalClass(name, baseName);
+	// Add all methods and field from base class
+	//TODO fields
+	auto baseClass = this->findClass(baseName);
+	if (baseClass == nullptr)
+		std::runtime_error("Error adding class \"" + name + "\"! It's base class \"" + baseName + "\" doesn't exist!");
+
+	for (auto& baseClassMethod : baseClass->getMethods())
+	{
+		if (baseClassMethod->getMethodName() != "<init>")
+			newClass->addMethod(baseClassMethod->getMethodName(), baseClassMethod->getDescriptor(), baseClassMethod->getFlags());
+	}
+
 	_classes[name] = newClass;
 	return newClass;
 }

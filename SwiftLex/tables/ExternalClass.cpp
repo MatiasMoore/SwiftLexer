@@ -32,6 +32,11 @@ ExternalField* ExternalClass::findField(std::string varName, bool isStatic)
 	return this->_fieldContainer.findField(varName, isStatic);
 }
 
+std::vector<ExternalMethod*> ExternalClass::getMethods()
+{
+	return this->_methodContainer.getAll();
+}
+
 std::string ExternalClass::getClassName()
 {
 	return _name;
