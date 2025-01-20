@@ -32,9 +32,9 @@ public:
 	ExprNode* _exprAccess;
 
 	int _methodRef = -1;
-	std::vector<MethodAccessFlag> _methodFlags = {};
 	bool _isConstructor = false;
 	int _classRefForConstructor;
+	bool _isStaticMethod = false;
 
 	static FuncCallNode* createFuncCall(std::string funcName, FuncCallArgListNode* funcArgs);
 

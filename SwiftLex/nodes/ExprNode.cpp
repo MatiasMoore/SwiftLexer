@@ -473,7 +473,7 @@ SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 		this->_left = this->_left->semanticsTransform(stack)->typecast<ExprNode>();
 		this->_right = this->_right->semanticsTransform(stack)->typecast<ExprNode>();
 	}
-	else if (this->_type == ExprType::Id || this->_type == ExprType::FieldAccess)
+	else if (this->_type == ExprType::Id || this->_type == ExprType::FieldAccess || this->_type == ExprType::SelfFieldAccess)
 	{
 		//Do nothing
 	}
@@ -504,12 +504,7 @@ TypeNode* ExprNode::evaluateType(ClassTable* classTable, InternalClass* currentC
 		}
 		else
 		{
-			auto classElem = classTable->findClass(this->_stringValue);
-			bool isClass = classElem != nullptr;
-			if (!isClass)
-				throw std::runtime_error("Unknown identifier \"" + this->_stringValue + "\"!" + LINE_AND_FILE);
-
-			return TypeNode::createIdType(this->_stringValue);
+			throw std::runtime_error("Can't evaluate type for identifier \"" + this->_stringValue + "\"!" + LINE_AND_FILE);
 		}
 	}
 	else if (this->_type == ExprType::FieldAccess)
@@ -643,11 +638,17 @@ std::vector<char> ExprNode::generateCode(InternalClass* currentClass, InternalMe
 		}
 		break;
 	case ExprType::Id:
-
 		localVar = currentMethod->getVarTable()->findLocalVar(this->_stringValue);
+		if (localVar == nullptr)
+			throw std::runtime_error("Critical error! Local var \"" + this->_stringValue + "\" is not defined!" + LINE_AND_FILE);
+
 		if (localVar->_descriptor == "I")
 		{
 			appendVecToVec(code, jvm::iload(localVar->localId));
+		}
+		else if (localVar->_descriptor[0] == 'L')
+		{
+			appendVecToVec(code, jvm::aload(localVar->localId));
 		}
 		else
 		{
