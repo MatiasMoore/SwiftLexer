@@ -3,6 +3,7 @@
 #include "ExternalField.h"
 #include "ExternalMethod.h"
 #include "MethodContainer.h"
+#include "FieldContainer.h"
 
 class ExternalClass
 {
@@ -31,7 +32,7 @@ public:
 	* \brief find an External field in map
 	* \return ExternalField - The ExternalField field
 	*/
-	ExternalField* findField(std::string varName);
+	ExternalField* findField(std::string varName, bool isStatic);
 
 	std::string getClassName();
 	std::string getBaseClassName();
@@ -43,8 +44,7 @@ protected:
 	std::string _baseName;
 
 	MethodContainer _methodContainer;
-
-	std::map<std::string, class ExternalField*> _fieldMap = {};
+	FieldContainer _fieldContainer;
 };
 
 

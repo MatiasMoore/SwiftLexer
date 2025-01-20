@@ -22,19 +22,14 @@ ExternalMethod* ExternalClass::findMethod(std::string name, std::string argDescr
 
 ExternalField* ExternalClass::addField(std::string varName, std::string descriptor, std::vector<FieldAccessFlag> flags)
 {
-	if (this->_fieldMap.count(varName) != 0)
-		throw std::runtime_error("Field " + varName + " already exists in class " + this->_name + LINE_AND_FILE);
-
 	auto newField = new ExternalField(varName, descriptor, getClassName(), flags);
-	this->_fieldMap[varName] = newField;
+	this->_fieldContainer.addField(newField);
 	return newField;
 }
 
-ExternalField* ExternalClass::findField(std::string varName)
+ExternalField* ExternalClass::findField(std::string varName, bool isStatic)
 {
-	if (this->_fieldMap.count(varName) == 0)
-		return nullptr;
-	return this->_fieldMap[varName];
+	return this->_fieldContainer.findField(varName, isStatic);
 }
 
 std::string ExternalClass::getClassName()

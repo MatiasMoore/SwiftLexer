@@ -22,6 +22,7 @@
     <Flex Include="swift.l" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="tables\FieldContainer.cpp" />
     <ClCompile Include="tables\MethodContainer.cpp" />
     <ClCompile Include="tables\ClassTable.cpp" />
     <ClCompile Include="tables\ExternalMethod.cpp" />
@@ -73,6 +74,7 @@
     <Bison Include="swift.y" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="tables\FieldContainer.h" />
     <ClInclude Include="tables\MethodContainer.h" />
     <ClInclude Include="tables\ClassTable.h" />
     <ClInclude Include="ExceptionHelper.h" />

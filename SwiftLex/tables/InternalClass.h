@@ -46,7 +46,7 @@ public:
 	* \brief Search for this class fields
 	* \return InternalField - The internal field
 	*/
-	InternalField* findInternalField(std::string varName);
+	InternalField* findInternalField(std::string varName, bool isStatic);
 
 	std::vector<InternalMethod*> getInternalMethods();
 
