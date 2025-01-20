@@ -144,4 +144,6 @@ namespace jvm
 	std::vector<char> iadd();
 
 	std::vector<char> getstatic(int fieldRef);
+
+	std::vector<char> putStatic(int fieldRef);
 }

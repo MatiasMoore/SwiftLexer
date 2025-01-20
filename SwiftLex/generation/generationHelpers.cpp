@@ -508,6 +508,14 @@ std::vector<char> jvm::getstatic(int fieldRef)
 	return res;
 }
 
+std::vector<char> jvm::putStatic(int fieldRef)
+{
+	std::vector<char> res;
+	res.push_back(0xb3);
+	appendVecToVec(res, intToByteVector(fieldRef, 2));
+	return res;
+}
+
 // ---------- aaload ----------
 std::vector<char> jvm::aaload()
 {
