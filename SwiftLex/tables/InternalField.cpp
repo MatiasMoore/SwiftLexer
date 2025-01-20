@@ -3,11 +3,15 @@
 
 InternalField::InternalField(ConstantTable* constantTable, std::string varName, std::string descriptor, std::string className, std::vector<FieldAccessFlag> flags) : ExternalField(varName, descriptor, className, flags)
 {
-	this->_fieldRef = this->addFieldRefToConstTable(constantTable);
-	this->_nameRef = constantTable->findUTF8(varName);
-	this->_descriptorRef = constantTable->findUTF8(descriptor);
-	this->_classRef = constantTable->findUTF8(className);
-	this->_nameAndTypeRef = constantTable->findNameAndType(this->_nameRef, this->_descriptorRef);
+	this->_nameRef = constantTable->findOrAddUTF8(varName);
+	this->_descriptorRef = constantTable->findOrAddUTF8(descriptor);
+	this->__classNameRef = constantTable->findOrAddUTF8(className);
+
+	this->_classRef = constantTable->findOrAddClassRef(this->__classNameRef);
+	this->_nameAndTypeRef = constantTable->findOrAddNameAndType(this->_nameRef, this->_descriptorRef);
+
+	this->_fieldRef = constantTable->findOrAddFieldRef(this->_classRef, this->_nameAndTypeRef);
+	
 	this->_flags = flags;
 }
 

@@ -15,7 +15,7 @@ public:
 	* \brief Search a field in class
 	* \return ExternalField - The ExternalField field
 	*/
-	ExternalField* findField(std::string name, std::string className);
+	ExternalField* findField(std::string name, std::string className, bool isStatic);
 
 	/*!
 	* \brief Search a method across all classes

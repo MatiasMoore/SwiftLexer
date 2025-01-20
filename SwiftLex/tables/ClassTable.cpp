@@ -1,12 +1,12 @@
 #include "ClassTable.h"
 #include "../ExceptionHelper.h"
 
-ExternalField* ClassTable::findField(std::string name, std::string className)
+ExternalField* ClassTable::findField(std::string name, std::string className, bool isStatic)
 {
 	auto myClass = this->findClass(className);
 	if (myClass != nullptr)
 	{
-		auto externalField = myClass->findField(name);
+		auto externalField = myClass->findField(name, isStatic);
 		if (externalField != nullptr)
 			return externalField;
 	}

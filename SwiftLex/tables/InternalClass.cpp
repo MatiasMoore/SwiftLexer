@@ -24,10 +24,7 @@ InternalField* InternalClass::addInternalFieldToConstantTable(std::string varNam
 {
 	auto newField = new InternalField(_constTable, varName, descriptor, getClassName(), flags);
 
-	if (this->_fieldMap.count(varName) != 0)
-		throw std::runtime_error("Field " + varName + " already exists in class " + getClassName() + LINE_AND_FILE);
-
-	this->_fieldMap[varName] = newField;
+	this->_fieldContainer.addField(newField);
 
 	return newField;
 }
@@ -55,9 +52,9 @@ InternalMethod* InternalClass::findInternalMethod(std::string methodName, std::s
 }
 
 
-InternalField* InternalClass::findInternalField(std::string varName)
+InternalField* InternalClass::findInternalField(std::string varName, bool isStatic)
 {
-	auto field = this->findField(varName);
+	auto field = this->findField(varName, isStatic);
 
 	auto internalField = dynamic_cast<InternalField*>(field);
 
@@ -83,9 +80,10 @@ std::vector<InternalMethod*> InternalClass::getInternalMethods()
 std::vector<InternalField*> InternalClass::getInternalFields()
 {
 	std::vector<InternalField*> internalFields;
-	for (auto& fieldPair : this->_fieldMap)
+	auto allFields = this->_fieldContainer.getAll();
+	for (auto& externalField : allFields)
 	{
-		auto internalField = dynamic_cast<InternalField*>(fieldPair.second);
+		auto internalField = dynamic_cast<InternalField*>(externalField);
 		if (internalField != nullptr)
 			internalFields.push_back(internalField);
 	}

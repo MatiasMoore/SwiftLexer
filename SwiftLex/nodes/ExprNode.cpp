@@ -535,7 +535,7 @@ TypeNode* ExprNode::evaluateType(ClassTable* classTable, InternalClass* currentC
 
 			bool isStaticFieldFound = false;
 			if (this->_fieldAccessExpr->_type == ExprType::Id) {
-				auto field = classTable->findClass(this->_fieldAccessExpr->_stringValue)->findField(this->_fieldAccessFieldName);
+				auto field = classTable->findClass(this->_fieldAccessExpr->_stringValue)->findField(this->_fieldAccessFieldName, true);
 				if (field != nullptr) {
 					isStaticFieldFound = field->containsFlag(FieldAccessFlag::F_ACC_STATIC);
 				}
@@ -560,13 +560,11 @@ TypeNode* ExprNode::evaluateType(ClassTable* classTable, InternalClass* currentC
 		if (!classFound)
 			throw std::runtime_error("Class \"" + classId + "\" is not found for field access!");
 
-		bool fieldFound = classTable->findClass(classId)->findField(this->_fieldAccessFieldName) != nullptr; // TODO: add descriptor
-		std::string warning = "WARNING: search for field \"" + this->_fieldAccessFieldName + "\" without descriptor!" + LINE_AND_FILE;
-		std::cout << warning;
+		bool fieldFound = classTable->findClass(classId)->findField(this->_fieldAccessFieldName, isStatic) != nullptr; 	
 		if (!fieldFound)
 			throw std::runtime_error("Field \"" + this->_fieldAccessFieldName + "\" is not found in class \"" + classId + "\"!");
 
-		auto field = classTable->findClass(classId)->findField(this->_fieldAccessFieldName);
+		auto field = classTable->findClass(classId)->findField(this->_fieldAccessFieldName, isStatic);
 
 		return TypeNode::createFromDescriptor(field->getDescriptor());
 	}
@@ -601,15 +599,12 @@ void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 		{
 			throw std::runtime_error("Unsupported field access with left part" + std::to_string(_fieldAccessExpr->_type) + "!" + "Field access only support \"ID\" at left part! ");
 		}
-		{ // wtf if works?
-			std::string warning = "WARNING: search for field \"" + this->_fieldAccessFieldName + "\" without descriptor!" + LINE_AND_FILE;
-			std::cout << warning;
-		}
+
 		this->_staticFieldRef = currentClass->getFieldRefForExternalField(
 			classTable->findField(
 				this->_fieldAccessFieldName,
-				// this->evaluateType(classTable, currentClass, currentMethod)->toDescriptor(classTable, currentClass, currentMethod),
-				_fieldAccessExpr->_stringValue
+				_fieldAccessExpr->_stringValue,
+				true
 			)
 		);
 		this->_isStaticFieldAccess = true;
