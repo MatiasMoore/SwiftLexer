@@ -228,13 +228,13 @@ void FuncDeclNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 	{
 		for (auto& arg : this->_argList->_vec)
 		{
-			strDesc += arg->_argType->toDescriptor(classTable, currentClass, currentMethod);
+			strDesc += arg->_argType->toDescriptor();
 		}
 	}
 	strDesc += ")";
 
 	if (this->_hasNonVoidReturn)
-		strDesc += this->_returnType->toDescriptor(classTable, currentClass, currentMethod);
+		strDesc += this->_returnType->toDescriptor();
 	else
 		strDesc += "V";
 
@@ -248,14 +248,14 @@ void FuncDeclNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 
 	if (!isStatic)
 	{
-		currentMethod->getVarTable()->addLocalVar("self", TypeNode::createIdType(currentClass->getClassName())->toDescriptor(classTable, currentClass, currentMethod));
+		currentMethod->getVarTable()->addLocalVar("self", TypeNode::createIdType(currentClass->getClassName())->toDescriptor());
 	}
 
 	if (this->_hasArgs)
 	{
 		for (auto& arg : this->_argList->_vec)
 		{
-			currentMethod->getVarTable()->addLocalVar(arg->_argName, arg->_argType->toDescriptor(classTable, currentClass, currentMethod));
+			currentMethod->getVarTable()->addLocalVar(arg->_argName, arg->_argType->toDescriptor());
 		}
 	}
 
@@ -268,6 +268,8 @@ void FuncDeclNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 SemanticsBase* FuncDeclNode::semanticsTransform(SemanticsStack stack)
 {
 	stack.push(this);
+	if (this->_isAlreadyTransformed)
+		return this;
 
 	//Add default modifiers
 	if (!this->_hasModifiers)

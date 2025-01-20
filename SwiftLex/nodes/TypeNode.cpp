@@ -25,14 +25,6 @@ TypeNode* TypeNode::createArrayType(TypeNode* type)
 	return node;
 }
 
-TypeNode* TypeNode::createDynamicType(ExprNode* expr)
-{
-	auto node = new TypeNode();
-	node->_type = DynamicT;
-	node->_exprForDynamicT = expr;
-	return node;
-}
-
 TypeNode* TypeNode::createFromDescriptor(std::string descriptor)
 {
 	if (descriptor.empty()) {
@@ -101,9 +93,6 @@ std::string TypeNode::getName()
 		case (TypeType::ArrayT):
 			return "Array";
 			break;
-		case (TypeType::DynamicT):
-			return "Dynamic";
-			break;
 		default:
 		throw std::runtime_error("Can't generate name for type node with enum type " + std::to_string(this->_type));
 	}
@@ -123,7 +112,16 @@ void TypeNode::generateDot(std::ofstream& file)
 	}
 }
 
-std::string TypeNode::toDescriptor(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
+SemanticsBase* TypeNode::semanticsTransform(SemanticsStack stack)
+{
+	stack.push(this);
+	if (this->_isAlreadyTransformed)
+		return this;
+
+	return this;
+}
+
+std::string TypeNode::toDescriptor()
 {
 	std::string desc = "";
 	switch (this->_type)
@@ -150,10 +148,7 @@ std::string TypeNode::toDescriptor(ClassTable* classTable, InternalClass* curren
 		break;
 	case ArrayT:
 		desc += "["; // JVM descriptor for array
-		desc += this->_arrayType->toDescriptor(classTable, currentClass, currentMethod);
-		break;
-	case DynamicT:
-		desc += this->_exprForDynamicT->evaluateType(classTable, currentClass, currentMethod)->toDescriptor(classTable, currentClass, currentMethod);
+		desc += this->_arrayType->toDescriptor();
 		break;
 	default:
 		throw std::runtime_error("Unsupported type for descriptor!" + LINE_AND_FILE);

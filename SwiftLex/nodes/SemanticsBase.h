@@ -10,9 +10,13 @@ class SemanticsStack;
 class SemanticsBase
 {
 protected:
+	bool _isAlreadyTransformed = false;
+
 	virtual SemanticsBase* semanticsTransform(SemanticsStack stack) = 0;
 
 public:
+	void setIsAlreadyTransformed(bool flag);
+
 	template <typename SemChild>
 	SemChild* typecast()
 	{

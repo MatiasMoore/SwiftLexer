@@ -1,9 +1,34 @@
+package rtl;
+
 public class Integer {
-    int _value;
+    public int _value;
 
     public Integer(int value)
     {
         _value = value;
     }
     
+    public Integer sum(Integer other)
+    {
+        _value += other._value;
+        return this;
+    }
+
+    public Integer sub(Integer other)
+    {
+        _value -= other._value;
+        return this;
+    }
+
+    public Integer mul(Integer other)
+    {
+        _value *= other._value;
+        return this;
+    }
+
+    public Integer div(Integer other)
+    {
+        _value /= other._value;
+        return this;
+    }
 }

@@ -9,10 +9,9 @@ ExternalMethod* FuncCallNode::findMethodForCall(ClassTable* classTable, Internal
 {
 	std::string funcCallArgDescriptor = "(";
 	if (this->_hasArgs) {
-		this->_funcArgs->fillTable(classTable, currentClass, currentMethod);
-		for (auto arg : this->_funcArgs->getArgsTypes())
+		for (auto arg : this->_funcArgs->_vec)
 		{
-			funcCallArgDescriptor += arg->toDescriptor(classTable, currentClass, currentMethod);
+			funcCallArgDescriptor += arg->_value->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
 		}
 	}
 	funcCallArgDescriptor += ")";
@@ -86,7 +85,7 @@ ExternalMethod* FuncCallNode::findMethodForCall(ClassTable* classTable, Internal
 		// Dynamic call
 		else
 		{
-			auto leftDesc = this->_exprAccess->evaluateType(classTable, currentClass, currentMethod)->toDescriptor(classTable, currentClass, currentMethod);
+			auto leftDesc = this->_exprAccess->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
 			if (leftDesc[0] != 'L')
 				throw std::runtime_error("Primitive types don't have methods!" + LINE_AND_FILE);
 
@@ -216,11 +215,18 @@ void FuncCallNode::generateDot(std::ofstream& file)
 SemanticsBase* FuncCallNode::semanticsTransform(SemanticsStack stack)
 {
 	stack.push(this);
+	if (this->_isAlreadyTransformed)
+		return this;
 
 	if (this->_funcName == "print")
 	{
 		auto newCall = FuncCallNode::createFuncCall(this->_funcName, this->_funcArgs);
-		newCall->setAsExprAccess(ExprNode::createId("InputOutput"));
+		newCall->setAsExprAccess(ExprNode::createId("rtl/InputOutput"));
+		if (newCall->_scopeType == FuncCallScopeType::exprAccessCall)
+			newCall->_exprAccess = newCall->_exprAccess->semanticsTransform(stack)->typecast<ExprNode>();
+
+		if (newCall->_hasArgs)
+			newCall->_funcArgs = newCall->_funcArgs->semanticsTransform(stack)->typecast<FuncCallArgListNode>();
 		return newCall;
 	}
 	else
@@ -257,6 +263,12 @@ void FuncCallNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 
 	if (currentMethod == nullptr)
 		throw std::runtime_error("Function call must be inside a method!");
+
+	if (this->_scopeType == FuncCallScopeType::exprAccessCall)
+		this->_exprAccess->fillTable(classTable, currentClass, currentMethod);
+
+	if (this->_hasArgs)
+		this->_funcArgs->fillTable(classTable, currentClass, currentMethod);
 
 	auto method = this->findMethodForCall(classTable, currentClass, currentMethod);
 	this->_methodRef = currentClass->getMethodRefForExternalMethod(method);

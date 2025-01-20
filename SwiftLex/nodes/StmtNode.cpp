@@ -285,6 +285,8 @@ void StmtNode::generateDot(std::ofstream& file)
 SemanticsBase* StmtNode::semanticsTransform(SemanticsStack stack)
 {
 	stack.push(this);
+	if (this->_isAlreadyTransformed)
+		return this;
 
 	std::set<StmtType> topLevelStmtTypes = { StmtType::ClassDecl };
 
@@ -459,8 +461,8 @@ void StmtNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 			this->_assignLeft->fillTable(classTable, currentClass, currentMethod);
 			this->_assignRight->fillTable(classTable, currentClass, currentMethod);
 
-			auto leftDesc = this->_assignLeft->evaluateType(classTable, currentClass, currentMethod)->toDescriptor(classTable, currentClass, currentMethod);
-			auto rightDesc = _assignRight->evaluateType(classTable, currentClass, currentMethod)->toDescriptor(classTable, currentClass, currentMethod);
+			auto leftDesc = this->_assignLeft->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+			auto rightDesc = _assignRight->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
 
 			//FIXME
 			bool bothClassObjects = leftDesc[0] == 'L' && rightDesc[0] == 'L';
@@ -559,14 +561,8 @@ std::string StmtListNode::getName()
 SemanticsBase* StmtListNode::semanticsTransform(SemanticsStack stack)
 {
 	stack.push(this);
-	/*
-	
-	for (auto& elem : _vec)
-	{
-		elem = elem->semanticsTransform(stack)->typecast<StmtNode>();
-	}
-
-	*/
+	if (this->_isAlreadyTransformed)
+		return this;
 
 	for (int i = 0; i < _vec.size(); i++)
 	{

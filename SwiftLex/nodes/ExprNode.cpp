@@ -441,25 +441,42 @@ void ExprNode::generateDot(std::ofstream& file)
 SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 {
 	stack.push(this);
+	if (this->_isAlreadyTransformed)
+		return this;
 
 	std::set<ExprType> typesWithLeftRightOperands = { 
 		ExprType::LT, ExprType::GT, ExprType::GTE, ExprType::LTE, ExprType::EQ, ExprType::NEQ, 
 	};
 
+	std::set<ExprType> doNothingTypes = {
+		ExprType::Id, ExprType::FieldAccess, ExprType::SelfFieldAccess
+	};
+
+	std::map < ExprType, std::string> exprTypeToTransform = {
+		{ ExprType::Sum, "sum" },
+		{ ExprType::Sub, "sub" },
+		{ ExprType::Mul, "mul" },
+		{ ExprType::Div, "div" },
+	};
+
 	if (this->_type == ExprType::Int)
 	{
-		//auto args = FuncCallArgListNode::createListNode(FuncCallArgNode::createFromExpr(ExprNode::createInt(this->_intValue)));
-		//return ExprNode::createFuncCall(FuncCallNode::createFuncCall("Integer", args));
+		auto args = FuncCallArgListNode::createListNode(FuncCallArgNode::createFromExpr(ExprNode::createInt(this->_intValue)));
+		auto newExpr = ExprNode::createFuncCall(FuncCallNode::createFuncCall("rtl/Integer", args));
+		newExpr->setIsAlreadyTransformed(true);
+		return newExpr;
+		/*
 		return this;
+		*/
 	}
-	else if (this->_type == ExprType::Sum)
+	else if (exprTypeToTransform.count(this->_type) != 0)
 	{
 		this->_left = _left->semanticsTransform(stack)->typecast<ExprNode>();
 		this->_right = _right->semanticsTransform(stack)->typecast<ExprNode>();
 
 		auto args = FuncCallArgListNode::createListNode(FuncCallArgNode::createFromExpr(this->_right));
 
-		auto plusFunc = FuncCallNode::createFuncCall("plus", args);
+		auto plusFunc = FuncCallNode::createFuncCall(exprTypeToTransform[this->_type], args);
 		plusFunc->setAsExprAccess(this->_left);
 
 		return ExprNode::createFuncCall(plusFunc);
@@ -473,7 +490,7 @@ SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 		this->_left = this->_left->semanticsTransform(stack)->typecast<ExprNode>();
 		this->_right = this->_right->semanticsTransform(stack)->typecast<ExprNode>();
 	}
-	else if (this->_type == ExprType::Id || this->_type == ExprType::FieldAccess || this->_type == ExprType::SelfFieldAccess)
+	else if (doNothingTypes.count(this->_type) != 0)
 	{
 		//Do nothing
 	}
@@ -575,6 +592,7 @@ TypeNode* ExprNode::evaluateType(ClassTable* classTable, InternalClass* currentC
 
 void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
 {
+	//FIXME
 	ExternalField* field;
 	if (currentClass == nullptr)
 		throw std::runtime_error("Expression must be associated with a class!");

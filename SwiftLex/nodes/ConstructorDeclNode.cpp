@@ -84,6 +84,8 @@ void ConstructorDeclNode::generateDot(std::ofstream& file)
 SemanticsBase* ConstructorDeclNode::semanticsTransform(SemanticsStack stack)
 {
 	stack.push(this);
+	if (this->_isAlreadyTransformed)
+		return this;
 
 	if (!this->_hasModifiers)
 	{
@@ -177,7 +179,7 @@ void ConstructorDeclNode::fillTable(ClassTable* classTable, InternalClass* curre
 	{
 		for (auto& arg : this->_argList->_vec)
 		{
-			strDesc += arg->_argType->toDescriptor(classTable, currentClass, currentMethod);
+			strDesc += arg->_argType->toDescriptor();
 		}
 	}
 	strDesc += ")V";
@@ -188,13 +190,13 @@ void ConstructorDeclNode::fillTable(ClassTable* classTable, InternalClass* curre
 	currentMethod = currentClass->addInternalMethodToConstantTable("<init>", strDesc, this->_modifiers->getMethodAccessFlags(), this->_body);
 
 	//Default local var for constructors
-	currentMethod->getVarTable()->addLocalVar("self", TypeNode::createIdType(currentClass->getClassName())->toDescriptor(classTable, currentClass, currentMethod));
+	currentMethod->getVarTable()->addLocalVar("self", TypeNode::createIdType(currentClass->getClassName())->toDescriptor());
 
 	if (this->_hasArgs)
 	{
 		for (auto& arg : this->_argList->_vec)
 		{
-			currentMethod->getVarTable()->addLocalVar(arg->_argName, arg->_argType->toDescriptor(classTable, currentClass, currentMethod));
+			currentMethod->getVarTable()->addLocalVar(arg->_argName, arg->_argType->toDescriptor());
 		}
 	}
 

@@ -86,16 +86,16 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, InternalClass* curren
 			this->_valueNode->fillTable(classTable, currentClass, currentMethod);
 
 			// Check if var type and assignable type is equal
-			auto varTypeDescriptor = this->_typeNode->toDescriptor(classTable, currentClass, currentMethod);
+			auto varTypeDescriptor = this->_typeNode->toDescriptor();
 			auto assignableValueType = this->_valueNode->evaluateType(classTable, currentClass, currentMethod);
-			auto assignableValueDescriptor = assignableValueType->toDescriptor(classTable, currentClass, currentMethod);
+			auto assignableValueDescriptor = assignableValueType->toDescriptor();
 			if (varTypeDescriptor != assignableValueDescriptor) //maybe override "==" for TypeNode???
 				throw std::runtime_error("Variable descriptor\"" + varTypeDescriptor + "\" does not match with assignable descriptor \"" + assignableValueDescriptor + "\" for field \"" + this->_varName + "\" in class \"" + currentClass->getClassName() + "\"" + LINE_AND_FILE);
 
 			// Create field
 			currentClass->addInternalFieldToConstantTable(
 				this->_varName,
-				this->_typeNode->toDescriptor(classTable, currentClass, currentMethod),
+				this->_typeNode->toDescriptor(),
 				this->_modifiers->getFieldAccessFlags()
 				);
 		}
@@ -117,7 +117,7 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, InternalClass* curren
 			// Create field
 			currentClass->addInternalFieldToConstantTable(
 				this->_varName,
-				this->_typeNode->toDescriptor(classTable, currentClass, currentMethod),
+				this->_typeNode->toDescriptor(),
 				this->_modifiers->getFieldAccessFlags()
 				);
 		}
@@ -130,12 +130,12 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, InternalClass* curren
 
 			// Get type from assignable value
 			this->_typeNode = this->_valueNode->evaluateType(classTable, currentClass, currentMethod);
-			auto varTypeDescriptor = this->_typeNode->toDescriptor(classTable, currentClass, currentMethod); 
+			auto varTypeDescriptor = this->_typeNode->toDescriptor(); 
 
 			// Create field
 			currentClass->addInternalFieldToConstantTable(
 				this->_varName,
-				this->_typeNode->toDescriptor(classTable, currentClass, currentMethod),
+				this->_typeNode->toDescriptor(),
 				this->_modifiers->getFieldAccessFlags()
 			);
 		}
@@ -151,13 +151,23 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, InternalClass* curren
 		switch (this->_type)
 		{
 		case ValueAndTypeKnown:
+			currentMethod->getVarTable()->addLocalVar(this->_varName, this->_typeNode->toDescriptor());
+			this->_valueNode->fillTable(classTable, currentClass, currentMethod);
 			break;
 		case TypeKnown:
-			currentMethod->getVarTable()->addLocalVar(this->_varName, this->_typeNode->toDescriptor(classTable, currentClass, currentMethod));
+			currentMethod->getVarTable()->addLocalVar(this->_varName, this->_typeNode->toDescriptor());
 			break;
 		case ValueKnown:
+			{
+			auto evaluatedType = this->_valueNode->evaluateType(classTable, currentClass, currentMethod);
+			currentMethod->getVarTable()->addLocalVar(this->_varName, evaluatedType->toDescriptor());
+			this->_valueNode->fillTable(classTable, currentClass, currentMethod);
+			this->_typeNode = evaluatedType;
+			this->_type = ValueAndTypeKnown;
+			}
 			break;
 		default:
+			throw std::runtime_error("Critical error!" + LINE_AND_FILE);
 			break;
 		}
 	}
@@ -170,6 +180,8 @@ std::vector<char> VarDeclarationNode::generateCode(InternalClass * currentClass,
 	switch (this->_type)
 	{
 	case TypeKnown:
+	case ValueKnown:
+	case ValueAndTypeKnown:
 		//No code required for this type
 		break;
 	default:
@@ -182,38 +194,42 @@ std::vector<char> VarDeclarationNode::generateCode(InternalClass * currentClass,
 SemanticsBase* VarDeclarationNode::semanticsTransform(SemanticsStack stack)
 {
 	stack.push(this);
+	if (this->_isAlreadyTransformed)
+		return this;
 
-	// Add default modiffiers
-	if (!this->_hasModifiers)
+	if (this->_isFieldDecl)
 	{
-		this->_modifiers = AccessModifierListNode::createListNode(AccessModifierNode::createModifier(Internal));
-		this->_hasModifiers = true;
+		// Add default modiffiers
+		if (!this->_hasModifiers)
+		{
+			this->_modifiers = AccessModifierListNode::createListNode(AccessModifierNode::createModifier(Internal));
+			this->_hasModifiers = true;
+		}
+		if (this->_type == VarDeclType::TypeKnown)
+		{
+			this->_typeNode = this->_typeNode->semanticsTransform(stack)->typecast<TypeNode>();
+		}
+		else if (this->_type == VarDeclType::ValueKnown)
+		{
+			this->_valueNode = this->_valueNode->semanticsTransform(stack)->typecast<ExprNode>();
+		}
+		else
+		{
+			this->_typeNode = this->_typeNode->semanticsTransform(stack)->typecast<TypeNode>();
+			this->_valueNode = this->_valueNode->semanticsTransform(stack)->typecast<ExprNode>();
+		}
 	}
-
-	// Only if it's not a field declaration
-	if (!this->_isFieldDecl)
+	else
 	{
-		auto valueKnown = this->_type == ValueKnown || this->_type == ValueAndTypeKnown;
-		auto typeKnown = this->_type == TypeKnown || this->_type == ValueAndTypeKnown;
+		if (this->_hasModifiers)
+			throw std::runtime_error("Only field declaration can have modifiers!" + LINE_AND_FILE);
 
+		auto valueKnown = this->_type == ValueKnown || this->_type == ValueAndTypeKnown;
+
+		// Create assignment if we know the value
 		if (valueKnown)
 		{
 			this->_valueNode = this->_valueNode->semanticsTransform(stack)->typecast<ExprNode>();
-
-			auto typeNode = this->_typeNode;
-			if (!typeKnown)
-			{
-				typeNode = TypeNode::createDynamicType(this->_valueNode);
-			}
-
-			auto thisNode = VarDeclarationNode::createFromType(this->_varName, typeNode);
-			if (this->_hasModifiers)
-			{
-				thisNode->addModifiers(this->_modifiers);
-			}
-			else {
-				throw std::runtime_error("Missing modiffiers");
-			}
 
 			auto thisStmtList = stack.getClosest<StmtListNode>();
 			if (thisStmtList == nullptr)
@@ -226,11 +242,9 @@ SemanticsBase* VarDeclarationNode::semanticsTransform(SemanticsStack stack)
 			auto assignmentNode = StmtNode::createStmtAssignment(ExprNode::createId(this->_varName), this->_valueNode);
 
 			thisStmtList->appendNodeAfterNode(assignmentNode, thisStmt);
-
-			return thisNode;
 		}
 	}
-	
+
 	return this;
 }
 
@@ -289,6 +303,8 @@ std::vector<char> VarDeclarationListNode::generateCode(InternalClass* currentCla
 SemanticsBase* VarDeclarationListNode::semanticsTransform(SemanticsStack stack)
 {
 	stack.push(this);
+	if (this->_isAlreadyTransformed)
+		return this;
 	for (auto& elem : _vec)
 	{
 		elem = elem->semanticsTransform(stack)->typecast<VarDeclarationNode>();

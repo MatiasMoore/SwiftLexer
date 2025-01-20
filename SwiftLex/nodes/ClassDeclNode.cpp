@@ -81,6 +81,9 @@ void ClassDeclNode::generateDot(std::ofstream& file)
 SemanticsBase* ClassDeclNode::semanticsTransform(SemanticsStack stack)
 {
     stack.push(this);
+    if (this->_isAlreadyTransformed)
+        return this;
+
     this->_body = this->_body->semanticsTransform(stack)->typecast<StmtListNode>();
     return this;
 }

@@ -34,6 +34,8 @@ void FuncCallArgNode::generateDot(std::ofstream& file)
 SemanticsBase* FuncCallArgNode::semanticsTransform(SemanticsStack stack)
 {
     stack.push(this);
+    if (this->_isAlreadyTransformed)
+        return this;
 
     this->_value = this->_value->semanticsTransform(stack)->typecast<ExprNode>();
 
@@ -61,6 +63,9 @@ std::string FuncCallArgListNode::getName()
 SemanticsBase* FuncCallArgListNode::semanticsTransform(SemanticsStack stack)
 {
     stack.push(this);
+    if (this->_isAlreadyTransformed)
+        return this;
+
     for (int i = 0; i < _vec.size(); i++)
     {
         _vec[i] = _vec[i]->semanticsTransform(stack)->typecast<FuncCallArgNode>();

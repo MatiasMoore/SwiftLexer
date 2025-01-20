@@ -104,6 +104,8 @@ std::vector<enum FieldAccessFlag> AccessModifierNode::getFieldAccessFlags()
 SemanticsBase* AccessModifierNode::semanticsTransform(SemanticsStack stack)
 {
 	stack.push(this);
+	if (this->_isAlreadyTransformed)
+		return this;
 
 	auto myModifierList = stack.getClosest<AccessModifierListNode>();
 	if (myModifierList == nullptr)
@@ -192,6 +194,9 @@ std::vector<enum FieldAccessFlag> AccessModifierListNode::getFieldAccessFlags()
 SemanticsBase* AccessModifierListNode::semanticsTransform(SemanticsStack stack)
 {
 	stack.push(this);
+	if (this->_isAlreadyTransformed)
+		return this;
+
 	for (int i = 0; i < _vec.size(); i++)
 	{
 		_vec[i] = _vec[i]->semanticsTransform(stack)->typecast<AccessModifierNode>();

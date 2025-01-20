@@ -177,11 +177,22 @@ int main(int argc, const char* argv[])
 	auto classTable = ClassTable();
 
 	// Add external classes
-	auto javaObject = classTable.addExternalClass("java/lang/Object", "");
-	javaObject->addMethod("<init>", "()V", { MethodAccessFlag::M_ACC_PUBLIC });
+	auto publicStaticFlag = { MethodAccessFlag::M_ACC_PUBLIC, MethodAccessFlag::M_ACC_STATIC };
+	auto publicFlag = { MethodAccessFlag::M_ACC_PUBLIC };
 
-	auto inputOutput = classTable.addExternalClass("InputOutput", "java/lang/object");
-	inputOutput->addMethod("print", "(I)V", { MethodAccessFlag::M_ACC_PUBLIC, MethodAccessFlag::M_ACC_STATIC });
+	auto javaObject = classTable.addExternalClass("java/lang/Object", "");
+	javaObject->addMethod("<init>", "()V", publicFlag);
+
+	auto inputOutput = classTable.addExternalClass("rtl/InputOutput", "java/lang/object");
+	inputOutput->addMethod("print", "(I)V", publicStaticFlag);
+	inputOutput->addMethod("print", "(Lrtl/Integer;)V", publicStaticFlag);
+
+	auto integer = classTable.addExternalClass("rtl/Integer", "java/lang/object");
+	integer->addMethod("<init>", "(I)V", publicFlag);
+	integer->addMethod("sum", "(Lrtl/Integer;)Lrtl/Integer;", publicFlag);
+	integer->addMethod("mul", "(Lrtl/Integer;)Lrtl/Integer;", publicFlag);
+	integer->addMethod("div", "(Lrtl/Integer;)Lrtl/Integer;", publicFlag);
+	integer->addMethod("sub", "(Lrtl/Integer;)Lrtl/Integer;", publicFlag);
 
 	try
 	{

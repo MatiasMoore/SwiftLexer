@@ -1,6 +1,7 @@
 #pragma once
 #include "dottable.h"
 #include "../tables/tables.h"
+#include "SemanticsBase.h"
 
 class ExprNode;
 
@@ -13,10 +14,9 @@ enum TypeType
 	CharacterT,
 	IdT,
 	ArrayT,
-	DynamicT
 };
 
-class TypeNode : public Dottable
+class TypeNode : public Dottable, public SemanticsBase
 {
 public:
 	TypeType _type;
@@ -25,15 +25,11 @@ public:
 
 	TypeNode* _arrayType;
 
-	ExprNode* _exprForDynamicT;
-
 	static TypeNode* createType(TypeType type);
 
 	static TypeNode* createIdType(std::string id);
 
 	static TypeNode* createArrayType(TypeNode* type);
-
-	static TypeNode* createDynamicType(ExprNode* expr);
 
 	static TypeNode* createFromDescriptor(std::string descriptor);
 
@@ -41,6 +37,8 @@ public:
 
 	void generateDot(std::ofstream& file) override;
 
-	std::string toDescriptor(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
+	SemanticsBase* semanticsTransform(SemanticsStack stack) override;
+
+	std::string toDescriptor();
 };
 
