@@ -118,6 +118,17 @@ SemanticsBase* TypeNode::semanticsTransform(SemanticsStack stack)
 	if (this->_isAlreadyTransformed)
 		return this;
 
+	std::map<TypeType, std::string> primitiveToClass = {
+		{ TypeType::IntT, "rtl/Integer"},
+	};
+
+	if (primitiveToClass.count(this->_type) != 0)
+	{
+		auto newType = TypeNode::createIdType(primitiveToClass[this->_type]);
+		newType->setIsAlreadyTransformed(true);
+		return newType;
+	}
+
 	return this;
 }
 

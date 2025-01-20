@@ -225,6 +225,7 @@ SemanticsBase* VarDeclarationNode::semanticsTransform(SemanticsStack stack)
 			throw std::runtime_error("Only field declaration can have modifiers!" + LINE_AND_FILE);
 
 		auto valueKnown = this->_type == ValueKnown || this->_type == ValueAndTypeKnown;
+		auto typeKnown = this->_type == TypeKnown || this->_type == ValueAndTypeKnown;
 
 		// Create assignment if we know the value
 		if (valueKnown)
@@ -242,6 +243,10 @@ SemanticsBase* VarDeclarationNode::semanticsTransform(SemanticsStack stack)
 			auto assignmentNode = StmtNode::createStmtAssignment(ExprNode::createId(this->_varName), this->_valueNode);
 
 			thisStmtList->appendNodeAfterNode(assignmentNode, thisStmt);
+		}
+		else
+		{
+			this->_typeNode = this->_typeNode->semanticsTransform(stack)->typecast<TypeNode>();
 		}
 	}
 
