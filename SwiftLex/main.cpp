@@ -186,6 +186,7 @@ int main(int argc, const char* argv[])
 	auto inputOutput = classTable.addExternalClass("rtl/InputOutput", "java/lang/object");
 	inputOutput->addMethod("print", "(I)V", publicStaticFlag);
 	inputOutput->addMethod("print", "(Lrtl/Integer;)V", publicStaticFlag);
+	inputOutput->addMethod("print", "(Lrtl/String;)V", publicStaticFlag);
 
 	auto integer = classTable.addExternalClass("rtl/Integer", "java/lang/object");
 	integer->addMethod("<init>", "(I)V", publicFlag);
@@ -193,6 +194,10 @@ int main(int argc, const char* argv[])
 	integer->addMethod("mul", "(Lrtl/Integer;)Lrtl/Integer;", publicFlag);
 	integer->addMethod("div", "(Lrtl/Integer;)Lrtl/Integer;", publicFlag);
 	integer->addMethod("sub", "(Lrtl/Integer;)Lrtl/Integer;", publicFlag);
+
+	auto string = classTable.addExternalClass("rtl/String", "java/lang/object");
+	string->addMethod("<init>", "(Ljava/lang/String;)V", publicFlag);
+	string->addMethod("sum", "(Lrtl/String;)Lrtl/String;", publicFlag);
 
 	try
 	{

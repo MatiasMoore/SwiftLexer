@@ -11,4 +11,9 @@ public class InputOutput {
     {
         System.out.println(integer._value);
     }
+
+    public static void print(String string)
+    {
+        System.out.println(string._value);
+    }
 }

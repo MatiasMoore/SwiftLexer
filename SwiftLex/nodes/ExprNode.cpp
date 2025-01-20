@@ -452,7 +452,7 @@ SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 		ExprType::Id, ExprType::FieldAccess, ExprType::SelfFieldAccess
 	};
 
-	std::map < ExprType, std::string> exprTypeToTransform = {
+	std::map <ExprType, std::string> exprTypeToTransform = {
 		{ ExprType::Sum, "sum" },
 		{ ExprType::Sub, "sub" },
 		{ ExprType::Mul, "mul" },
@@ -465,9 +465,13 @@ SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 		auto newExpr = ExprNode::createFuncCall(FuncCallNode::createFuncCall("rtl/Integer", args));
 		newExpr->setIsAlreadyTransformed(true);
 		return newExpr;
-		/*
-		return this;
-		*/
+	}
+	else if (this->_type == ExprType::String)
+	{
+		auto args = FuncCallArgListNode::createListNode(FuncCallArgNode::createFromExpr(ExprNode::createString(this->_stringValue)));
+		auto newExpr = ExprNode::createFuncCall(FuncCallNode::createFuncCall("rtl/String", args));
+		newExpr->setIsAlreadyTransformed(true);
+		return newExpr;
 	}
 	else if (exprTypeToTransform.count(this->_type) != 0)
 	{
@@ -628,6 +632,9 @@ void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 			currentClass->getConstTable()->findOrAddInteger(this->_intValue);
 		}
 		break;
+	case ExprType::String:
+		currentClass->getConstTable()->findOrAddString(currentClass->getConstTable()->findOrAddUTF8(this->_stringValue));
+		break;
 	case ExprType::Id:
 		break;
 	default:
@@ -654,6 +661,9 @@ std::vector<char> ExprNode::generateCode(InternalClass* currentClass, InternalMe
 		else {
 			appendVecToVec(code, jvm::iconstBipushSipush(this->_intValue));
 		}
+		break;
+	case ExprType::String:
+		appendVecToVec(code, jvm::ldc(currentClass->getConstTable()->findStringRef(currentClass->getConstTable()->findUTF8(this->_stringValue))));
 		break;
 	case ExprType::Id:
 		localVar = currentMethod->getVarTable()->findLocalVar(this->_stringValue);

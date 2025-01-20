@@ -1,5 +1,4 @@
-var a : Int
+var a = "Hello"
+var b = " world!"
 
-a = 5
-
-print(a)
+print(a + b)

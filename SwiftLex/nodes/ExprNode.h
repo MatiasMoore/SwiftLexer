@@ -98,7 +98,6 @@ public:
 
 	bool _isStaticFieldAccess;
 	int _staticFieldRef;
-	int _constTableValueRef;
 
 	static ExprNode* createBool(bool value);
 
