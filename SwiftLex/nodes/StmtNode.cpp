@@ -380,7 +380,7 @@ SemanticsBase* StmtNode::semanticsTransform(SemanticsStack stack)
 	}
 	else if (this->_type == StmtType::Return)
 	{
-		//do nothing
+		this->_return = this->_return->semanticsTransform(stack)->typecast<ReturnNode>();
 	}
 	else {
 		throw std::runtime_error("Unsupported stmnt with enum type " + std::to_string(this->_type) + "!");

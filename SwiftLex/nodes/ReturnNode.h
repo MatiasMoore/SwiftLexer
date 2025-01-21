@@ -1,6 +1,7 @@
 #pragma once
 #include "dottable.h"
 #include "../tables/tables.h"
+#include "SemanticsBase.h"
 
 class ExprNode;
 
@@ -10,7 +11,7 @@ enum ReturnNodeType
 	ExprReturn
 };
 
-class ReturnNode : public Dottable
+class ReturnNode : public Dottable, public SemanticsBase
 {
 public:
 	ReturnNodeType _type;
@@ -24,6 +25,8 @@ public:
 	static ReturnNode* createExprReturn(ExprNode* expr);
 
 	void generateDot(std::ofstream& file) override;
+
+	SemanticsBase* semanticsTransform(SemanticsStack stack) override;
 
 	void fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
 

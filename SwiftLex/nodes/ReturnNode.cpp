@@ -33,12 +33,35 @@ void ReturnNode::generateDot(std::ofstream& file)
     }
 }
 
+SemanticsBase* ReturnNode::semanticsTransform(SemanticsStack stack)
+{
+    stack.push(this);
+    if (this->_isAlreadyTransformed)
+        return this;
+
+    if (this->_type == ReturnNodeType::ExprReturn)
+        this->_expr = this->_expr->semanticsTransform(stack)->typecast<ExprNode>();
+
+    return this;
+}
+
 void ReturnNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
 {
     if (this->_type == ReturnNodeType::ExprReturn)
     {
         this->_expr->fillTable(classTable, currentClass, currentMethod);
         this->_exprDesc = this->_expr->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+    }
+    else
+    {
+        this->_exprDesc = "V";
+    }
+
+    auto expectedReturn = currentMethod->getReturnDescriptor();
+    if (expectedReturn != this->_exprDesc)
+    {
+        throw std::runtime_error("Method \"" + currentMethod->getMethodName() + "\" must return type with descriptor \"" + expectedReturn
+            + "\" but attempts to return type with descriptor \"" + this->_exprDesc + "\"!" + LINE_AND_FILE);
     }
 }
 
