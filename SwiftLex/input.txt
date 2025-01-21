@@ -45,7 +45,6 @@ var d = A.printValue(aObj)
 var f = A.printValue(bObj)
 print(d)
 print(f)
-*/
 
 print("Hello!")
 
@@ -55,3 +54,17 @@ while (a < 5)
 	print(" world!")
 	a += 1
 }
+*/
+
+// program to display numbers
+
+var i = 1, n = 5
+
+// repeat...while loop from 1 to 5
+repeat {
+  
+  print(i)
+
+  i = i + 1
+
+} while (i < n)

@@ -149,6 +149,8 @@ namespace jvm
 
 	std::vector<char> whileLoop(std::vector<char> condition, std::vector<char> loopBody);
 
+	std::vector<char> repeatWhileLoop(std::vector<char> condition, std::vector<char> loopBody);;
+
 	std::vector<char> aastore();
 
 	std::vector<char> iadd();

@@ -635,3 +635,21 @@ std::vector<char> jvm::whileLoop(std::vector<char> condition, std::vector<char> 
 
 	return code;
 }
+
+std::vector<char> jvm::repeatWhileLoop(std::vector<char> condition, std::vector<char> loopBody)
+{
+	std::vector<char> code = {};
+
+	appendVecToVec(code, loopBody);
+
+	//Condition must be 1 or 0 
+	appendVecToVec(code, condition);
+	appendVecToVec(code, jvm::iconst_1());
+
+	int jumpOffset = code.size();
+	jumpOffset = -jumpOffset;
+
+	appendVecToVec(code, jvm::if_icmp(IfCommandType::EQ_if, jumpOffset));
+
+	return code;
+}

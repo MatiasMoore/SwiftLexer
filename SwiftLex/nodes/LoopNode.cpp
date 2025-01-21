@@ -116,6 +116,13 @@ SemanticsBase* LoopNode::semanticsTransform(SemanticsStack stack)
 			this->_body = this->_body->semanticsTransform(stack)->typecast<StmtListNode>();
 		}
 	}
+	else if (this->_type == LoopNodeType::repeatWhileLoop)
+	{
+		if (this->_hasBody)
+		{
+			this->_body = this->_body->semanticsTransform(stack)->typecast<StmtListNode>();
+		}
+	}
 	else
 	{
 		throw std::runtime_error("Loop with enum type " + std::to_string(this->_type) + " is not supported!" + LINE_AND_FILE);
@@ -156,6 +163,13 @@ void LoopNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 			this->_body->fillTable(classTable, currentClass, currentMethod);
 		}
 	}
+	else if (this->_type == LoopNodeType::repeatWhileLoop)
+	{
+		if (this->_hasBody)
+		{
+			this->_body->fillTable(classTable, currentClass, currentMethod);
+		}
+	}
 	else
 	{
 		throw std::runtime_error("Loop with enum type " + std::to_string(this->_type) + " is not supported!" + LINE_AND_FILE);
@@ -183,6 +197,19 @@ std::vector<char> LoopNode::generateCode(InternalClass* currentClass, InternalMe
 		}
 
 		appendVecToVec(code, jvm::whileLoop(conditionCode, loopBodyCode));
+	} 
+	else if (this->_type == LoopNodeType::repeatWhileLoop)
+	{
+		std::vector<char> conditionCode = {};
+		appendVecToVec(conditionCode, condition->generateCode(currentClass, currentMethod));
+
+		std::vector<char> loopBodyCode = {};
+		if (this->_hasBody)
+		{
+			appendVecToVec(loopBodyCode, this->_body->generateCode(currentClass, currentMethod));
+		}
+
+		appendVecToVec(code, jvm::repeatWhileLoop(conditionCode, loopBodyCode));
 	}
 	else
 	{
