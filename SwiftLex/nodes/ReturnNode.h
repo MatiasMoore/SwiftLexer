@@ -1,5 +1,6 @@
 #pragma once
 #include "dottable.h"
+#include "../tables/tables.h"
 
 class ExprNode;
 
@@ -16,10 +17,16 @@ public:
 
 	ExprNode* _expr;
 
+	std::string _exprDesc;
+
 	static ReturnNode* createVoidReturn();
 
 	static ReturnNode* createExprReturn(ExprNode* expr);
 
 	void generateDot(std::ofstream& file) override;
+
+	void fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
+
+	std::vector<char> generateCode(InternalClass* currentClass, InternalMethod* currentMethod);
 };
 

@@ -480,6 +480,7 @@ void StmtNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 		break;
 	case StmtType::Return:
 		//TODO maybe do something here
+		this->_return->fillTable(classTable, currentClass, currentMethod);
 
 		break;
 	default:
@@ -494,8 +495,7 @@ std::vector<char> StmtNode::generateCode(InternalClass* currentClass, InternalMe
 	switch (this->_type)
 	{
 	case StmtType::Return:
-		//TODO non void returns
-		appendVecToVec(code, jvm::_return());
+		appendVecToVec(code, this->_return->generateCode(currentClass, currentMethod));
 		break;
 	case StmtType::Expr:
 		appendVecToVec(code, this->_expr->generateCode(currentClass, currentMethod));

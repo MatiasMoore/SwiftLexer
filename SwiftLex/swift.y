@@ -444,6 +444,7 @@ returnStmt: return {printf("P: stmt return\n"); $$ = StmtNode::createStmtReturn(
 
 return: RETURN expr  {printf("P: return\n"); $$ = ReturnNode::createExprReturn($2);}
     | RETURN {printf("P: return empty\n"); $$ = ReturnNode::createVoidReturn();}
+    | RETURN SELF {printf("P: return self\n"); $$ = ReturnNode::createExprReturn(ExprNode::createId("self"));}
     ;
 
 exprThrow: THROW expr {printf("P: throw\n"); $$ = ThrowNode::createThrowExpr($2);}
