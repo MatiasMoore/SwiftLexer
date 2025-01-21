@@ -378,6 +378,10 @@ SemanticsBase* StmtNode::semanticsTransform(SemanticsStack stack)
 	{
 		this->_ifElse = this->_ifElse->semanticsTransform(stack)->typecast<IfElseNode>();
 	}
+	else if (this->_type == StmtType::Loop)
+	{
+		this->_loop = this->_loop->semanticsTransform(stack)->typecast<LoopNode>();
+	}
 	else if (this->_type == StmtType::DefaultConstructor)
 	{
 		//do nothing
@@ -488,6 +492,9 @@ void StmtNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 	case StmtType::IfElse:
 		this->_ifElse->fillTable(classTable, currentClass, currentMethod);
 		break;
+	case StmtType::Loop:
+		this->_loop->fillTable(classTable, currentClass, currentMethod);
+		break;
 	default:
 		throw std::runtime_error("Unsupported stmnt with enum type " + std::to_string(this->_type) + "!");
 		break;
@@ -554,6 +561,9 @@ std::vector<char> StmtNode::generateCode(InternalClass* currentClass, InternalMe
 		break;
 	case StmtType::IfElse:
 		appendVecToVec(code, this->_ifElse->generateCode(currentClass, currentMethod));
+		break;
+	case StmtType::Loop:
+		appendVecToVec(code, this->_loop->generateCode(currentClass, currentMethod));
 		break;
 	case StmtType::FuncDecl:
 

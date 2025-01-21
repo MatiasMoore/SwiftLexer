@@ -147,6 +147,8 @@ namespace jvm
 
 	std::vector<char> ifElseComplex(IfCommandType ifType, std::vector<char> trueBranch, std::vector<char> falseBranch);
 
+	std::vector<char> whileLoop(std::vector<char> condition, std::vector<char> loopBody);
+
 	std::vector<char> aastore();
 
 	std::vector<char> iadd();

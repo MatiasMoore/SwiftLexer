@@ -1,3 +1,4 @@
+/*
 //var a = 5.0 + 1 //Float(5.0).sum(Integer(1))
 //print(a)
 
@@ -19,13 +20,13 @@ class A {
 		return obj._value
 	}
 
-	/*
-	public func printValue(obj : B)
-	{
-		print("Class B")
-		print(obj._value)
-	}
-	*/
+	//
+	//public func printValue(obj : B)
+	//{
+	//	print("Class B")
+	//	print(obj._value)
+	//}
+	//
 
 }
 
@@ -42,7 +43,15 @@ var aObj = A(10)
 var bObj = B(15)
 var d = A.printValue(aObj)
 var f = A.printValue(bObj)
-/*
 print(d)
 print(f)
 */
+
+print("Hello!")
+
+var a = 0
+while (a < 5)
+{
+	print(" world!")
+	a += 1
+}

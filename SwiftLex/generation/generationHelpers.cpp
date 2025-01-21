@@ -618,3 +618,20 @@ std::vector<char> jvm::ifElseComplex(IfCommandType ifType, std::vector<char> tru
 
 	return code;
 }
+
+std::vector<char> jvm::whileLoop(std::vector<char> condition, std::vector<char> loopBody)
+{
+	std::vector<char> code = {};
+
+	//Condition must be 1 or 0 
+	appendVecToVec(code, condition);
+	appendVecToVec(code, jvm::iconst_1());
+
+	int jumpOffset = loopBody.size() + code.size() + 6; //6 because of the ifcmp intruction
+	jumpOffset = -jumpOffset;
+
+	appendVecToVec(loopBody, jvm::go_to(jumpOffset));
+	appendVecToVec(code, jvm::ifElseComplex(IfCommandType::EQ_if, loopBody, {}));
+
+	return code;
+}
