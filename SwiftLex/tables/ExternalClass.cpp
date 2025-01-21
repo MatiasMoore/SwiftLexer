@@ -37,6 +37,11 @@ std::vector<ExternalMethod*> ExternalClass::getMethods()
 	return this->_methodContainer.getAll();
 }
 
+std::vector<ExternalField*> ExternalClass::getFields()
+{
+	return this->_fieldContainer.getAll();
+}
+
 std::string ExternalClass::getClassName()
 {
 	return _name;

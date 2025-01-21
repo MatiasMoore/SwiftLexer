@@ -1,72 +1,41 @@
-/*
-var a = "Hello"
-var b = " world!"
-
-print(a + b)
 class A {
-	public static var _a : Int
-	public func test(a : String)
+	public var a : Int
+	init()
 	{
-		print(a)
+	self.a = 32
+	print(self.a)
+	}
+
+	public func printField()
+	{
+		print(self.a)
 	}
 }
 
-class B : A
-{
-}
-
-var c = B()
-c.test(b + a)
-//c._a = 5
-
-testFunc()
-
-func testFunc()
-{
-	testFunc2()
-}
-
-func testFunc2()
-{
-	print(9945)
-}
-
-testFunc()
-
-
-print(
-"""
-Hello!
-	Enter\
-		 your\
-			 name\
-				 please!
-"""
-)
-var name = readLine()
-print("Hello \"" + name + "\" !")
-*/
-
-//print(true)
-//print(false)
-
-//print(1.1 + 1.2)
-//print(1.11e-1)
-
-class Num {
-	public func test() -> Int
+class B : A {
+	public var b : A
+	init()
 	{
-		return 5
+	self.a = 2323
+	self.b = A()
+	self.b.a = 999
+	print(self.a)
 	}
 
-	public func sum(other : Num) -> Num
+	public func printBField()
 	{
-		print("override sum!")
-		var a = test()
-		print(a + 5)
-		return self
+		print(self.a)
+		print(self.b.a)
 	}
-} 
+}
 
-var a = Num(), b = Num()
-a + b
+
+var a = A()
+a.a = 10
+a.printField()
+
+var b = B()
+b.a = 123
+b.b.a = 1999
+b.printBField()
+
