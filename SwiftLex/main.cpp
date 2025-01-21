@@ -7,9 +7,7 @@
 #include "tables/tables.h"
 #include <filesystem>
 #include "RTLHelper.h"
-
-bool _DRAW_DOT = false;
-bool _EXEC_MAINCLASS = true;
+#include "GlobalSettings.h"
 
 std::string generatedClassFilesDirectory = "out/";
 std::string rtlSourceDirectory = "rtl/";
@@ -68,7 +66,7 @@ int main(int argc, const char* argv[])
 
 	// Before semantics
 
-	if (_DRAW_DOT)
+	if (GlobalSettings::_DRAW_DOT)
 	{
 		std::ofstream dotInitial;
 		dotInitial.open("swift.dot");
@@ -153,7 +151,7 @@ int main(int argc, const char* argv[])
 		return 1;
 	}
 
-	if (_DRAW_DOT)
+	if (GlobalSettings::_DRAW_DOT)
 	{
 		std::ofstream dotSemantics;
 		dotSemantics.open("swiftSem.dot");
@@ -231,7 +229,7 @@ int main(int argc, const char* argv[])
 	
 	//Execute
 
-	if (_EXEC_MAINCLASS) {
+	if (GlobalSettings::_EXEC_MAINCLASS) {
 		std::cout << "//---------Program exec---------\\\\" << std::endl;
 		//TODO maybe implement proper stackmap frames
 		std::string javaExecutionCommand = "java -noverify -cp " + generatedClassFilesDirectory + " MainClass";

@@ -22,6 +22,7 @@
     <Flex Include="swift.l" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="GlobalSettings.cpp" />
     <ClCompile Include="RTLHelper.cpp" />
     <ClCompile Include="tables\FieldContainer.cpp" />
     <ClCompile Include="tables\MethodContainer.cpp" />
@@ -75,6 +76,7 @@
     <Bison Include="swift.y" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GlobalSettings.h" />
     <ClInclude Include="RTLHelper.h" />
     <ClInclude Include="tables\FieldContainer.h" />
     <ClInclude Include="tables\MethodContainer.h" />
