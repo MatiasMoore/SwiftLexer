@@ -1,35 +1,31 @@
 #pragma once
 #include "dottable.h"
+#include "SemanticsBase.h"
+#include "../tables/tables.h"
 
 class StmtListNode;
 class ExprNode;
 class ExprListNode;
 
-enum IfElseNodeType
-{
-	onlyIf,
-	ifElseSimple,
-	ifElseComplex
-};
-
-class IfElseNode : public Dottable
+class IfElseNode : public Dottable, public SemanticsBase
 {
 public:
-	IfElseNodeType _type;
-
 	ExprListNode* _conditions;
 
 	bool _hasIfTrue;
 	bool _hasElse;
 
 	StmtListNode* _ifTrue;
-	StmtListNode* _elseSimple;
-	IfElseNode* _elseComplex;
+	StmtListNode* _else;
 
-	static IfElseNode* createSimple(ExprListNode* conditions, StmtListNode* ifTrue, StmtListNode* elseSimple);
-
-	static IfElseNode* createComplex(ExprListNode* conditions, StmtListNode* ifTrue, IfElseNode* elseComplex);
+	static IfElseNode* createSimple(ExprListNode* conditions, StmtListNode* ifTrue, StmtListNode* else_);
 
 	void generateDot(std::ofstream& file) override;
+
+	SemanticsBase* semanticsTransform(SemanticsStack stack) override;
+
+	void fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
+
+	std::vector<char> generateCode(InternalClass* currentClass, InternalMethod* currentMethod);
 };
 

@@ -52,7 +52,7 @@ print("Hello \"" + name + "\" !")
 
 //print(1.1 + 1.2)
 //print(1.11e-1)
-
+/*
 class Num {
 	public func test() -> Int
 	{
@@ -70,3 +70,37 @@ class Num {
 
 var a = Num(), b = Num()
 a + b
+*/
+
+if (true)
+{
+	print("True")
+	if (false)
+	{
+		print("True")
+	}
+	else
+	{
+		print("False")
+		if (true)
+		{
+			print("True")
+		}
+		else
+		{
+			print("False")
+		}
+	}
+}
+else
+{
+	print("False")
+		if (true)
+	{
+		print("True")
+	}
+	else
+	{
+		print("False")
+	}
+}

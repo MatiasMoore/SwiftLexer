@@ -476,10 +476,13 @@ SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 	}
 	else if (this->_type == ExprType::Bool)
 	{
+		return this;
+		/*
 		auto args = FuncCallArgListNode::createListNode(FuncCallArgNode::createFromExpr(ExprNode::createBool(this->_boolValue)));
 		auto newExpr = ExprNode::createFuncCall(FuncCallNode::createFuncCall(RTLHelper::_boolC, args));
 		newExpr->setIsAlreadyTransformed(true);
 		return newExpr;
+		*/
 	}
 	else if (this->_type == ExprType::Float)
 	{
@@ -663,6 +666,7 @@ void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 		currentClass->getConstTable()->findOrAddDouble(this->_floatValue);
 		break;
 	case ExprType::Bool:
+		break;
 	case ExprType::Id:
 	{
 		bool isSelf = this->_stringValue == "self";
@@ -759,4 +763,26 @@ std::vector<char> ExprNode::generateCode(InternalClass* currentClass, InternalMe
 std::string ExprListNode::getName()
 {
 	return "ExprList";
+}
+
+SemanticsBase* ExprListNode::semanticsTransform(SemanticsStack stack)
+{
+	stack.push(this);
+	if (this->_isAlreadyTransformed)
+		return this;
+
+	for (int i = 0; i < _vec.size(); i++)
+	{
+		_vec[i] = _vec[i]->semanticsTransform(stack)->typecast<ExprNode>();
+	}
+
+	return this;
+}
+
+void ExprListNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
+{
+	for (auto& elem : _vec)
+	{
+		elem->fillTable(classTable, currentClass, currentMethod);
+	}
 }

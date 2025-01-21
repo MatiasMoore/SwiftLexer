@@ -233,7 +233,8 @@ int main(int argc, const char* argv[])
 
 	if (_EXEC_MAINCLASS) {
 		std::cout << "//---------Program exec---------\\\\" << std::endl;
-		std::string javaExecutionCommand = "java -cp " + generatedClassFilesDirectory + " MainClass";
+		//TODO maybe implement proper stackmap frames
+		std::string javaExecutionCommand = "java -noverify -cp " + generatedClassFilesDirectory + " MainClass";
 		system(javaExecutionCommand.c_str());
 	}
 }
