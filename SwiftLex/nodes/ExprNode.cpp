@@ -664,6 +664,31 @@ void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 		break;
 	case ExprType::Bool:
 	case ExprType::Id:
+	{
+		bool isSelf = this->_stringValue == "self";
+		bool isSuper = this->_stringValue == "super";
+		if (isSelf)
+		{
+			auto selfLocalVar = currentMethod->getVarTable()->findLocalVar("self");
+			if (selfLocalVar == nullptr)
+				throw std::runtime_error("Keyword \"self\" is only allowed inside non-static methods!");
+
+			if (selfLocalVar->_descriptor[0] != 'L')
+				throw std::runtime_error("Critical error! \"Self\" must be a link type!" + LINE_AND_FILE);
+
+			auto localVarClassName = classnameFromDescriptor(selfLocalVar->_descriptor);
+			if (localVarClassName != currentClass->getClassName())
+				throw std::runtime_error("Critical error! \"Self\" must be of type " + currentClass->getClassName() + " but got " + localVarClassName + "!" + LINE_AND_FILE);
+
+			bool isCurrentMethodStatic = currentMethod->containsFlag(MethodAccessFlag::M_ACC_STATIC);
+			if (isCurrentMethodStatic)
+				throw std::runtime_error("Critical error! Static methods can't have a \"self\" variable defined!" + LINE_AND_FILE);
+		}
+		else if (isSuper)
+		{
+			throw std::runtime_error("Super is not supported yet!" + LINE_AND_FILE);
+		}
+	}
 		//Do nothing
 		break;
 	default:

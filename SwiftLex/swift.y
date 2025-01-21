@@ -444,7 +444,6 @@ returnStmt: return {printf("P: stmt return\n"); $$ = StmtNode::createStmtReturn(
 
 return: RETURN expr  {printf("P: return\n"); $$ = ReturnNode::createExprReturn($2);}
     | RETURN {printf("P: return empty\n"); $$ = ReturnNode::createVoidReturn();}
-    | RETURN SELF {printf("P: return self\n"); $$ = ReturnNode::createExprReturn(ExprNode::createId("self"));}
     ;
 
 exprThrow: THROW expr {printf("P: throw\n"); $$ = ThrowNode::createThrowExpr($2);}
@@ -827,13 +826,12 @@ expr: LITERAL_INT {printf("P: expr int\n"); switchStateToSubscript(); $$ = ExprN
     | expr '?' expr ':' expr {printf("P: expr ternary ? :\n"); switchStateToSubscript(); $$ = ExprNode::createTernary($1, $3, $5);}
     | '(' expr ')' {printf("P: expr brackets\n"); $$ = $2; switchStateToSubscript();}
     | funcCall {printf("P: expr funcCall\n"); switchStateToSubscript(); switchStateToSubscript(); $$ = ExprNode::createFuncCall($1);}
-    | SUPER '.' funcCall {printf("P: expr super funcCall\n"); switchStateToSubscript(); $3->_scopeType = superCall; $$ = ExprNode::createFuncCall($3);}
     | expr '.' funcCall {printf("P: expr func access\n"); switchStateToSubscript(); $3->setAsExprAccess($1); $$ = ExprNode::createFuncCall($3);}
-    | SELF '.' funcCall {printf("P: expr self func access\n"); switchStateToSubscript(); $3->_scopeType = selfCall; $$ = ExprNode::createFuncCall($3);}
     | expr '.' ID {printf("P: expr field access\n"); switchStateToSubscript(); $$ = ExprNode::createFieldAccessExpr($1, $3);}
-    | SELF '.' ID {printf("P: expr self fieldAccess\n"); switchStateToSubscript(); $$ = ExprNode::createFieldAccessSelf($3);}
     | '[' exprList ']' {printf("P: expr array\n"); switchStateToSubscript(); $$ = ExprNode::createArray($2);}
     | expr SUBSCRIPT_SQUARE_BRACKET expr ']' {printf("P: expr array indexing\n"); switchStateToSubscript(); $$ = ExprNode::createBinaryOp(ExprType::Subscript, $1, $3);}
+    | SELF {printf("P: self expr"); $$ = ExprNode::createId("self");}
+    | SUPER {printf("P: self expr"); $$ = ExprNode::createId("super");}
     ;
 
 anyRoundBracket: '('

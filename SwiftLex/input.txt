@@ -54,9 +54,15 @@ print("Hello \"" + name + "\" !")
 //print(1.11e-1)
 
 class Num {
+	public func test()
+	{
+		print(5)
+	}
+
 	public func sum(other : Num) -> Num
 	{
 		print("override sum!")
+		test()
 		return self
 	}
 } 
