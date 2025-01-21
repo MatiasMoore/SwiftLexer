@@ -634,21 +634,49 @@ void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 		break;
 
 	case ExprType::FieldAccess:
-		//TODO non static field access; for reference see ExprNode::evaluateType
-		if (this->_fieldAccessExpr->_type != Id)
-		{
-			throw std::runtime_error("Unsupported field access with left part" + std::to_string(_fieldAccessExpr->_type) + "!" + "Field access only support \"ID\" at left part! ");
-		}
+	{
+		this->_fieldAccessExpr->fillTable(classTable, currentClass, currentMethod);
 
-		{
-			auto field = classTable->findField(this->_fieldAccessFieldName, _fieldAccessExpr->_stringValue, true);
+		bool isStatic = this->_fieldAccessExpr->_type == ExprType::Id && classTable->findClass(this->_fieldAccessFieldName) != nullptr;
 
+		// Static access
+		if (isStatic)
+		{
+			auto className = this->_fieldAccessExpr->_stringValue;
+
+			auto classElem = classTable->findClass(className);
+			if (classElem == nullptr)
+				throw std::runtime_error("Unknown identifier \"" + className + "\"in function call!" + LINE_AND_FILE);
+
+			auto field = classElem->findField(this->_fieldAccessFieldName, true);
 			if (field == nullptr)
-				throw std::runtime_error("Can't find field \"" + this->_fieldAccessFieldName + "\"!" + LINE_AND_FILE);
+				throw std::runtime_error("Static field \"" + this->_fieldAccessFieldName + "\" is not defined in class \"" + className + "\"!" + LINE_AND_FILE);
 
 			this->_staticFieldRef = currentClass->getFieldRefForExternalField(field);
 			this->_isStaticFieldAccess = true;
 		}
+		// Dynamic access
+		else
+		{
+			auto leftDesc = this->_fieldAccessExpr->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+			if (leftDesc[0] != 'L')
+				throw std::runtime_error("Primitive types don't have methods!" + LINE_AND_FILE);
+
+			auto className = classnameFromDescriptor(leftDesc);
+
+			auto classElem = classTable->findClass(className);
+			if (classElem == nullptr)
+				throw std::runtime_error("Critical error! Class \"" + className + "\" is not found!" + LINE_AND_FILE);
+
+			auto field = classElem->findField(this->_fieldAccessFieldName, false);
+			if (field == nullptr)
+				throw std::runtime_error("Dynamic field \"" + this->_fieldAccessFieldName + "\" is not defined in class \"" + className + "\"!" + LINE_AND_FILE);
+
+			this->_nonStaticFieldRef = currentClass->getFieldRefForExternalField(field);
+			this->_isStaticFieldAccess = false;
+		}
+	}
+
 		break;
 	case ExprType::Int:
 		if (this->_intValue < -32767 || this->_intValue > 32767)
@@ -713,9 +741,19 @@ std::vector<char> ExprNode::generateCode(InternalClass* currentClass, InternalMe
 		}
 		break;
 	case ExprType::FieldAccess:
-		appendVecToVec(code, jvm::getstatic(this->_staticFieldRef));
+		if (this->_isStaticFieldAccess) {
+			appendVecToVec(code, jvm::getstatic(this->_staticFieldRef));
+		}
+		else {
+			this->_fieldAccessExpr->generateCode(currentClass, currentMethod);
+			appendVecToVec(code, jvm::getfield(this->_nonStaticFieldRef));
+		}
+		
 		break;
 	case ExprType::Bool:
+		if (_isStaticFieldAccess) {
+
+		}
 		appendVecToVec(code, jvm::iconstBipushSipush(this->_boolValue ? 1 : 0));
 		break;
 	case ExprType::Float: {
