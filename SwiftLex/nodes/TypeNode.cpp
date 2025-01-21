@@ -1,6 +1,7 @@
 #include "TypeNode.h"
 #include "ExprNode.h"
 #include "../ExceptionHelper.h"
+#include "../RTLHelper.h"
 
 TypeNode* TypeNode::createType(TypeType type)
 {
@@ -119,8 +120,10 @@ SemanticsBase* TypeNode::semanticsTransform(SemanticsStack stack)
 		return this;
 
 	std::map<TypeType, std::string> primitiveToClass = {
-		{ TypeType::IntT, "rtl/Integer"},
-		{ TypeType::StringT, "rtl/String"}
+		{ TypeType::IntT, RTLHelper::_intC},
+		{ TypeType::StringT, RTLHelper::_strC},
+		{ TypeType::FloatT, RTLHelper::_floatC},
+		{ TypeType::BoolT, RTLHelper::_boolC},
 	};
 
 	if (primitiveToClass.count(this->_type) != 0)

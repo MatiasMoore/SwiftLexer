@@ -4,6 +4,7 @@
 #include "../ExceptionHelper.h"
 #include "../generation/generationHelpers.h"
 #include "TypeNode.h"
+#include "FuncCallNode.h"
 
 IfElseNode* IfElseNode::createSimple(ExprListNode* conditions, StmtListNode* ifTrue, StmtListNode* else_)
 {
@@ -85,12 +86,23 @@ void IfElseNode::fillTable(ClassTable* classTable, InternalClass* currentClass, 
 
 	auto condition = this->_conditions->_vec[0];
 
-	condition->fillTable(classTable, currentClass, currentMethod);
-
 	auto conditionDesc = condition->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
 
+	//Cast to bool 
 	if (conditionDesc != "Z")
-		throw std::runtime_error("Condition inside if else must have a descriptor \"Z\"(bool) but got \"" + conditionDesc + "\"!" + LINE_AND_FILE);
+	{
+		auto funcCall = FuncCallNode::createFuncCallNoArgs("toBool");
+		funcCall->setAsExprAccess(condition);
+		auto newCondition = ExprNode::createFuncCall(funcCall);
+		this->_conditions->_vec[0] = newCondition;
+		condition = newCondition;
+		/*
+		*/
+		//throw std::runtime_error("Condition inside if else must have a descriptor \"Z\" but got \"" + conditionDesc + "\"!" + LINE_AND_FILE);
+	}
+
+	condition->fillTable(classTable, currentClass, currentMethod);
+
 
 	if (this->_hasIfTrue)
 	{

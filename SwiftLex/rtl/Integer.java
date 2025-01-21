@@ -31,4 +31,9 @@ public class Integer {
         _value /= other._value;
         return this;
     }
+
+    public Boolean lt(Integer other)
+    {
+        return new Boolean(this._value < other._value);
+    }
 }

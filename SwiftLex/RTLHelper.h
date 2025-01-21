@@ -23,12 +23,23 @@ public:
 
     // Method names
     inline static std::string _constructor = "<init>";
+
     inline static std::string _sum = "sum";
     inline static std::string _sub = "sub";
     inline static std::string _mul = "mul";
     inline static std::string _div = "div";
+
     inline static std::string _print = "print";
     inline static std::string _readLine = "readLine";
+
+    inline static std::string _toBool = "toBool";
+
+    inline static std::string _logAnd = "logAnd";
+    inline static std::string _logOr = "logOr";
+    inline static std::string _logNot = "logNot";
+
+    inline static std::string _lt = "lt";
+
 
     // Flags
     inline static std::vector<MethodAccessFlag> _publicFlags = { MethodAccessFlag::M_ACC_PUBLIC };
@@ -49,15 +60,21 @@ public:
             {_sum, "(" + D(_intC) + ")" + D(_intC)},
             {_sub, "(" + D(_intC) + ")" + D(_intC)},
         	{_mul, "(" + D(_intC) + ")" + D(_intC)},
-			{_div, "(" + D(_intC) + ")" + D(_intC)}, //FIXME
+            {_div, "(" + D(_intC) + ")" + D(_intC)}, //FIXME
+
+            {_lt, "(" + D(_intC) + ")" + D(_boolC)},
         }},
         {_strC, {
             {_constructor, "(Ljava/lang/String;)V"},
             {_sum, "(" + D(_strC) + ")" + D(_strC)}
         }},
         {_boolC, {
-			{_constructor, "(Z)V"}
-		}},
+			{_constructor, "(Z)V"},
+            {_toBool, "()Z"},
+            {_logAnd, "(" + D(_boolC) + ")" + D(_boolC)},
+            {_logOr, "(" + D(_boolC) + ")" + D(_boolC)},
+            {_logNot, "()" + D(_boolC)},
+        }},
         {_floatC, {
             {_constructor, "(F)V"},
             { _sum, "(" + D(_floatC) + ")" + D(_floatC) },

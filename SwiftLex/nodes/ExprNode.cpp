@@ -453,11 +453,19 @@ SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 		ExprType::Id, ExprType::FieldAccess, ExprType::SelfFieldAccess
 	};
 
-	std::map <ExprType, std::string> exprTypeToTransform = {
+	std::map <ExprType, std::string> binaryExprTypeToTransform = {
 		{ ExprType::Sum, RTLHelper::_sum},
 		{ ExprType::Sub, RTLHelper::_sub},
 		{ ExprType::Mul, RTLHelper::_mul},
-		{ ExprType::Div, RTLHelper::_div}
+		{ ExprType::Div, RTLHelper::_div},
+		{ ExprType::LogAnd, RTLHelper::_logAnd},
+		{ ExprType::LogOr, RTLHelper::_logOr},
+		{ ExprType::LT, RTLHelper::_lt},
+	};
+
+	std::map <ExprType, std::string> unaryExprTypeToTransform =
+	{
+		{ ExprType::LogNot, RTLHelper::_logNot },
 	};
 
 	if (this->_type == ExprType::Int)
@@ -476,13 +484,10 @@ SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 	}
 	else if (this->_type == ExprType::Bool)
 	{
-		return this;
-		/*
 		auto args = FuncCallArgListNode::createListNode(FuncCallArgNode::createFromExpr(ExprNode::createBool(this->_boolValue)));
 		auto newExpr = ExprNode::createFuncCall(FuncCallNode::createFuncCall(RTLHelper::_boolC, args));
 		newExpr->setIsAlreadyTransformed(true);
 		return newExpr;
-		*/
 	}
 	else if (this->_type == ExprType::Float)
 	{
@@ -491,17 +496,26 @@ SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 		newExpr->setIsAlreadyTransformed(true);
 		return newExpr;
 	}
-	else if (exprTypeToTransform.count(this->_type) != 0)
+	else if (binaryExprTypeToTransform.count(this->_type) != 0)
 	{
 		this->_left = _left->semanticsTransform(stack)->typecast<ExprNode>();
 		this->_right = _right->semanticsTransform(stack)->typecast<ExprNode>();
 
 		auto args = FuncCallArgListNode::createListNode(FuncCallArgNode::createFromExpr(this->_right));
 
-		auto plusFunc = FuncCallNode::createFuncCall(exprTypeToTransform[this->_type], args);
-		plusFunc->setAsExprAccess(this->_left);
+		auto newFunc = FuncCallNode::createFuncCall(binaryExprTypeToTransform[this->_type], args);
+		newFunc->setAsExprAccess(this->_left);
 
-		return ExprNode::createFuncCall(plusFunc);
+		return ExprNode::createFuncCall(newFunc);
+	}
+	else if (unaryExprTypeToTransform.count(this->_type) != 0)
+	{
+		this->_unary = this->_unary->semanticsTransform(stack)->typecast<ExprNode>();
+
+		auto newFunc = FuncCallNode::createFuncCallNoArgs(unaryExprTypeToTransform[this->_type]);
+		newFunc->setAsExprAccess(this->_unary);
+
+		return ExprNode::createFuncCall(newFunc);
 	}
 	else if (this->_type == ExprType::FuncCall)
 	{
