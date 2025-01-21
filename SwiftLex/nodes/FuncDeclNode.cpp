@@ -300,6 +300,10 @@ SemanticsBase* FuncDeclNode::semanticsTransform(SemanticsStack stack)
 		this->_argList = this->_argList->semanticsTransform(stack)->typecast<FuncDeclArgListNode>();
 	}
 
+	//Transform type
+	if (this->_hasNonVoidReturn)
+		this->_returnType = this->_returnType->semanticsTransform(stack)->typecast<TypeNode>();
+
 	//Function may not have a body if it has a void return which is checked later
 	if (this->_hasBody)
 		this->_body = this->_body->semanticsTransform(stack)->typecast<StmtListNode>();
@@ -309,11 +313,7 @@ SemanticsBase* FuncDeclNode::semanticsTransform(SemanticsStack stack)
 		&& this->_body->_vec.back()->_type == StmtType::Return; //last stmt is a return
 
 	if (!hasReturnStmt)
-	{
-		//Function has a return type and has no return stmt
-		if (this->_hasNonVoidReturn)
-			throw std::runtime_error("Method \"" + this->_idName + "\" must have at least a return stmt inside the body!");
-		
+	{		
 		//Add void return
 		auto returnStmt = StmtNode::createStmtReturn(ReturnNode::createVoidReturn());
 
