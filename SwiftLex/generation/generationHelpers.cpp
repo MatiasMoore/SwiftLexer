@@ -601,3 +601,20 @@ std::vector<char> jvm::iconst_m1()
 	res.push_back(0x2); //aaload
 	return res;
 }
+
+std::vector<char> jvm::ifElseComplex(IfCommandType ifType, std::vector<char> trueBranch, std::vector<char> falseBranch)
+{
+	std::vector<char> code = {};
+	std::vector<char> bothBranches = {};
+
+	//Always end on this
+	appendVecToVec(falseBranch, jvm::go_to(trueBranch.size()));
+
+	appendVecToVec(bothBranches, falseBranch);
+	appendVecToVec(bothBranches, trueBranch);
+
+	appendVecToVec(code, jvm::if_icmp(ifType, falseBranch.size()));
+	appendVecToVec(code, bothBranches);
+
+	return code;
+}

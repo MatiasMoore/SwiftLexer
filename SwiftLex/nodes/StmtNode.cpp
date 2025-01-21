@@ -374,6 +374,10 @@ SemanticsBase* StmtNode::semanticsTransform(SemanticsStack stack)
 	{
 		this->_varDeclList->semanticsTransform(stack);
 	}
+	else if (this->_type == StmtType::IfElse)
+	{
+		this->_ifElse = this->_ifElse->semanticsTransform(stack)->typecast<IfElseNode>();
+	}
 	else if (this->_type == StmtType::DefaultConstructor)
 	{
 		//do nothing
@@ -479,9 +483,10 @@ void StmtNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 	}
 		break;
 	case StmtType::Return:
-		//TODO maybe do something here
 		this->_return->fillTable(classTable, currentClass, currentMethod);
-
+		break;
+	case StmtType::IfElse:
+		this->_ifElse->fillTable(classTable, currentClass, currentMethod);
 		break;
 	default:
 		throw std::runtime_error("Unsupported stmnt with enum type " + std::to_string(this->_type) + "!");
@@ -547,6 +552,9 @@ std::vector<char> StmtNode::generateCode(InternalClass* currentClass, InternalMe
 		appendVecToVec(code, jvm::aload(0));
 		appendVecToVec(code, jvm::invokespecial(this->_defaultConstructorMethodRef));
 		break;
+	case StmtType::IfElse:
+		appendVecToVec(code, this->_ifElse->generateCode(currentClass, currentMethod));
+		break;
 	case StmtType::FuncDecl:
 
 		
@@ -583,4 +591,16 @@ void StmtListNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 	{
 		elem->fillTable(classTable, currentClass, currentMethod, initialScan);
 	}
+}
+
+std::vector<char> StmtListNode::generateCode(InternalClass* currentClass, InternalMethod* currentMethod)
+{
+	std::vector<char> code = {};
+
+	for (auto& elem : _vec)
+	{
+		appendVecToVec(code, elem->generateCode(currentClass, currentMethod));
+	}
+
+	return code;
 }

@@ -64,10 +64,14 @@ enum ExprType
 	PostfixLogOr
 };
 
-class ExprListNode : public GenericListNode<ExprNode, ExprListNode>
+class ExprListNode : public GenericListNode<ExprNode, ExprListNode>, public SemanticsBase
 {
 public:
 	std::string getName() override;
+
+	SemanticsBase* semanticsTransform(SemanticsStack stack) override;
+
+	void fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
 };
 
 class ExprNode : public Dottable, public SemanticsBase

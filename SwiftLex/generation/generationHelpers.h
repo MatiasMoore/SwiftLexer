@@ -145,6 +145,8 @@ namespace jvm
 
 	std::vector<char> iconst_m1();
 
+	std::vector<char> ifElseComplex(IfCommandType ifType, std::vector<char> trueBranch, std::vector<char> falseBranch);
+
 	std::vector<char> aastore();
 
 	std::vector<char> iadd();
