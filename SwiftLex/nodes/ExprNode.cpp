@@ -7,6 +7,7 @@
 #include "../ExceptionHelper.h"
 #include "../tables/tables.h"
 #include "../tables/FieldAccessFlag.h"
+#include "../RTLHelper.h"
 
 ExprNode* ExprNode::createBool(bool value)
 {
@@ -453,23 +454,23 @@ SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 	};
 
 	std::map <ExprType, std::string> exprTypeToTransform = {
-		{ ExprType::Sum, "sum" },
-		{ ExprType::Sub, "sub" },
-		{ ExprType::Mul, "mul" },
-		{ ExprType::Div, "div" },
+		{ ExprType::Sum, RTLHelper::_sum},
+		{ ExprType::Sub, RTLHelper::_sub},
+		{ ExprType::Mul, RTLHelper::_mul},
+		{ ExprType::Div, RTLHelper::_div}
 	};
 
 	if (this->_type == ExprType::Int)
 	{
 		auto args = FuncCallArgListNode::createListNode(FuncCallArgNode::createFromExpr(ExprNode::createInt(this->_intValue)));
-		auto newExpr = ExprNode::createFuncCall(FuncCallNode::createFuncCall("rtl/Integer", args));
+		auto newExpr = ExprNode::createFuncCall(FuncCallNode::createFuncCall(RTLHelper::_intC, args));
 		newExpr->setIsAlreadyTransformed(true);
 		return newExpr;
 	}
 	else if (this->_type == ExprType::String)
 	{
 		auto args = FuncCallArgListNode::createListNode(FuncCallArgNode::createFromExpr(ExprNode::createString(this->_stringValue)));
-		auto newExpr = ExprNode::createFuncCall(FuncCallNode::createFuncCall("rtl/String", args));
+		auto newExpr = ExprNode::createFuncCall(FuncCallNode::createFuncCall(RTLHelper::_strC, args));
 		newExpr->setIsAlreadyTransformed(true);
 		return newExpr;
 	}

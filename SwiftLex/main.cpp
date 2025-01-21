@@ -6,6 +6,7 @@
 #include "generation/classFileGeneration.h"
 #include "tables/tables.h"
 #include <filesystem>
+#include "RTLHelper.h"
 
 bool _DRAW_DOT = false;
 bool _EXEC_MAINCLASS = true;
@@ -177,28 +178,7 @@ int main(int argc, const char* argv[])
 	auto classTable = ClassTable();
 
 	// Add external classes
-	auto publicStaticFlag = { MethodAccessFlag::M_ACC_PUBLIC, MethodAccessFlag::M_ACC_STATIC };
-	auto publicFlag = { MethodAccessFlag::M_ACC_PUBLIC };
-
-	auto javaObject = classTable.addExternalClass("java/lang/Object", "");
-	javaObject->addMethod("<init>", "()V", publicFlag);
-
-	auto inputOutput = classTable.addExternalClass("rtl/InputOutput", "java/lang/object");
-	inputOutput->addMethod("print", "(I)V", publicStaticFlag);
-	inputOutput->addMethod("print", "(Lrtl/Integer;)V", publicStaticFlag);
-	inputOutput->addMethod("print", "(Lrtl/String;)V", publicStaticFlag);
-	inputOutput->addMethod("readLine", "()Lrtl/String;", publicStaticFlag);
-
-	auto integer = classTable.addExternalClass("rtl/Integer", "java/lang/object");
-	integer->addMethod("<init>", "(I)V", publicFlag);
-	integer->addMethod("sum", "(Lrtl/Integer;)Lrtl/Integer;", publicFlag);
-	integer->addMethod("mul", "(Lrtl/Integer;)Lrtl/Integer;", publicFlag);
-	integer->addMethod("div", "(Lrtl/Integer;)Lrtl/Integer;", publicFlag);
-	integer->addMethod("sub", "(Lrtl/Integer;)Lrtl/Integer;", publicFlag);
-
-	auto string = classTable.addExternalClass("rtl/String", "java/lang/object");
-	string->addMethod("<init>", "(Ljava/lang/String;)V", publicFlag);
-	string->addMethod("sum", "(Lrtl/String;)Lrtl/String;", publicFlag);
+	RTLHelper::addRTLToClassTable(&classTable);
 
 	try
 	{
