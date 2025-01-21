@@ -38,3 +38,36 @@ var b = B()
 b.a = 123
 b.b.a = 1999
 b.printBField()
+
+if (true)
+{
+	print("True")
+	if (false)
+	{
+		print("True")
+	}
+	else
+	{
+		print("False")
+		if (true)
+		{
+			print("True")
+		}
+		else
+		{
+			print("False")
+		}
+	}
+}
+else
+{
+	print("False")
+		if (true)
+	{
+		print("True")
+	}
+	else
+	{
+		print("False")
+	}
+}
