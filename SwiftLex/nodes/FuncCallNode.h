@@ -12,8 +12,6 @@ class TypeNode;
 enum FuncCallScopeType
 {
 	normalCall,
-	selfCall,
-	superCall,
 	exprAccessCall
 };
 

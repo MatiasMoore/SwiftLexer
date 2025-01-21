@@ -102,29 +102,6 @@ ExternalMethod* FuncCallNode::findMethodForCall(ClassTable* classTable, Internal
 			return method;
 		}
 	}
-	else if (this->_scopeType == FuncCallScopeType::selfCall)
-	{
-		auto selfLocalVar = currentMethod->getVarTable()->findLocalVar("self");
-		if (selfLocalVar == nullptr)
-			throw std::runtime_error("Keyword \"self\" is only allowed inside non-static methods!");
-
-		if (selfLocalVar->_descriptor[0] != 'L')
-			throw std::runtime_error("Critical error! \"Self\" must be a link type!" + LINE_AND_FILE);
-
-		auto localVarClassName = classnameFromDescriptor(selfLocalVar->_descriptor);
-		if (localVarClassName != currentClass->getClassName())
-			throw std::runtime_error("Critical error! \"Self\" must be of type " + currentClass->getClassName() + " but got " + localVarClassName + "!" + LINE_AND_FILE);
-
-		bool isCurrentMethodStatic = currentMethod->containsFlag(MethodAccessFlag::M_ACC_STATIC);
-		if (isCurrentMethodStatic)
-			throw std::runtime_error("Critical error! Static methods can't have a \"self\" variable defined!" + LINE_AND_FILE);
-
-		auto method = currentClass->findMethod(this->_funcName, funcCallArgDescriptor, false);
-		if (method == nullptr)
-			throw std::runtime_error("Dynamic method \"" + this->_funcName + "\" with descriptor\"" + funcCallArgDescriptor + "\" is not defined in class \"" + currentClass->getClassName() + "\"!" + LINE_AND_FILE);
-
-		return method;
-	}
 	else
 	{
 		throw std::runtime_error("Unsupported function call type!" + LINE_AND_FILE);
@@ -165,12 +142,6 @@ std::string FuncCallNode::getName()
 	case FuncCallScopeType::normalCall:
 		scopeType = "Normal call";
 		break;
-	case FuncCallScopeType::selfCall:
-		scopeType = "Self call";
-		break;
-	case FuncCallScopeType::superCall:
-		scopeType = "Super call";
-		break;
 	case FuncCallScopeType::exprAccessCall:
 		scopeType = "Expr access call";
 		break;
@@ -190,8 +161,6 @@ void FuncCallNode::generateDot(std::ofstream& file)
 	switch (this->_scopeType)
 	{
 		case FuncCallScopeType::normalCall:
-		case FuncCallScopeType::selfCall:
-		case FuncCallScopeType::superCall:
 		file << dotLabel(this->_id, this->getName() + ": " + _funcName);
 		if (this->_hasArgs)
 		{
@@ -316,18 +285,16 @@ std::vector<char> FuncCallNode::generateCode(InternalClass* currentClass, Intern
 		}
 		else
 		{
-			if (this->_scopeType == FuncCallScopeType::selfCall)
-			{
-				appendVecToVec(code, jvm::aload(0));
-			}
-			else if (this->_scopeType == FuncCallScopeType::exprAccessCall)
+
+			if (this->_scopeType == FuncCallScopeType::exprAccessCall)
 			{
 				appendVecToVec(code, this->_exprAccess->generateCode(currentClass, currentMethod));
 			}
-			else
+			else if (this->_scopeType == FuncCallScopeType::normalCall)
 			{
-				throw std::runtime_error("Super calls are not supported yet!" + LINE_AND_FILE);
+				appendVecToVec(code, jvm::aload(0));
 			}
+
 
 			if (this->_hasArgs) {
 				appendVecToVec(code, this->_funcArgs->generateCode(currentClass, currentMethod));
