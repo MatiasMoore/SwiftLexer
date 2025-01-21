@@ -508,27 +508,35 @@ std::vector<char> StmtNode::generateCode(InternalClass* currentClass, InternalMe
 		appendVecToVec(code, this->_assignRight->generateCode(currentClass, currentMethod));
 
 		if (this->_assignLeft->_type == ExprType::Id) {
-			int varNum = currentMethod->getVarTable()->findLocalVar(this->_assignLeft->_stringValue)->localId;
-
-			if (this->_assignDesc == "I")
-			{
-				appendVecToVec(code, jvm::istore(varNum));
-			}
-			else if (this->_assignDesc[0] == 'L')
-			{
-				appendVecToVec(code, jvm::astore(varNum));
-			}
-			else
-			{
-				throw std::runtime_error("Can't assign descriptor " + this->_assignDesc + "!" + LINE_AND_FILE);
-			}
-
+				int varNum = currentMethod->getVarTable()->findLocalVar(this->_assignLeft->_stringValue)->localId;
+				if (this->_assignDesc == "I")
+				{
+					appendVecToVec(code, jvm::istore(varNum));
+				}
+				else if (this->_assignDesc[0] == 'L')
+				{
+					appendVecToVec(code, jvm::astore(varNum));
+				}
+				else
+				{
+					throw std::runtime_error("Can't assign descriptor " + this->_assignDesc + "!" + LINE_AND_FILE);
+				}
+			
 		}
 		else if(this->_assignLeft->_type == ExprType::FieldAccess) {
 			if (!this->_assignLeft->_isStaticFieldAccess)
-				throw std::runtime_error("Non static field access is not supported for field + \"" + _assignLeft->_fieldAccessFieldName + "\"" + LINE_AND_FILE);
-			appendVecToVec(code, this->_assignRight->generateCode(currentClass, currentMethod));
-			appendVecToVec(code, jvm::putStatic(this->_assignLeft->_staticFieldRef));
+			{
+				appendVecToVec(code, this->_assignLeft->_fieldAccessExpr->generateCode(currentClass, currentMethod));
+				appendVecToVec(code, this->_assignRight->generateCode(currentClass, currentMethod));
+				appendVecToVec(code, jvm::putfield(this->_assignLeft->_nonStaticFieldRef));
+
+			}
+			else {
+				appendVecToVec(code, this->_assignRight->generateCode(currentClass, currentMethod));
+				appendVecToVec(code, jvm::putStatic(this->_assignLeft->_staticFieldRef));
+			}
+				
+
 		}
 		else {
 			throw std::runtime_error("Unsupported assignment with left operand type: " + std::to_string(this->_assignLeft->_type) + "!");

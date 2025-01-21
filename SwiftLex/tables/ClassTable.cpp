@@ -50,6 +50,11 @@ InternalClass* ClassTable::addInternalClass(std::string name, std::string baseNa
 			newClass->addMethod(baseClassMethod->getMethodName(), baseClassMethod->getDescriptor(), baseClassMethod->getFlags());
 	}
 
+	for (auto& baseClassField : baseClass->getFields())
+	{
+		newClass->addField(baseClassField->getVarName(), baseClassField->getDescriptor(), baseClassField->getFlags());
+	}
+
 	_classes[name] = newClass;
 	return newClass;
 }

@@ -98,6 +98,7 @@ public:
 
 	bool _isStaticFieldAccess;
 	int _staticFieldRef;
+	int _nonStaticFieldRef;
 
 	static ExprNode* createBool(bool value);
 

@@ -35,6 +35,7 @@ public:
 	ExternalField* findField(std::string varName, bool isStatic);
 
 	std::vector<ExternalMethod*> getMethods();
+	std::vector<ExternalField*> getFields();
 
 	std::string getClassName();
 	std::string getBaseClassName();
