@@ -77,6 +77,7 @@ public:
         }},
         {_floatC, {
             {_constructor, "(F)V"},
+            {_constructor, "(" + D(_intC) + ")V"},
             { _sum, "(" + D(_floatC) + ")" + D(_floatC) },
             { _sub, "(" + D(_floatC) + ")" + D(_floatC) },
 			{ _mul, "(" + D(_floatC) + ")" + D(_floatC) },

@@ -160,6 +160,11 @@ SemanticsBase* ConstructorDeclNode::semanticsTransform(SemanticsStack stack)
 		}
 	}
 
+	if (this->_hasArgs)
+	{
+		this->_argList = this->_argList->semanticsTransform(stack)->typecast<FuncDeclArgListNode>();
+	}
+
 	this->_body = this->_body->semanticsTransform(stack)->typecast<StmtListNode>();
 
 	return this;

@@ -34,6 +34,8 @@ public:
 	*/
 	ExternalField* findField(std::string varName, bool isStatic);
 
+	std::vector<ExternalMethod*> getMethodsWithNameAndParamCount(std::string methodName, int argCount);
+
 	std::vector<ExternalMethod*> getMethods();
 	std::vector<ExternalField*> getFields();
 

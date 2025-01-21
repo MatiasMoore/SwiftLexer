@@ -10,6 +10,8 @@ public:
 
 	std::vector<ExternalMethod*> getAll();
 
+	std::vector<ExternalMethod*> getMethodsWithNameAndParamCount(std::string methodName, int argCount);
+
 private:
 	std::map < std::string,
 		std::map<std::string,

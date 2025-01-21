@@ -1,73 +1,48 @@
+//var a = 5.0 + 1 //Float(5.0).sum(Integer(1))
+//print(a)
+
 class A {
-	public var a : Int
-	init()
-	{
-	self.a = 32
-	print(self.a)
+	public var _value : Int
+
+	init(startValue : Int) {
+		self._value = startValue
 	}
 
-	public func printField()
-	{
-		print(self.a)
+	init(bObj : B) {
+		self._value = bObj._value
 	}
+
+	public static func printValue(obj : A) -> Int
+	{
+		print("Class A")
+		print(obj._value)
+		return obj._value
+	}
+
+	/*
+	public func printValue(obj : B)
+	{
+		print("Class B")
+		print(obj._value)
+	}
+	*/
+
 }
 
-class B : A {
-	public var b : A
-	init()
-	{
-	self.a = 2323
-	self.b = A()
-	self.b.a = 999
-	print(self.a)
+class B {
+	public var _value : Int
+
+	init(startValue : Int) {
+		self._value = startValue
 	}
 
-	public func printBField()
-	{
-		print(self.a)
-		print(self.b.a)
-	}
 }
 
-
-var a = A()
-a.a = 10
-a.printField()
-
-var b = B()
-b.a = 123
-b.b.a = 1999
-b.printBField()
-
-if (true)
-{
-	print("True")
-	if (false)
-	{
-		print("True")
-	}
-	else
-	{
-		print("False")
-		if (true)
-		{
-			print("True")
-		}
-		else
-		{
-			print("False")
-		}
-	}
-}
-else
-{
-	print("False")
-		if (true)
-	{
-		print("True")
-	}
-	else
-	{
-		print("False")
-	}
-}
+var aObj = A(10)
+var bObj = B(15)
+var d = A.printValue(aObj)
+var f = A.printValue(bObj)
+/*
+print(d)
+print(f)
+*/

@@ -4,17 +4,11 @@
 #include "../generation/generationHelpers.h"
 #include "../ExceptionHelper.h"
 #include "TypeNode.h"
+#include "../GlobalSettings.h"
 
 ExternalMethod* FuncCallNode::findMethodForCall(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
 {
-	std::string funcCallArgDescriptor = "(";
-	if (this->_hasArgs) {
-		for (auto arg : this->_funcArgs->_vec)
-		{
-			funcCallArgDescriptor += arg->_value->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
-		}
-	}
-	funcCallArgDescriptor += ")";
+	
 	if (this->_scopeType == normalCall)
 	{
 		auto classWithFuncName = classTable->findClass(this->_funcName);
@@ -23,10 +17,11 @@ ExternalMethod* FuncCallNode::findMethodForCall(ClassTable* classTable, Internal
 		// Constructor call
 		if (isConstructorCall)
 		{
-			auto constructorMethod = classWithFuncName->findMethod("<init>", funcCallArgDescriptor, false);
+			auto constructorMethod = this->findMethodWithTypeCasting(classWithFuncName, "<init>", false, classTable, currentClass, currentMethod);
 
 			if (constructorMethod == nullptr)
-				throw std::runtime_error("Class \"" + this->_funcName + "\" has no constructor with descriptor \"" + funcCallArgDescriptor + "\"!" + LINE_AND_FILE);
+				throw std::runtime_error("Class \"" + this->_funcName + "\" has no constructor with descriptor \"" + 
+					this->getArgsDescriptor(classTable, currentClass, currentMethod) + "\"!" + LINE_AND_FILE);
 
 			return constructorMethod;
 		}
@@ -38,12 +33,14 @@ ExternalMethod* FuncCallNode::findMethodForCall(ClassTable* classTable, Internal
 		// Static call
 		if (isCallStatic)
 		{
-			auto methodInThisClass = currentClass->findInternalMethod(this->_funcName, funcCallArgDescriptor, true);
+			auto asExternalMethod = this->findMethodWithTypeCasting(currentClass, this->_funcName, true, classTable, currentClass, currentMethod);
+			auto methodInThisClass = dynamic_cast<InternalMethod*>(asExternalMethod);
 
 			if (methodInThisClass == nullptr)
 			{
 				if (!isConstructorCall)
-					throw std::runtime_error("Static method \"" + this->_funcName + "\" with descriptor\"" + funcCallArgDescriptor + "\" is not defined in class \"" + currentClass->getClassName() + "\"" + LINE_AND_FILE);
+					throw std::runtime_error("Static method \"" + this->_funcName + "\" with descriptor\"" + 
+						this->getArgsDescriptor(classTable, currentClass, currentMethod)  + "\" is not defined in class \"" + currentClass->getClassName() + "\"" + LINE_AND_FILE);
 			}
 
 			return methodInThisClass;
@@ -51,12 +48,14 @@ ExternalMethod* FuncCallNode::findMethodForCall(ClassTable* classTable, Internal
 		// Dynamic call
 		else
 		{
-			auto methodInThisClass = currentClass->findInternalMethod(this->_funcName, funcCallArgDescriptor, false);
+			auto asExternalMethod = this->findMethodWithTypeCasting(currentClass, this->_funcName, false, classTable, currentClass, currentMethod);
+			auto methodInThisClass = dynamic_cast<InternalMethod*>(asExternalMethod);
 
 			if (methodInThisClass == nullptr)
 			{
 				if (!isConstructorCall)
-					throw std::runtime_error("Dynamic method \"" + this->_funcName + "\" with descriptor\"" + funcCallArgDescriptor + "\" is not defined in class \"" + currentClass->getClassName() + "\"" + LINE_AND_FILE);
+					throw std::runtime_error("Dynamic method \"" + this->_funcName + "\" with descriptor\"" + 
+						this->getArgsDescriptor(classTable, currentClass, currentMethod) + "\" is not defined in class \"" + currentClass->getClassName() + "\"" + LINE_AND_FILE);
 			}
 
 			return methodInThisClass;
@@ -76,9 +75,10 @@ ExternalMethod* FuncCallNode::findMethodForCall(ClassTable* classTable, Internal
 			if (classElem == nullptr)
 				throw std::runtime_error("Unknown identifier \"" + className + "\"in function call!" + LINE_AND_FILE);
 
-			auto method = classElem->findMethod(this->_funcName, funcCallArgDescriptor, true);
+			auto method = this->findMethodWithTypeCasting(classElem, this->_funcName, true, classTable, currentClass, currentMethod);
 			if (method == nullptr)
-				throw std::runtime_error("Static method \"" + this->_funcName + "\" with descriptor\"" + funcCallArgDescriptor + "\" is not defined in class \"" + className + "\"!" + LINE_AND_FILE);
+				throw std::runtime_error("Static method \"" + this->_funcName + "\" with descriptor\"" + 
+					this->getArgsDescriptor(classTable, currentClass, currentMethod) + "\" is not defined in class \"" + className + "\"!" + LINE_AND_FILE);
 
 			return method;
 		}
@@ -94,10 +94,11 @@ ExternalMethod* FuncCallNode::findMethodForCall(ClassTable* classTable, Internal
 			auto classElem = classTable->findClass(className);
 			if (classElem == nullptr)
 				throw std::runtime_error("Critical error! Class \"" + className + "\" is not found!" + LINE_AND_FILE);
-
-			auto method = classElem->findMethod(this->_funcName, funcCallArgDescriptor, false);
+			
+			auto method = this->findMethodWithTypeCasting(classElem, this->_funcName, false, classTable, currentClass, currentMethod);
 			if (method == nullptr)
-				throw std::runtime_error("Dynamic method \"" + this->_funcName + "\" with descriptor\"" + funcCallArgDescriptor + "\" is not defined in class \"" + className + "\"!" + LINE_AND_FILE);
+				throw std::runtime_error("Dynamic method \"" + this->_funcName + "\" with descriptor\"" + 
+					this->getArgsDescriptor(classTable, currentClass, currentMethod) + "\" is not defined in class \"" + className + "\"!" + LINE_AND_FILE);
 
 			return method;
 		}
@@ -106,6 +107,124 @@ ExternalMethod* FuncCallNode::findMethodForCall(ClassTable* classTable, Internal
 	{
 		throw std::runtime_error("Unsupported function call type!" + LINE_AND_FILE);
 	}
+}
+
+std::string FuncCallNode::getArgsDescriptor(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
+{
+	std::string funcCallArgDescriptor = "(";
+	if (this->_hasArgs) {
+		for (auto arg : this->_funcArgs->_vec)
+		{
+			funcCallArgDescriptor += arg->_value->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+		}
+	}
+	funcCallArgDescriptor += ")";
+	return funcCallArgDescriptor;
+}
+
+ExternalMethod* FuncCallNode::findMethodWithTypeCasting(ExternalClass* classWithMethod, std::string methodName, bool shouldBeStatic, ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
+{
+	ExternalMethod* method = nullptr;
+
+	auto funcCallArgDescriptor = this->getArgsDescriptor(classTable, currentClass, currentMethod);
+
+	// Just use a perfectly matching method if it's found
+	auto perfectMatch = classWithMethod->findMethod(methodName, funcCallArgDescriptor, shouldBeStatic);
+	if (perfectMatch != nullptr)
+		return perfectMatch;
+
+	// If this is not enabled, stop here
+	if (!GlobalSettings::_IMPLICIT_CONSTRUCTORS)
+		return nullptr;
+
+	int argCount = 0;
+	if (this->_hasArgs)
+		argCount = this->_funcArgs->_vec.size();
+
+	// No args to try and cast, so there is no way we find anything other than a perfect match (which failed earlier)
+	if (argCount == 0)
+		return nullptr;
+
+	// Get all methods from class with our name and our amount of arguments
+	auto potentialMethods = classWithMethod->getMethodsWithNameAndParamCount(methodName, argCount);
+	for (auto& potentialMethod : potentialMethods)
+	{
+		//Skip if it's not the type we want
+		bool isPotentialMethodStatic = potentialMethod->containsFlag(MethodAccessFlag::M_ACC_STATIC);
+		if (isPotentialMethodStatic != shouldBeStatic)
+			continue;
+
+		//Try to construct required args from what we got
+
+		auto potentialMethodArgs = potentialMethod->getArgDescriptorsVector();
+
+		bool allGood = true; //if its true, we managed to cast everything we needed to
+		FuncCallArgListNode* newArgs = this->_funcArgs; //our args, but the ones casted are replaced
+		FuncCallArgListNode* onlyNewArgs = nullptr; //only the casted ones
+
+		//For each argument
+		for (int argNum = 0; argNum < argCount; argNum++)
+		{
+			auto ourArg = this->_funcArgs->_vec[argNum];
+			auto requiredDesc = potentialMethodArgs[argNum];
+			auto ourArgDesc = ourArg->_value->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+
+			// This arg matches perfectly
+			if (requiredDesc == ourArgDesc)
+			{
+				allGood = true;
+				continue;
+			}
+
+			// Required arg must be a class since we'll be looking for a constructor
+			if (requiredDesc[0] != 'L')
+			{
+				allGood = false;
+				break;
+			}
+
+			// Trying to find constructor from our type to required
+			auto requiredClassName = classnameFromDescriptor(requiredDesc);
+			auto requiredClass = classTable->findClass(requiredClassName);
+			if (requiredClass == nullptr)
+				throw std::runtime_error("Critical error!" + LINE_AND_FILE);
+			auto ourToRequired = requiredClass->findMethod("<init>", "(" + ourArgDesc + ")", false);
+
+			// Couldn't find the constructor from our type to required
+			if (ourToRequired == nullptr)
+			{
+				allGood = false;
+				break;
+			}
+
+			// Found the constructor, so use it
+			auto ourToRequiredArgs = FuncCallArgListNode::createListNode(FuncCallArgNode::createFromExpr(ourArg->_value));
+			auto ourToRequiredCall = FuncCallNode::createFuncCall(requiredClassName, ourToRequiredArgs);
+			auto ourToRequiredExpr = ExprNode::createFuncCall(ourToRequiredCall);
+			auto newArg = FuncCallArgNode::createFromExpr(ourToRequiredExpr);;
+
+			//Add to new args
+			newArgs->_vec[argNum] = newArg;
+			if (onlyNewArgs == nullptr)
+				onlyNewArgs = FuncCallArgListNode::createListNode(newArg);
+			else
+				onlyNewArgs->appendNode(newArg);
+		}
+
+		//Success! So now just replace the current args with the new ones
+		if (allGood)
+		{
+			if (newArgs != nullptr)
+			{
+				this->_funcArgs = newArgs;
+				this->_newFuncArgs = onlyNewArgs;
+				this->_hasArgs = true;
+			}
+			return potentialMethod;
+		}
+	}
+
+	return method;
 }
 
 FuncCallNode* FuncCallNode::createFuncCall(std::string funcName, FuncCallArgListNode* funcArgs)
@@ -247,6 +366,10 @@ void FuncCallNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 		this->_funcArgs->fillTable(classTable, currentClass, currentMethod);
 
 	auto method = this->findMethodForCall(classTable, currentClass, currentMethod);
+
+	if (this->_newFuncArgs != nullptr)
+		this->_newFuncArgs->fillTable(classTable, currentClass, currentMethod);
+
 	this->_methodRef = currentClass->getMethodRefForExternalMethod(method);
 	bool isContructor = method->getMethodName() == "<init>";
 	this->_isConstructor = isContructor;

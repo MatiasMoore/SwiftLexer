@@ -18,6 +18,8 @@ public:
     int accessFlagsToInt();
     bool containsFlag(MethodAccessFlag flag);
 
+    std::vector<std::string> getArgDescriptorsVector();
+
     virtual ~ExternalMethod();
 
 protected:

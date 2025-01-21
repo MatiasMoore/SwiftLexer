@@ -51,3 +51,21 @@ std::vector<ExternalMethod*> MethodContainer::getAll()
 
     return allMethods;
 }
+
+std::vector<ExternalMethod*> MethodContainer::getMethodsWithNameAndParamCount(std::string methodName, int argCount)
+{
+    std::vector<ExternalMethod*> found = {};
+
+    if (this->_nameArgDescIsStaticToMethod.count(methodName) == 0)
+        return found;
+
+    auto allMethods = this->getAll();
+    for (auto& method : allMethods)
+    {
+        auto currentArgCount = method->getArgDescriptorsVector().size();
+        if (currentArgCount == argCount && method->getMethodName() == methodName)
+            found.push_back(method);
+    }
+
+    return found;
+}

@@ -96,6 +96,66 @@ bool ExternalMethod::containsFlag(MethodAccessFlag flag)
 	return std::find(_flags.begin(), _flags.end(), flag) != _flags.end();
 }
 
+std::vector<std::string> ExternalMethod::getArgDescriptorsVector()
+{
+    std::vector<std::string> descriptors;
+
+    auto argDesc = this->getArgsDescriptor();
+
+    if (argDesc.empty() || argDesc[0] != '(') {
+        throw std::runtime_error("Critical error!" + LINE_AND_FILE);
+    }
+
+    // Remove the parentheses
+    argDesc = argDesc.substr(1, argDesc.size() - 2);
+
+    size_t i = 0;
+    while (i < argDesc.size()) {
+        if (argDesc[i] == '[') {
+            // Array type
+            std::string descriptor = "[";
+            ++i;
+            if (i < argDesc.size() && (argDesc[i] == 'L' || std::isalpha(argDesc[i]))) {
+                // Process the array element type
+                descriptor += argDesc[i];
+                if (argDesc[i] == 'L') {
+                    ++i;
+                    // Process the rest of the class type until ';'
+                    while (i < argDesc.size() && argDesc[i] != ';') {
+                        descriptor += argDesc[i++];
+                    }
+                    if (i < argDesc.size() && argDesc[i] == ';') {
+                        descriptor += argDesc[i++];
+                    }
+                }
+                else {
+                    ++i; // For primitives (e.g., [I, [Z)
+                }
+            }
+            descriptors.push_back(descriptor);
+        }
+        else if (argDesc[i] == 'L') {
+            // Class type
+            std::string descriptor = "L";
+            ++i;
+            while (i < argDesc.size() && argDesc[i] != ';') {
+                descriptor += argDesc[i++];
+            }
+            if (i < argDesc.size() && argDesc[i] == ';') {
+                descriptor += argDesc[i++];
+            }
+            descriptors.push_back(descriptor);
+        }
+        else {
+            // Primitive type
+            descriptors.push_back(std::string(1, argDesc[i]));
+            ++i;
+        }
+    }
+
+    return descriptors;
+}
+
 ExternalMethod::~ExternalMethod()
 {
 }

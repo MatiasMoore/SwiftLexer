@@ -19,6 +19,8 @@ class FuncCallNode : public Dottable, public SemanticsBase
 {
 private:
 	ExternalMethod* findMethodForCall(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
+	ExternalMethod* findMethodWithTypeCasting(ExternalClass* classWithMethod, std::string methodName, bool shouldBeStatic, ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
+	std::string getArgsDescriptor(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
 
 public:
 	bool _hasArgs;
@@ -26,6 +28,8 @@ public:
 
 	std::string _funcName;
 	FuncCallArgListNode* _funcArgs;
+
+	FuncCallArgListNode* _newFuncArgs;
 
 	ExprNode* _exprAccess;
 

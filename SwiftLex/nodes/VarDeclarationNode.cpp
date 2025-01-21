@@ -203,6 +203,9 @@ SemanticsBase* VarDeclarationNode::semanticsTransform(SemanticsStack stack)
 	if (this->_isAlreadyTransformed)
 		return this;
 
+	auto valueKnown = this->_type == ValueKnown || this->_type == ValueAndTypeKnown;
+	auto typeKnown = this->_type == TypeKnown || this->_type == ValueAndTypeKnown;
+
 	if (this->_isFieldDecl)
 	{
 		// Add default modiffiers
@@ -211,17 +214,14 @@ SemanticsBase* VarDeclarationNode::semanticsTransform(SemanticsStack stack)
 			this->_modifiers = AccessModifierListNode::createListNode(AccessModifierNode::createModifier(Internal));
 			this->_hasModifiers = true;
 		}
-		if (this->_type == VarDeclType::TypeKnown)
+
+		if (typeKnown)
 		{
 			this->_typeNode = this->_typeNode->semanticsTransform(stack)->typecast<TypeNode>();
 		}
-		else if (this->_type == VarDeclType::ValueKnown)
+
+		if (valueKnown)
 		{
-			this->_valueNode = this->_valueNode->semanticsTransform(stack)->typecast<ExprNode>();
-		}
-		else
-		{
-			this->_typeNode = this->_typeNode->semanticsTransform(stack)->typecast<TypeNode>();
 			this->_valueNode = this->_valueNode->semanticsTransform(stack)->typecast<ExprNode>();
 		}
 	}
@@ -229,9 +229,6 @@ SemanticsBase* VarDeclarationNode::semanticsTransform(SemanticsStack stack)
 	{
 		if (this->_hasModifiers)
 			throw std::runtime_error("Only field declaration can have modifiers!" + LINE_AND_FILE);
-
-		auto valueKnown = this->_type == ValueKnown || this->_type == ValueAndTypeKnown;
-		auto typeKnown = this->_type == TypeKnown || this->_type == ValueAndTypeKnown;
 
 		// Create assignment if we know the value
 		if (valueKnown)
