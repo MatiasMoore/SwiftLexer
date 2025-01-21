@@ -5,12 +5,8 @@
 #include "tables/tables.h"
 #include "ExceptionHelper.h"
 
-#define D(c) std::string("L") + std::string(c) + std::string(";") 
-
 class RTLHelper {
 public:
-    static void addRTLToClassTable(ClassTable* classTable);
-
     // Class names
     inline static std::string _baseC = "java/lang/Object";
 
@@ -39,64 +35,5 @@ public:
     inline static std::string _logNot = "logNot";
 
     inline static std::string _lt = "lt";
-
-
-    // Flags
-    inline static std::vector<MethodAccessFlag> _publicFlags = { MethodAccessFlag::M_ACC_PUBLIC };
-    inline static std::vector<MethodAccessFlag> _publicStaticFlags = { MethodAccessFlag::M_ACC_PUBLIC, MethodAccessFlag::M_ACC_STATIC };
-
-    struct MethodInfo {
-        std::string name;
-        std::string descriptor;
-    };
-
-    // Methods to add
-    inline static std::map<std::string, std::vector<MethodInfo>> _nonStaticMethods = {
-        {_baseC, {
-			{_constructor, "()V"}
-		}},
-        {_intC, {
-            {_constructor, "(I)V"},
-            {_sum, "(" + D(_intC) + ")" + D(_intC)},
-            {_sub, "(" + D(_intC) + ")" + D(_intC)},
-        	{_mul, "(" + D(_intC) + ")" + D(_intC)},
-            {_div, "(" + D(_intC) + ")" + D(_intC)}, //FIXME
-
-            {_lt, "(" + D(_intC) + ")" + D(_boolC)},
-        }},
-        {_strC, {
-            {_constructor, "(Ljava/lang/String;)V"},
-            {_sum, "(" + D(_strC) + ")" + D(_strC)}
-        }},
-        {_boolC, {
-			{_constructor, "(Z)V"},
-            {_toBool, "()Z"},
-            {_logAnd, "(" + D(_boolC) + ")" + D(_boolC)},
-            {_logOr, "(" + D(_boolC) + ")" + D(_boolC)},
-            {_logNot, "()" + D(_boolC)},
-        }},
-        {_floatC, {
-            {_constructor, "(F)V"},
-            {_constructor, "(" + D(_intC) + ")V"},
-            { _sum, "(" + D(_floatC) + ")" + D(_floatC) },
-            { _sub, "(" + D(_floatC) + ")" + D(_floatC) },
-			{ _mul, "(" + D(_floatC) + ")" + D(_floatC) },
-			{ _div, "(" + D(_floatC) + ")" + D(_floatC) }
-        }},
-
-    };
-
-private:
-    inline static std::map<std::string, std::vector<MethodInfo>> _staticMethods = {
-        {_IOC, {
-            {_print, "(" + D(_intC) + ")V"},
-            {_print, "(" + D(_strC) + ")V"},
-			{_print, "(" + D(_floatC) + ")V"},
-            {_print, "(" + D(_boolC) + ")V"},
-			{_readLine, "()" + D(_strC)}
-        }}
-    };
-
-    static void addExternalMethod(ClassTable* classTable, std::string className, MethodInfo methodInfo, std::vector<MethodAccessFlag> flags);
 };
 

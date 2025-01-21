@@ -8,6 +8,7 @@
 #include <filesystem>
 #include "RTLHelper.h"
 #include "GlobalSettings.h"
+#include "ClassfileParser.h"
 
 std::string generatedClassFilesDirectory = "out/";
 std::string rtlSourceDirectory = "rtl/";
@@ -175,8 +176,50 @@ int main(int argc, const char* argv[])
 	// Attribution
 	auto classTable = ClassTable();
 
-	// Add external classes
-	RTLHelper::addRTLToClassTable(&classTable);
+	// Add default java object
+	auto javaObj = classTable.addExternalClass("java/lang/Object", "");
+	javaObj->addMethod("<init>", "()V", { MethodAccessFlag::M_ACC_PUBLIC });
+
+	try
+	{
+		// Delete old .class files
+		deleteDirectoryContents(generatedClassFilesDirectory);
+	}
+	catch (...)
+	{
+		std::cout << "Failed to delete previous files! Make sure the files in directory \"" << 
+			generatedClassFilesDirectory << "\" are not use by another process!" << std::endl;
+		return 1;
+	}
+	
+
+	// Generate rtl .class files and add them as external
+	for (const auto& entry : std::filesystem::directory_iterator(rtlSourceDirectory))
+	{
+		auto pathToJavaFile = entry.path().generic_string();
+		std::string compilationCommand = "javac " + pathToJavaFile + " -d " + generatedClassFilesDirectory;
+		int result = system(compilationCommand.c_str());
+		if (result != 0)
+		{
+			std::cout << "Failed to compile rtl file \"" << pathToJavaFile << "\"!" << std::endl;
+			return 1;
+		}
+
+		auto pathToCompiledFile = generatedClassFilesDirectory + pathToJavaFile;
+		
+		// Replace .java with .class
+		pathToCompiledFile = pathToCompiledFile.substr(0, pathToCompiledFile.find_last_of('.')) + ".class";
+
+		try
+		{
+			JavaClassFileParser::addFromFileToClassTable(pathToCompiledFile, &classTable);
+		}
+		catch (std::runtime_error error)
+		{
+			std::cout << "Failed to add external class from file \"" << pathToCompiledFile << "\"! " << error.what() << std::endl;
+			return 1;
+		}
+	}
 
 	try
 	{
@@ -198,19 +241,6 @@ int main(int argc, const char* argv[])
 		return 1;
 	}
 
-
-	// Generation
-
-	// Delete old .class files
-	deleteDirectoryContents(generatedClassFilesDirectory);
-	
-	// Generate rtl .class files
-	for (const auto& entry : std::filesystem::directory_iterator(rtlSourceDirectory))
-	{
-		auto test = entry.path().generic_string();
-		std::string compilationCommand = "javac " + entry.path().generic_string() + " -d " + generatedClassFilesDirectory;
-		system(compilationCommand.c_str());
-	}
 
 	// Generate .class files based on _root
 	try
