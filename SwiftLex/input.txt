@@ -50,5 +50,16 @@ print("Hello \"" + name + "\" !")
 //print(true)
 //print(false)
 
-print(1.1 + 1.2)
-print(1.11e-1)
+//print(1.1 + 1.2)
+//print(1.11e-1)
+
+class Num {
+	public func sum(other : Num) -> Num
+	{
+		print("override sum!")
+		return self
+	}
+} 
+
+var a = Num(), b = Num()
+a + b
