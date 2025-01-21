@@ -89,6 +89,9 @@ public:
 
 	std::string _defaultConstructorBaseName;
 
+	bool _isDynamicClassFieldAssignment = false;
+	int _dynamicClassFieldAssignmentRef;
+
 	int _defaultConstructorClassRef;
 	int _defaultConstructorMethodRef;
 

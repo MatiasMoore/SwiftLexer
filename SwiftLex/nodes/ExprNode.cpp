@@ -770,7 +770,7 @@ std::vector<char> ExprNode::generateCode(InternalClass* currentClass, InternalMe
 			appendVecToVec(code, jvm::getstatic(this->_staticFieldRef));
 		}
 		else {
-			this->_fieldAccessExpr->generateCode(currentClass, currentMethod);
+			appendVecToVec(code, this->_fieldAccessExpr->generateCode(currentClass, currentMethod));
 			appendVecToVec(code, jvm::getfield(this->_nonStaticFieldRef));
 		}
 		
