@@ -20,7 +20,6 @@ public:
     inline static std::string _floatC = "rtl/Float";
     inline static std::string _intC = "rtl/Integer";
     inline static std::string _strC = "rtl/String";
-    inline static std::string _charC = "rtl/Char";
 
     // Method names
     inline static std::string _constructor = "<init>";
