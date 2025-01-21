@@ -22,7 +22,7 @@ int ConstantTable::addConstant(ConstantType type, std::string utf8string, int in
     if (type == ConstantType::Utf8_C) { constants[constant] = new ConstantTableItem(type, constant, utf8string); }
     else if (type == ConstantType::Class_C) { constants[constant] = new ConstantTableItem(type, constant, "", NULL, NULL, fRef); }
     else if (type == ConstantType::Integer_C) constants[constant] = new ConstantTableItem(type, constant, "", intVal);
-    else if (type == ConstantType::Double_C) constants[constant] = new ConstantTableItem(type, constant, "", NULL, dVal);
+    else if (type == ConstantType::Float_C) constants[constant] = new ConstantTableItem(type, constant, "", NULL, dVal);
     else if (type == ConstantType::NameAndType_C) constants[constant] = new ConstantTableItem(type, constant, "", NULL, NULL, fRef, sRef);
     else if (type == ConstantType::FieldRef_C) constants[constant] = new ConstantTableItem(type, constant, "", NULL, NULL, fRef, sRef);
     else if (type == ConstantType::MethodRef_C) constants[constant] = new ConstantTableItem(type, constant, "", NULL, NULL, fRef, sRef);
@@ -64,8 +64,8 @@ int ConstantTable::findConstant(enum ConstantType type, std::string utf8string, 
                 if (iterator->second->Integer == intVal) // Вернуть номер константы, если совпадают значения номеров констант-ссылок.
                     return iterator->first;
                 break;
-            case Double_C: // В случае, если константа - литерал double...
-                if (iterator->second->Double == dVal) // Вернуть номер константы, если совпадают значения номеров констант-ссылок.
+            case Float_C: // В случае, если константа - литерал double...
+                if (iterator->second->Float == dVal) // Вернуть номер константы, если совпадают значения номеров констант-ссылок.
                     return iterator->first;
                 break;
             case FieldRef_C: // В случае, если константа - ссылка на поле...
@@ -97,12 +97,12 @@ ConstantTableItem::ConstantTableItem(enum ConstantType type, int id, std::string
     this->cnst = type;
     this->string;
     this->Integer = 0;
-    this->Double = 0;
+    this->Float = 0;
     this->firstRef = 0;
     this->secRef = 0;
     if (type == ConstantType::Utf8_C) { this->string = utf8; }
     else if (type == ConstantType::Integer_C) this->Integer = intVal;
-    else if (type == ConstantType::Double_C) this->Double = dVal;
+    else if (type == ConstantType::Float_C) this->Float = dVal;
     else if (type == ConstantType::Class_C) this->firstRef = fRef;
     else if (type == ConstantType::String_C) this->firstRef = fRef;
     else if (type == ConstantType::NameAndType_C) { this->firstRef = fRef; this->secRef = secondRef; }
@@ -137,7 +137,7 @@ int ConstantTable::findOrAddInteger(int intValue)
 
 int ConstantTable::findOrAddDouble(double doubleValue)
 {
-    return this->findOrAddConstant(Double_C, "", 0, doubleValue);
+    return this->findOrAddConstant(Float_C, "", 0, doubleValue);
 }
 
 int ConstantTable::findOrAddFieldRef(int classRef, int NameAndTypeRef)
@@ -177,7 +177,7 @@ int ConstantTable::findIntegerRef(int intValue)
 
 int ConstantTable::findDoubleRef(double doubleValue)
 {
-	return this->findConstant(Double_C, "", 0, 0, 0, doubleValue);
+	return this->findConstant(Float_C, "", 0, 0, 0, doubleValue);
 }
 
 int ConstantTable::findFieldRef(int classRef, int NameAndTypeRef)
@@ -217,7 +217,7 @@ int ConstantTable::addIntegerRef(int intValue)
 
 int ConstantTable::addDoubleRef(double doubleValue)
 {
-	return this->addConstant(Double_C, "", 0, doubleValue);
+	return this->addConstant(Float_C, "", 0, doubleValue);
 }
 
 int ConstantTable::addFieldRef(int classRef, int NameAndTypeRef)
@@ -234,3 +234,4 @@ int ConstantTable::size()
 {
     return this->constants.size();
 }
+

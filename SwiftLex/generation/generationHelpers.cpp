@@ -13,6 +13,20 @@ std::vector<char> intToByteVector(int num, int arraySize)
 	return res;
 }
 
+std::vector<char> doubleToFloatByteVector(double num)
+{
+	float floatNum = num;
+	
+	std::vector<char> res(4);
+	auto ptr = (unsigned char*)(&floatNum);
+	for (int i = 0; i < 4; i++)
+	{
+		res[4 - i - 1] = ptr[i];
+	}
+	
+	return res;	
+}
+
 void appendArrayToByteVector(std::vector<char>* data, char array[], int arraySize)
 {
 	for (int i = 0; i < arraySize; i++)
@@ -82,7 +96,13 @@ std::vector<char> generateBytesForConstantTableItem(class ConstantTableItem* ele
 		appendArrayToByteVector(&res, secondRef.data(), secondRef.size());
 	}
 	break;
+	case Float_C: {
+		std::vector<char> num = doubleToFloatByteVector(elem->Float);
+		appendVecToVec(res, num);
+	}
+	break;
 	default:
+		throw std::runtime_error("Error in generateBytesForConstantTableItem: Invalid constant enum type: " + std::to_string(elem->cnst) + LINE_AND_FILE);
 		break;
 	}
 

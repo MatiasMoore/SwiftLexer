@@ -6,6 +6,8 @@ class TypeNode;
 
 std::vector<char> intToByteVector(int num, int arraySize);
 
+std::vector<char> doubleToFloatByteVector(int num);
+
 //void appendArrayToByteVector(std::vector<char>* data, char array[], int arraySize);
 
 void appendVecToVec(std::vector<char>& vecA, const std::vector<char>& vecB);

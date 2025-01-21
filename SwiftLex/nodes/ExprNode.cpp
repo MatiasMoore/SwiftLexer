@@ -481,6 +481,13 @@ SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 		newExpr->setIsAlreadyTransformed(true);
 		return newExpr;
 	}
+	else if (this->_type == ExprType::Float)
+	{
+		auto args = FuncCallArgListNode::createListNode(FuncCallArgNode::createFromExpr(ExprNode::createFloat(this->_floatValue)));
+		auto newExpr = ExprNode::createFuncCall(FuncCallNode::createFuncCall(RTLHelper::_floatC, args));
+		newExpr->setIsAlreadyTransformed(true);
+		return newExpr;
+	}
 	else if (exprTypeToTransform.count(this->_type) != 0)
 	{
 		this->_left = _left->semanticsTransform(stack)->typecast<ExprNode>();
@@ -526,6 +533,10 @@ TypeNode* ExprNode::evaluateType(ClassTable* classTable, InternalClass* currentC
 	else if (this->_type == ExprType::Bool)
 	{
 		return TypeNode::createType(TypeType::BoolT);
+	}
+	else if (this->_type == ExprType::Float)
+	{
+		return TypeNode::createType(TypeType::FloatT);
 	}
 	else if (this->_type == ExprType::Id)
 	{
@@ -648,6 +659,9 @@ void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 	case ExprType::String:
 		currentClass->getConstTable()->findOrAddString(currentClass->getConstTable()->findOrAddUTF8(this->_stringValue));
 		break;
+	case ExprType::Float:
+		currentClass->getConstTable()->findOrAddDouble(this->_floatValue);
+		break;
 	case ExprType::Bool:
 	case ExprType::Id:
 		//Do nothing
@@ -703,6 +717,12 @@ std::vector<char> ExprNode::generateCode(InternalClass* currentClass, InternalMe
 		break;
 	case ExprType::Bool:
 		appendVecToVec(code, jvm::iconstBipushSipush(this->_boolValue ? 1 : 0));
+		break;
+	case ExprType::Float: {
+
+		int floatRef = currentClass->getConstTable()->findDoubleRef(this->_floatValue);
+		appendVecToVec(code, jvm::ldc(floatRef));
+	}
 		break;
 	default:
 		throw std::runtime_error("Can't generate code for expr with type " + std::to_string(this->_type) + "!");

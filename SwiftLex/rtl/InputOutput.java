@@ -41,4 +41,9 @@ public class InputOutput {
             System.out.println("false");
         }
     }
+
+    public static void print(Float f)
+    {
+        System.out.println(f._value);
+    }
 }

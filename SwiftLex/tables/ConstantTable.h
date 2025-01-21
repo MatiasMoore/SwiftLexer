@@ -10,7 +10,7 @@ enum ConstantType
     MethodRef_C = 10,
     NameAndType_C = 12,
     Integer_C = 3,
-    Double_C = 6,
+    Float_C = 4,
     FieldRef_C = 9,
     String_C = 8
 };
@@ -83,7 +83,7 @@ public:
     enum ConstantType cnst; // Тип константы.
     std::string string; // Строка для Utf-8 констант.
     int Integer; // Целое число для целочисленной константы.
-    double Double; // Число с плавающий точкой.
+    double Float; // Число с плавающий точкой.
     int firstRef; // Сслыка на первую константу.
     int secRef;  // Ссылка на вторую константу.
 

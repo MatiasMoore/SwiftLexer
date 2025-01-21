@@ -47,5 +47,8 @@ var name = readLine()
 print("Hello \"" + name + "\" !")
 */
 
-print(true)
-print(false)
+//print(true)
+//print(false)
+
+print(1.1 + 1.2)
+print(1.11e-1)

@@ -58,6 +58,13 @@ public:
         {_boolC, {
 			{_constructor, "(Z)V"}
 		}},
+        {_floatC, {
+            {_constructor, "(F)V"},
+            { _sum, "(" + D(_floatC) + ")" + D(_floatC) },
+            { _sub, "(" + D(_floatC) + ")" + D(_floatC) },
+			{ _mul, "(" + D(_floatC) + ")" + D(_floatC) },
+			{ _div, "(" + D(_floatC) + ")" + D(_floatC) }
+        }},
 
     };
 
