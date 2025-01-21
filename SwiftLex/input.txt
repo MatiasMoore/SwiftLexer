@@ -17,7 +17,7 @@ class B : A
 
 var c = B()
 c.test(b + a)
-c._a = 5
+//c._a = 5
 
 testFunc()
 
@@ -32,7 +32,7 @@ func testFunc2()
 }
 
 testFunc()
-*/
+
 
 print(
 """
@@ -45,4 +45,7 @@ Hello!
 )
 var name = readLine()
 print("Hello \"" + name + "\" !")
+*/
 
+print(true)
+print(false)

@@ -55,7 +55,11 @@ public:
         {_strC, {
             {_constructor, "(Ljava/lang/String;)V"},
             {_sum, "(" + D(_strC) + ")" + D(_strC)}
-        }}
+        }},
+        {_boolC, {
+			{_constructor, "(Z)V"}
+		}},
+
     };
 
 private:
@@ -64,6 +68,7 @@ private:
             {_print, "(" + D(_intC) + ")V"},
             {_print, "(" + D(_strC) + ")V"},
 			{_print, "(" + D(_floatC) + ")V"},
+            {_print, "(" + D(_boolC) + ")V"},
 			{_readLine, "()" + D(_strC)}
         }}
     };

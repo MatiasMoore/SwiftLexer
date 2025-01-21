@@ -32,4 +32,13 @@ public class InputOutput {
     {
         System.out.println(string._value);
     }
+
+    public static void print(Boolean bool)
+    {
+        if (bool._value) {
+            System.out.println("true");
+        } else {
+            System.out.println("false");
+        }
+    }
 }

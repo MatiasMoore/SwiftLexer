@@ -474,6 +474,13 @@ SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 		newExpr->setIsAlreadyTransformed(true);
 		return newExpr;
 	}
+	else if (this->_type == ExprType::Bool)
+	{
+		auto args = FuncCallArgListNode::createListNode(FuncCallArgNode::createFromExpr(ExprNode::createBool(this->_boolValue)));
+		auto newExpr = ExprNode::createFuncCall(FuncCallNode::createFuncCall(RTLHelper::_boolC, args));
+		newExpr->setIsAlreadyTransformed(true);
+		return newExpr;
+	}
 	else if (exprTypeToTransform.count(this->_type) != 0)
 	{
 		this->_left = _left->semanticsTransform(stack)->typecast<ExprNode>();
@@ -515,6 +522,10 @@ TypeNode* ExprNode::evaluateType(ClassTable* classTable, InternalClass* currentC
 	else if (this->_type == ExprType::Int)
 	{
 		return TypeNode::createType(TypeType::IntT);
+	}
+	else if (this->_type == ExprType::Bool)
+	{
+		return TypeNode::createType(TypeType::BoolT);
 	}
 	else if (this->_type == ExprType::Id)
 	{
@@ -637,7 +648,9 @@ void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 	case ExprType::String:
 		currentClass->getConstTable()->findOrAddString(currentClass->getConstTable()->findOrAddUTF8(this->_stringValue));
 		break;
+	case ExprType::Bool:
 	case ExprType::Id:
+		//Do nothing
 		break;
 	default:
 		throw std::runtime_error("Unsupported expr with enum type " + std::to_string(this->_type) + "!");
@@ -687,6 +700,9 @@ std::vector<char> ExprNode::generateCode(InternalClass* currentClass, InternalMe
 		break;
 	case ExprType::FieldAccess:
 		appendVecToVec(code, jvm::getstatic(this->_staticFieldRef));
+		break;
+	case ExprType::Bool:
+		appendVecToVec(code, jvm::iconstBipushSipush(this->_boolValue ? 1 : 0));
 		break;
 	default:
 		throw std::runtime_error("Can't generate code for expr with type " + std::to_string(this->_type) + "!");
