@@ -250,7 +250,8 @@ SemanticsBase* VarDeclarationNode::semanticsTransform(SemanticsStack stack)
 
 			thisStmtList->appendNodeAfterNode(assignmentNode, thisStmt);
 		}
-		else
+
+		if (typeKnown)
 		{
 			this->_typeNode = this->_typeNode->semanticsTransform(stack)->typecast<TypeNode>();
 		}
