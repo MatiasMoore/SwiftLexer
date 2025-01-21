@@ -654,7 +654,7 @@ void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 	{
 		this->_fieldAccessExpr->fillTable(classTable, currentClass, currentMethod);
 
-		bool isStatic = this->_fieldAccessExpr->_type == ExprType::Id && classTable->findClass(this->_fieldAccessFieldName) != nullptr;
+		bool isStatic = this->_fieldAccessExpr->_type == ExprType::Id && classTable->findClass(this->_fieldAccessExpr->_stringValue) != nullptr;
 
 		// Static access
 		if (isStatic)
