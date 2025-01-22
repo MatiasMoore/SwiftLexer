@@ -98,7 +98,7 @@ int main(int argc, const char* argv[])
 		auto mainFuncArgs = FuncDeclArgListNode::createListNode(mainFuncArg);
 		auto mainFuncReturn = StmtNode::createStmtReturn(ReturnNode::createVoidReturn());
 		auto mainFuncBody = StmtListNode::createListNode(mainFuncReturn);
-		auto mainFuncDecl = FuncDeclNode::createRegular("main", mainFuncArgs, mainFuncBody, nullptr, false);
+		auto mainFuncDecl = FuncDeclNode::createRegular(RTLHelper::_defaultMainFunc, mainFuncArgs, mainFuncBody, nullptr, false);
 		auto mainFuncModifiers = AccessModifierListNode::createListNode(AccessModifierNode::createModifier(Public));
 		mainFuncModifiers->appendNode(AccessModifierNode::createModifier(Static));
 		mainFuncDecl->addModifiers(mainFuncModifiers);
@@ -106,7 +106,7 @@ int main(int argc, const char* argv[])
 
 		// Main class
 		auto mainClassBody = StmtListNode::createListNode(mainFuncDeclStmt);
-		auto mainClassDecl = ClassDeclNode::createClass("MainClass", mainClassBody);
+		auto mainClassDecl = ClassDeclNode::createClass(RTLHelper::_defaultMainClass, mainClassBody);
 		auto mainClassDeclStmt = StmtNode::createClassDecl(mainClassDecl);
 
 		StmtListNode* newRoot = StmtListNode::createListNode(mainClassDeclStmt);

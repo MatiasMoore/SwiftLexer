@@ -7,6 +7,10 @@
 
 class RTLHelper {
 public:
+    // Default class and main function
+    inline static std::string _defaultMainFunc = "main";
+    inline static std::string _defaultMainClass = "MainClass";
+
     // Class names
     inline static std::string _baseC = "java/lang/Object";
 
@@ -17,9 +21,12 @@ public:
     inline static std::string _intC = "rtl/Integer";
     inline static std::string _strC = "rtl/String";
 
-    // Method names
-    inline static std::string _constructor = "<init>";
+    inline static std::string _arrayC = "rtl/Array";
 
+    // Property names
+    inline static std::string _propertyCount = "count";
+
+    // Method names
     inline static std::string _sum = "sum";
     inline static std::string _sub = "sub";
     inline static std::string _mul = "mul";
@@ -35,5 +42,8 @@ public:
     inline static std::string _logNot = "logNot";
 
     inline static std::string _lt = "lt";
+
+    // Generate a unique id for internally created variables (e.g. during tree transform)
+    static std::string getUniqueInternalVarName();
 };
 

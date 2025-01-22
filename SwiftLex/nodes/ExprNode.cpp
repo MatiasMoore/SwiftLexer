@@ -445,6 +445,17 @@ SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 	if (this->_isAlreadyTransformed)
 		return this;
 
+	//FIXME should really be done in fillTable because we need to 
+	// check type of expr and make sure it's an array
+	if (this->_type == ExprType::FieldAccess && this->_fieldAccessFieldName == RTLHelper::_propertyCount)
+	{
+		//a.count -> Array(a).count()
+		auto arrayConst = FuncCallNode::createFuncCall(RTLHelper::_arrayC, FuncCallArgListNode::createListNode(FuncCallArgNode::createFromExpr(this->_fieldAccessExpr)));
+		auto countCall = FuncCallNode::createFuncCallNoArgs(RTLHelper::_propertyCount);
+		countCall->setAsExprAccess(ExprNode::createFuncCall(arrayConst));
+		return ExprNode::createFuncCall(countCall);
+	}
+
 	std::set<ExprType> typesWithLeftRightOperands = { 
 		ExprType::LT, ExprType::GT, ExprType::GTE, ExprType::LTE, ExprType::EQ, ExprType::NEQ, ExprType::Subscript
 	};
@@ -924,16 +935,7 @@ std::string ExprListNode::getName()
 
 SemanticsBase* ExprListNode::semanticsTransform(SemanticsStack stack)
 {
-	stack.push(this);
-	if (this->_isAlreadyTransformed)
-		return this;
-
-	for (int i = 0; i < _vec.size(); i++)
-	{
-		_vec[i] = _vec[i]->semanticsTransform(stack)->typecast<ExprNode>();
-	}
-
-	return this;
+	return SemanticsBase::semanticsTransformVector<ExprNode>(stack, this, _vec);
 }
 
 void ExprListNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)

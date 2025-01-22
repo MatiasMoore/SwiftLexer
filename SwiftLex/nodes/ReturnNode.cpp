@@ -78,7 +78,7 @@ std::vector<char> ReturnNode::generateCode(InternalClass* currentClass, Internal
         appendVecToVec(code, this->_expr->generateCode(currentClass, currentMethod));
         appendVecToVec(code, jvm::ireturn());
     }
-    else if (this->_exprDesc[0] == 'L')
+    else if (this->_exprDesc[0] == 'L' || this->_exprDesc[0] == '[')
     {
         appendVecToVec(code, this->_expr->generateCode(currentClass, currentMethod));
         appendVecToVec(code, jvm::areturn());

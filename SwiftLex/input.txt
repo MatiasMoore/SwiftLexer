@@ -1,37 +1,12 @@
-class C {
-	public func printNum()
-	{
-		print(5)
-	}
-}
-
-class A {
-	public func printNum()
-	{
-		print(5)
-	}
-}
-
-class B : A
+func getArr() -> [Int]
 {
-	public override func printNum()
-	{
-		print(6)
-	}
+	print("getting arr")
+	return [1, 2, 3, 4, 5]
 }
 
-public static func polyFunc(aObj : A)
+
+for num in getArr()
 {
-	aObj.printNum()
+	print("The num is")
+	print(num)
 }
-
-var bObj = B()
-
-polyFunc(bObj)
-
-var bObjAsA : A = bObj
-
-var cObj = C()
-
-bObjAsA = bObj
-

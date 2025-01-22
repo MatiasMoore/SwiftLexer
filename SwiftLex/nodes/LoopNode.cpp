@@ -5,6 +5,8 @@
 #include "TypeNode.h"
 #include "FuncCallNode.h"
 #include "../generation/generationHelpers.h"
+#include "VarDeclarationNode.h"
+#include "../RTLHelper.h"
 
 LoopNode* LoopNode::createForLoop(std::string id, ExprNode* iterable, StmtListNode* body)
 {
@@ -101,13 +103,16 @@ SemanticsBase* LoopNode::semanticsTransform(SemanticsStack stack)
 	if (this->_isAlreadyTransformed)
 		return this;
 
-	if (this->_conditions->_vec.size() == 0)
-		throw std::runtime_error("Loops must have an expression inside brackets!" + LINE_AND_FILE);
+	if (this->_type == LoopNodeType::whileLoop || this->_type == LoopNodeType::repeatWhileLoop)
+	{
+		if (this->_conditions->_vec.size() == 0)
+			throw std::runtime_error("Loops must have an expression inside brackets!" + LINE_AND_FILE);
 
-	if (this->_conditions->_vec.size() != 1)
-		throw std::runtime_error("Expr list inside loops is not supported!" + LINE_AND_FILE);
+		if (this->_conditions->_vec.size() != 1)
+			throw std::runtime_error("Expr list inside loops is not supported!" + LINE_AND_FILE);
 
-	this->_conditions = this->_conditions->semanticsTransform(stack)->typecast<ExprListNode>();
+		this->_conditions = this->_conditions->semanticsTransform(stack)->typecast<ExprListNode>();
+	}
 
 	if (this->_type == LoopNodeType::whileLoop)
 	{
@@ -122,6 +127,75 @@ SemanticsBase* LoopNode::semanticsTransform(SemanticsStack stack)
 		{
 			this->_body = this->_body->semanticsTransform(stack)->typecast<StmtListNode>();
 		}
+	}
+	else if (this->_type == LoopNodeType::forLoop)
+	{
+		auto myStmt = stack.getClosest<StmtNode>();
+		if (myStmt == nullptr)
+			throw std::runtime_error("Critical error! Can't find my stmt node!" + LINE_AND_FILE);
+
+		auto myStmtList = stack.getClosest<StmtListNode>();
+		if (myStmtList == nullptr)
+			throw std::runtime_error("Critical error! Can't find my stmt list node!" + LINE_AND_FILE);
+
+		std::string arrayCopyVarName = RTLHelper::getUniqueInternalVarName();
+		std::string indexVarName = RTLHelper::getUniqueInternalVarName();
+		std::string countVarName = RTLHelper::getUniqueInternalVarName();
+
+		// var arrayCopy = array
+		VarDeclarationListNode* arrayCopyVarDecl = VarDeclarationListNode::createListNode(VarDeclarationNode::createFromValue(arrayCopyVarName, this->_forLoopIterable));
+		StmtNode* arrayCopyVarDeclStmt = StmtNode::createStmtVarDeclaration(arrayCopyVarDecl);
+		myStmtList->appendNodeBeforeNode(arrayCopyVarDeclStmt, myStmt);
+
+		// var index = 0 FIXME should be LET
+		VarDeclarationListNode* indexVarDecl = VarDeclarationListNode::createListNode(VarDeclarationNode::createFromValue(indexVarName, ExprNode::createInt(0)));
+		StmtNode* indexVarDeclStmt = StmtNode::createStmtVarDeclaration(indexVarDecl);
+		myStmtList->appendNodeBeforeNode(indexVarDeclStmt, myStmt);
+
+		// var count = arrayCopy.count FIXME should be LET
+		ExprNode* getArrCount = ExprNode::createFieldAccessExpr(ExprNode::createId(arrayCopyVarName), "count");
+		VarDeclarationListNode* countVarDecl = VarDeclarationListNode::createListNode(VarDeclarationNode::createFromValue(countVarName, getArrCount));
+		StmtNode* countVarDeclStmt = StmtNode::createStmtVarDeclaration(countVarDecl);
+		myStmtList->appendNodeBeforeNode(countVarDeclStmt, myStmt);
+
+		// index < count
+		ExprListNode* whileCondition = ExprListNode::createListNode(ExprNode::createBinaryOp(ExprType::LT, ExprNode::createId(indexVarName), ExprNode::createId(countVarName)));
+
+		// the newly created stmts and expr above are added before this one, so we have to run semantics on them manually
+		arrayCopyVarDeclStmt = arrayCopyVarDeclStmt->semanticsTransform(stack)->typecast<StmtNode>();
+		indexVarDeclStmt = indexVarDeclStmt->semanticsTransform(stack)->typecast<StmtNode>();
+		countVarDeclStmt = countVarDeclStmt->semanticsTransform(stack)->typecast<StmtNode>();
+		whileCondition = whileCondition->semanticsTransform(stack)->typecast<ExprListNode>();
+
+		// var elem = arrayCopy[index] FIXME should be LET
+		VarDeclarationListNode* forLoopVarDecl = VarDeclarationListNode::createListNode(VarDeclarationNode::createFromValue(this->_forLoopId, 
+			ExprNode::createBinaryOp(ExprType::Subscript, ExprNode::createId(arrayCopyVarName), ExprNode::createId(indexVarName))));
+		StmtNode* forLoopVarDeclStmt = StmtNode::createStmtVarDeclaration(forLoopVarDecl);
+
+		// index += 1
+		StmtNode* incrementIndexVar = StmtNode::createStmtAssignment(ExprNode::createId(indexVarName), 
+			ExprNode::createBinaryOp(ExprType::Sum, ExprNode::createId(indexVarName), ExprNode::createInt(1)));
+
+		StmtListNode* newBody;
+		if (this->_hasBody)
+		{
+			newBody = this->_body;
+			newBody->appendNodeAtIndex(forLoopVarDeclStmt, 0);
+			newBody->appendNodeAtIndex(incrementIndexVar, newBody->_vec.size());
+		}
+		else
+		{
+			newBody = StmtListNode::createListNode(forLoopVarDeclStmt);
+			newBody->appendNode(incrementIndexVar);
+		}
+
+		// run semantics for the new body
+		newBody = newBody->semanticsTransform(stack)->typecast<StmtListNode>();
+
+		auto newLoop = LoopNode::createWhileLoop(whileCondition, newBody);
+		newLoop->setIsAlreadyTransformed(true);
+
+		return newLoop;
 	}
 	else
 	{

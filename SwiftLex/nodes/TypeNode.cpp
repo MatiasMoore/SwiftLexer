@@ -133,6 +133,9 @@ SemanticsBase* TypeNode::semanticsTransform(SemanticsStack stack)
 		return newType;
 	}
 
+	if (this->_type == ArrayT)
+		this->_arrayType = this->_arrayType->semanticsTransform(stack)->typecast<TypeNode>();
+
 	return this;
 }
 

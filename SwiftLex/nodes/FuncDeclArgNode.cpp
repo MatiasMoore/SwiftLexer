@@ -84,14 +84,5 @@ std::string FuncDeclArgListNode::getName()
 
 SemanticsBase* FuncDeclArgListNode::semanticsTransform(SemanticsStack stack)
 {
-	stack.push(this);
-	if (this->_isAlreadyTransformed)
-		return this;
-
-	for (int i = 0; i < _vec.size(); i++)
-	{
-		_vec[i] = _vec[i]->semanticsTransform(stack)->typecast<FuncDeclArgNode>();
-	}
-
-	return this;
+	return SemanticsBase::semanticsTransformVector<FuncDeclArgNode>(stack, this, _vec);
 }

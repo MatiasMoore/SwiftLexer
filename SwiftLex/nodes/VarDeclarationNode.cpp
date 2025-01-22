@@ -159,6 +159,9 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, InternalClass* curren
 			{
 				currentMethod->getVarTable()->addLocalVar(this->_varName, this->_typeNode->toDescriptor());
 
+				//FIXME not sure if this must be called before evaluate type
+				this->_valueNode->fillTable(classTable, currentClass, currentMethod);
+
 				//Check if types are the same
 				auto typeDesc = this->_typeNode->toDescriptor();
 				auto exprDesc = this->_valueNode->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
@@ -178,7 +181,6 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, InternalClass* curren
 							typeDesc + "\" while expr has descriptor \"" + exprDesc + "\"!" + LINE_AND_FILE);
 				}
 
-				this->_valueNode->fillTable(classTable, currentClass, currentMethod);
 				this->_type = VarDeclType::TypeKnown;
 			}
 				break;
@@ -187,9 +189,11 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, InternalClass* curren
 				break;
 			case ValueKnown:
 			{
+				//FIXME not sure if this must be called before evaluate type
+				this->_valueNode->fillTable(classTable, currentClass, currentMethod);
+
 				auto evaluatedType = this->_valueNode->evaluateType(classTable, currentClass, currentMethod);
 				currentMethod->getVarTable()->addLocalVar(this->_varName, evaluatedType->toDescriptor());
-				this->_valueNode->fillTable(classTable, currentClass, currentMethod);
 				this->_typeNode = evaluatedType;
 				this->_type = VarDeclType::TypeKnown;
 			}
@@ -351,12 +355,5 @@ std::vector<char> VarDeclarationListNode::generateCode(InternalClass* currentCla
 
 SemanticsBase* VarDeclarationListNode::semanticsTransform(SemanticsStack stack)
 {
-	stack.push(this);
-	if (this->_isAlreadyTransformed)
-		return this;
-	for (auto& elem : _vec)
-	{
-		elem = elem->semanticsTransform(stack)->typecast<VarDeclarationNode>();
-	}
-	return this;
+	return SemanticsBase::semanticsTransformVector<VarDeclarationNode>(stack, this, _vec);
 }

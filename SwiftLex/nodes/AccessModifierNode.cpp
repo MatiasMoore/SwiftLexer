@@ -197,13 +197,5 @@ std::vector<enum FieldAccessFlag> AccessModifierListNode::getFieldAccessFlags()
 
 SemanticsBase* AccessModifierListNode::semanticsTransform(SemanticsStack stack)
 {
-	stack.push(this);
-	if (this->_isAlreadyTransformed)
-		return this;
-
-	for (int i = 0; i < _vec.size(); i++)
-	{
-		_vec[i] = _vec[i]->semanticsTransform(stack)->typecast<AccessModifierNode>();
-	}
-	return this;
+	return SemanticsBase::semanticsTransformVector<AccessModifierNode>(stack, this, _vec);
 }

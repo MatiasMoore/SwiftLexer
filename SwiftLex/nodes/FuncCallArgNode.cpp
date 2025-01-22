@@ -62,15 +62,7 @@ std::string FuncCallArgListNode::getName()
 
 SemanticsBase* FuncCallArgListNode::semanticsTransform(SemanticsStack stack)
 {
-    stack.push(this);
-    if (this->_isAlreadyTransformed)
-        return this;
-
-    for (int i = 0; i < _vec.size(); i++)
-    {
-        _vec[i] = _vec[i]->semanticsTransform(stack)->typecast<FuncCallArgNode>();
-    }
-    return this;
+    return SemanticsBase::semanticsTransformVector<FuncCallArgNode>(stack, this, _vec);
 }
 
 void FuncCallArgListNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)

@@ -6,6 +6,7 @@
 #include "ReturnNode.h"
 #include "../generation/generationHelpers.h"
 #include "../ExceptionHelper.h"
+#include "../RTLHelper.h"
 
 FuncDeclNode* FuncDeclNode::createRegular(std::string idName, FuncDeclArgListNode* argList, StmtListNode* body, TypeNode* returnType, bool throwsException)
 {
@@ -330,9 +331,13 @@ SemanticsBase* FuncDeclNode::semanticsTransform(SemanticsStack stack)
 	//Check modifiers
 	this->_modifiers = this->_modifiers->semanticsTransform(stack)->typecast<AccessModifierListNode>();
 
-	if (this->_hasArgs)
+	//Don't transform args of default main function
+	if (this->_idName != RTLHelper::_defaultMainFunc)
 	{
-		this->_argList = this->_argList->semanticsTransform(stack)->typecast<FuncDeclArgListNode>();
+		if (this->_hasArgs)
+		{
+			this->_argList = this->_argList->semanticsTransform(stack)->typecast<FuncDeclArgListNode>();
+		}
 	}
 
 	//Transform type

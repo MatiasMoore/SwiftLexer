@@ -665,16 +665,7 @@ std::string StmtListNode::getName()
 
 SemanticsBase* StmtListNode::semanticsTransform(SemanticsStack stack)
 {
-	stack.push(this);
-	if (this->_isAlreadyTransformed)
-		return this;
-
-	for (int i = 0; i < _vec.size(); i++)
-	{
-		_vec[i] = _vec[i]->semanticsTransform(stack)->typecast<StmtNode>();
-	}
-
-	return this;
+	return SemanticsBase::semanticsTransformVector<StmtNode>(stack, this, _vec);
 }
 
 void StmtListNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, bool initialScan)
