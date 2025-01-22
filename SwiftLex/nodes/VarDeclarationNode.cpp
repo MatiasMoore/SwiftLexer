@@ -158,6 +158,7 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, InternalClass* curren
 			case ValueAndTypeKnown:
 				currentMethod->getVarTable()->addLocalVar(this->_varName, this->_typeNode->toDescriptor());
 				this->_valueNode->fillTable(classTable, currentClass, currentMethod);
+				this->_type = VarDeclType::TypeKnown;
 				break;
 			case TypeKnown:
 				currentMethod->getVarTable()->addLocalVar(this->_varName, this->_typeNode->toDescriptor());
@@ -168,7 +169,7 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, InternalClass* curren
 				currentMethod->getVarTable()->addLocalVar(this->_varName, evaluatedType->toDescriptor());
 				this->_valueNode->fillTable(classTable, currentClass, currentMethod);
 				this->_typeNode = evaluatedType;
-				this->_type = ValueAndTypeKnown;
+				this->_type = VarDeclType::TypeKnown;
 			}
 			break;
 			default:
@@ -183,17 +184,34 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, InternalClass* curren
 std::vector<char> VarDeclarationNode::generateCode(InternalClass * currentClass, InternalMethod * currentMethod)
 {
 	std::vector<char> code = {};
-	switch (this->_type)
+
+	if (this->_isFieldDecl)
 	{
-	case TypeKnown:
-	case ValueKnown:
-	case ValueAndTypeKnown:
-		//No code required for this type
-		break;
-	default:
-		throw std::runtime_error("Var decl with enum type " + std::to_string(this->_type) + " is not supported!");
-		break;
+		switch (this->_type)
+		{
+		case TypeKnown:
+		case ValueKnown:
+		case ValueAndTypeKnown:
+			//No code required for this type
+			break;
+		default:
+			throw std::runtime_error("Var decl with enum type " + std::to_string(this->_type) + " is not supported!");
+			break;
+		}
 	}
+	else
+	{
+		switch (this->_type)
+		{
+		case TypeKnown:
+			//No code required for this type
+			break;
+		default:
+			throw std::runtime_error("Var decl with enum type " + std::to_string(this->_type) + " is not supported!");
+			break;
+		}
+	}
+
 	return code;
 }
 
