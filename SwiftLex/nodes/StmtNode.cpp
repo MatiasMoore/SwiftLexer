@@ -19,6 +19,8 @@
 #include "../generation/generationHelpers.h"
 #include <set>
 #include "../ExceptionHelper.h"
+#include "../RTLHelper.h"
+#include "FuncCallNode.h"
 
 StmtNode* StmtNode::createStmtExpr(ExprNode* expr)
 {
@@ -197,11 +199,24 @@ void StmtNode::generateDot(std::ofstream& file)
 		this->_varDeclList->generateDot(file);
 		break;
 	case StmtType::Assignment:
-		file << dotLabel(this->_id, "AssignmentStmt");
-		file << dotConnectionWithLabel(this->_id, this->_assignLeft->_id, "left");
-		file << dotConnectionWithLabel(this->_id, this->_assignRight->_id, "right");
-		this->_assignLeft->generateDot(file);
-		this->_assignRight->generateDot(file);
+		if (this->_assignArrayElem)
+		{
+			file << dotLabel(this->_id, "ArrayElemAssignment");
+			file << dotConnectionWithLabel(this->_id, this->_assignArray->_id, "array");
+			file << dotConnectionWithLabel(this->_id, this->_assignArrayIndex->_id, "index");
+			file << dotConnectionWithLabel(this->_id, this->_assignRight->_id, "value");
+			this->_assignArray->generateDot(file);
+			this->_assignArrayIndex->generateDot(file);
+			this->_assignRight->generateDot(file);
+		}
+		else
+		{
+			file << dotLabel(this->_id, "AssignmentStmt");
+			file << dotConnectionWithLabel(this->_id, this->_assignLeft->_id, "left");
+			file << dotConnectionWithLabel(this->_id, this->_assignRight->_id, "right");
+			this->_assignLeft->generateDot(file);
+			this->_assignRight->generateDot(file);
+		}
 		break;
 	case StmtType::Return:
 		file << dotLabel(this->_id, "ReturnStmt");
@@ -457,25 +472,67 @@ void StmtNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 			if (currentMethod == nullptr)
 				throw std::runtime_error("Expr stmt must be inside a method!");
 
-			bool leftIsId = this->_assignLeft->_type == ExprType::Id;
-			bool leftIsField = this->_assignLeft->_type == ExprType::FieldAccess;
+			bool isLeftSubscript = this->_assignLeft->_type == ExprType::Subscript;
 
-			if (!leftIsId && !leftIsField)
-				throw std::runtime_error("Assignment can't be used with left side expr of enum type" + std::to_string(this->_assignLeft->_type) + "!" + LINE_AND_FILE);
+			if (isLeftSubscript)
+			{
+				this->_assignArrayElem = true;
 
-			this->_assignLeft->fillTable(classTable, currentClass, currentMethod);
-			this->_assignRight->fillTable(classTable, currentClass, currentMethod);
+				this->_assignArray = this->_assignLeft->_left;
+				auto assignArrayDesc = this->_assignArray->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+				if (assignArrayDesc[0] != '[')
+					throw std::runtime_error("Can't do array assignment for type with descriptor \"" + assignArrayDesc + "\"!" + LINE_AND_FILE);
 
-			auto leftDesc = this->_assignLeft->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
-			auto rightDesc = _assignRight->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+				this->_assignArrayIndex = this->_assignLeft->_right;
+				auto assignIndexDesc = this->_assignArrayIndex->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
 
-			//FIXME
-			bool bothClassObjects = leftDesc[0] == 'L' && rightDesc[0] == 'L';
+				if (assignIndexDesc != "I")
+				{
+					if (assignIndexDesc[0] != 'L' || classnameFromDescriptor(assignIndexDesc) != RTLHelper::_intC)
+						throw std::runtime_error("Index for subcript must be of type int but got type with descriptor \"" + assignIndexDesc + "\"!" + LINE_AND_FILE);
 
-			if (!bothClassObjects && leftDesc != rightDesc)
-				throw std::runtime_error("Assignment types do not match!" + LINE_AND_FILE);
+					auto funcCall = FuncCallNode::createFuncCallNoArgs("toInt");
+					funcCall->setAsExprAccess(this->_assignArrayIndex);
+					auto newRight = ExprNode::createFuncCall(funcCall);
+					this->_assignArrayIndex = newRight;
+				}
 
-			this->_assignDesc = rightDesc;
+				auto rightDesc = _assignRight->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+
+				auto arrayElemDesc = assignArrayDesc.substr(1);
+
+				if (arrayElemDesc != rightDesc)
+					throw std::runtime_error("Can't assign expr with descriptor \"" + 
+						rightDesc + "\" to array element with descriptor \"" + arrayElemDesc + "\"!" + LINE_AND_FILE);
+
+				this->_assignArray->fillTable(classTable, currentClass, currentMethod);
+				this->_assignArrayIndex->fillTable(classTable, currentClass, currentMethod);
+				this->_assignRight->fillTable(classTable, currentClass, currentMethod);
+			}
+			else
+			{
+				this->_assignArrayElem = false;
+
+				bool leftIsId = this->_assignLeft->_type == ExprType::Id;
+				bool leftIsField = this->_assignLeft->_type == ExprType::FieldAccess;
+
+				if (!leftIsId && !leftIsField)
+					throw std::runtime_error("Assignment can't be used with left side expr of enum type" + std::to_string(this->_assignLeft->_type) + "!" + LINE_AND_FILE);
+
+				this->_assignLeft->fillTable(classTable, currentClass, currentMethod);
+				this->_assignRight->fillTable(classTable, currentClass, currentMethod);
+
+				auto leftDesc = this->_assignLeft->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+				auto rightDesc = _assignRight->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+
+				//FIXME
+				bool bothClassObjects = leftDesc[0] == 'L' && rightDesc[0] == 'L';
+
+				if (!bothClassObjects && leftDesc != rightDesc)
+					throw std::runtime_error("Assignment types do not match!" + LINE_AND_FILE);
+
+				this->_assignDesc = rightDesc;
+			}
 		}
 		break;
 	case StmtType::DefaultConstructor:
@@ -516,10 +573,20 @@ std::vector<char> StmtNode::generateCode(InternalClass* currentClass, InternalMe
 		appendVecToVec(code, this->_varDeclList->generateCode(currentClass, currentMethod));
 		break;
 	case StmtType::Assignment:
+		if (this->_assignArrayElem)
+		{
+			appendVecToVec(code, this->_assignArray->generateCode(currentClass, currentMethod));
+			appendVecToVec(code, this->_assignArrayIndex->generateCode(currentClass, currentMethod));
 
-		appendVecToVec(code, this->_assignRight->generateCode(currentClass, currentMethod));
+			appendVecToVec(code, this->_assignRight->generateCode(currentClass, currentMethod));
 
-		if (this->_assignLeft->_type == ExprType::Id) {
+			appendVecToVec(code, jvm::aastore());
+		}
+		else
+		{
+			appendVecToVec(code, this->_assignRight->generateCode(currentClass, currentMethod));
+
+			if (this->_assignLeft->_type == ExprType::Id) {
 				int varNum = currentMethod->getVarTable()->findLocalVar(this->_assignLeft->_stringValue)->localId;
 				if (this->_assignDesc == "I")
 				{
@@ -529,31 +596,35 @@ std::vector<char> StmtNode::generateCode(InternalClass* currentClass, InternalMe
 				{
 					appendVecToVec(code, jvm::astore(varNum));
 				}
+				else if (this->_assignDesc[0] == '[')
+				{
+					appendVecToVec(code, jvm::astore(varNum));
+				}
 				else
 				{
 					throw std::runtime_error("Can't assign descriptor " + this->_assignDesc + "!" + LINE_AND_FILE);
 				}
-			
-		}
-		else if(this->_assignLeft->_type == ExprType::FieldAccess) {
-			if (!this->_assignLeft->_isStaticFieldAccess)
-			{
-				appendVecToVec(code, this->_assignLeft->_fieldAccessExpr->generateCode(currentClass, currentMethod));
-				appendVecToVec(code, this->_assignRight->generateCode(currentClass, currentMethod));
-				appendVecToVec(code, jvm::putfield(this->_assignLeft->_nonStaticFieldRef));
+
+			}
+			else if (this->_assignLeft->_type == ExprType::FieldAccess) {
+				if (!this->_assignLeft->_isStaticFieldAccess)
+				{
+					appendVecToVec(code, this->_assignLeft->_fieldAccessExpr->generateCode(currentClass, currentMethod));
+					appendVecToVec(code, this->_assignRight->generateCode(currentClass, currentMethod));
+					appendVecToVec(code, jvm::putfield(this->_assignLeft->_nonStaticFieldRef));
+
+				}
+				else {
+					appendVecToVec(code, this->_assignRight->generateCode(currentClass, currentMethod));
+					appendVecToVec(code, jvm::putStatic(this->_assignLeft->_staticFieldRef));
+				}
+
 
 			}
 			else {
-				appendVecToVec(code, this->_assignRight->generateCode(currentClass, currentMethod));
-				appendVecToVec(code, jvm::putStatic(this->_assignLeft->_staticFieldRef));
+				throw std::runtime_error("Unsupported assignment with left operand type: " + std::to_string(this->_assignLeft->_type) + "!");
 			}
-				
-
 		}
-		else {
-			throw std::runtime_error("Unsupported assignment with left operand type: " + std::to_string(this->_assignLeft->_type) + "!");
-		}
-
 		break;
 	case StmtType::DefaultConstructor:
 		appendVecToVec(code, jvm::aload(0));

@@ -86,6 +86,9 @@ public:
 	ClassDeclNode* _classDecl;
 
 	std::string _assignDesc;
+	bool _assignArrayElem = false;
+	ExprNode* _assignArray;
+	ExprNode* _assignArrayIndex;
 
 	std::string _defaultConstructorBaseName;
 

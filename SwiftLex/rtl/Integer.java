@@ -14,6 +14,11 @@ public class Integer {
         return this;
     }
 
+    public int toInt()
+    {
+        return this._value;
+    }
+
     public Integer sub(Integer other)
     {
         _value -= other._value;

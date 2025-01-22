@@ -68,7 +68,6 @@ int main(int argc, const char* argv[])
 	std::remove(tempFileName.c_str());
 
 	// Before semantics
-
 	if (GlobalSettings::_DRAW_DOT)
 	{
 		std::ofstream dotInitial;
@@ -89,8 +88,6 @@ int main(int argc, const char* argv[])
 		}
 	}	
 
-	// After semantics
-	auto newStack = SemanticsStack();
 
 	try
 	{
@@ -146,33 +143,13 @@ int main(int argc, const char* argv[])
 		
 		_root = newRoot;
 
+		auto newStack = SemanticsStack();
 		_root = _root->semanticsTransform(newStack)->typecast<StmtListNode>();
 	}
 	catch (std::runtime_error error)
 	{
 		std::cout << "Semantics transform error: " << error.what() << std::endl;
 		return 1;
-	}
-
-	if (GlobalSettings::_DRAW_DOT)
-	{
-		std::ofstream dotSemantics;
-		dotSemantics.open("swiftSem.dot");
-
-		if (_root != nullptr) {
-			dotSemantics << "digraph swift {\n";
-			clearDotCache();
-			_root->generateDot(dotSemantics);
-			dotSemantics << "}\n";
-
-			dotSemantics.close();
-			system("cd");
-			system("Graphviz\\bin\\dot.exe -Tpng swiftSem.dot > swiftSem.png");
-			system("swiftSem.png");
-		}
-		else {
-			std::cout << "File empty" << std::endl;
-		}
 	}
 
 	// Attribution
@@ -244,6 +221,27 @@ int main(int argc, const char* argv[])
 		return 1;
 	}
 
+	// After semantics
+	if (GlobalSettings::_DRAW_DOT)
+	{
+		std::ofstream dotSemantics;
+		dotSemantics.open("swiftSem.dot");
+
+		if (_root != nullptr) {
+			dotSemantics << "digraph swift {\n";
+			clearDotCache();
+			_root->generateDot(dotSemantics);
+			dotSemantics << "}\n";
+
+			dotSemantics.close();
+			system("cd");
+			system("Graphviz\\bin\\dot.exe -Tpng swiftSem.dot > swiftSem.png");
+			system("swiftSem.png");
+		}
+		else {
+			std::cout << "File empty" << std::endl;
+		}
+	}
 
 	// Generate .class files based on _root
 	try

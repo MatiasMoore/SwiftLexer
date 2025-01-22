@@ -122,6 +122,7 @@ std::string FuncCallNode::getArgsDescriptor(ClassTable* classTable, InternalClas
 	return funcCallArgDescriptor;
 }
 
+//TODO support stuff like 1 + 5.0 (exprAccess needs to be casted as well)
 ExternalMethod* FuncCallNode::findMethodWithTypeCasting(ExternalClass* classWithMethod, std::string methodName, bool shouldBeStatic, ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
 {
 	ExternalMethod* method = nullptr;

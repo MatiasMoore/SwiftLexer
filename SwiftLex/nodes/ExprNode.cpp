@@ -446,7 +446,7 @@ SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 		return this;
 
 	std::set<ExprType> typesWithLeftRightOperands = { 
-		ExprType::LT, ExprType::GT, ExprType::GTE, ExprType::LTE, ExprType::EQ, ExprType::NEQ, 
+		ExprType::LT, ExprType::GT, ExprType::GTE, ExprType::LTE, ExprType::EQ, ExprType::NEQ, ExprType::Subscript
 	};
 
 	std::set<ExprType> doNothingTypes = {
@@ -520,6 +520,10 @@ SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 	else if (this->_type == ExprType::FuncCall)
 	{
 		this->_funcCall = this->_funcCall->semanticsTransform(stack)->typecast<FuncCallNode>();
+	}
+	else if (this->_type == ExprType::Array)
+	{
+		this->_arrayExprList = this->_arrayExprList->semanticsTransform(stack)->typecast<ExprListNode>();
 	}
 	else if (typesWithLeftRightOperands.count(this->_type) != 0)
 	{
@@ -627,6 +631,18 @@ TypeNode* ExprNode::evaluateType(ClassTable* classTable, InternalClass* currentC
 	else if (this->_type == ExprType::FuncCall)
 	{
 		return this->_funcCall->evaluateType(classTable, currentClass, currentMethod);
+	}
+	else if (this->_type == ExprType::Array)
+	{
+		return TypeNode::createArrayType(this->_arrayExprList->_vec[0]->evaluateType(classTable, currentClass, currentMethod));
+	}
+	else if (this->_type == ExprType::Subscript)
+	{
+		auto arrayType = this->_left->evaluateType(classTable, currentClass, currentMethod);
+		if (arrayType->_type != TypeType::ArrayT)
+			throw std::runtime_error("Can't evaluate type for subcript because the left expresion in not an array!" + LINE_AND_FILE);
+
+		return arrayType->_arrayType;
 	}
 	else
 	{
@@ -737,6 +753,69 @@ void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 	}
 		//Do nothing
 		break;
+	case ExprType::Array:
+	{
+		this->_arrayExprList->fillTable(classTable, currentClass, currentMethod);
+
+		//All elements must be of the same type
+		auto firstElemDesc = this->_arrayExprList->_vec[0]->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+		for (int i = 1; i < this->_arrayExprList->_vec.size(); i++)
+		{
+			auto currentElemDesc = this->_arrayExprList->_vec[i]->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+			
+			//TODO cast ints to floats
+
+			if (firstElemDesc != currentElemDesc)
+				throw std::runtime_error("All array elements must be of the same type! Elem at index " + std::to_string(i) + 
+					" has descriptor \"" + currentElemDesc + "\" but previous elements have descriptor \"" + firstElemDesc + "\"!" + LINE_AND_FILE);
+		}
+
+		this->_arraySize = this->_arrayExprList->_vec.size();
+		int nameRef;
+		if (firstElemDesc[0] == 'L')
+		{
+			nameRef = currentClass->getConstTable()->findOrAddUTF8(classnameFromDescriptor(firstElemDesc));
+		}
+		else if (firstElemDesc[0] == '[')
+		{
+			nameRef = currentClass->getConstTable()->findOrAddUTF8(firstElemDesc);
+		}
+		else
+		{
+			throw std::runtime_error("Only arrays of references are supported!" + LINE_AND_FILE);
+		}
+
+		this->_arrayElemDesc = currentClass->getConstTable()->findOrAddClassRef(nameRef);
+	}
+		break;
+	case ExprType::Subscript:
+	{
+		this->_left->fillTable(classTable, currentClass, currentMethod);
+
+		auto leftDesc = this->_left->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+
+		if (leftDesc[0] != '[')
+			throw std::runtime_error("Subcript can only be used on array expressions but got expression with descriptor \"" + leftDesc + "\"!" + LINE_AND_FILE);
+
+		if (leftDesc[1] != 'L' && leftDesc[1] != '[')
+			throw std::runtime_error("Can only subscript from reference arrays!" + LINE_AND_FILE);
+
+		auto rightDesc = this->_right->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+
+		if (rightDesc != "I")
+		{
+			if (rightDesc[0] != 'L' || classnameFromDescriptor(rightDesc) != RTLHelper::_intC)
+				throw std::runtime_error("Index for subcript must be of type int but got type with descriptor \"" + rightDesc + "\"!" + LINE_AND_FILE);
+
+			auto funcCall = FuncCallNode::createFuncCallNoArgs("toInt");
+			funcCall->setAsExprAccess(this->_right);
+			auto newRight = ExprNode::createFuncCall(funcCall);
+			this->_right = newRight;
+		}
+
+		this->_right->fillTable(classTable, currentClass, currentMethod);
+	}
+	break;
 	default:
 		throw std::runtime_error("Unsupported expr with enum type " + std::to_string(this->_type) + "!");
 		break;
@@ -778,6 +857,10 @@ std::vector<char> ExprNode::generateCode(InternalClass* currentClass, InternalMe
 		{
 			appendVecToVec(code, jvm::aload(localVar->localId));
 		}
+		else if (localVar->_descriptor[0] == '[')
+		{
+			appendVecToVec(code, jvm::aload(localVar->localId));
+		}
 		else
 		{
 			throw std::runtime_error("Can't generate code for expr ID with descriptor \"" + localVar->_descriptor + "\"!");
@@ -793,10 +876,32 @@ std::vector<char> ExprNode::generateCode(InternalClass* currentClass, InternalMe
 		}
 		
 		break;
-	case ExprType::Bool:
-		if (_isStaticFieldAccess) {
+	case ExprType::Array:
+	{
+		if (this->_arraySize < -32767 || this->_arraySize > 32767)
+			throw std::runtime_error("Arrays with size of more than 2 bytes are not supported!" + LINE_AND_FILE);
 
+		appendVecToVec(code, jvm::iconstBipushSipush(this->_arraySize));
+		appendVecToVec(code, jvm::anewarray(this->_arrayElemDesc));
+
+		for (int i = 0; i < this->_arrayExprList->_vec.size(); i++)
+		{
+			appendVecToVec(code, jvm::dup());
+			auto currentElem = this->_arrayExprList->_vec[i];
+			appendVecToVec(code, jvm::iconstBipushSipush(i));
+			appendVecToVec(code, currentElem->generateCode(currentClass, currentMethod));
+			appendVecToVec(code, jvm::aastore());
 		}
+	}
+	break;
+	case ExprType::Subscript:
+	{
+		appendVecToVec(code, this->_left->generateCode(currentClass, currentMethod));
+		appendVecToVec(code, this->_right->generateCode(currentClass, currentMethod));
+		appendVecToVec(code, jvm::aaload());
+	}
+	break;
+	case ExprType::Bool:
 		appendVecToVec(code, jvm::iconstBipushSipush(this->_boolValue ? 1 : 0));
 		break;
 	case ExprType::Float: {
