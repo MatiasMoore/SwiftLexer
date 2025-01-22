@@ -8,6 +8,15 @@ ExternalClass::ExternalClass(std::string name, std::string baseName)
 	this->_baseName = baseName;
 }
 
+ExternalMethod* ExternalClass::overrideMethod(ExternalMethod* oldMethod, ExternalMethod* newMethod)
+{
+	if (this->findMethod(oldMethod->getMethodName(), oldMethod->getArgsDescriptor(), oldMethod->containsFlag(M_ACC_STATIC)) == nullptr)
+		throw std::runtime_error("Failed to override! Method \"" + oldMethod->getMethodName() + 
+			"\" is not found in class \"" + this->getClassName() + "\"!" + LINE_AND_FILE);
+
+	return this->_methodContainer.overrideMethod(oldMethod, newMethod);
+}
+
 ExternalMethod* ExternalClass::addMethod(std::string methodName, std::string descriptor, std::vector<MethodAccessFlag> flags)
 {
 	auto newMethod = new ExternalMethod(methodName, descriptor, getClassName(), flags);

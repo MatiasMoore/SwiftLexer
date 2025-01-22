@@ -156,9 +156,31 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, InternalClass* curren
 			switch (this->_type)
 			{
 			case ValueAndTypeKnown:
+			{
 				currentMethod->getVarTable()->addLocalVar(this->_varName, this->_typeNode->toDescriptor());
+
+				//Check if types are the same
+				auto typeDesc = this->_typeNode->toDescriptor();
+				auto exprDesc = this->_valueNode->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+
+				if (typeDesc != exprDesc)
+				{
+					bool isTypeClass = typeDesc[0] == 'L';
+					bool isExprCLass = exprDesc[0] == 'L';
+
+					if (!isTypeClass || !isExprCLass)
+						throw std::runtime_error("Type mismatch in declaration of var \"" + this->_varName + "\"! Written type has descriptor \"" +
+							typeDesc + "\" while expr has descriptor \"" + exprDesc + "\"!" + LINE_AND_FILE);
+
+					//Check if expr can be downcasted to type
+					if (!classTable->isClassDerivedFromClass(classnameFromDescriptor(exprDesc), classnameFromDescriptor(typeDesc)))
+						throw std::runtime_error("Type mismatch in declaration of var \"" + this->_varName + "\"! Written type has descriptor \"" +
+							typeDesc + "\" while expr has descriptor \"" + exprDesc + "\"!" + LINE_AND_FILE);
+				}
+
 				this->_valueNode->fillTable(classTable, currentClass, currentMethod);
 				this->_type = VarDeclType::TypeKnown;
+			}
 				break;
 			case TypeKnown:
 				currentMethod->getVarTable()->addLocalVar(this->_varName, this->_typeNode->toDescriptor());

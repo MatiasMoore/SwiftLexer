@@ -11,6 +11,8 @@ class ClassTable
 public:
 	std::map<std::string, ExternalClass*> _classes = {};
 
+	bool isClassDerivedFromClass(std::string derivedName, std::string parentName);
+
 	/*!
 	* \brief Search a field in class
 	* \return ExternalField - The ExternalField field

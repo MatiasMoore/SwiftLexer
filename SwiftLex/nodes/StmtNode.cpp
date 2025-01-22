@@ -525,11 +525,18 @@ void StmtNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 				auto leftDesc = this->_assignLeft->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
 				auto rightDesc = _assignRight->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
 
-				//FIXME
-				bool bothClassObjects = leftDesc[0] == 'L' && rightDesc[0] == 'L';
+				if (leftDesc != rightDesc)
+				{
+					bool bothClassObjects = leftDesc[0] == 'L' && rightDesc[0] == 'L';
+					if (!bothClassObjects)
+						throw std::runtime_error("Type mismatch in assignment of var \"" + this->_assignLeft->_stringValue + "\"! It's current type has descriptor \"" +
+							leftDesc + "\" while trying to assign type with has descriptor \"" + rightDesc + "\"!");
 
-				if (!bothClassObjects && leftDesc != rightDesc)
-					throw std::runtime_error("Assignment types do not match!" + LINE_AND_FILE);
+					//Check if expr can be downcasted to type
+					if (!classTable->isClassDerivedFromClass(classnameFromDescriptor(rightDesc), classnameFromDescriptor(leftDesc)))
+						throw std::runtime_error("Type mismatch in assignment of var \"" + this->_assignLeft->_stringValue + "\"! It's current type has descriptor \"" +
+							leftDesc + "\" while trying to assign type with has descriptor \"" + rightDesc + "\"!");
+				}
 
 				this->_assignDesc = rightDesc;
 			}

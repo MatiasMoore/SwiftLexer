@@ -1,70 +1,37 @@
-/*
-//var a = 5.0 + 1 //Float(5.0).sum(Integer(1))
-//print(a)
+class C {
+	public func printNum()
+	{
+		print(5)
+	}
+}
 
 class A {
-	public var _value : Int
-
-	init(startValue : Int) {
-		self._value = startValue
-	}
-
-	init(bObj : B) {
-		self._value = bObj._value
-	}
-
-	public static func printValue(obj : A) -> Int
+	public func printNum()
 	{
-		print("Class A")
-		print(obj._value)
-		return obj._value
+		print(5)
 	}
-
-	//
-	//public func printValue(obj : B)
-	//{
-	//	print("Class B")
-	//	print(obj._value)
-	//}
-	//
-
 }
 
-class B {
-	public var _value : Int
-
-	init(startValue : Int) {
-		self._value = startValue
-	}
-
-}
-
-var aObj = A(10)
-var bObj = B(15)
-var d = A.printValue(aObj)
-var f = A.printValue(bObj)
-print(d)
-print(f)
-
-print("Hello!")
-
-var a = 0
-while (a < 5)
+class B : A
 {
-	print(" world!")
-	a += 1
+	public override func printNum()
+	{
+		print(6)
+	}
 }
-*/
 
-// program to display numbers
+public static func polyFunc(aObj : A)
+{
+	aObj.printNum()
+}
 
-var i = 1, n = 5
+var bObj = B()
 
-// repeat...while loop from 1 to 5
-repeat {
-  
-  print(i)
+polyFunc(bObj)
 
-  i = i + 1
+var bObjAsA : A = bObj
 
-} while (i < n)
+var cObj = C()
+
+bObjAsA = bObj
+

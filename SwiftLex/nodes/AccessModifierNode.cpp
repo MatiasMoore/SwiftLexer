@@ -73,6 +73,10 @@ std::vector<enum MethodAccessFlag> AccessModifierNode::getMethodAccessFlags()
 	case (AccessModifierType::Internal):
 		return { M_ACC_PRIVATE };
 		break;
+	case (AccessModifierType::Override):
+		//All java methods override by default, we set a custom flag
+		return { M_ACC_CUSTOM_OVERRIDE };
+		break;
 	default:
 		throw std::runtime_error("Method access flag node with type " + std::to_string(this->_type) + " can't convert to jvm access flag!");
 		break;

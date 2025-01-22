@@ -1,6 +1,18 @@
 #include "ClassTable.h"
 #include "../ExceptionHelper.h"
 
+bool ClassTable::isClassDerivedFromClass(std::string derivedName, std::string parentName)
+{
+	auto derivedClass = this->findClass(derivedName);
+	if (derivedClass == nullptr)
+		return false;
+
+	if (derivedClass->getBaseClassName() == parentName)
+		return true;
+
+	return this->isClassDerivedFromClass(derivedClass->getBaseClassName(), parentName);
+}
+
 ExternalField* ClassTable::findField(std::string name, std::string className, bool isStatic)
 {
 	auto myClass = this->findClass(className);
@@ -44,10 +56,14 @@ InternalClass* ClassTable::addInternalClass(std::string name, std::string baseNa
 	if (baseClass == nullptr)
 		std::runtime_error("Error adding class \"" + name + "\"! It's base class \"" + baseName + "\" doesn't exist!");
 
+	//TODO don't inherit private methods and fields
 	for (auto& baseClassMethod : baseClass->getMethods())
 	{
-		if (baseClassMethod->getMethodName() != "<init>")
-			newClass->addMethod(baseClassMethod->getMethodName(), baseClassMethod->getDescriptor(), baseClassMethod->getFlags());
+		//Skip constructors for now
+		if (baseClassMethod->getMethodName() == "<init>")
+			continue;
+
+		newClass->addMethod(baseClassMethod->getMethodName(), baseClassMethod->getDescriptor(), baseClassMethod->getFlags());
 	}
 
 	for (auto& baseClassField : baseClass->getFields())
@@ -63,6 +79,8 @@ ExternalClass* ClassTable::addExternalClass(std::string name, std::string baseNa
 {
 	if (this->_classes.count(name) != 0)
 		throw std::runtime_error("Class " + name + " already exists!" + LINE_AND_FILE);
+
+	//TODO copy methods from base class, same as for internal classes
 
 	auto newClass = new ExternalClass(name, baseName);
 	_classes[name] = newClass;

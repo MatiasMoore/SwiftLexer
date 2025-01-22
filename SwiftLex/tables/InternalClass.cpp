@@ -20,6 +20,15 @@ InternalMethod* InternalClass::addInternalMethodToConstantTable(std::string meth
 	return newMethod;
 }
 
+InternalMethod* InternalClass::addInternalMethodAsOverrideToConstantTable(ExternalMethod* oldMethod, std::string methodName, std::string descriptor, std::vector<MethodAccessFlag> flags, StmtListNode* body)
+{
+	auto newMethod = new InternalMethod(_constTable, body, methodName, descriptor, getClassName(), flags);
+
+	this->overrideMethod(oldMethod, newMethod);
+
+	return newMethod;
+}
+
 InternalField* InternalClass::addInternalFieldToConstantTable(std::string varName, std::string descriptor, std::vector<FieldAccessFlag> flags)
 {
 	auto newField = new InternalField(_constTable, varName, descriptor, getClassName(), flags);

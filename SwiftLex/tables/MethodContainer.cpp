@@ -2,6 +2,17 @@
 #include "../generation/generationHelpers.h"
 #include "../ExceptionHelper.h"
 
+ExternalMethod* MethodContainer::overrideMethod(ExternalMethod* oldMethod, ExternalMethod* newMethod)
+{
+    if (this->findMethod(oldMethod->getMethodName(), oldMethod->getArgsDescriptor(), oldMethod->containsFlag(M_ACC_STATIC)) == nullptr)
+        throw std::runtime_error("Failed to override! Method \"" + oldMethod->getMethodName() +
+            "\" is not found!" + LINE_AND_FILE);
+
+    this->_nameArgDescIsStaticToMethod[oldMethod->getMethodName()][oldMethod->getArgsDescriptor()][oldMethod->containsFlag(M_ACC_STATIC)] = newMethod;
+
+    return newMethod;
+}
+
 ExternalMethod* MethodContainer::findMethod(std::string name, std::string argDescriptor, bool isStatic)
 {
     if (_nameArgDescIsStaticToMethod.count(name) == 0)

@@ -184,6 +184,13 @@ ExternalMethod* FuncCallNode::findMethodWithTypeCasting(ExternalClass* classWith
 				break;
 			}
 
+			// Check if our can be downcasted to required
+			if (classTable->isClassDerivedFromClass(classnameFromDescriptor(ourArgDesc), classnameFromDescriptor(requiredDesc)))
+			{
+				allGood = true;
+				break;
+			}
+
 			// Trying to find constructor from our type to required
 			auto requiredClassName = classnameFromDescriptor(requiredDesc);
 			auto requiredClass = classTable->findClass(requiredClassName);

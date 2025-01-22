@@ -225,29 +225,64 @@ void FuncDeclNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 
 	if (initialScan)
 	{
-		std::string strDesc = "(";
+		std::string fullDesc = "";
+		std::string argDesc = "(";
 
 		if (this->_hasArgs)
 		{
 			for (auto& arg : this->_argList->_vec)
 			{
-				strDesc += arg->_argType->toDescriptor();
+				argDesc += arg->_argType->toDescriptor();
 			}
 		}
-		strDesc += ")";
+		argDesc += ")";
+
+		fullDesc = argDesc;
 
 		if (this->_hasNonVoidReturn)
-			strDesc += this->_returnType->toDescriptor();
+			fullDesc += this->_returnType->toDescriptor();
 		else
-			strDesc += "V";
+			fullDesc += "V";
 
 		if (!this->_hasModifiers)
 			throw std::runtime_error("Func decl \"" + this->_idName + "\" must have access modifiers!");
 
 		auto accessFlags = this->_modifiers->getMethodAccessFlags();
-		currentMethod = currentClass->addInternalMethodToConstantTable(this->_idName, strDesc, accessFlags, this->_body);
-
 		bool isStatic = std::find(accessFlags.begin(), accessFlags.end(), M_ACC_STATIC) != accessFlags.end();
+		bool isOverride = std::find(accessFlags.begin(), accessFlags.end(), M_ACC_CUSTOM_OVERRIDE) != accessFlags.end();
+		std::string prefix = isStatic ? "static" : "non-static";
+
+		auto existingMethod = currentClass->findMethod(this->_idName, argDesc, isStatic);
+
+		if (existingMethod == nullptr && isOverride)
+			throw std::runtime_error("Class \"" + currentClass->getClassName() + "\" can't override a " + prefix + " method with name \"" +
+				this->_idName + "\" and arg descriptor \"" + argDesc + "\" as it's baseclass doesn't have it!" + LINE_AND_FILE);
+
+		// This method already exist in this class
+		if (existingMethod != nullptr)
+		{
+			auto asInternalMethod = dynamic_cast<InternalMethod*>(existingMethod);
+
+			if (asInternalMethod != nullptr)
+			{
+				throw std::runtime_error("Class \"" + currentClass->getClassName() + "\" already has a " + prefix + " method with name \"" +
+					this->_idName + "\" and arg descriptor \"" + argDesc + "\" defined!" + LINE_AND_FILE);
+			}
+
+			if (!isOverride)
+				throw std::runtime_error("Class \"" + currentClass->getClassName() + "\" already has a " + prefix + " method with name \"" +
+					this->_idName + "\" and arg descriptor \"" + argDesc + 
+					"\" defined in it's base class! If you want to override it, use the keyword override!" + LINE_AND_FILE);
+			
+			currentMethod = currentClass->addInternalMethodAsOverrideToConstantTable(existingMethod, this->_idName, fullDesc, accessFlags, this->_body);
+		}
+		// This method is new for this class
+		else
+		{
+			currentMethod = currentClass->addInternalMethodToConstantTable(this->_idName, fullDesc, accessFlags, this->_body);
+		}
+
+
 
 		if (!isStatic)
 		{

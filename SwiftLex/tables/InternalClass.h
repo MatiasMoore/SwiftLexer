@@ -16,6 +16,8 @@ public:
 	* \return InternalMethod - The internal method created
 	*/
 	InternalMethod* addInternalMethodToConstantTable(std::string methodName, std::string descriptor, std::vector<MethodAccessFlag> flags, StmtListNode* body);
+
+	InternalMethod* addInternalMethodAsOverrideToConstantTable(ExternalMethod* oldMethod, std::string methodName, std::string descriptor, std::vector<MethodAccessFlag> flags, StmtListNode* body);
 	
 	// Methods
 	/*!

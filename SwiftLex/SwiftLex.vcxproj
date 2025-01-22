@@ -26,6 +26,7 @@
     <ClCompile Include="GlobalSettings.cpp" />
     <ClCompile Include="RTLHelper.cpp" />
     <ClCompile Include="tables\FieldContainer.cpp" />
+    <ClCompile Include="tables\MethodAccessFlag.cpp" />
     <ClCompile Include="tables\MethodContainer.cpp" />
     <ClCompile Include="tables\ClassTable.cpp" />
     <ClCompile Include="tables\ExternalMethod.cpp" />

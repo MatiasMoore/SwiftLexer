@@ -5,10 +5,14 @@
 #include "MethodContainer.h"
 #include "FieldContainer.h"
 
+class ClassTable;
+
 class ExternalClass
 {
 public:
 	ExternalClass(std::string name, std::string baseName);
+
+	ExternalMethod* overrideMethod(ExternalMethod* oldMethod, ExternalMethod* newMethod);
 
 	/*!
 	* \brief Add an EXTERNAL method (this method does not write anything to the constant table)

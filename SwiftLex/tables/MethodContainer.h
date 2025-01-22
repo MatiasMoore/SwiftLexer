@@ -4,6 +4,8 @@
 class MethodContainer
 {
 public:
+	ExternalMethod* overrideMethod(ExternalMethod* oldMethod, ExternalMethod* newMethod);
+
 	ExternalMethod* findMethod(std::string name, std::string argDescriptor, bool isStatic);
 
 	ExternalMethod* addMethod(ExternalMethod* method);
