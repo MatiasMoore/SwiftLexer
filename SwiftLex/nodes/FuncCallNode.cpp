@@ -177,17 +177,38 @@ ExternalMethod* FuncCallNode::findMethodWithTypeCasting(ExternalClass* classWith
 				continue;
 			}
 
-			// Required arg must be a class since we'll be looking for a constructor
-			if (requiredDesc[0] != 'L')
-			{
-				allGood = false;
-				break;
-			}
-
-			// Check if our can be downcasted to required
-			if (classTable->isClassDerivedFromClass(classnameFromDescriptor(ourArgDesc), classnameFromDescriptor(requiredDesc)))
+			bool isRequiredClass = requiredDesc[0] == 'L';
+			bool isOurArgClass = ourArgDesc[0] == 'L';
+			
+			// Check if our can be downcasted to required (for classes)
+			if (isRequiredClass && isOurArgClass 
+				&& classTable->isClassDerivedFromClass(classnameFromDescriptor(ourArgDesc), classnameFromDescriptor(requiredDesc)))
 			{
 				allGood = true;
+				continue;
+			}
+
+			// Check if our can be downcasted to required (for arrays of classes)
+			bool isRequiredArray = requiredDesc[0] == '[';
+			bool isOurArgArray = ourArgDesc[0] == '[';
+
+			if (isRequiredArray && isOurArgArray)
+			{
+				bool isRequiredArrayOfClass = requiredDesc.find('L') != -1;
+				bool isOurArgArrayOfClass = ourArgDesc.find('L') != -1;
+
+				if (isRequiredArrayOfClass && isOurArgArrayOfClass 
+					&& classTable->isClassDerivedFromClass(classnameFromDescriptor(ourArgDesc), classnameFromDescriptor(requiredDesc)))
+				{
+					allGood = true;
+					continue;
+				}
+			}
+
+			// Required arg must be a class since we'll be looking for a constructor
+			if (!isRequiredClass)
+			{
+				allGood = false;
 				break;
 			}
 

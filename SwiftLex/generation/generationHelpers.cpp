@@ -114,9 +114,26 @@ std::string classnameFromDescriptor(std::string descriptor)
 	if (descriptor.size() < 3)
 		throw std::runtime_error("Can't get a classname from primitive type descriptor!");
 
-	auto temp = std::string(descriptor.c_str() + 1);
+	auto temp = descriptor.substr(descriptor.find_first_of('L') + 1);
 	temp.pop_back();
 	return temp;
+}
+
+int dimCountFromDescriptor(std::string descriptor)
+{
+	if (descriptor[0] != '[')
+		throw std::runtime_error("Descriptor must be of an array type to get dimension count!" + LINE_AND_FILE);
+
+	int dimCount = 0;
+	for (auto& elem : descriptor)
+	{
+		if (elem == '[')
+			dimCount++;
+		else
+			break;
+	}
+
+	return dimCount;
 }
 
 std::string getArgDescFromFullDesc(std::string descriptor)

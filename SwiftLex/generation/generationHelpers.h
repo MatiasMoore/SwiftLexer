@@ -18,6 +18,8 @@ std::vector<char> generateBytesForConstantTableItem(class ConstantTableItem* ele
 
 std::string classnameFromDescriptor(std::string descriptor);
 
+int dimCountFromDescriptor(std::string descriptor);
+
 std::string getArgDescFromFullDesc(std::string descriptor);
 
 std::string getReturnDescFromFullDesc(std::string descriptor);
