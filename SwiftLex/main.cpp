@@ -20,6 +20,8 @@ extern StmtListNode* _root;
 
 void deleteDirectoryContents(const std::filesystem::path& dir);
 
+void getFilesInDirRecursively(const std::filesystem::path& directory, std::vector<std::string>& fileList);
+
 int main(int argc, const char* argv[])
 {
 	std::string filename = "";
@@ -193,7 +195,7 @@ int main(int argc, const char* argv[])
 	}
 	
 
-	// Generate rtl .class files and add them as external
+	// Generate rtl .class files
 	for (const auto& entry : std::filesystem::directory_iterator(rtlSourceDirectory))
 	{
 		auto pathToJavaFile = entry.path().generic_string();
@@ -204,19 +206,20 @@ int main(int argc, const char* argv[])
 			std::cout << "Failed to compile rtl file \"" << pathToJavaFile << "\"!" << std::endl;
 			return 1;
 		}
+	}
 
-		auto pathToCompiledFile = generatedClassFilesDirectory + pathToJavaFile;
-		
-		// Replace .java with .class
-		pathToCompiledFile = pathToCompiledFile.substr(0, pathToCompiledFile.find_last_of('.')) + ".class";
-
+	// Add generated classes as external
+	std::vector<std::string> allClassFiles = {};
+	getFilesInDirRecursively(generatedClassFilesDirectory, allClassFiles);
+	for (auto& classFilePath : allClassFiles)
+	{
 		try
 		{
-			JavaClassFileParser::addFromFileToClassTable(pathToCompiledFile, &classTable);
+			JavaClassFileParser::addFromFileToClassTable(classFilePath, &classTable);
 		}
 		catch (std::runtime_error error)
 		{
-			std::cout << "Failed to add external class from file \"" << pathToCompiledFile << "\"! " << error.what() << std::endl;
+			std::cout << "Failed to add external class from file \"" << classFilePath << "\"! " << error.what() << std::endl;
 			return 1;
 		}
 	}
@@ -271,4 +274,24 @@ void deleteDirectoryContents(const std::filesystem::path& dir)
 {
 	for (const auto& entry : std::filesystem::directory_iterator(dir))
 		std::filesystem::remove_all(entry.path());
+}
+
+void getFilesInDirRecursively(const std::filesystem::path& directory, std::vector<std::string>& fileList)
+{
+	try {
+		// Iterate through each item in the directory
+		for (const auto& entry : std::filesystem::directory_iterator(directory)) {
+			// If the entry is a directory, recursively call this function
+			if (std::filesystem::is_directory(entry)) {
+				getFilesInDirRecursively(entry.path(), fileList);
+			}
+			// If the entry is a regular file, add its path to the list
+			else if (std::filesystem::is_regular_file(entry)) {
+				fileList.push_back(entry.path().string());
+			}
+		}
+	}
+	catch (const std::exception& e) {
+		std::cerr << "Error while accessing directory: " << e.what() << std::endl;
+	}
 }
