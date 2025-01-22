@@ -40,7 +40,7 @@ enum ExprType
 	LogNot,
 	UnaryMinus,
 	Ternary,
-	Array,
+	ArrayCreation,
 	Subscript,
 	FuncCall,
 	FieldAccess,

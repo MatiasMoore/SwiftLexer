@@ -87,7 +87,7 @@ ExprNode* ExprNode::createTernary(ExprNode* condition, ExprNode* ifTrue, ExprNod
 ExprNode* ExprNode::createArray(ExprListNode* list)
 {
 	auto node = new ExprNode();
-	node->_type = ExprType::Array;
+	node->_type = ExprType::ArrayCreation;
 	node->_arrayExprList = list;
 	printf("N: array %d\n", (int)node->_type);
 	return node;
@@ -251,7 +251,7 @@ std::string ExprNode::getName()
 	case ExprType::Ternary:
 		return "Ternary ? :";
 		break;
-	case ExprType::Array:
+	case ExprType::ArrayCreation:
 		return "Array";
 		break;
 	case ExprType::Subscript:
@@ -351,7 +351,7 @@ void ExprNode::generateDot(std::ofstream& file)
 		this->_ternaryIfTrue->generateDot(file);
 		this->_ternaryIfFalse->generateDot(file);
 		break;
-	case ExprType::Array:
+	case ExprType::ArrayCreation:
 		file << dotLabel(this->_id, this->getName());
 		file << dotConnection(this->_id, this->_arrayExprList->_id);
 		this->_arrayExprList->generateDot(file);
@@ -521,7 +521,7 @@ SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 	{
 		this->_funcCall = this->_funcCall->semanticsTransform(stack)->typecast<FuncCallNode>();
 	}
-	else if (this->_type == ExprType::Array)
+	else if (this->_type == ExprType::ArrayCreation)
 	{
 		this->_arrayExprList = this->_arrayExprList->semanticsTransform(stack)->typecast<ExprListNode>();
 	}
@@ -632,7 +632,7 @@ TypeNode* ExprNode::evaluateType(ClassTable* classTable, InternalClass* currentC
 	{
 		return this->_funcCall->evaluateType(classTable, currentClass, currentMethod);
 	}
-	else if (this->_type == ExprType::Array)
+	else if (this->_type == ExprType::ArrayCreation)
 	{
 		return TypeNode::createArrayType(this->_arrayExprList->_vec[0]->evaluateType(classTable, currentClass, currentMethod));
 	}
@@ -753,7 +753,7 @@ void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 	}
 		//Do nothing
 		break;
-	case ExprType::Array:
+	case ExprType::ArrayCreation:
 	{
 		this->_arrayExprList->fillTable(classTable, currentClass, currentMethod);
 
@@ -876,7 +876,7 @@ std::vector<char> ExprNode::generateCode(InternalClass* currentClass, InternalMe
 		}
 		
 		break;
-	case ExprType::Array:
+	case ExprType::ArrayCreation:
 	{
 		if (this->_arraySize < -32767 || this->_arraySize > 32767)
 			throw std::runtime_error("Arrays with size of more than 2 bytes are not supported!" + LINE_AND_FILE);
