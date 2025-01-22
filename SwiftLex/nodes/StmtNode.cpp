@@ -540,6 +540,10 @@ void StmtNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 		auto class_ = classTable->findClass(this->_defaultConstructorBaseName);
 		this->_defaultConstructorClassRef = currentClass->getClassRefForExternalClass(class_);
 		auto method = class_->findMethod("<init>", "()", false);
+
+		if (method == nullptr)
+			throw std::runtime_error("Can't find default constructor for class \"" + this->_defaultConstructorBaseName + "\"!" + LINE_AND_FILE);
+
 		this->_defaultConstructorMethodRef = currentClass->getMethodRefForExternalMethod(method);
 	}
 		break;
