@@ -14,6 +14,28 @@ ExternalMethod* ExternalClass::overrideMethod(ExternalMethod* oldMethod, Externa
 		throw std::runtime_error("Failed to override! Method \"" + oldMethod->getMethodName() + 
 			"\" is not found in class \"" + this->getClassName() + "\"!" + LINE_AND_FILE);
 
+	auto oldMethodFlagsWithoutOverride = oldMethod->getFlags();
+
+	//Remove override if present
+	auto oldMethodOverrideIter = std::find(oldMethodFlagsWithoutOverride.cbegin(),
+		oldMethodFlagsWithoutOverride.cend(),
+		MethodAccessFlag::M_ACC_CUSTOM_OVERRIDE);
+	if (oldMethodOverrideIter != oldMethodFlagsWithoutOverride.cend())
+		oldMethodFlagsWithoutOverride.erase(oldMethodOverrideIter);
+
+	auto newMethodFlagsWithoutOverride = newMethod->getFlags();
+
+	//Remove override if present
+	auto newMethodOverrideIter = std::find(newMethodFlagsWithoutOverride.cbegin(),
+		newMethodFlagsWithoutOverride.cend(),
+		MethodAccessFlag::M_ACC_CUSTOM_OVERRIDE);
+	if (newMethodOverrideIter != newMethodFlagsWithoutOverride.cend())
+		newMethodFlagsWithoutOverride.erase(newMethodOverrideIter);
+
+	if (methodAccessFlagsToInt(oldMethodFlagsWithoutOverride) != methodAccessFlagsToInt(newMethodFlagsWithoutOverride))
+		throw std::runtime_error("Overriding method \"" + newMethod->getMethodName() + 
+			"\" must be as accessible as the declaration it overrides!" + LINE_AND_FILE);
+
 	return this->_methodContainer.overrideMethod(oldMethod, newMethod);
 }
 
