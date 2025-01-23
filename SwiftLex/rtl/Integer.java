@@ -10,8 +10,7 @@ public class Integer {
     
     public Integer sum(Integer other)
     {
-        _value += other._value;
-        return this;
+        return new Integer(_value + other._value);
     }
 
     public int toInt()
@@ -21,20 +20,17 @@ public class Integer {
 
     public Integer sub(Integer other)
     {
-        _value -= other._value;
-        return this;
+        return new Integer(_value - other._value);
     }
 
     public Integer mul(Integer other)
     {
-        _value *= other._value;
-        return this;
+        return new Integer(_value * other._value);
     }
 
     public Integer div(Integer other)
     {
-        _value /= other._value;
-        return this;
+        return new Integer(_value / other._value);
     }
 
     public Boolean lt(Integer other)

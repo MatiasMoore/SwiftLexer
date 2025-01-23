@@ -14,25 +14,21 @@ public class Float {
     
     public Float sum(Float other)
     {
-        _value += other._value;
-        return this;
+        return new Float(_value + other._value);
     }
 
     public Float sub(Float other)
     {
-        _value -= other._value;
-        return this;
+        return new Float(_value - other._value);
     }
 
     public Float mul(Float other)
     {
-        _value *= other._value;
-        return this;
+        return new Float(_value * other._value);
     }
 
     public Float div(Float other)
     {
-        _value /= other._value;
-        return this;
+        return new Float(_value / other._value);
     }
 }
