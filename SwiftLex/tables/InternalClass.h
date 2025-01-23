@@ -70,8 +70,15 @@ public:
 
 	int getClassRef();
 
+	void addStmtToStaticConstructor(class StmtNode* stmt);
+
+	InternalMethod* getStaticConstructor();
+
+	void addStaticConstructorToInternalMethods();
+
 private:
 	ConstantTable* _constTable;
+	InternalMethod* _staticConstructor;
 
 	int _classRef;
 	int _baseClassRef;

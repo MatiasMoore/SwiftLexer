@@ -85,25 +85,30 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, InternalClass* curren
 
 			if (this->_type == ValueAndTypeKnown)
 			{
-				// All done, required to add assign to <clinit> (if static) or <init> (if not static)
-				this->_valueNode->fillTable(classTable, currentClass, currentMethod);
-
-				// Check if var type and assignable type is equal
-				auto varTypeDescriptor = this->_typeNode->toDescriptor();
-				auto assignableValueType = this->_valueNode->evaluateType(classTable, currentClass, currentMethod);
-				auto assignableValueDescriptor = assignableValueType->toDescriptor();
-				if (varTypeDescriptor != assignableValueDescriptor) //maybe override "==" for TypeNode???
-					throw std::runtime_error("Variable descriptor\"" + varTypeDescriptor + "\" does not match with assignable descriptor \"" + assignableValueDescriptor + "\" for field \"" + this->_varName + "\" in class \"" + currentClass->getClassName() + "\"" + LINE_AND_FILE);
-
 				// Create field
 				currentClass->addInternalFieldToConstantTable(
 					this->_varName,
 					this->_typeNode->toDescriptor(),
 					this->_modifiers->getFieldAccessFlags()
 				);
+
+				if (this->_modifiers->hasModifier(AccessModifierType::Static))
+				{
+					auto fieldAccessExpr = ExprNode::createFieldAccessExpr(
+						ExprNode::createId(currentClass->getClassName()),
+						this->_varName
+					);
+					auto assign = StmtNode::createStmtAssignment(
+						fieldAccessExpr,
+						this->_valueNode
+					);
+					currentClass->addStmtToStaticConstructor(assign);
+				}
 			}
 			else if (this->_type == TypeKnown)
 			{
+				if (this->_modifiers->hasModifier(AccessModifierType::Static))
+					throw std::runtime_error("Static field \"" + this->_varName + "\" in class \"" + currentClass->getClassName() + "\" needs to be initialized" + LINE_AND_FILE);
 
 				//Check if field not final (needs to be initialized)
 				auto accessFlags = this->_modifiers->getMethodAccessFlags();
@@ -129,14 +134,27 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, InternalClass* curren
 
 				// Get type from assignable value
 				this->_typeNode = this->_valueNode->evaluateType(classTable, currentClass, currentMethod);
-					auto varTypeDescriptor = this->_typeNode->toDescriptor();
+				auto varTypeDescriptor = this->_typeNode->toDescriptor();
 
 					// Create field
 				currentClass->addInternalFieldToConstantTable(
-						this->_varName,
-						this->_typeNode->toDescriptor(),
+					this->_varName,
+					this->_typeNode->toDescriptor(),
 					this->_modifiers->getFieldAccessFlags()
 				);
+				
+				if (this->_modifiers->hasModifier(AccessModifierType::Static))
+				{
+					auto fieldAccessExpr = ExprNode::createFieldAccessExpr(
+						ExprNode::createId(currentClass->getClassName()),
+						this->_varName
+					);
+					auto assign = StmtNode::createStmtAssignment(
+						fieldAccessExpr,
+						this->_valueNode
+					);
+					currentClass->addStmtToStaticConstructor(assign);
+				}
 
 				this->_type = TypeKnown;
 			}
@@ -272,15 +290,15 @@ SemanticsBase* VarDeclarationNode::semanticsTransform(SemanticsStack stack)
 
 		if (valueKnown)
 		{
+			this->_valueNode = this->_valueNode->semanticsTransform(stack)->typecast<ExprNode>();
+
 			if (isStatic)
-				throw std::runtime_error("Unsupported static var declaration for var" + _varName + LINE_AND_FILE);
+				return this;
 
 			auto myClassDecl = stack.getClosest<ClassDeclNode>();
 			auto myClassBody = myClassDecl->_body;
 			if (myClassBody == nullptr)
 				throw std::runtime_error("Critical error! Body of class" + myClassDecl->_name + " do not exist" + LINE_AND_FILE);
-
-			this->_valueNode = this->_valueNode->semanticsTransform(stack)->typecast<ExprNode>();
 
 			for (auto& stmt : myClassBody->_vec)
 			{
