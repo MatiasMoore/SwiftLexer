@@ -396,6 +396,16 @@ void FuncCallNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 
 	auto method = this->findMethodForCall(classTable, currentClass, currentMethod);
 
+	//Check for permission to call method
+	bool isMethodFromOurClass = method->getClassName() == currentClass->getClassName() 
+		|| classTable->isClassDerivedFromClass(currentClass->getClassName(), method->getClassName());
+
+	bool isMethodPublic = method->containsFlag(MethodAccessFlag::M_ACC_PUBLIC);
+
+	if (!isMethodPublic && !isMethodFromOurClass)
+		throw std::runtime_error("Method \"" + method->getMethodName() + "\" is not public and is inaccessible from this class \"" 
+			+ currentClass->getClassName() + "\"!" + LINE_AND_FILE);
+
 	if (this->_newFuncArgs != nullptr)
 		this->_newFuncArgs->fillTable(classTable, currentClass, currentMethod);
 
