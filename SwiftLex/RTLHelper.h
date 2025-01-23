@@ -26,6 +26,8 @@ public:
     // Property names
     inline static std::string _propertyCount = "count";
 
+    inline static std::string _propertyIsEmpty = "isEmpty";
+
     // Method names
     inline static std::string _sum = "sum";
     inline static std::string _sub = "sub";

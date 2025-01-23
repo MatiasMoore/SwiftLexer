@@ -445,6 +445,10 @@ SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 	if (this->_isAlreadyTransformed)
 		return this;
 
+	std::set<std::string> fieldAcessToProperty = {
+		RTLHelper::_propertyIsEmpty,
+	};
+
 	//FIXME should really be done in fillTable because we need to 
 	// check type of expr and make sure it's an array
 	if (this->_type == ExprType::FieldAccess && this->_fieldAccessFieldName == RTLHelper::_propertyCount)
@@ -454,6 +458,13 @@ SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 		auto countCall = FuncCallNode::createFuncCallNoArgs(RTLHelper::_propertyCount);
 		countCall->setAsExprAccess(ExprNode::createFuncCall(arrayConst));
 		return ExprNode::createFuncCall(countCall);
+	}
+	else if (this->_type == ExprType::FieldAccess && fieldAcessToProperty.count(this->_fieldAccessFieldName) != 0)
+	{
+		//a.property -> a.property()
+		auto propertyCall = FuncCallNode::createFuncCallNoArgs(this->_fieldAccessFieldName);
+		propertyCall->setAsExprAccess(this->_fieldAccessExpr);
+		return ExprNode::createFuncCall(propertyCall);
 	}
 
 	std::set<ExprType> typesWithLeftRightOperands = { 
