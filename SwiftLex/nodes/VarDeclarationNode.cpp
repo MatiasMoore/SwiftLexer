@@ -5,6 +5,9 @@
 #include "StmtNode.h"
 #include "../generation/generationHelpers.h"
 #include "../ExceptionHelper.h"
+#include "ClassDeclNode.h"
+#include "ConstructorDeclNode.h"
+#include "AccessModifierNode.h"
 
 VarDeclarationNode* VarDeclarationNode::createFromValue(std::string varName, ExprNode* value)
 {
@@ -73,7 +76,7 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, InternalClass* curren
 	{
 		// Class Field
 		int constantValueIndex;
-		if (currentMethod == nullptr)
+		if (this->_isFieldDecl)
 		{
 			if (_modifiers == nullptr)
 			{
@@ -82,8 +85,6 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, InternalClass* curren
 
 			if (this->_type == ValueAndTypeKnown)
 			{
-				throw std::runtime_error("Field with initialization does not support for field \"" + this->_varName + "\" in class \"" + currentClass->getClassName() + "\" REQUIRED TO ADD <init> OR <clinit>" + LINE_AND_FILE);
-
 				// All done, required to add assign to <clinit> (if static) or <init> (if not static)
 				this->_valueNode->fillTable(classTable, currentClass, currentMethod);
 
@@ -125,21 +126,19 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, InternalClass* curren
 			}
 			else if (this->_type == ValueKnown)
 			{
-				throw std::runtime_error("Field with initialization does not support for field \"" + this->_varName + "\" in class \"" + currentClass->getClassName() + "\" REQUIRED TO ADD <init> OR <clinit>" + LINE_AND_FILE);
-
-				// All done, required to add assign to <clinit> (if static) or <init> (if not static)
-				this->_valueNode->fillTable(classTable, currentClass, currentMethod);
 
 				// Get type from assignable value
 				this->_typeNode = this->_valueNode->evaluateType(classTable, currentClass, currentMethod);
-				auto varTypeDescriptor = this->_typeNode->toDescriptor();
+					auto varTypeDescriptor = this->_typeNode->toDescriptor();
 
-				// Create field
+					// Create field
 				currentClass->addInternalFieldToConstantTable(
-					this->_varName,
-					this->_typeNode->toDescriptor(),
+						this->_varName,
+						this->_typeNode->toDescriptor(),
 					this->_modifiers->getFieldAccessFlags()
 				);
+
+				this->_type = TypeKnown;
 			}
 			else
 			{
@@ -258,6 +257,13 @@ SemanticsBase* VarDeclarationNode::semanticsTransform(SemanticsStack stack)
 			this->_modifiers = AccessModifierListNode::createListNode(AccessModifierNode::createModifier(Internal));
 			this->_hasModifiers = true;
 		}
+			
+		auto modiffiersList = this->_modifiers->getFieldAccessFlags();
+		bool isStatic = std::find(
+			modiffiersList.begin(),
+			modiffiersList.end(),
+			FieldAccessFlag::F_ACC_STATIC
+		) != modiffiersList.end();
 
 		if (typeKnown)
 		{
@@ -266,7 +272,42 @@ SemanticsBase* VarDeclarationNode::semanticsTransform(SemanticsStack stack)
 
 		if (valueKnown)
 		{
+			if (isStatic)
+				throw std::runtime_error("Unsupported static var declaration for var" + _varName + LINE_AND_FILE);
+
+			auto myClassDecl = stack.getClosest<ClassDeclNode>();
+			auto myClassBody = myClassDecl->_body;
+			if (myClassBody == nullptr)
+				throw std::runtime_error("Critical error! Body of class" + myClassDecl->_name + " do not exist" + LINE_AND_FILE);
+
 			this->_valueNode = this->_valueNode->semanticsTransform(stack)->typecast<ExprNode>();
+
+			for (auto& stmt : myClassBody->_vec)
+			{
+				if (stmt->_type != StmtType::ConstructorDecl)
+					continue;
+
+				auto constructorDecl = stmt->_constructorDecl;
+
+				auto assignStmt = StmtNode::createStmtAssignment(
+					ExprNode::createFieldAccessExpr(
+						ExprNode::createId("self"),
+						this->_varName
+					),
+					_valueNode
+				);
+
+				if (constructorDecl->_hasBody)
+				{
+					constructorDecl->_body = constructorDecl->_body->appendNodeAtIndex(assignStmt, 0);
+				}
+				else
+				{
+					constructorDecl->_body = StmtListNode::createListNode(assignStmt);
+					constructorDecl->_hasBody = true;
+				}
+			}
+			
 		}
 	}
 	else

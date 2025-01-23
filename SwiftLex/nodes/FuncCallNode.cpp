@@ -26,6 +26,9 @@ ExternalMethod* FuncCallNode::findMethodForCall(ClassTable* classTable, Internal
 			return constructorMethod;
 		}
 
+		if (currentMethod == nullptr)
+			throw std::runtime_error("This function call \"" + this->_funcName + "\" can't be used in this context" + LINE_AND_FILE);
+
 		bool isCurrentMethodStatic = currentMethod->containsFlag(MethodAccessFlag::M_ACC_STATIC);
 
 		bool isCallStatic = isCurrentMethodStatic;

@@ -605,6 +605,8 @@ TypeNode* ExprNode::evaluateType(ClassTable* classTable, InternalClass* currentC
 	}
 	else if (this->_type == ExprType::Id)
 	{
+		if (currentMethod == nullptr)
+			throw std::runtime_error("This id \"" + this->_stringValue + "\" can't be used in this context!" + LINE_AND_FILE);
 		auto localVar = currentMethod->getVarTable()->findLocalVar(this->_stringValue);
 		bool isLocalVar = localVar != nullptr;
 		if (isLocalVar)
@@ -621,7 +623,7 @@ TypeNode* ExprNode::evaluateType(ClassTable* classTable, InternalClass* currentC
 		std::string classId = "";
 
 		bool isLeftSideComplex = this->_fieldAccessExpr->_type != ExprType::Id;
-		bool isLocalVar = !isLeftSideComplex && currentMethod->getVarTable()->items.count(this->_fieldAccessExpr->_stringValue);
+		bool isLocalVar = !isLeftSideComplex && currentMethod != nullptr && currentMethod->getVarTable()->items.count(this->_fieldAccessExpr->_stringValue);
 		bool isStatic = !isLeftSideComplex && !isLocalVar;
 
 		if (isLeftSideComplex)
@@ -652,6 +654,9 @@ TypeNode* ExprNode::evaluateType(ClassTable* classTable, InternalClass* currentC
 		}
 		else if (classId.empty())// Non-static field with unknown class id
 		{
+			if (currentMethod == nullptr)
+				throw std::runtime_error("Can't use field access with field \"" + this->_fieldAccessFieldName + "\" in this context" + LINE_AND_FILE);
+
 			auto localVar = currentMethod->getVarTable()->findLocalVar(this->_fieldAccessExpr->_stringValue);
 			if (localVar->_descriptor.size() == 1)
 				throw std::runtime_error("Primitive types can't be used with field access!");
