@@ -38,12 +38,6 @@ std::string AccessModifierNode::getName()
 	case (AccessModifierType::Private):
 		typeName = "Private";
 		break;
-	case (AccessModifierType::Prefix):
-		typeName = "Prefix";
-		break;
-	case (AccessModifierType::Postfix):
-		typeName = "Postfix";
-		break;
 	default:
 		throw new std::runtime_error("Unknown type!");
 		break;

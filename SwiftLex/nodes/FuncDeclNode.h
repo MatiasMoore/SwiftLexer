@@ -31,13 +31,22 @@ enum OverloadableOperatorType
     OpRSHIFT,
     OpCLOSEDRANGE,
     OpHALFOPENRANGE,
-    OpNILCOALESCE
+    OpNILCOALESCE,
+	opPrefixMinus
+};
+
+enum OverloadOperatorNotation
+{
+	Postfix,
+	Prefix,
+	Infix
 };
 
 class FuncDeclNode : public Dottable, public SemanticsBase
 {
 public:
 	bool _isOperatorOverload;
+	OverloadOperatorNotation _overloadNotation;
 
 	bool _hasModifiers;
 	bool _hasArgs;
@@ -51,17 +60,17 @@ public:
 	StmtListNode* _body;
 	TypeNode* _returnType;
 
-	OverloadableOperatorType _overloadOpearatorType;
+	OverloadableOperatorType _overloadOperatorType;
 
 	InternalMethod* _scannedMethod;
 
 	static FuncDeclNode* createRegular(std::string idName, FuncDeclArgListNode* argList, StmtListNode* body, TypeNode* returnType, bool throwsException);
 
-	static FuncDeclNode* createRegularOperator(OverloadableOperatorType overloadType, FuncDeclArgListNode* argList, StmtListNode* body, TypeNode* returnType, bool throwsException);
+	static FuncDeclNode* createRegularOperator(OverloadOperatorNotation overloadNotation, OverloadableOperatorType overloadOperatorType, FuncDeclArgListNode* argList, StmtListNode* body, TypeNode* returnType, bool throwsException);
 
 	FuncDeclNode* addModifiers(AccessModifierListNode* modifiers);
 
-	std::string getOperatorOverloadName(OverloadableOperatorType overloadType);
+	std::string getOperatorOverloadName(OverloadableOperatorType overloadOperatorType, OverloadOperatorNotation overloadOperatorNotation);
 
 	void generateDot(std::ofstream& file) override;
 

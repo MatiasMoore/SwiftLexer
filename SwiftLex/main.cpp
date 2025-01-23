@@ -9,6 +9,7 @@
 #include "RTLHelper.h"
 #include "GlobalSettings.h"
 #include "ClassfileParser.h"
+#include "NodeTreeTransform.h"
 
 std::string generatedClassFilesDirectory = "out/";
 std::string rtlSourceDirectory = "rtl/";
@@ -89,70 +90,6 @@ int main(int argc, const char* argv[])
 	}	
 
 
-	try
-	{
-		// Add main class and method for free stmts
-		// Main method
-		auto mainFuncArgType = TypeNode::createArrayType(TypeNode::createType(TypeType::StringT));
-		auto mainFuncArg = FuncDeclArgNode::createPositionalArg("args", mainFuncArgType, nullptr);
-		auto mainFuncArgs = FuncDeclArgListNode::createListNode(mainFuncArg);
-		auto mainFuncReturn = StmtNode::createStmtReturn(ReturnNode::createVoidReturn());
-		auto mainFuncBody = StmtListNode::createListNode(mainFuncReturn);
-		auto mainFuncDecl = FuncDeclNode::createRegular(RTLHelper::_defaultMainFunc, mainFuncArgs, mainFuncBody, nullptr, false);
-		auto mainFuncModifiers = AccessModifierListNode::createListNode(AccessModifierNode::createModifier(Public));
-		mainFuncModifiers->appendNode(AccessModifierNode::createModifier(Static));
-		mainFuncDecl->addModifiers(mainFuncModifiers);
-		auto mainFuncDeclStmt = StmtNode::createStmtFuncDecl(mainFuncDecl);
-
-		// Main class
-		auto mainClassBody = StmtListNode::createListNode(mainFuncDeclStmt);
-		auto mainClassDecl = ClassDeclNode::createClass(RTLHelper::_defaultMainClass, mainClassBody);
-		auto mainClassDeclStmt = StmtNode::createClassDecl(mainClassDecl);
-
-		StmtListNode* newRoot = StmtListNode::createListNode(mainClassDeclStmt);
-
-		if (_root != nullptr)
-		{
-			for (auto& stmt : _root->_vec)
-			{
-				// For classes
-				if (stmt->_type == StmtType::ClassDecl)
-				{
-					newRoot->appendNodeBeforeNode(stmt, mainClassDeclStmt);
-				}
-				// For functions
-				else if (stmt->_type == StmtType::FuncDecl)
-				{
-					// Make all free methods public and static
-					auto funcDecl = stmt->_funcDecl;
-					if (!funcDecl->_hasModifiers)
-					{
-						auto defaultModifiers = AccessModifierListNode::createListNode(AccessModifierNode::createModifier(Public));
-						defaultModifiers->appendNode(AccessModifierNode::createModifier(Static));
-						funcDecl->addModifiers(defaultModifiers);
-					}
-
-					mainClassBody->appendNodeBeforeNode(stmt, mainFuncDeclStmt);
-				}
-				else // All other stmts
-				{
-					mainFuncBody->appendNodeBeforeNode(stmt, mainFuncReturn);
-				}
-			}
-		}
-		
-		_root = newRoot;
-
-		auto newStack = SemanticsStack();
-		_root = _root->semanticsTransform(newStack)->typecast<StmtListNode>();
-	}
-	catch (std::runtime_error error)
-	{
-		std::cout << "Semantics transform error: " << error.what() << std::endl;
-		return 1;
-	}
-
-	// Attribution
 	auto classTable = ClassTable();
 
 	// Add default java object
@@ -199,6 +136,20 @@ int main(int argc, const char* argv[])
 			std::cout << "Failed to add external class from file \"" << classFilePath << "\"! " << error.what() << std::endl;
 			return 1;
 		}
+	}
+
+	try
+	{
+		// Wrap all free stmts inside main class and create internal Operators class
+		_root = NodeTreeTransform::transformTree(&classTable, _root);
+
+		auto newStack = SemanticsStack();
+		_root = _root->semanticsTransform(newStack)->typecast<StmtListNode>();
+	}
+	catch (std::runtime_error error)
+	{
+		std::cout << "Tree transform error: " << error.what() << std::endl;
+		return 1;
 	}
 
 	try

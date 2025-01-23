@@ -12,22 +12,5 @@ public class Boolean {
     {
         return _value;
     }
-
-    public Boolean logAnd(Boolean other)
-    {
-        _value = _value && other._value;
-        return this;
-    }
-
-    public Boolean logOr(Boolean other)
-    {
-        _value = _value || other._value;
-        return this;
-    }
-
-    public Boolean logNot()
-    {
-        _value = !_value;
-        return this;
-    }
+    
 }
