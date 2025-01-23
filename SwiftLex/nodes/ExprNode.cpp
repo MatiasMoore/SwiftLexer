@@ -683,6 +683,8 @@ void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 
 		bool isStatic = this->_fieldAccessExpr->_type == ExprType::Id && classTable->findClass(this->_fieldAccessExpr->_stringValue) != nullptr;
 
+		ExternalField* field;
+
 		// Static access
 		if (isStatic)
 		{
@@ -692,12 +694,9 @@ void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 			if (classElem == nullptr)
 				throw std::runtime_error("Unknown identifier \"" + className + "\"in function call!" + LINE_AND_FILE);
 
-			auto field = classElem->findField(this->_fieldAccessFieldName, true);
+			field = classElem->findField(this->_fieldAccessFieldName, true);
 			if (field == nullptr)
 				throw std::runtime_error("Static field \"" + this->_fieldAccessFieldName + "\" is not defined in class \"" + className + "\"!" + LINE_AND_FILE);
-
-			this->_staticFieldRef = currentClass->getFieldRefForExternalField(field);
-			this->_isStaticFieldAccess = true;
 		}
 		// Dynamic access
 		else
@@ -712,13 +711,23 @@ void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 			if (classElem == nullptr)
 				throw std::runtime_error("Critical error! Class \"" + className + "\" is not found!" + LINE_AND_FILE);
 
-			auto field = classElem->findField(this->_fieldAccessFieldName, false);
+			field = classElem->findField(this->_fieldAccessFieldName, false);
 			if (field == nullptr)
 				throw std::runtime_error("Dynamic field \"" + this->_fieldAccessFieldName + "\" is not defined in class \"" + className + "\"!" + LINE_AND_FILE);
-
-			this->_nonStaticFieldRef = currentClass->getFieldRefForExternalField(field);
-			this->_isStaticFieldAccess = false;
 		}
+
+		//Check for permission to access field
+		bool isFieldFromOurClass = field->getClassName() == currentClass->getClassName()
+			|| classTable->isClassDerivedFromClass(currentClass->getClassName(), field->getClassName());
+
+		bool isFieldPublic = field->containsFlag(FieldAccessFlag::F_ACC_PUBLIC);
+
+		if (!isFieldPublic && !isFieldFromOurClass)
+			throw std::runtime_error("Field \"" + field->getVarName() + "\" is not public and is inaccessible from this class \""
+				+ currentClass->getClassName() + "\"!" + LINE_AND_FILE);
+
+		_fieldRef = currentClass->getFieldRefForExternalField(field);
+		this->_isStaticFieldAccess = field->containsFlag(FieldAccessFlag::F_ACC_STATIC);
 	}
 
 		break;
@@ -879,11 +888,11 @@ std::vector<char> ExprNode::generateCode(InternalClass* currentClass, InternalMe
 		break;
 	case ExprType::FieldAccess:
 		if (this->_isStaticFieldAccess) {
-			appendVecToVec(code, jvm::getstatic(this->_staticFieldRef));
+			appendVecToVec(code, jvm::getstatic(this->_fieldRef));
 		}
 		else {
 			appendVecToVec(code, this->_fieldAccessExpr->generateCode(currentClass, currentMethod));
-			appendVecToVec(code, jvm::getfield(this->_nonStaticFieldRef));
+			appendVecToVec(code, jvm::getfield(this->_fieldRef));
 		}
 		
 		break;

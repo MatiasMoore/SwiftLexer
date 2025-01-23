@@ -104,8 +104,7 @@ public:
 	FuncCallNode* _funcCall;
 
 	bool _isStaticFieldAccess;
-	int _staticFieldRef;
-	int _nonStaticFieldRef;
+	int _fieldRef;
 
 	static ExprNode* createBool(bool value);
 

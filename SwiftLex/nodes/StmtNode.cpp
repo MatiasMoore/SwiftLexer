@@ -622,12 +622,12 @@ std::vector<char> StmtNode::generateCode(InternalClass* currentClass, InternalMe
 				{
 					appendVecToVec(code, this->_assignLeft->_fieldAccessExpr->generateCode(currentClass, currentMethod));
 					appendVecToVec(code, this->_assignRight->generateCode(currentClass, currentMethod));
-					appendVecToVec(code, jvm::putfield(this->_assignLeft->_nonStaticFieldRef));
+					appendVecToVec(code, jvm::putfield(this->_assignLeft->_fieldRef));
 
 				}
 				else {
 					appendVecToVec(code, this->_assignRight->generateCode(currentClass, currentMethod));
-					appendVecToVec(code, jvm::putStatic(this->_assignLeft->_staticFieldRef));
+					appendVecToVec(code, jvm::putStatic(this->_assignLeft->_fieldRef));
 				}
 
 
