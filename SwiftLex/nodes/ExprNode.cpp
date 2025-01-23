@@ -483,6 +483,7 @@ SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 		{ ExprType::LogAnd, RTLHelper::_logAnd},
 		{ ExprType::LogOr, RTLHelper::_logOr},
 		{ ExprType::LT, RTLHelper::_lt},
+		{ ExprType::GT, RTLHelper::_gt},
 	};
 
 	std::map <ExprType, std::string> unaryExprTypeToTransform =

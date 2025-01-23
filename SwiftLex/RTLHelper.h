@@ -45,6 +45,7 @@ public:
     inline static std::string _logNot = "logNot";
 
     inline static std::string _lt = "lt";
+    inline static std::string _gt = "gt";
 
     inline static std::string _toArray = "toArray";
 
