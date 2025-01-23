@@ -15,8 +15,28 @@ ExternalMethod* MethodContainer::overrideMethod(ExternalMethod* oldMethod, Exter
 
 ExternalMethod* MethodContainer::findMethod(std::string name, std::string argDescriptor, bool isStatic)
 {
+    //Not even gonna bother explaining this
     if (_nameArgDescIsStaticToMethod.count(name) == 0)
-        return nullptr;
+    {
+        if (isStatic)
+        {
+            name += "$";
+            if (_nameArgDescIsStaticToMethod.count(name) == 0)
+                return nullptr;
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+    else
+    {
+        if (_nameArgDescIsStaticToMethod[name].count(argDescriptor) == 0)
+            return nullptr;
+
+        if (_nameArgDescIsStaticToMethod[name][argDescriptor].count(isStatic) == 0)
+            return this->findMethod(name + "$", argDescriptor, isStatic);
+    }
 
     if (_nameArgDescIsStaticToMethod[name].count(argDescriptor) == 0)
         return nullptr;

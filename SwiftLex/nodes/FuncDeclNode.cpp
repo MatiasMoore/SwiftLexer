@@ -373,6 +373,8 @@ void FuncDeclNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 
 	if (initialScan)
 	{
+		auto accessFlags = this->_modifiers->getMethodAccessFlags();
+		bool isStatic = std::find(accessFlags.begin(), accessFlags.end(), M_ACC_STATIC) != accessFlags.end();
 		std::string funcName;
 
 		if (this->_isOperatorOverload)
@@ -396,6 +398,9 @@ void FuncDeclNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 				throw std::runtime_error("Func decl \"" + this->_idName + "\" must have access modifiers!");
 
 			funcName = this->_idName;
+
+			if (isStatic && this->_idName != RTLHelper::_defaultMainFunc)
+				funcName += "$";
 		}
 
 		std::string fullDesc = "";
@@ -417,8 +422,6 @@ void FuncDeclNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 		else
 			fullDesc += "V";
 
-		auto accessFlags = this->_modifiers->getMethodAccessFlags();
-		bool isStatic = std::find(accessFlags.begin(), accessFlags.end(), M_ACC_STATIC) != accessFlags.end();
 		bool isOverride = std::find(accessFlags.begin(), accessFlags.end(), M_ACC_CUSTOM_OVERRIDE) != accessFlags.end();
 		std::string prefix = isStatic ? "static" : "non-static";
 
