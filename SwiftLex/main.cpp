@@ -214,7 +214,7 @@ int main(int argc, const char* argv[])
 	if (GlobalSettings::_EXEC_MAINCLASS) {
 		std::cout << "//---------Program exec---------\\\\" << std::endl;
 		//TODO maybe implement proper stackmap frames
-		std::string javaExecutionCommand = "java -noverify -cp " + generatedClassFilesDirectory + " MainClass";
+		std::string javaExecutionCommand = "java -noverify -cp " + generatedClassFilesDirectory + " " + RTLHelper::_defaultMainClass;
 		system(javaExecutionCommand.c_str());
 	}
 }

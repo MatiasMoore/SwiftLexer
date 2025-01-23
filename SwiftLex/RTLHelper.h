@@ -9,7 +9,7 @@ class RTLHelper {
 public:
     // Default class and main function
     inline static std::string _defaultMainFunc = "main";
-    inline static std::string _defaultMainClass = "MainClass";
+    inline static std::string _defaultMainClass = "$MainClass";
 
     // Operators overload main class
     inline static std::string _rtlOpClassName = "rtl/Operators";
