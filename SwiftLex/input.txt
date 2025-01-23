@@ -1,12 +1,21 @@
-func getArr() -> [Int]
+func bubbleSort(_ arr: [Int])
 {
-	print("getting arr")
-	return [1, 2, 3, 4, 5]
+    let n = arr.count
+
+    for i in 0..<n {
+        for j in 0..<n-i-1 {
+            if arr[j] > arr[j+1] {
+                let temp = arr[j]
+                arr[j] = arr[j+1]
+                arr[j+1] = temp
+            }
+        }
+    }
 }
 
-
-for num in getArr()
+var arr = [5, 2, 3, 1, 4]
+bubbleSort(arr)
+for num in arr
 {
-	print("The num is")
-	print(num)
+    print(num)
 }
