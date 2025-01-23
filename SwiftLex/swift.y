@@ -123,6 +123,8 @@ TYPE_DOUBLE
 
 SUBSCRIPT_SQUARE_BRACKET FUNC_CALL_ROUND_BRACKET
 
+UNKNOWN_TOKEN
+
 %left '=' ID
 
 %right '?' ':'  
@@ -520,11 +522,28 @@ overloadableOperators: BINARY_PLUS {$$ = OverloadableOperatorType::OpPLUS;}
 
 funcOverloadOperatorIncomplete: FUNC overloadableOperators anyRoundBracket funcDeclArgListE ')' funcReturnTypeE '{' lowLevelStmtListE '}' {
     printf("P: func overload Operator Incomplete\n");
-    $$ = FuncDeclNode::createRegularOperator($2, $4, $8, $6, false);
+    $$ = FuncDeclNode::createRegularOperator(OverloadOperatorNotation::Infix, $2, $4, $8, $6, false);
 }
+    | FUNC PREFIX overloadableOperators anyRoundBracket funcDeclArgListE ')' funcReturnTypeE '{' lowLevelStmtListE '}' {
+    printf("P: func overload Operator Incomplete\n");
+    $$ = FuncDeclNode::createRegularOperator(OverloadOperatorNotation::Prefix, $3, $5, $9, $7, false);
+}
+    | FUNC POSTFIX overloadableOperators anyRoundBracket funcDeclArgListE ')' funcReturnTypeE '{' lowLevelStmtListE '}' {
+    printf("P: func overload Operator Incomplete\n");
+    $$ = FuncDeclNode::createRegularOperator(OverloadOperatorNotation::Postfix, $3, $5, $9, $7, false);
+}
+
     | FUNC overloadableOperators anyRoundBracket funcDeclArgListE ')' THROWS funcReturnTypeE '{' lowLevelStmtListE '}' {
         printf("P: func overload Operator Incomplete\n");
-        $$ = FuncDeclNode::createRegularOperator($2, $4, $9, $7, true);
+        $$ = FuncDeclNode::createRegularOperator(OverloadOperatorNotation::Infix, $2, $4, $9, $7, true);
+        }
+    | FUNC PREFIX overloadableOperators anyRoundBracket funcDeclArgListE ')' THROWS funcReturnTypeE '{' lowLevelStmtListE '}' {
+        printf("P: func overload Operator Incomplete\n");
+        $$ = FuncDeclNode::createRegularOperator(OverloadOperatorNotation::Prefix, $3, $5, $10, $8, true);
+        }
+    | FUNC POSTFIX overloadableOperators anyRoundBracket funcDeclArgListE ')' THROWS funcReturnTypeE '{' lowLevelStmtListE '}' {
+        printf("P: func overload Operator Incomplete\n");
+        $$ = FuncDeclNode::createRegularOperator(OverloadOperatorNotation::Postfix, $3, $5, $10, $8, true);
         }
 	;
 
@@ -546,8 +565,6 @@ modifiersWords: STATIC { $$ = AccessModifierNode::createModifier(AccessModifierT
     | INTERNAL { $$ = AccessModifierNode::createModifier(AccessModifierType::Internal);}
     | FILEPRIVATE { $$ = AccessModifierNode::createModifier(AccessModifierType::Fileprivate);}
     | PRIVATE { $$ = AccessModifierNode::createModifier(AccessModifierType::Private);}
-    | PREFIX { $$ = AccessModifierNode::createModifier(AccessModifierType::Prefix);}
-	| POSTFIX { $$ = AccessModifierNode::createModifier(AccessModifierType::Postfix);}
 	;
 
 modifiersWordsList: modifiersWords {printf("P: modifiersWordsList\n"); $$ = AccessModifierListNode::createListNode($1);}

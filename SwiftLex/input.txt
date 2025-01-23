@@ -1,12 +1,35 @@
-func getArr() -> [Int]
-{
-	print("getting arr")
-	return [1, 2, 3, 4, 5]
+class A {
+    public static func + (a: A, b: B) {
+        print("aaaa")
+    }
 }
 
+class B {
+    public static func + (a: A, b: B) {
+        print("aaaa")
+    }
+}
+/*
 
-for num in getArr()
+
+var a = 5 + 5.0
+print(a)
+var b = 5.0 + 1
+print(b)
+*/
+
+
+for elem in arr
 {
-	print("The num is")
-	print(num)
+    ...
+}
+
+var <1> = arr
+var <2> = 0
+var <3> = arrayCopy.count()
+while (arrayIndex < arrayCount)
+{
+   var elem = arrayCopy[arrayIndex]
+   ...
+   arrayIndex += 1
 }

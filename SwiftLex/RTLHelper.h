@@ -11,6 +11,10 @@ public:
     inline static std::string _defaultMainFunc = "main";
     inline static std::string _defaultMainClass = "MainClass";
 
+    // Operators overload main class
+    inline static std::string _rtlOpClassName = "rtl/Operators";
+    inline static std::string _internalOpClassName = "$Operators";
+
     // Class names
     inline static std::string _baseC = "java/lang/Object";
 
@@ -42,6 +46,11 @@ public:
     inline static std::string _logNot = "logNot";
 
     inline static std::string _lt = "lt";
+    inline static std::string _lte = "lte";
+    inline static std::string _gt = "gt";
+    inline static std::string _gte = "gte";
+    inline static std::string _eq = "eq";
+    inline static std::string _neq = "neq";
 
     // Generate a unique id for internally created variables (e.g. during tree transform)
     static std::string getUniqueInternalVarName();

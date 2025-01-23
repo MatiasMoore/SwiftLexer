@@ -8,10 +8,4 @@ public class String {
         _value = value;
     }
 
-    public String sum(String other)
-    {
-        _value += other._value;
-        return this;
-    }
-
 }

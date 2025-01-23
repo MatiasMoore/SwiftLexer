@@ -50,11 +50,12 @@ FuncDeclNode* FuncDeclNode::createRegular(std::string idName, FuncDeclArgListNod
 	return node;
 }
 
-FuncDeclNode* FuncDeclNode::createRegularOperator(OverloadableOperatorType overloadType, FuncDeclArgListNode* argList, StmtListNode* body, TypeNode* returnType, bool throwsException)
+FuncDeclNode* FuncDeclNode::createRegularOperator(OverloadOperatorNotation overloadNotation, OverloadableOperatorType overloadOperatorType, FuncDeclArgListNode* argList, StmtListNode* body, TypeNode* returnType, bool throwsException)
 {
 	auto node = new FuncDeclNode();
 	node->_isOperatorOverload = true;
-	node->_overloadOpearatorType = overloadType;
+	node->_overloadOperatorType = overloadOperatorType;
+	node->_overloadNotation = overloadNotation;
 	node->_hasModifiers = false;
 
 	if (argList == nullptr)
@@ -99,72 +100,218 @@ FuncDeclNode* FuncDeclNode::addModifiers(AccessModifierListNode* modifiers)
 	return this;
 }
 
-std::string FuncDeclNode::getOperatorOverloadName(OverloadableOperatorType overloadType)
+#define getOperatorOverloadNameError "Unsupported OverloadOperatorNotation with enum value " + std::to_string(overloadOperatorNotation) + " for OverloadableOperatorType with enum value " + std::to_string(overloadOperatorType) + LINE_AND_FILE
+
+std::string FuncDeclNode::getOperatorOverloadName(OverloadableOperatorType overloadOperatorType, OverloadOperatorNotation overloadOperatorNotation)
 {
-	switch (this->_overloadOpearatorType)
+	switch (this->_overloadOperatorType)
 	{
 		case (OverloadableOperatorType::OpPLUS):
-			return "OpPLUS";
+			switch (overloadOperatorNotation)
+			{
+			case Infix:
+				return RTLHelper::_sum;
+				break;
+			default:
+				throw std::runtime_error(getOperatorOverloadNameError);
+				break;
+			}
 				break;
 		case (OverloadableOperatorType::OpMINUS):
-			return "OpMINUS";
+			switch (overloadOperatorNotation)
+			{
+			case Infix:
+				return RTLHelper::_sub;
 				break;
+			default:
+				throw std::runtime_error(getOperatorOverloadNameError);
+				break;
+			}
+			break;
 		case (OverloadableOperatorType::OpMUL):
-			return "OpMUL";
+			switch (overloadOperatorNotation)
+			{
+			case Infix:
+				return RTLHelper::_mul;
 				break;
+			default:
+				throw std::runtime_error(getOperatorOverloadNameError);
+				break;
+			}
+			break;
 		case (OverloadableOperatorType::OpDIV):
-			return "OpDIV";
+			switch (overloadOperatorNotation)
+			{
+			case Infix:
+				return RTLHelper::_div;
 				break;
+			default:
+				throw std::runtime_error(getOperatorOverloadNameError);
+				break;
+			}
+			break;
 		case (OverloadableOperatorType::OpMOD):
-			return "OpMOD";
+			switch (overloadOperatorNotation)
+			{
+			default:
+				throw std::runtime_error(getOperatorOverloadNameError);
 				break;
+			}
+			break;
 		case (OverloadableOperatorType::OpLT):
-			return "OpLT";
+			switch (overloadOperatorNotation)
+			{
+			case Infix:
+				return RTLHelper::_lt;
 				break;
+			default:
+				throw std::runtime_error(getOperatorOverloadNameError);
+				break;
+			}
+			break;
 		case (OverloadableOperatorType::OpGT):
-			return "OpGT";
+			switch (overloadOperatorNotation)
+			{
+			case Infix:
+				return RTLHelper::_gt;
 				break;
+			default:
+				throw std::runtime_error(getOperatorOverloadNameError);
+				break;
+			}
+			break;
 		case (OverloadableOperatorType::OpGTE):
-			return "OpGTE";
+			switch (overloadOperatorNotation)
+			{
+			case Infix:
+				return RTLHelper::_gte;
 				break;
+			default:
+				throw std::runtime_error(getOperatorOverloadNameError);
+				break;
+			}
+			break;
 		case (OverloadableOperatorType::OpLTE):
-			return "OpLTE";
+			switch (overloadOperatorNotation)
+			{
+			case Infix:
+				return RTLHelper::_lte;
 				break;
+			default:
+				throw std::runtime_error(getOperatorOverloadNameError);
+				break;
+			}
+			break;
 		case (OverloadableOperatorType::OpEQ):
-			return "OpEQ";
+			switch (overloadOperatorNotation)
+			{
+			case Infix:
+				return RTLHelper::_eq;
 				break;
+			default:
+				throw std::runtime_error(getOperatorOverloadNameError);
+				break;
+			}
+			break;
 		case (OverloadableOperatorType::OpNEQ):
-			return "OpNEQ";
+			switch (overloadOperatorNotation)
+			{
+			case Infix:
+				return RTLHelper::_neq;
 				break;
+			default:
+				throw std::runtime_error(getOperatorOverloadNameError);
+				break;
+			}
+			break;
 		case (OverloadableOperatorType::OpBitAND):
-			return "OpBitAND";
+			switch (overloadOperatorNotation)
+			{
+			default:
+				throw std::runtime_error(getOperatorOverloadNameError);
 				break;
+			}
+			break;
 		case (OverloadableOperatorType::OpBitOR):
-			return "OpBitOR";
+			switch (overloadOperatorNotation)
+			{
+			default:
+				throw std::runtime_error(getOperatorOverloadNameError);
 				break;
+			}
+			break;
 		case (OverloadableOperatorType::OpBitXOR):
-			return "OpBitXOR";
+			switch (overloadOperatorNotation)
+			{
+			default:
+				throw std::runtime_error(getOperatorOverloadNameError);
 				break;
+			}
+			break;
 		case (OverloadableOperatorType::OpLogAND):
-			return "OpLogAND";
+			switch (overloadOperatorNotation)
+			{
+			case Infix:
+				return RTLHelper::_logAnd;
 				break;
+			default:
+				throw std::runtime_error(getOperatorOverloadNameError);
+				break;
+			}
+			break;
 		case (OverloadableOperatorType::OpLogOR):
-			return "OpLogOR";
+			switch (overloadOperatorNotation)
+			{
+			case Infix:
+				return RTLHelper::_logOr;
 				break;
+			default:
+				throw std::runtime_error(getOperatorOverloadNameError);
+				break;
+			}
+			break;
 		case (OverloadableOperatorType::OpLSHIFT):
-			return "OpLSHIFT";
+			switch (overloadOperatorNotation)
+			{
+			default:
+				throw std::runtime_error(getOperatorOverloadNameError);
 				break;
+			}
+			break;
 		case (OverloadableOperatorType::OpRSHIFT):
-			return "OpRSHIFT";
+			switch (overloadOperatorNotation)
+			{
+			default:
+				throw std::runtime_error(getOperatorOverloadNameError);
 				break;
+			}
+			break;
 		case (OverloadableOperatorType::OpCLOSEDRANGE):
-			return "OpCLOSEDRANGE";
+			switch (overloadOperatorNotation)
+			{
+			default:
+				throw std::runtime_error(getOperatorOverloadNameError);
 				break;
+			}
+			break;
 		case (OverloadableOperatorType::OpHALFOPENRANGE):
-			return "OpHALFOPENRANGE";
+			switch (overloadOperatorNotation)
+			{
+			default:
+				throw std::runtime_error(getOperatorOverloadNameError);
 				break;
+			}
+			break;
 		case (OverloadableOperatorType::OpNILCOALESCE):
-			return "OpNILCOALESC";
+			switch (overloadOperatorNotation)
+			{
+			default:
+				throw std::runtime_error(getOperatorOverloadNameError);
+				break;
+			}
+			break;
+		default:
+			throw std::runtime_error("Unsupported OverloadableOperatorType with enum value " + std::to_string(overloadOperatorType) + LINE_AND_FILE);
 			break;
 	}
 }
@@ -189,7 +336,7 @@ void FuncDeclNode::generateDot(std::ofstream& file)
 
 	if (this->_isOperatorOverload)
 	{
-		file << dotLabel(this->_id, "OperatorOverloadDecl\noperatorName: " + this->getOperatorOverloadName(this->_overloadOpearatorType) + extraInfo);
+		file << dotLabel(this->_id, "OperatorOverloadDecl\noperatorName: " + this->getOperatorOverloadName(this->_overloadOperatorType, this->_overloadNotation) + extraInfo);
 	}
 	else
 	{
@@ -226,6 +373,31 @@ void FuncDeclNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 
 	if (initialScan)
 	{
+		std::string funcName;
+
+		if (this->_isOperatorOverload)
+		{
+			if (!this->_hasModifiers)
+				throw std::runtime_error("Operator overload \"" + this->getOperatorOverloadName(this->_overloadOperatorType, this->_overloadNotation) + "\" must have access modifiers!" + LINE_AND_FILE);
+
+			if (!this->_hasArgs)
+				throw std::runtime_error("Operator overload \"" + this->getOperatorOverloadName(this->_overloadOperatorType, this->_overloadNotation) + "\" must have arguments!" + LINE_AND_FILE);
+
+			funcName = this->getOperatorOverloadName(this->_overloadOperatorType, this->_overloadNotation);
+
+			currentClass = classTable->findInternalClass(RTLHelper::_internalOpClassName);
+
+			if (currentClass == nullptr)
+				throw std::runtime_error("Critical error! Can't find internal operators class named \"" + RTLHelper::_internalOpClassName + "\"!" + LINE_AND_FILE);
+		}
+		else
+		{
+			if (!this->_hasModifiers)
+				throw std::runtime_error("Func decl \"" + this->_idName + "\" must have access modifiers!");
+
+			funcName = this->_idName;
+		}
+
 		std::string fullDesc = "";
 		std::string argDesc = "(";
 
@@ -245,19 +417,16 @@ void FuncDeclNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 		else
 			fullDesc += "V";
 
-		if (!this->_hasModifiers)
-			throw std::runtime_error("Func decl \"" + this->_idName + "\" must have access modifiers!");
-
 		auto accessFlags = this->_modifiers->getMethodAccessFlags();
 		bool isStatic = std::find(accessFlags.begin(), accessFlags.end(), M_ACC_STATIC) != accessFlags.end();
 		bool isOverride = std::find(accessFlags.begin(), accessFlags.end(), M_ACC_CUSTOM_OVERRIDE) != accessFlags.end();
 		std::string prefix = isStatic ? "static" : "non-static";
 
-		auto existingMethod = currentClass->findMethod(this->_idName, argDesc, isStatic);
+		auto existingMethod = currentClass->findMethod(funcName, argDesc, isStatic);
 
 		if (existingMethod == nullptr && isOverride)
 			throw std::runtime_error("Class \"" + currentClass->getClassName() + "\" can't override a " + prefix + " method with name \"" +
-				this->_idName + "\" and arg descriptor \"" + argDesc + "\" as it's baseclass doesn't have it!" + LINE_AND_FILE);
+				funcName + "\" and arg descriptor \"" + argDesc + "\" as it's baseclass doesn't have it!" + LINE_AND_FILE);
 
 		// This method already exist in this class
 		if (existingMethod != nullptr)
@@ -267,23 +436,21 @@ void FuncDeclNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 			if (asInternalMethod != nullptr)
 			{
 				throw std::runtime_error("Class \"" + currentClass->getClassName() + "\" already has a " + prefix + " method with name \"" +
-					this->_idName + "\" and arg descriptor \"" + argDesc + "\" defined!" + LINE_AND_FILE);
+					funcName + "\" and arg descriptor \"" + argDesc + "\" defined!" + LINE_AND_FILE);
 			}
 
 			if (!isOverride)
 				throw std::runtime_error("Class \"" + currentClass->getClassName() + "\" already has a " + prefix + " method with name \"" +
-					this->_idName + "\" and arg descriptor \"" + argDesc + 
+					funcName + "\" and arg descriptor \"" + argDesc +
 					"\" defined in it's base class! If you want to override it, use the keyword override!" + LINE_AND_FILE);
-			
-			currentMethod = currentClass->addInternalMethodAsOverrideToConstantTable(existingMethod, this->_idName, fullDesc, accessFlags, this->_body);
+
+			currentMethod = currentClass->addInternalMethodAsOverrideToConstantTable(existingMethod, funcName, fullDesc, accessFlags, this->_body);
 		}
 		// This method is new for this class
 		else
 		{
-			currentMethod = currentClass->addInternalMethodToConstantTable(this->_idName, fullDesc, accessFlags, this->_body);
+			currentMethod = currentClass->addInternalMethodToConstantTable(funcName, fullDesc, accessFlags, this->_body);
 		}
-
-
 
 		if (!isStatic)
 		{
@@ -302,13 +469,28 @@ void FuncDeclNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 	}
 	else
 	{
-		if (!this->_hasBody)
-			throw std::runtime_error("Func decl \"" + this->_idName + "\" must have a body!");
+		if (this->_isOperatorOverload)
+		{
+			if (!this->_hasBody)
+				throw std::runtime_error("Operator overload \"" + this->getOperatorOverloadName(this->_overloadOperatorType, this->_overloadNotation) + "\" must have a body!");
 
+			if (this->_scannedMethod == nullptr)
+				throw std::runtime_error("Critical error! Initial scan failed for operator overload \"" + this->getOperatorOverloadName(this->_overloadOperatorType, this->_overloadNotation) + "\" of class \"" + currentClass->getClassName() + "\"!" + LINE_AND_FILE);
 		
-		if (this->_scannedMethod == nullptr)
-			throw std::runtime_error("Critical error! Initial scan failed for method \"" + this->_idName + "\" of class \"" + currentClass->getClassName() + "\"!" + LINE_AND_FILE);
+			currentClass = classTable->findInternalClass(RTLHelper::_internalOpClassName);
 
+			if (currentClass == nullptr)
+				throw std::runtime_error("Critical error! Can't find internal operators class named \"" + RTLHelper::_internalOpClassName + "\"!" + LINE_AND_FILE);
+		}
+		else
+		{
+			if (!this->_hasBody)
+				throw std::runtime_error("Func decl \"" + this->_idName + "\" must have a body!");
+
+			if (this->_scannedMethod == nullptr)
+				throw std::runtime_error("Critical error! Initial scan failed for method \"" + this->_idName + "\" of class \"" + currentClass->getClassName() + "\"!" + LINE_AND_FILE);
+		}
+		
 		currentMethod = this->_scannedMethod;
 
 		this->_body->fillTable(classTable, currentClass, currentMethod, initialScan);
@@ -321,26 +503,76 @@ SemanticsBase* FuncDeclNode::semanticsTransform(SemanticsStack stack)
 	if (this->_isAlreadyTransformed)
 		return this;
 
-	//Add default modifiers
-	if (!this->_hasModifiers)
+	if (this->_isOperatorOverload)
 	{
-		this->_modifiers = AccessModifierListNode::createListNode(AccessModifierNode::createModifier(AccessModifierType::Internal));
-		this->_hasModifiers = true;
-	}
+		if (this->_overloadNotation == OverloadOperatorNotation::Postfix)
+			throw std::runtime_error("Postfix notation is not supported for operator overload!" + LINE_AND_FILE);
+		 
+		//Must have a static modifier
+		if (!this->_hasModifiers)
+			throw std::runtime_error("Operator overloads must have static and public modifiers! All other modifiers are not supported! Mutating operators like \"+=\" are not supported!" + LINE_AND_FILE);
 
-	//Check modifiers
-	this->_modifiers = this->_modifiers->semanticsTransform(stack)->typecast<AccessModifierListNode>();
+		//Check modifiers
+		this->_modifiers = this->_modifiers->semanticsTransform(stack)->typecast<AccessModifierListNode>();
 
-	//Don't transform args of default main function
-	if (this->_idName != RTLHelper::_defaultMainFunc)
-	{
+		bool hasStatic = false;
+		bool hasPublic = false;
+		bool hasAnythingOtherThanPublicOrStatic = false;
+		for (auto& modifier : this->_modifiers->_vec)
+		{
+			if (modifier->_type == AccessModifierType::Static)
+				hasStatic = true;
+			else if (modifier->_type == AccessModifierType::Public)
+				hasPublic = true;
+			else
+				hasAnythingOtherThanPublicOrStatic = true;
+		}
+
+		if (!hasStatic || !hasPublic || hasAnythingOtherThanPublicOrStatic)
+			throw std::runtime_error("Operator overloads must have static and public modifiers! All other modifiers are not supported! Mutating operators like \"+=\" are not supported!" + LINE_AND_FILE);
+
+		if (!this->_hasArgs)
+			throw std::runtime_error("Operator overloads must have at least 1 argument!" + LINE_AND_FILE);
+
+		//Check and enforce the correct operator count
+		int argCount = this->_argList->_vec.size();
+
+		bool isPrefixPostfix = this->_overloadNotation == OverloadOperatorNotation::Postfix || this->_overloadNotation == OverloadOperatorNotation::Prefix;
+		if (isPrefixPostfix && argCount != 1)
+			throw std::runtime_error("Operator overloads must have exactly 1 argument for prefix and postfix operators!" + LINE_AND_FILE);
+
+		bool isInfix = this->_overloadNotation == OverloadOperatorNotation::Infix;
+		if (isInfix && argCount != 2)
+			throw std::runtime_error("Operator overloads must have exactly 2 arguments for infix operators!" + LINE_AND_FILE);
+
 		if (this->_hasArgs)
 		{
 			this->_argList = this->_argList->semanticsTransform(stack)->typecast<FuncDeclArgListNode>();
 		}
 	}
+	else
+	{
+		//Add default modifiers
+		if (!this->_hasModifiers)
+		{
+			this->_modifiers = AccessModifierListNode::createListNode(AccessModifierNode::createModifier(AccessModifierType::Internal));
+			this->_hasModifiers = true;
+		}
 
-	//Transform type
+		//Check modifiers
+		this->_modifiers = this->_modifiers->semanticsTransform(stack)->typecast<AccessModifierListNode>();
+
+		//Don't transform args of default main function
+		if (this->_idName != RTLHelper::_defaultMainFunc)
+		{
+			if (this->_hasArgs)
+			{
+				this->_argList = this->_argList->semanticsTransform(stack)->typecast<FuncDeclArgListNode>();
+			}
+		}
+	}
+
+	//Transform return type
 	if (this->_hasNonVoidReturn)
 		this->_returnType = this->_returnType->semanticsTransform(stack)->typecast<TypeNode>();
 

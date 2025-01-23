@@ -62,6 +62,9 @@ TypeNode* TypeNode::createFromDescriptor(std::string descriptor)
 		node = TypeNode::createArrayType(arrayType);
 		break;
 	}
+	case 'V':
+		throw std::runtime_error("Void can't be an assignable type!" + LINE_AND_FILE);
+		break;
 	default:
 		throw std::runtime_error("Unsupported descriptor: " + descriptor);
 	}

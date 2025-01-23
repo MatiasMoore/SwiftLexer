@@ -14,8 +14,6 @@ enum AccessModifierType
 	Internal,
 	Fileprivate,
 	Private,
-	Prefix,
-	Postfix
 };
 
 class AccessModifierNode : public Dottable, public SemanticsBase

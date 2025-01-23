@@ -512,10 +512,14 @@ SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 		this->_left = _left->semanticsTransform(stack)->typecast<ExprNode>();
 		this->_right = _right->semanticsTransform(stack)->typecast<ExprNode>();
 
-		auto args = FuncCallArgListNode::createListNode(FuncCallArgNode::createFromExpr(this->_right));
+		auto args = FuncCallArgListNode::createListNode(FuncCallArgNode::createFromExpr(this->_left))->appendNode(FuncCallArgNode::createFromExpr(this->_right));
 
 		auto newFunc = FuncCallNode::createFuncCall(binaryExprTypeToTransform[this->_type], args);
-		newFunc->setAsExprAccess(this->_left);
+		newFunc->setAsExprAccess(ExprNode::createId(RTLHelper::_internalOpClassName));
+
+		// objA + objB -> Operators.sum(objA, objB)
+		// A.sum(objA, objB)
+		// Integer.sum(intA, intB)
 
 		return ExprNode::createFuncCall(newFunc);
 	}
@@ -523,8 +527,10 @@ SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 	{
 		this->_unary = this->_unary->semanticsTransform(stack)->typecast<ExprNode>();
 
-		auto newFunc = FuncCallNode::createFuncCallNoArgs(unaryExprTypeToTransform[this->_type]);
-		newFunc->setAsExprAccess(this->_unary);
+		auto args = FuncCallArgListNode::createListNode(FuncCallArgNode::createFromExpr(this->_unary));
+
+		auto newFunc = FuncCallNode::createFuncCall(unaryExprTypeToTransform[this->_type], args);
+		newFunc->setAsExprAccess(ExprNode::createId(RTLHelper::_internalOpClassName));
 
 		return ExprNode::createFuncCall(newFunc);
 	}

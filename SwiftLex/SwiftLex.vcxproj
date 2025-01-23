@@ -24,6 +24,7 @@
   <ItemGroup>
     <ClCompile Include="ClassfileParser.cpp" />
     <ClCompile Include="GlobalSettings.cpp" />
+    <ClCompile Include="NodeTreeTransform.cpp" />
     <ClCompile Include="RTLHelper.cpp" />
     <ClCompile Include="tables\FieldContainer.cpp" />
     <ClCompile Include="tables\MethodAccessFlag.cpp" />
@@ -80,6 +81,7 @@
   <ItemGroup>
     <ClInclude Include="ClassfileParser.h" />
     <ClInclude Include="GlobalSettings.h" />
+    <ClInclude Include="NodeTreeTransform.h" />
     <ClInclude Include="RTLHelper.h" />
     <ClInclude Include="tables\FieldContainer.h" />
     <ClInclude Include="tables\MethodContainer.h" />

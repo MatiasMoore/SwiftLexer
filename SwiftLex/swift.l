@@ -537,8 +537,11 @@ _ { cout << "Underscore" << endl; return '_';}
 	return getBinaryOperatorFromString(str);
 }
 
-	/* TODO: DELETE THIS WHEN EVERYTHING IS DONE*/
-.|[^.] {}
+	/* IGNORE WHITESPACE */
+[ \n\t\r] {}
+
+	/* Catch unknown symbols */
+.|[^.] { std::cout << "Unknown symbol " << yytext << std::endl; return UNKNOWN_TOKEN;}
 %%
 
 
