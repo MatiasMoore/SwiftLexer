@@ -5,6 +5,7 @@
 #include "../ExceptionHelper.h"
 #include "TypeNode.h"
 #include "../GlobalSettings.h"
+#include "../RTLHelper.h"
 
 ExternalMethod* FuncCallNode::findMethodForCall(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
 {
@@ -137,10 +138,6 @@ ExternalMethod* FuncCallNode::findMethodWithTypeCasting(ExternalClass* classWith
 	if (perfectMatch != nullptr)
 		return perfectMatch;
 
-	// If this is not enabled, stop here
-	if (!GlobalSettings::_IMPLICIT_CONSTRUCTORS)
-		return nullptr;
-
 	int argCount = 0;
 	if (this->_hasArgs)
 		argCount = this->_funcArgs->_vec.size();
@@ -206,6 +203,24 @@ ExternalMethod* FuncCallNode::findMethodWithTypeCasting(ExternalClass* classWith
 					allGood = true;
 					continue;
 				}
+			}
+			
+			// If this is not enabled, stop here
+			const std::set<std::string> alwaysCastTheseClasses = {
+				RTLHelper::_arrayC, RTLHelper::_baseC, RTLHelper::_floatC, RTLHelper::_boolC, 
+				RTLHelper::_intC, RTLHelper::_IOC, RTLHelper::_rangeC, RTLHelper::_strC
+			};
+			bool shouldAlwaysCastTheseClasses = 
+				isRequiredClass
+				&& isOurArgClass
+				&& alwaysCastTheseClasses.count(classnameFromDescriptor(requiredDesc)) != 0
+				&& alwaysCastTheseClasses.count(classnameFromDescriptor(ourArgDesc)) != 0
+				;
+
+			if (!GlobalSettings::_IMPLICIT_CONSTRUCTORS && !shouldAlwaysCastTheseClasses)
+			{
+				allGood = false;
+				break;
 			}
 
 			// Required arg must be a class since we'll be looking for a constructor
