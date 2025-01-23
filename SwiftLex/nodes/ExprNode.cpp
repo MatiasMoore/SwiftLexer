@@ -552,6 +552,18 @@ SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 		this->_left = this->_left->semanticsTransform(stack)->typecast<ExprNode>();
 		this->_right = this->_right->semanticsTransform(stack)->typecast<ExprNode>();
 	}
+	else if (this->_type == ExprType::ClosedRange || this->_type == ExprType::HalfOpenRange)
+	{
+		//a...b -> Range(a, b, isHalfOpen).toArray()
+		auto rangeConstArgs = FuncCallArgListNode::createListNode(
+			FuncCallArgNode::createFromExpr(this->_left))
+			->appendNode(FuncCallArgNode::createFromExpr(this->_right))
+			->appendNode(FuncCallArgNode::createFromExpr(ExprNode::createBool(this->_type == ExprType::HalfOpenRange)));
+		auto rangeConst = FuncCallNode::createFuncCall(RTLHelper::_rangeC, rangeConstArgs);
+		auto toArrayCall = FuncCallNode::createFuncCallNoArgs(RTLHelper::_toArray);
+		toArrayCall->setAsExprAccess(ExprNode::createFuncCall(rangeConst));
+		return ExprNode::createFuncCall(toArrayCall);
+	}
 	else if (doNothingTypes.count(this->_type) != 0)
 	{
 		//Do nothing

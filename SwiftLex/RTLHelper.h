@@ -22,6 +22,7 @@ public:
     inline static std::string _strC = "rtl/String";
 
     inline static std::string _arrayC = "rtl/Array";
+    inline static std::string _rangeC = "rtl/Range";
 
     // Property names
     inline static std::string _propertyCount = "count";
@@ -44,6 +45,8 @@ public:
     inline static std::string _logNot = "logNot";
 
     inline static std::string _lt = "lt";
+
+    inline static std::string _toArray = "toArray";
 
     // Generate a unique id for internally created variables (e.g. during tree transform)
     static std::string getUniqueInternalVarName();
