@@ -44,6 +44,12 @@ public class Operators {
         return new Boolean(a._value < b._value);
     }
 
+    public static Boolean gt(Integer a, Integer b)
+    {
+        return new Boolean(a._value > b._value);
+    }
+
+
     // Float
     public static Float sum(Float a, Float b)
     {
