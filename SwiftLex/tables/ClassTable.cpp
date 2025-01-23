@@ -50,17 +50,18 @@ InternalClass* ClassTable::addInternalClass(std::string name, std::string baseNa
 		throw std::runtime_error("Class " + name + " already exists!" + LINE_AND_FILE);
 
 	auto newClass = new InternalClass(name, baseName);
-	// Add all methods and field from base class
-	//TODO fields
 	auto baseClass = this->findClass(baseName);
 	if (baseClass == nullptr)
 		std::runtime_error("Error adding class \"" + name + "\"! It's base class \"" + baseName + "\" doesn't exist!");
 
-	//TODO don't inherit private methods and fields
 	for (auto& baseClassMethod : baseClass->getMethods())
 	{
-		//Skip constructors for now
+		//FIXME Skip constructors for now
 		if (baseClassMethod->getMethodName() == "<init>")
+			continue;
+
+		//Don't inherit private methods
+		if (baseClassMethod->containsFlag(MethodAccessFlag::M_ACC_PRIVATE))
 			continue;
 
 		newClass->addMethod(baseClassMethod->getMethodName(), baseClassMethod->getDescriptor(), baseClassMethod->getFlags());
@@ -68,6 +69,10 @@ InternalClass* ClassTable::addInternalClass(std::string name, std::string baseNa
 
 	for (auto& baseClassField : baseClass->getFields())
 	{
+		//Don't inherit private fields
+		if (baseClassField->containsFlag(FieldAccessFlag::F_ACC_PRIVATE))
+			continue;
+
 		newClass->addField(baseClassField->getVarName(), baseClassField->getDescriptor(), baseClassField->getFlags());
 	}
 

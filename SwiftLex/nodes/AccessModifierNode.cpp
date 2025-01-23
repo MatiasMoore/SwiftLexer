@@ -69,8 +69,10 @@ std::vector<enum MethodAccessFlag> AccessModifierNode::getMethodAccessFlags()
 	case (AccessModifierType::Public):
 		return { M_ACC_PUBLIC };
 		break;
-	case (AccessModifierType::Private):
 	case (AccessModifierType::Internal):
+		return { M_ACC_PROTECTED };
+		break;
+	case (AccessModifierType::Private):
 		return { M_ACC_PRIVATE };
 		break;
 	case (AccessModifierType::Override):
@@ -98,6 +100,9 @@ std::vector<enum FieldAccessFlag> AccessModifierNode::getFieldAccessFlags()
 		break;
 	case (AccessModifierType::Private):
 		return { F_ACC_PRIVATE };
+		break;
+	case (AccessModifierType::Internal):
+		return { F_ACC_PROTECTED };
 		break;
 	default:
 		throw std::runtime_error("Field access flag node with type " + std::to_string(this->_type) + " can't convert to jvm access flag!");
