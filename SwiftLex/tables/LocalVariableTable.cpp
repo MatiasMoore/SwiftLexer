@@ -1,13 +1,13 @@
 #include "LocalVariableTable.h"
 #include <stdexcept>
 
-LocalVariableElement* LocalVariableTable::addLocalVar(std::string name, std::string descriptor)
+LocalVariableElement* LocalVariableTable::addLocalVar(std::string name, std::string descriptor, bool isConst)
 {
     if (items.find(name) != items.cend())
         throw std::runtime_error("Local variable with name " + name + " already exists!");
 
     int newLocalId = this->items.size();
-    this->items[name] = new LocalVariableElement(newLocalId, name, descriptor);
+    this->items[name] = new LocalVariableElement(newLocalId, name, descriptor, isConst);
     return this->items[name];
 }
 
@@ -19,12 +19,13 @@ LocalVariableElement* LocalVariableTable::findLocalVar(std::string name)
     return this->items[name];
 }
 
-LocalVariableElement::LocalVariableElement(int localId, std::string name, std::string descriptor)
+LocalVariableElement::LocalVariableElement(int localId, std::string name, std::string descriptor, bool isConst)
 {
     this->name = name;
     this->_descriptor = descriptor;
     this->localId = localId;
     this->nameIndex = -1;
     this->descriptorIndex = -1;
+    this->isConst = isConst;
 }
 

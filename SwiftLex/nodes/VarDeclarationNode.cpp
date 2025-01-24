@@ -50,6 +50,12 @@ VarDeclarationNode* VarDeclarationNode::setAsFieldDecl(bool flag)
 	return this;
 }
 
+VarDeclarationNode* VarDeclarationNode::setAsConst(bool flag)
+{
+	this->_isConst = flag;
+	return this;
+}
+
 void VarDeclarationNode::generateDot(std::ofstream& file)
 {
 	file << dotLabel(this->_id, "VarDecl: " + _varName);
@@ -102,6 +108,7 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, InternalClass* curren
 						fieldAccessExpr,
 						this->_valueNode
 					);
+					assign->setSkipConstCheck(true);
 					currentClass->addStmtToStaticConstructor(assign);
 				}
 			}
@@ -153,6 +160,7 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, InternalClass* curren
 						fieldAccessExpr,
 						this->_valueNode
 					);
+					assign->setSkipConstCheck(true);
 					currentClass->addStmtToStaticConstructor(assign);
 				}
 
@@ -174,7 +182,7 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, InternalClass* curren
 			{
 			case ValueAndTypeKnown:
 			{
-				currentMethod->getVarTable()->addLocalVar(this->_varName, this->_typeNode->toDescriptor());
+				currentMethod->getVarTable()->addLocalVar(this->_varName, this->_typeNode->toDescriptor(), this->_isConst);
 
 				//FIXME not sure if this must be called before evaluate type
 				this->_valueNode->fillTable(classTable, currentClass, currentMethod);
@@ -224,7 +232,7 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, InternalClass* curren
 			}
 				break;
 			case TypeKnown:
-				currentMethod->getVarTable()->addLocalVar(this->_varName, this->_typeNode->toDescriptor());
+				currentMethod->getVarTable()->addLocalVar(this->_varName, this->_typeNode->toDescriptor(), this->_isConst);
 				break;
 			case ValueKnown:
 			{
@@ -232,7 +240,7 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, InternalClass* curren
 				this->_valueNode->fillTable(classTable, currentClass, currentMethod);
 
 				auto evaluatedType = this->_valueNode->evaluateType(classTable, currentClass, currentMethod);
-				currentMethod->getVarTable()->addLocalVar(this->_varName, evaluatedType->toDescriptor());
+				currentMethod->getVarTable()->addLocalVar(this->_varName, evaluatedType->toDescriptor(), this->_isConst);
 				this->_typeNode = evaluatedType;
 				this->_type = VarDeclType::TypeKnown;
 			}
@@ -336,6 +344,7 @@ SemanticsBase* VarDeclarationNode::semanticsTransform(SemanticsStack stack)
 					),
 					_valueNode
 				);
+				assignStmt->setSkipConstCheck(true);
 
 				if (constructorDecl->_hasBody)
 				{
@@ -369,6 +378,7 @@ SemanticsBase* VarDeclarationNode::semanticsTransform(SemanticsStack stack)
 				throw std::runtime_error("Critical error! Unable to find stmt for var decl!");
 
 			auto assignmentNode = StmtNode::createStmtAssignment(ExprNode::createId(this->_varName), this->_valueNode);
+			assignmentNode->setSkipConstCheck(true);
 
 			thisStmtList->appendNodeAfterNode(assignmentNode, thisStmt);
 		}
@@ -414,6 +424,15 @@ bool VarDeclarationListNode::isFieldDecl()
 	}
 
 	return false;
+}
+
+VarDeclarationListNode* VarDeclarationListNode::setAsConst(bool flag)
+{
+	for (auto& elem : _vec)
+	{
+		elem->setAsConst(flag);
+	}
+	return this;
 }
 
 void VarDeclarationListNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, bool initialScan)

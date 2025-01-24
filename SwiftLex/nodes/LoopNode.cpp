@@ -149,12 +149,14 @@ SemanticsBase* LoopNode::semanticsTransform(SemanticsStack stack)
 
 		// var index = 0 FIXME should be LET
 		VarDeclarationListNode* indexVarDecl = VarDeclarationListNode::createListNode(VarDeclarationNode::createFromValue(indexVarName, ExprNode::createInt(0)));
+		indexVarDecl->setAsConst(true);
 		StmtNode* indexVarDeclStmt = StmtNode::createStmtVarDeclaration(indexVarDecl);
 		myStmtList->appendNodeBeforeNode(indexVarDeclStmt, myStmt);
 
 		// var count = arrayCopy.count FIXME should be LET
 		ExprNode* getArrCount = ExprNode::createFieldAccessExpr(ExprNode::createId(arrayCopyVarName), "count");
 		VarDeclarationListNode* countVarDecl = VarDeclarationListNode::createListNode(VarDeclarationNode::createFromValue(countVarName, getArrCount));
+		countVarDecl->setAsConst(true);
 		StmtNode* countVarDeclStmt = StmtNode::createStmtVarDeclaration(countVarDecl);
 		myStmtList->appendNodeBeforeNode(countVarDeclStmt, myStmt);
 
@@ -169,12 +171,14 @@ SemanticsBase* LoopNode::semanticsTransform(SemanticsStack stack)
 
 		// var elem = arrayCopy[index] FIXME should be LET
 		VarDeclarationListNode* forLoopVarDecl = VarDeclarationListNode::createListNode(VarDeclarationNode::createFromValue(this->_forLoopId, 
-			ExprNode::createBinaryOp(ExprType::Subscript, ExprNode::createId(arrayCopyVarName), ExprNode::createId(indexVarName))));
+			ExprNode::createBinaryOp(ExprType::Subscript, ExprNode::createId(arrayCopyVarName), ExprNode::createId(indexVarName))));	
+		forLoopVarDecl->setAsConst(true);
 		StmtNode* forLoopVarDeclStmt = StmtNode::createStmtVarDeclaration(forLoopVarDecl);
 
 		// index += 1
 		StmtNode* incrementIndexVar = StmtNode::createStmtAssignment(ExprNode::createId(indexVarName), 
 			ExprNode::createBinaryOp(ExprType::Sum, ExprNode::createId(indexVarName), ExprNode::createInt(1)));
+		incrementIndexVar->setSkipConstCheck(true);
 
 		StmtListNode* newBody;
 		if (this->_hasBody)

@@ -98,6 +98,10 @@ public:
 	int _defaultConstructorClassRef;
 	int _defaultConstructorMethodRef;
 
+	bool _assignmentSkipConstCheck = false;
+
+	void setSkipConstCheck(bool flag);
+
 	static StmtNode* createStmtExpr(ExprNode* expr);
 
 	static StmtNode* createStmtAssignment(ExprNode* left, ExprNode* right);

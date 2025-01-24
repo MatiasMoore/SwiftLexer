@@ -22,6 +22,11 @@
 #include "../RTLHelper.h"
 #include "FuncCallNode.h"
 
+void StmtNode::setSkipConstCheck(bool flag)
+{
+	this->_assignmentSkipConstCheck = flag;
+}
+
 StmtNode* StmtNode::createStmtExpr(ExprNode* expr)
 {
 	auto node = new StmtNode();
@@ -478,6 +483,19 @@ void StmtNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 				this->_assignArrayElem = true;
 
 				this->_assignArray = this->_assignLeft->_left;
+
+				if (this->_assignArray->_type == ExprType::Id)
+				{
+					auto localVar = currentMethod->getVarTable()->findLocalVar(this->_assignArray->_stringValue);
+					if (localVar == nullptr)
+						throw std::runtime_error("Can't find local var array \"" + this->_assignArray->_stringValue + "\"!" + LINE_AND_FILE);
+
+					bool canAssign = this->_assignmentSkipConstCheck || !localVar->isConst;
+
+					if (!canAssign)
+						throw std::runtime_error("Can't assign elem of local var array \"" + this->_assignArray->_stringValue + "\" as it's a const variable!" + LINE_AND_FILE);
+				}
+
 				auto assignArrayDesc = this->_assignArray->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
 				if (assignArrayDesc[0] != '[')
 					throw std::runtime_error("Can't do array assignment for type with descriptor \"" + assignArrayDesc + "\"!" + LINE_AND_FILE);
@@ -517,6 +535,30 @@ void StmtNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 
 				if (!leftIsId && !leftIsField)
 					throw std::runtime_error("Assignment can't be used with left side expr of enum type" + std::to_string(this->_assignLeft->_type) + "!" + LINE_AND_FILE);
+
+				if (leftIsField)
+				{
+					//FIXME check if field is const
+					bool canAssign = this->_assignmentSkipConstCheck || true;
+
+					if (!canAssign)
+						throw std::runtime_error("Field can't be assigned, it is a constant!" + LINE_AND_FILE);
+				}
+				else
+				{
+					if (currentMethod == nullptr)
+						throw std::runtime_error("Assignment can't be used outside of a method!" + LINE_AND_FILE);
+
+					auto leftLocalVar = currentMethod->getVarTable()->findLocalVar(this->_assignLeft->_stringValue);
+
+					if (leftLocalVar == nullptr)
+						throw std::runtime_error("Variable \"" + this->_assignLeft->_stringValue + "\" not found!" + LINE_AND_FILE);
+
+					bool canAssign = this->_assignmentSkipConstCheck || !leftLocalVar->isConst;
+
+					if (!canAssign)
+						throw std::runtime_error("Variable \"" + this->_assignLeft->_stringValue + "\" is a constant!" + LINE_AND_FILE);
+				}				
 
 				this->_assignLeft->fillTable(classTable, currentClass, currentMethod);
 				this->_assignRight->fillTable(classTable, currentClass, currentMethod);

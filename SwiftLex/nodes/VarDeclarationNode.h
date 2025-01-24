@@ -48,6 +48,8 @@ public:
 
 	bool isFieldDecl();
 
+	VarDeclarationListNode* setAsConst(bool flag);
+
 	void fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, bool initialScan = false);
 
 	std::vector<char> generateCode(InternalClass* currentClass, InternalMethod* currentMethod);
@@ -68,6 +70,8 @@ public:
 	bool _hasModifiers = false;
 	bool _isFieldDecl = false;
 
+	bool _isConst = false;
+
 	static VarDeclarationNode* createFromValue(std::string varName, ExprNode* value);
 
 	static VarDeclarationNode* createFromType(std::string varName, TypeNode* type);
@@ -77,6 +81,8 @@ public:
 	VarDeclarationNode* addModifiers(AccessModifierListNode* modifiers);
 
 	VarDeclarationNode* setAsFieldDecl(bool flag);
+
+	VarDeclarationNode* setAsConst(bool flag);
 
 	void generateDot(std::ofstream& file) override;
 

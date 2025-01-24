@@ -10,7 +10,7 @@ public:
     /// Контейнер элементов.
     std::map<std::string, class LocalVariableElement*> items = {};
 
-    LocalVariableElement* addLocalVar(std::string name, std::string descriptor);
+    LocalVariableElement* addLocalVar(std::string name, std::string descriptor, bool isConst);
 
     LocalVariableElement* findLocalVar(std::string name);
 };
@@ -26,6 +26,7 @@ public:
     int length = 9;
     int nameIndex;
     int descriptorIndex;
+    bool isConst;
 
-    LocalVariableElement(int localId, std::string name, std::string descriptor);
+    LocalVariableElement(int localId, std::string name, std::string descriptor, bool isConst);
 };

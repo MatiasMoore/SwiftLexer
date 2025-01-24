@@ -454,14 +454,14 @@ void FuncDeclNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 
 		if (!isStatic)
 		{
-			currentMethod->getVarTable()->addLocalVar("self", TypeNode::createIdType(currentClass->getClassName())->toDescriptor());
+			currentMethod->getVarTable()->addLocalVar("self", TypeNode::createIdType(currentClass->getClassName())->toDescriptor(), true);
 		}
 
 		if (this->_hasArgs)
 		{
 			for (auto& arg : this->_argList->_vec)
 			{
-				currentMethod->getVarTable()->addLocalVar(arg->_argName, arg->_argType->toDescriptor());
+				currentMethod->getVarTable()->addLocalVar(arg->_argName, arg->_argType->toDescriptor(), true);
 			}
 		}
 

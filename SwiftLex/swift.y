@@ -677,7 +677,7 @@ varVarList: varList {$$ = $1;}
     ;
         
 varDeclIncommplete: VAR varVarList {printf("P: varDeclIncommplete\n"); $$ = $2;}
-    | LET varVarList {printf("P: varDeclIncommplete\n"); $$ = $2;}
+    | LET varVarList {printf("P: varDeclIncommplete\n"); $$ = $2->setAsConst(true); }
     ;
 
 varDeclaration: modifiersWordsList varDeclIncommplete {printf("P: variable declaration with prefix\n"); $$ = $2; $$ = $$->addModifiers($1);}
