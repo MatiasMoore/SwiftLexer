@@ -1,0 +1,12 @@
+func floatChanger(_ num : Float)-> Float{
+	print("Float in func: " + num)
+	var num2 = num + 200
+	return num2
+	
+}
+
+var a = 1.9232
+
+print(a)
+print(floatChanger(a))
+print(a)
