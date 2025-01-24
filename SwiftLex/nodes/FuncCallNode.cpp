@@ -53,16 +53,21 @@ ExternalMethod* FuncCallNode::findMethodForCall(ClassTable* classTable, Internal
 		else
 		{
 			auto asExternalMethod = this->findMethodWithTypeCasting(currentClass, this->_funcName, false, classTable, currentClass, currentMethod);
-			auto methodInThisClass = dynamic_cast<InternalMethod*>(asExternalMethod);
+			
+			if (asExternalMethod == nullptr)
+				throw std::runtime_error("Dynamic method \"" + this->_funcName + "\" with descriptor\"" +
+					this->getArgsDescriptor(classTable, currentClass, currentMethod) + "\" is not defined in class \"" + currentClass->getClassName() + "\"" + LINE_AND_FILE);
 
-			if (methodInThisClass == nullptr)
+			bool methodInThisClass = asExternalMethod->getClassName() == currentClass->getClassName();
+
+			if (!methodInThisClass)
 			{
 				if (!isConstructorCall)
 					throw std::runtime_error("Dynamic method \"" + this->_funcName + "\" with descriptor\"" + 
 						this->getArgsDescriptor(classTable, currentClass, currentMethod) + "\" is not defined in class \"" + currentClass->getClassName() + "\"" + LINE_AND_FILE);
 			}
 
-			return methodInThisClass;
+			return asExternalMethod;
 		}
 
 	}

@@ -9,6 +9,45 @@
 #include "../tables/FieldAccessFlag.h"
 #include "../RTLHelper.h"
 
+bool ExprNode::areDescTheSame(std::string leftDesc, std::string rightDesc, ClassTable* classTable)
+{
+	if (leftDesc != rightDesc)
+	{
+		bool isLeftClass = leftDesc[0] == 'L';
+		bool isRightClass = rightDesc[0] == 'L';
+
+		if (!isLeftClass || !isRightClass)
+		{
+			// Check if our can be downcasted to required (for arrays of classes)
+			bool isLeftArray = leftDesc[0] == '[';
+			bool isRightArray = rightDesc[0] == '[';
+
+			if (isLeftArray && isRightArray)
+			{
+				bool isLeftArrayOfClass = leftDesc.find('L') != -1;
+				bool isRightArrayOfClass = rightDesc.find('L') != -1;
+
+				if (!isLeftArrayOfClass || !isRightArrayOfClass || !classTable->isClassDerivedFromClass(classnameFromDescriptor(rightDesc), classnameFromDescriptor(leftDesc)))
+				{
+					return false;
+				}
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			//Check if expr can be downcasted to type
+			if (!classTable->isClassDerivedFromClass(classnameFromDescriptor(rightDesc), classnameFromDescriptor(leftDesc)))
+				return false;
+		}
+	}
+
+	return true;
+}
+
 ExprNode* ExprNode::createBool(bool value)
 {
 	auto node = new ExprNode();
@@ -833,6 +872,12 @@ void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 			auto currentElemDesc = this->_arrayExprList->_vec[i]->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
 			
 			//TODO cast ints to floats
+
+			//Check for base class
+			if (ExprNode::areDescTheSame(firstElemDesc, currentElemDesc, classTable) || ExprNode::areDescTheSame(currentElemDesc, firstElemDesc, classTable))
+			{
+				break;
+			}
 
 			if (firstElemDesc != currentElemDesc)
 				throw std::runtime_error("All array elements must be of the same type! Elem at index " + std::to_string(i) + 

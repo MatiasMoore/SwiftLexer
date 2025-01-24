@@ -106,6 +106,8 @@ public:
 	bool _isStaticFieldAccess;
 	int _fieldRef;
 
+	static bool areDescTheSame(std::string leftDesc, std::string rightDesc, ClassTable* classTable);
+
 	static ExprNode* createBool(bool value);
 
 	static ExprNode* createInt(int value);
