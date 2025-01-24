@@ -1,0 +1,15 @@
+class A {
+	public static func overrideArgs(a : Int, b : Int) -> Int{
+		print("Two arg func")
+		return a + b
+	}
+		
+	public static func overrideArgs(a : Int, b : Int, c : Int) -> Int{
+		print("Three arg func")
+		return a + b + c
+	}
+}
+
+
+print(A.overrideArgs(5,10))
+print(A.overrideArgs(5,10,15))
