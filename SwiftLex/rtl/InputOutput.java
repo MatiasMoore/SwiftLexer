@@ -7,12 +7,12 @@ public class InputOutput {
 
     public static void print(int i) 
     {
-        System.out.print(i);
+        System.out.println(i);
     }
     
     public static void print(Integer integer)
     {
-        System.out.print(integer._value);
+        System.out.println(integer._value);
     }
     
     public static String readLine()
@@ -30,7 +30,7 @@ public class InputOutput {
 
     public static void print(String string)
     {
-        System.out.print(string._value);
+        System.out.println(string._value);
     }
 
     public static void print(Boolean bool)
@@ -44,6 +44,6 @@ public class InputOutput {
 
     public static void print(Float f)
     {
-        System.out.print(f._value);
+        System.out.println(f._value);
     }
 }
