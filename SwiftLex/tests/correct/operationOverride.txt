@@ -1,0 +1,33 @@
+class Vector {
+  
+  public var x : Float
+  public var y : Float
+  
+  public init(_ x: Float, _ y : Float)
+  {
+    self.x = x
+    self.y = y
+  }
+  
+  public static func +(_ vec1 : Vector, _ vec2 : Vector) -> Vector
+  {
+    return Vector(vec1.x + vec2.x, vec1.y + vec2.y)
+  }
+}
+
+var vec1 = Vector(10, 20)
+var vec2 = Vector(20, 30)
+
+var vec3 = vec1 + vec2
+
+print("Vec1")
+print(vec1.x)
+print(vec1.y)
+
+print("\nVec2")
+print(vec2.x)
+print(vec2.y)
+
+print("\nResult")
+print(vec3.x)
+print(vec3.y)
