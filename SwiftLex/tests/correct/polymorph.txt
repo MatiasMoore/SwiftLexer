@@ -1,10 +1,6 @@
 class Parent{
 	public var a = 199
 
-	public func parentFunc() {
-		print("Parent Func!")
-	}
-
 	public func parentFuncToOverride() {
 		print("Parent Func to override!")
 	}
@@ -13,26 +9,14 @@ class Parent{
 
 class Child : Parent{
 	override public func parentFuncToOverride() {
-		print("Chindren overrided Func!")
+		print("Chindren overriden Func!")
 	}
 }
 
-var parrent = Parent()
-var children = Child()
 
-var childrenWithTypeParrent : Parent
-childrenWithTypeParrent  = children
+var arr : [Parent] = [Parent(), Child(), Parent(), Child()]
 
-print("Parrent")
-parrent.parentFunc()
-parrent.parentFuncToOverride()
-
-print("\nChild")
-children.parentFunc()
-children.parentFuncToOverride()
-
-print("\nChild with type Parent")
-childrenWithTypeParrent.parentFunc()
-childrenWithTypeParrent.parentFuncToOverride()
-
-
+for elem in arr
+{
+	elem.parentFuncToOverride();
+}
