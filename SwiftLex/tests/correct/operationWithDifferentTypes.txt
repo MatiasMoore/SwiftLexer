@@ -1,0 +1,30 @@
+var a : Int = 10
+var b : Float = 2.9382
+
+var c = a + b
+var d = b + a
+
+var c1 = a - b
+var d1 = b - a
+
+var c2 = a * b
+var d2 = b * a
+
+var c3 = a / b
+var d3 = b / a
+
+print(c)
+print(d)
+print("\n")
+
+print(c1)
+print(d1)
+print("\n")
+
+print(c2)
+print(d2)
+print("\n")
+
+print(c3)
+print(d3)
+print("\n")
