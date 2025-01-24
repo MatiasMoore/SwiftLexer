@@ -8,4 +8,14 @@ public class String {
         _value = value;
     }
 
+    public String(Integer i)
+    {
+        _value = java.lang.String.valueOf(i._value);
+    }
+
+    public String(Float f)
+    {
+        _value = java.lang.String.valueOf(f._value);
+    }
+
 }
