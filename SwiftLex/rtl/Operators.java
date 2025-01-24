@@ -49,6 +49,11 @@ public class Operators {
         return new Boolean(a._value > b._value);
     }
 
+    public static Boolean lte(Integer a, Integer b)
+    {
+        return new Boolean(a._value <= b._value);
+    }
+
 
     // Float
     public static Float sum(Float a, Float b)
@@ -69,6 +74,11 @@ public class Operators {
     public static Float div(Float a, Float b)
     {
         return new Float(a._value / b._value);
+    }
+
+    public static Boolean lte(Float a, Float b)
+    {
+        return new Boolean(a._value <= b._value);
     }
 
     // String
