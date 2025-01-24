@@ -123,6 +123,9 @@ std::string FuncDeclNode::getOperatorOverloadName(OverloadableOperatorType overl
 			case Infix:
 				return RTLHelper::_sub;
 				break;
+			case Prefix:
+				return RTLHelper::_unaryMinus;
+				break;
 			default:
 				throw std::runtime_error(getOperatorOverloadNameError);
 				break;
@@ -264,6 +267,17 @@ std::string FuncDeclNode::getOperatorOverloadName(OverloadableOperatorType overl
 			{
 			case Infix:
 				return RTLHelper::_logOr;
+				break;
+			default:
+				throw std::runtime_error(getOperatorOverloadNameError);
+				break;
+			}
+			break;
+		case (OverloadableOperatorType::opPrefixMinus):
+			switch (overloadOperatorNotation)
+			{
+			case Prefix:
+				return RTLHelper::_unaryMinus;
 				break;
 			default:
 				throw std::runtime_error(getOperatorOverloadNameError);

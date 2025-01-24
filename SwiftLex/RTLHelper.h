@@ -56,6 +56,8 @@ public:
     inline static std::string _eq = "eq";
     inline static std::string _neq = "neq";
 
+    inline static std::string _unaryMinus = "unaryMinus";
+
     // Generate a unique id for internally created variables (e.g. during tree transform)
     static std::string getUniqueInternalVarName();
 };

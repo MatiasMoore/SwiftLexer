@@ -19,6 +19,11 @@ public class Operators {
     }
 
     // Integer
+
+    public static Integer unaryMinus(Integer a)
+    {
+        return new Integer(-a._value);
+    }
     public static Integer sum(Integer a, Integer b)
     {
         return new Integer(a._value + b._value);
@@ -51,6 +56,11 @@ public class Operators {
 
 
     // Float
+
+    public static Integer unaryFloat(Integer a)
+    {
+        return new Integer(-a._value);
+    }
     public static Float sum(Float a, Float b)
     {
         return new Float(a._value + b._value);
