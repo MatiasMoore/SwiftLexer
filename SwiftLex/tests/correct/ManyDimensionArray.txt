@@ -1,12 +1,62 @@
-var array = [
-[1,2,3,4,5],
-[6,7,8,9,10],
-[11,12,13,14,15],
-[16,17,18,19,20]
+func dfs(_ array: [[Int]], _ row: Int, _ col: Int, _ rows: Int, _ cols: Int, _ startColor: Int, _ newColor: Int) -> [[Int]] {
+    var array2 = array // Локальная копия для изменения
+
+    // Проверка границ массива
+    if row < 0 || row >= rows || col < 0 || col >= cols {
+        return array2
+    }
+
+    // Проверка цвета
+    if array2[row][col] != startColor {
+        return array2
+    }
+
+    // Замена цвета
+    array2[row][col] = newColor
+
+    // Рекурсивные вызовы
+    array2 = dfs(array2, row + 1, col, rows, cols, startColor, newColor) // вниз
+    array2 = dfs(array2, row - 1, col, rows, cols, startColor, newColor) // вверх
+    array2 = dfs(array2, row, col + 1, rows, cols, startColor, newColor) // вправо
+    array2 = dfs(array2, row, col - 1, rows, cols, startColor, newColor) // влево
+
+    return array2
+}
+
+func floodFill(_ array: [[Int]], _ x: Int, _ y: Int, _ newColor: Int, _ rows: Int, _ cols: Int) -> [[Int]] {
+    let startColor = array[x][y]
+
+    // Если цвет совпадает, возвращаем оригинальный массив
+    if startColor == newColor {
+        return array
+    }
+
+    // Запускаем DFS
+    return dfs(array, x, y, rows, cols, startColor, newColor)
+}
+
+// Тестирование функции
+let field = [
+    [1, 1, 1, 0, 0],
+    [1, 1, 0, 0, 0],
+    [1, 0, 0, 1, 1],
+    [0, 0, 1, 1, 1]
 ]
 
-for i in 0..<array.count {
-    for j in 0..<array[i].count {
-        print(array[i][j])
+print("Исходное поле:\n")
+for row in field {
+    for element in row {
+        print(" " + element)
     }
+    print("\n")
+}
+
+let updatedField = floodFill(field, 1, 1, 2, 4, 5)
+
+print("\nПоле после закраски:\n")
+for r in updatedField {
+    for el in r {
+        print(" " + el)
+    }
+    print("\n")
 }
