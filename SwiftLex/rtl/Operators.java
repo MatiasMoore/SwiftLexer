@@ -59,6 +59,20 @@ public class Operators {
         return new Boolean(a._value <= b._value);
     }
 
+    public static Boolean gte(Integer a, Integer b)
+    {
+        return new Boolean(a._value >= b._value);
+    }
+
+    public static Boolean neq(Integer a, Integer b)
+    {
+        return new Boolean(a._value != b._value);
+    }
+
+    public static Boolean eq(Integer a, Integer b)
+    {
+        return new Boolean(a._value == b._value);
+    }
 
     // Float
 
@@ -89,6 +103,21 @@ public class Operators {
     public static Boolean lte(Float a, Float b)
     {
         return new Boolean(a._value <= b._value);
+    }
+
+    public static Boolean gte(Float a, Float b)
+    {
+        return new Boolean(a._value >= b._value);
+    }
+
+    public static Boolean neq(Float a, Float b)
+    {
+        return new Boolean(a._value != b._value);
+    }
+
+    public static Boolean eq(Float a, Float b)
+    {
+        return new Boolean(a._value == b._value);
     }
 
     // String
