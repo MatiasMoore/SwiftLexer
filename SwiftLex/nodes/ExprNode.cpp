@@ -608,10 +608,15 @@ TypeNode* ExprNode::evaluateType(ClassTable* classTable, InternalClass* currentC
 		if (currentMethod == nullptr)
 			throw std::runtime_error("This id \"" + this->_stringValue + "\" can't be used in this context!" + LINE_AND_FILE);
 		auto localVar = currentMethod->getVarTable()->findLocalVar(this->_stringValue);
+		auto nonStaticClassfield = currentClass->findField(this->_stringValue, false);
 		bool isLocalVar = localVar != nullptr;
 		if (isLocalVar)
 		{
 			return TypeNode::createFromDescriptor(localVar->_descriptor);
+		}
+		else if (nonStaticClassfield != nullptr)
+		{
+			return TypeNode::createFromDescriptor(nonStaticClassfield->getDescriptor());
 		}
 		else
 		{
@@ -803,6 +808,12 @@ void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 		{
 			throw std::runtime_error("Super is not supported yet!" + LINE_AND_FILE);
 		}
+		bool isClassField = currentClass->findField(this->_stringValue, false) != nullptr && currentMethod != nullptr && currentMethod->getVarTable()->findLocalVar(_stringValue) == nullptr;
+		if (isClassField)
+		{
+			auto field = currentClass->findField(this->_stringValue, false);
+			_fieldRef = currentClass->getFieldRefForExternalField(field);
+		}
 	}
 		//Do nothing
 		break;
@@ -879,6 +890,7 @@ std::vector<char> ExprNode::generateCode(InternalClass* currentClass, InternalMe
 {
 	
 	LocalVariableElement* localVar;
+	ExternalField* nonStaticClassfield;
 	std::vector<char> code = {};
 	// TODO change switch to if else
 	switch (this->_type)
@@ -899,25 +911,34 @@ std::vector<char> ExprNode::generateCode(InternalClass* currentClass, InternalMe
 		break;
 	case ExprType::Id:
 		localVar = currentMethod->getVarTable()->findLocalVar(this->_stringValue);
-		if (localVar == nullptr)
+		nonStaticClassfield = currentClass->findField(this->_stringValue, false);
+		if (localVar == nullptr && nonStaticClassfield == nullptr)
 			throw std::runtime_error("Critical error! Local var \"" + this->_stringValue + "\" is not defined!" + LINE_AND_FILE);
+		if (localVar != nullptr)
+		{
+			if (localVar->_descriptor == "I")
+			{
+				appendVecToVec(code, jvm::iload(localVar->localId));
+			}
+			else if (localVar->_descriptor[0] == 'L')
+			{
+				appendVecToVec(code, jvm::aload(localVar->localId));
+			}
+			else if (localVar->_descriptor[0] == '[')
+			{
+				appendVecToVec(code, jvm::aload(localVar->localId));
+			}
+			else
+			{
+				throw std::runtime_error("Can't generate code for expr ID with descriptor \"" + localVar->_descriptor + "\"!");
+			}
+		}
+		else if (nonStaticClassfield != nullptr)
+		{
+			appendVecToVec(code, jvm::aload(0));
+			appendVecToVec(code, jvm::getfield(_fieldRef));
+		}
 
-		if (localVar->_descriptor == "I")
-		{
-			appendVecToVec(code, jvm::iload(localVar->localId));
-		}
-		else if (localVar->_descriptor[0] == 'L')
-		{
-			appendVecToVec(code, jvm::aload(localVar->localId));
-		}
-		else if (localVar->_descriptor[0] == '[')
-		{
-			appendVecToVec(code, jvm::aload(localVar->localId));
-		}
-		else
-		{
-			throw std::runtime_error("Can't generate code for expr ID with descriptor \"" + localVar->_descriptor + "\"!");
-		}
 		break;
 	case ExprType::FieldAccess:
 		if (this->_isStaticFieldAccess) {

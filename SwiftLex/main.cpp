@@ -172,6 +172,25 @@ int main(int argc, const char* argv[])
 		return 1;
 	}
 
+	// Static constructor
+	for (auto& classElem : classTable.getInternalClasses())
+	{
+		auto staticConstuctor = classElem->getStaticConstructor();
+		if (staticConstuctor == nullptr)
+			continue;
+		try
+		{
+			staticConstuctor->_body->fillTable(&classTable, classElem, staticConstuctor);
+		}
+		catch (std::runtime_error error)
+		{
+			std::cout << "Static constructor table filling error: " << error.what() << std::endl;
+			return 1;
+		}
+
+		classElem->addStaticConstructorToInternalMethods();
+	}
+
 	// After semantics
 	if (GlobalSettings::_DRAW_DOT)
 	{

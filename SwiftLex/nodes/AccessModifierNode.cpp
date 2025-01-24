@@ -194,6 +194,16 @@ std::vector<enum FieldAccessFlag> AccessModifierListNode::getFieldAccessFlags()
 	return flags;
 }
 
+bool AccessModifierListNode::hasModifier(AccessModifierType type)
+{
+	for (auto& modifier : _vec)
+	{
+		if (modifier->_type == type)
+			return true;
+	}
+	return false;
+}
+
 SemanticsBase* AccessModifierListNode::semanticsTransform(SemanticsStack stack)
 {
 	return SemanticsBase::semanticsTransformVector<AccessModifierNode>(stack, this, _vec);

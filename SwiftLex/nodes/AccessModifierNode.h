@@ -44,5 +44,7 @@ public:
 	std::vector<MethodAccessFlag> getMethodAccessFlags();
 
 	std::vector<FieldAccessFlag> getFieldAccessFlags();
+
+	bool hasModifier(AccessModifierType type);
 };
 

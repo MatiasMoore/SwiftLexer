@@ -1,6 +1,8 @@
 #include "InternalClass.h"
 #include "../ExceptionHelper.h"
 #include "../generation/generationHelpers.h"
+#include "../nodes/StmtNode.h"
+#include "../nodes/ReturnNode.h"
 
 InternalClass::InternalClass(std::string name, std::string baseName) : ExternalClass(name, baseName)
 {
@@ -9,6 +11,7 @@ InternalClass::InternalClass(std::string name, std::string baseName) : ExternalC
 	_baseNameRef = _constTable->findOrAddUTF8(baseName);
 	_classRef = _constTable->findOrAddClassRef(_nameRef);
 	_baseClassRef = _constTable->findOrAddClassRef(_baseNameRef);
+	_staticConstructor = nullptr;
 }
 
 InternalMethod* InternalClass::addInternalMethodToConstantTable(std::string methodName, std::string descriptor, std::vector<MethodAccessFlag> flags, StmtListNode* body)
@@ -123,4 +126,41 @@ int InternalClass::getClassRef()
 {
 	return this->_classRef;
 }
+
+void InternalClass::addStmtToStaticConstructor(StmtNode* stmt)
+{
+	
+	if (_staticConstructor == nullptr)
+	{
+		std::vector<MethodAccessFlag> flags = { MethodAccessFlag::M_ACC_STATIC };
+		_staticConstructor = new InternalMethod(
+			_constTable,
+			StmtListNode::createListNode(stmt),
+			"<clinit>",
+			"()V",
+			getClassName(),
+			flags
+		);
+	}
+	else
+	{
+		_staticConstructor->_body->appendNode(stmt);
+	}
+}
+
+InternalMethod* InternalClass::getStaticConstructor()
+{
+	return _staticConstructor;
+}
+
+void InternalClass::addStaticConstructorToInternalMethods()
+{
+	if (_staticConstructor != nullptr)
+	{
+		_staticConstructor->_body->appendNode(StmtNode::createStmtReturn(ReturnNode::createVoidReturn()));
+		this->_methodContainer.addMethod(_staticConstructor);
+	}
+}
+
+
 

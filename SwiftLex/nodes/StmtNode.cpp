@@ -618,9 +618,8 @@ std::vector<char> StmtNode::generateCode(InternalClass* currentClass, InternalMe
 		}
 		else
 		{
-			appendVecToVec(code, this->_assignRight->generateCode(currentClass, currentMethod));
-
 			if (this->_assignLeft->_type == ExprType::Id) {
+				appendVecToVec(code, this->_assignRight->generateCode(currentClass, currentMethod));
 				int varNum = currentMethod->getVarTable()->findLocalVar(this->_assignLeft->_stringValue)->localId;
 				if (this->_assignDesc == "I")
 				{
