@@ -11,6 +11,8 @@
   void switchStateToSubscript();
 %}
 
+%define parse.error detailed
+
 %union {
 	int ival;
 	float fval;
