@@ -1,0 +1,35 @@
+class A {
+	private func privateFunc()
+	{
+		print("Private!")
+	}
+
+	internal func internalFunc()
+	{
+		print("Internal!")
+	}
+
+	public func publicFunc()
+	{
+		A().privateFunc()
+		A().internalFunc()
+		print("Public!")
+	}
+
+}
+
+class B : A
+{
+	public func anotherPublicFunc()
+	{
+		//privateFunc()
+		internalFunc()
+		publicFunc()
+	}
+}
+
+//A().privateFunc()
+//A().internalFunc()
+//A().publicFunc()
+
+B().publicFunc()
