@@ -1,0 +1,12 @@
+func fibonacci(_ n: Int) -> Int {
+    if n <= 1 {
+        return n
+    }
+    return fibonacci(n - 1) + fibonacci(n - 2)
+}
+
+// Тестирование функции
+let number = 10
+print("Fibonacci for")
+print(number)
+print(fibonacci(number))
