@@ -262,6 +262,8 @@
 xcopy "$(SolutionDir)SwiftLex\win_flex.exe" "$(TargetDir)" /Y
 mkdir "$(TargetDir)rtl" 2&gt;nul
 xcopy "$(SolutionDir)SwiftLex\rtl\*" "$(TargetDir)rtl" /E /Y
+mkdir "$(TargetDir)tests" 2&gt;nul
+xcopy "$(SolutionDir)SwiftLex\tests\*" "$(TargetDir)tests" /E /Y
 mkdir "$(TargetDir)out" 2&gt;nul
 echo print("Hello world!") &gt; "$(TargetDir)main.swift"</Command>
     </PostBuildEvent>

@@ -1,0 +1,38 @@
+class Parent{
+	public var a = 199
+
+	public func parentFunc() {
+		print("Parent Func!")
+	}
+
+	public func parentFuncToOverride() {
+		print("Parent Func to override!")
+	}
+
+}
+
+class Child : Parent{
+	override public func parentFuncToOverride() {
+		print("Chindren overrided Func!")
+	}
+}
+
+var parrent = Parent()
+var children = Child()
+
+var childrenWithTypeParrent : Parent
+childrenWithTypeParrent  = children
+
+print("Parrent")
+parrent.parentFunc()
+parrent.parentFuncToOverride()
+
+print("\nChild")
+children.parentFunc()
+children.parentFuncToOverride()
+
+print("\nChild with type Parent")
+childrenWithTypeParrent.parentFunc()
+childrenWithTypeParrent.parentFuncToOverride()
+
+

@@ -1,0 +1,22 @@
+class testClass {
+  
+  public var testField = 10
+  public static var testStaticField = 1099
+}
+
+func classChanger(_ obj : testClass) -> testClass {
+	
+	obj.testField = 199
+	return obj
+	
+}
+
+var a = testClass()
+
+print("Base field")
+print(a.testField)
+var b = classChanger(a)
+print("\nField from returned obj")
+print(a.testField)
+print("\nChanged field")
+print(b.testField)

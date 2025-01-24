@@ -1,0 +1,12 @@
+func strChanger(_ str : String) -> String {
+	
+	str += "Hello"
+	return str
+	
+}
+
+var a = "World"
+
+print(a)
+print(strChanger(a))
+print(a)

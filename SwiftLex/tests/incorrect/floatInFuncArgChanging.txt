@@ -1,0 +1,12 @@
+func floatChanger(_ num : Float)-> Float{
+	
+	num += 2.22222
+	return num
+	
+}
+
+var a = 1.9232
+
+print(a)
+print(floatChanger(a))
+print(a)
