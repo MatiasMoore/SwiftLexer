@@ -124,10 +124,6 @@ SemanticsBase* ConstructorDeclNode::semanticsTransform(SemanticsStack stack)
 	//Set default basename
 	baseClassName = baseClassName.empty() ? "java/lang/Object" : baseClassName;
 
-	//FIXME
-	//auto selfId = ExprNode::createId("self");
-	//auto baseConstructorArgs = FuncCallArgListNode::createListNode(FuncCallArgNode::createFromExpr(selfId));
-	//auto baseConstructor = ExprNode::createFuncCall(FuncCallNode::createFuncCall(baseClassName, baseConstructorArgs));
 	auto constructorCallStmt = StmtNode::createDefaultClassConstructor(baseClassName);
 
 	//Add default constructor call

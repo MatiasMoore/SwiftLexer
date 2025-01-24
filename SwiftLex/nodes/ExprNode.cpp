@@ -701,14 +701,9 @@ TypeNode* ExprNode::evaluateType(ClassTable* classTable, InternalClass* currentC
 
 void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
 {
-	//FIXME
-	ExternalField* field;
 	if (currentClass == nullptr)
 		throw std::runtime_error("Expression must be associated with a class!");
-/*  It is class Field
-	if (currentMethod == nullptr)
-		throw std::runtime_error("Expression must be inside a method!");
-*/
+
 	switch (this->_type)
 	{
 	case ExprType::FuncCall:

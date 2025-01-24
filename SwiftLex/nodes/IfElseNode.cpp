@@ -128,7 +128,6 @@ std::vector<char> IfElseNode::generateCode(InternalClass* currentClass, Internal
 	appendVecToVec(code, condition->generateCode(currentClass, currentMethod));
 	appendVecToVec(code, jvm::iconst_1());
 
-	//FIXME Maybe put an empty default instruction there?
 	std::vector<char> trueBranch = {};
 	std::vector<char> falseBranch = {};
 

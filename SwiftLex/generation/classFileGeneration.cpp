@@ -71,27 +71,18 @@ std::vector<char> generateMethodAttribute(InternalMethod* mElem, InternalClass* 
 
 	std::vector<char> codeBytes = {};
 
-	//TODO WARNING REMOVE LATER THIS IS JUST A PLACEHOLDER
-	//codeBytes.push_back(0xB1); //just return
-
-	//TODO generate code from body
-	
 	if (mElem->_body == nullptr)
 		throw std::runtime_error("Method \"" + mElem->getMethodName() + "\" must have a body!");
 
 	for (auto& stmt : mElem->_body->_vec)
 	{
-		std::vector<char> bytes = stmt->generateCode(cElem, mElem);// generateCodeForStatement(curStatement, cElem, mElem);
+		std::vector<char> bytes = stmt->generateCode(cElem, mElem);
 		appendVecToVec(codeBytes, bytes);
 	}
 	printf("Code bytes len: %d\n", codeBytes.size());
 	
 	// Вычисление локальной таблицы переменных
 	std::vector<char> localVariableTable = generateLocalVariableTable(mElem, cElem);
-
-	//Добавление длины атрибута
-	// removed local var table 
-	// std::vector<char> lengthBytes = intToByteVector(12 + localVariableTable.size() + codeBytes.size(), 4);
 
 	std::vector<char> lengthBytes = intToByteVector(12 + codeBytes.size(), 4);
 	appendVecToVec(res, lengthBytes);
@@ -116,17 +107,9 @@ std::vector<char> generateMethodAttribute(InternalMethod* mElem, InternalClass* 
 	std::vector<char> exceptionTableSizeBytes = intToByteVector(0, 2);
 	appendVecToVec(res, exceptionTableSizeBytes);
 
-	// Add attributes count
-	// removed local var table 
-	//int subAttributeCount = 1; // For LocalVariableTable
-
 	int subAttributeCount = 0;
 	std::vector<char> attributesCountBytes = intToByteVector(subAttributeCount, 2);
 	appendVecToVec(res, attributesCountBytes);
-
-	// Add LocalVariableTable
-	// removed local var table 
-	//appendVecToVec(res, localVariableTable);
 
 	return res;
 }

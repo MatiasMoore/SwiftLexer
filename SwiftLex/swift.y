@@ -202,7 +202,6 @@ UNKNOWN_TOKEN
 %type<strList> varIdWithCommaList
 %type<varDeclListNode> varVarList
 %type<varDeclListNode> varDeclIncommplete 
-//TODO: TEMPORARY!!!! SHOULD BE EXPANDED TO INCLUDE ACCESS MODIFIERS
 %type<varDeclListNode> varDeclaration
 
 %type<funcCallArgNode> funcCallArg
@@ -545,8 +544,6 @@ funcOverloadOperatorIncomplete: FUNC overloadableOperators anyRoundBracket funcD
         }
 	;
 
-    //TODO add modifiers to funcDecl node
-    //TODO add operator overloading
 funcDeclaration: modifiersWordsList funcDecIncomplete {printf("P: func declaration prefix\n"); $$ = $2; $$ = $$->addModifiers($1);}
     | funcDecIncomplete {printf("P: func declaration default\n"); $$ = $1;}
     
