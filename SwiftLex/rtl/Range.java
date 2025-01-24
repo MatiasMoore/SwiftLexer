@@ -10,6 +10,13 @@ public class Range {
         _endVal = end._value;
         _isHalfOpen = isHalfOpen._value;
     }
+
+    public Range(Integer start, Integer end, boolean isHalfOpen)
+    {
+        _startVal = start._value;
+        _endVal = end._value;
+        _isHalfOpen = isHalfOpen;
+    }
     
     public Integer[] toArray() {
         int size = _isHalfOpen ? (_endVal - _startVal) : (_endVal - _startVal + 1);
