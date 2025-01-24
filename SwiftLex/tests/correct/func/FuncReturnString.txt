@@ -1,0 +1,10 @@
+func strChanger(_ str : String) -> String {
+	print("Str in func: " + str)
+	var str2 = "Hello" + str
+	return str2
+}
+
+var a = "World"
+
+print(a)
+print(strChanger(a))
