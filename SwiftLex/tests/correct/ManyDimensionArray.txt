@@ -1,26 +1,27 @@
 func dfs(_ array: [[Int]], _ row: Int, _ col: Int, _ rows: Int, _ cols: Int, _ startColor: Int, _ newColor: Int) -> [[Int]] {
-    var array2 = array // Локальная копия для изменения
+    // Создаём копию массива для работы
+    var newArray = array
 
     // Проверка границ массива
     if row < 0 || row >= rows || col < 0 || col >= cols {
-        return array2
+        return newArray
     }
 
     // Проверка цвета
-    if array2[row][col] != startColor {
-        return array2
+    if newArray[row][col] != startColor {
+        return newArray
     }
 
     // Замена цвета
-    array2[row][col] = newColor
+    newArray[row][col] = newColor
 
-    // Рекурсивные вызовы
-    array2 = dfs(array2, row + 1, col, rows, cols, startColor, newColor) // вниз
-    array2 = dfs(array2, row - 1, col, rows, cols, startColor, newColor) // вверх
-    array2 = dfs(array2, row, col + 1, rows, cols, startColor, newColor) // вправо
-    array2 = dfs(array2, row, col - 1, rows, cols, startColor, newColor) // влево
+    // Рекурсивные вызовы, передавая новый массив
+    newArray = dfs(newArray, row + 1, col, rows, cols, startColor, newColor) // вниз
+    newArray = dfs(newArray, row - 1, col, rows, cols, startColor, newColor) // вверх
+    newArray = dfs(newArray, row, col + 1, rows, cols, startColor, newColor) // вправо
+    newArray = dfs(newArray, row, col - 1, rows, cols, startColor, newColor) // влево
 
-    return array2
+    return newArray
 }
 
 func floodFill(_ array: [[Int]], _ x: Int, _ y: Int, _ newColor: Int, _ rows: Int, _ cols: Int) -> [[Int]] {
