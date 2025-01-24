@@ -464,7 +464,6 @@ void StmtNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 		this->_varDeclList->fillTable(classTable, currentClass, currentMethod, initialScan);
 		break;
 	case StmtType::Assignment:
-		//FIXME
 		{
 			if (currentClass == nullptr)
 				throw std::runtime_error("Expr stmt must be associated with a class!");
@@ -527,15 +526,39 @@ void StmtNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 
 				if (leftDesc != rightDesc)
 				{
-					bool bothClassObjects = leftDesc[0] == 'L' && rightDesc[0] == 'L';
-					if (!bothClassObjects)
-						throw std::runtime_error("Type mismatch in assignment of var \"" + this->_assignLeft->_stringValue + "\"! It's current type has descriptor \"" +
-							leftDesc + "\" while trying to assign type with has descriptor \"" + rightDesc + "\"!");
+					bool isLeftClass = leftDesc[0] == 'L';
+					bool isRightClass = rightDesc[0] == 'L';
 
-					//Check if expr can be downcasted to type
-					if (!classTable->isClassDerivedFromClass(classnameFromDescriptor(rightDesc), classnameFromDescriptor(leftDesc)))
-						throw std::runtime_error("Type mismatch in assignment of var \"" + this->_assignLeft->_stringValue + "\"! It's current type has descriptor \"" +
-							leftDesc + "\" while trying to assign type with has descriptor \"" + rightDesc + "\"!");
+					if (!isLeftClass || !isRightClass)
+					{
+						// Check if our can be downcasted to required (for arrays of classes)
+						bool isLeftArray = leftDesc[0] == '[';
+						bool isRightArray = rightDesc[0] == '[';
+
+						if (isLeftArray && isRightArray)
+						{
+							bool isLeftArrayOfClass = leftDesc.find('L') != -1;
+							bool isRightArrayOfClass = rightDesc.find('L') != -1;
+
+							if (!isLeftArrayOfClass || !isRightArrayOfClass || !classTable->isClassDerivedFromClass(classnameFromDescriptor(rightDesc), classnameFromDescriptor(leftDesc)))
+							{
+								throw std::runtime_error("Type mismatch in assignment of var \"" + this->_assignLeft->_stringValue + "\"! It's current type has descriptor \"" +
+									leftDesc + "\" while trying to assign type with has descriptor \"" + rightDesc + "\"!" + LINE_AND_FILE);
+							}
+						}
+						else
+						{
+							throw std::runtime_error("Type mismatch in assignment of var \"" + this->_assignLeft->_stringValue + "\"! It's current type has descriptor \"" +
+								leftDesc + "\" while trying to assign type with has descriptor \"" + rightDesc + "\"!" + LINE_AND_FILE);
+						}
+					}
+					else
+					{
+						//Check if expr can be downcasted to type
+						if (!classTable->isClassDerivedFromClass(classnameFromDescriptor(rightDesc), classnameFromDescriptor(leftDesc)))
+							throw std::runtime_error("Type mismatch in assignment of var \"" + this->_assignLeft->_stringValue + "\"! It's current type has descriptor \"" +
+								leftDesc + "\" while trying to assign type with has descriptor \"" + rightDesc + "\"!" + LINE_AND_FILE);
+					}
 				}
 
 				this->_assignDesc = rightDesc;

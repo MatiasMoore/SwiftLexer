@@ -171,13 +171,35 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, InternalClass* curren
 					bool isExprCLass = exprDesc[0] == 'L';
 
 					if (!isTypeClass || !isExprCLass)
-						throw std::runtime_error("Type mismatch in declaration of var \"" + this->_varName + "\"! Written type has descriptor \"" +
-							typeDesc + "\" while expr has descriptor \"" + exprDesc + "\"!" + LINE_AND_FILE);
+					{
+						// Check if our can be downcasted to required (for arrays of classes)
+						bool isTypeArray = typeDesc[0] == '[';
+						bool isExprType = exprDesc[0] == '[';
 
-					//Check if expr can be downcasted to type
-					if (!classTable->isClassDerivedFromClass(classnameFromDescriptor(exprDesc), classnameFromDescriptor(typeDesc)))
-						throw std::runtime_error("Type mismatch in declaration of var \"" + this->_varName + "\"! Written type has descriptor \"" +
-							typeDesc + "\" while expr has descriptor \"" + exprDesc + "\"!" + LINE_AND_FILE);
+						if (isTypeArray && isExprType)
+						{
+							bool isTypeArrayOfClass = typeDesc.find('L') != -1;
+							bool isExprArrayOfClass = exprDesc.find('L') != -1;
+
+							if (!isTypeArrayOfClass || !isExprArrayOfClass || !classTable->isClassDerivedFromClass(classnameFromDescriptor(exprDesc), classnameFromDescriptor(typeDesc)))
+							{
+								throw std::runtime_error("Type mismatch in declaration of var \"" + this->_varName + "\"! Written type has descriptor \"" +
+									typeDesc + "\" while expr has descriptor \"" + exprDesc + "\"!" + LINE_AND_FILE);
+							}
+						}
+						else
+						{
+							throw std::runtime_error("Type mismatch in declaration of var \"" + this->_varName + "\"! Written type has descriptor \"" +
+								typeDesc + "\" while expr has descriptor \"" + exprDesc + "\"!" + LINE_AND_FILE);
+						}
+					} 
+					else
+					{
+						//Check if expr can be downcasted to type
+						if (!classTable->isClassDerivedFromClass(classnameFromDescriptor(exprDesc), classnameFromDescriptor(typeDesc)))
+							throw std::runtime_error("Type mismatch in declaration of var \"" + this->_varName + "\"! Written type has descriptor \"" +
+								typeDesc + "\" while expr has descriptor \"" + exprDesc + "\"!" + LINE_AND_FILE);
+					}					
 				}
 
 				this->_type = VarDeclType::TypeKnown;
