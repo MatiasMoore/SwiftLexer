@@ -1,0 +1,27 @@
+var arr = 0..<5
+print("Enter array of 5 ints please!")
+for index in 0..<arr.count
+{
+    arr[index] = readLine().toInt()
+}
+
+let n = arr.count
+
+for i in 0..<n {
+    for j in 0..<n - i - 1 {
+        if arr[j] > arr[j + 1] {
+            let temp = arr[j]
+            arr[j] = arr[j + 1]
+            arr[j + 1] = temp
+        }
+    }
+}
+
+var arrStr = ""
+
+for num in arr
+{
+    arrStr = arrStr + " " + num
+}
+print("Sorted array:")
+print(arrStr)

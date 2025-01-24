@@ -18,4 +18,14 @@ public class String {
         _value = java.lang.String.valueOf(f._value);
     }
 
+    public Integer toInt()
+    {
+        return new Integer(java.lang.Integer.parseInt(this._value));
+    }
+
+    public Float toFloat()
+    {
+        return new Float(java.lang.Float.parseFloat(this._value));
+    }
+
 }

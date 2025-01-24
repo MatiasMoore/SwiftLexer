@@ -490,6 +490,7 @@ SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 	std::map <ExprType, std::string> unaryExprTypeToTransform =
 	{
 		{ ExprType::LogNot, RTLHelper::_logNot },
+		{ ExprType::UnaryMinus, RTLHelper::_unaryMinus },
 	};
 
 	if (this->_type == ExprType::Int)
