@@ -9,14 +9,23 @@ class Parent{
 
 class Child : Parent{
 	override public func parentFuncToOverride() {
-		print("Chindren overriden Func!")
+		print("Child 1 overriden Func!")
+	}
+}
+
+class Child2 : Parent{
+
+	override public func parentFuncToOverride() {
+		super.parentFuncToOverride()
+		print("Child 2 overriden Func!")
 	}
 }
 
 
-var arr : [Parent] = [Parent(), Child(), Parent(), Child()]
+var arr : [Parent] = [Parent(), Child(), Child2()]
 
 for elem in arr
 {
+	print("New elem:")
 	elem.parentFuncToOverride();
 }

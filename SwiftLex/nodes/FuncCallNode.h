@@ -37,6 +37,7 @@ public:
 	bool _isConstructor = false;
 	int _classRefForConstructor;
 	bool _isStaticMethod = false;
+	bool _isSuperCall = false;
 
 	static FuncCallNode* createFuncCall(std::string funcName, FuncCallArgListNode* funcArgs);
 

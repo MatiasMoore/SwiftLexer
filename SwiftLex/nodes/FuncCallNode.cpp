@@ -443,6 +443,9 @@ void FuncCallNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 	{
 		this->_isStaticMethod = method->containsFlag(MethodAccessFlag::M_ACC_STATIC);
 	}
+	this->_isSuperCall = this->_scopeType == FuncCallScopeType::exprAccessCall 
+		&& this->_exprAccess->_type == ExprType::Id 
+		&& this->_exprAccess->_stringValue == "super";
 }
 
 std::vector<char> FuncCallNode::generateCode(InternalClass* currentClass, InternalMethod* currentMethod)
@@ -484,7 +487,8 @@ std::vector<char> FuncCallNode::generateCode(InternalClass* currentClass, Intern
 				appendVecToVec(code, this->_funcArgs->generateCode(currentClass, currentMethod));
 			}
 
-			appendVecToVec(code, jvm::invokevirtual(this->_methodRef));
+			auto callInstruction = this->_isSuperCall ? jvm::invokespecial(this->_methodRef) : jvm::invokevirtual(this->_methodRef);
+			appendVecToVec(code, callInstruction);
 		}
 	}
 	

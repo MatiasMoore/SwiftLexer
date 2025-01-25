@@ -649,13 +649,24 @@ TypeNode* ExprNode::evaluateType(ClassTable* classTable, InternalClass* currentC
 	}
 	else if (this->_type == ExprType::Id)
 	{
+		bool isSuper = this->_stringValue == "super";
+
 		if (currentMethod == nullptr)
 			throw std::runtime_error("This id \"" + this->_stringValue + "\" can't be used in this context!" + LINE_AND_FILE);
 		auto localVar = currentMethod->getVarTable()->findLocalVar(this->_stringValue);
 		auto nonStaticClassfield = currentClass->findField(this->_stringValue, false);
+
+		if (isSuper)
+			localVar = currentMethod->getVarTable()->findLocalVar("self");
+
 		bool isLocalVar = localVar != nullptr;
 		if (isLocalVar)
 		{
+			if (isSuper)
+			{
+				return TypeNode::createIdType(currentClass->getBaseClassName());
+			}
+
 			return TypeNode::createFromDescriptor(localVar->_descriptor);
 		}
 		else if (nonStaticClassfield != nullptr)
@@ -850,7 +861,9 @@ void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 		}
 		else if (isSuper)
 		{
-			throw std::runtime_error("Super is not supported yet!" + LINE_AND_FILE);
+			auto selfLocalVar = currentMethod->getVarTable()->findLocalVar("self");
+			if (selfLocalVar == nullptr)
+				throw std::runtime_error("Keyword \"super\" is only allowed inside non-static methods!");
 		}
 		bool isClassField = currentClass->findField(this->_stringValue, false) != nullptr && currentMethod != nullptr && currentMethod->getVarTable()->findLocalVar(_stringValue) == nullptr;
 		if (isClassField)
@@ -938,9 +951,6 @@ void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 
 std::vector<char> ExprNode::generateCode(InternalClass* currentClass, InternalMethod* currentMethod)
 {
-	
-	LocalVariableElement* localVar;
-	ExternalField* nonStaticClassfield;
 	std::vector<char> code = {};
 	// TODO change switch to if else
 	switch (this->_type)
@@ -960,8 +970,12 @@ std::vector<char> ExprNode::generateCode(InternalClass* currentClass, InternalMe
 		appendVecToVec(code, jvm::ldc(currentClass->getConstTable()->findStringRef(currentClass->getConstTable()->findUTF8(this->_stringValue))));
 		break;
 	case ExprType::Id:
-		localVar = currentMethod->getVarTable()->findLocalVar(this->_stringValue);
-		nonStaticClassfield = currentClass->findField(this->_stringValue, false);
+	{
+		bool isSuper = this->_stringValue == "super";
+		LocalVariableElement*  localVar = currentMethod->getVarTable()->findLocalVar(this->_stringValue);
+		if (isSuper)
+			localVar = currentMethod->getVarTable()->findLocalVar("self");
+		ExternalField* nonStaticClassfield = currentClass->findField(this->_stringValue, false);
 		if (localVar == nullptr && nonStaticClassfield == nullptr)
 			throw std::runtime_error("Critical error! Local var \"" + this->_stringValue + "\" is not defined!" + LINE_AND_FILE);
 		if (localVar != nullptr)
@@ -988,7 +1002,7 @@ std::vector<char> ExprNode::generateCode(InternalClass* currentClass, InternalMe
 			appendVecToVec(code, jvm::aload(0));
 			appendVecToVec(code, jvm::getfield(_fieldRef));
 		}
-
+	}
 		break;
 	case ExprType::FieldAccess:
 		if (this->_isStaticFieldAccess) {
