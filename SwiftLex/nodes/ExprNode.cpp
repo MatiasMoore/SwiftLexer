@@ -8,6 +8,9 @@
 #include "../tables/tables.h"
 #include "../tables/FieldAccessFlag.h"
 #include "../RTLHelper.h"
+#include "../nodes//StmtNode.h"
+#include "../nodes/IfElseNode.h"
+#include "../nodes/VarDeclarationNode.h"
 
 bool ExprNode::areDescTheSame(std::string leftDesc, std::string rightDesc, ClassTable* classTable)
 {
@@ -455,8 +458,8 @@ void ExprNode::generateDot(std::ofstream& file)
 	case ExprType::NilCoalesce:
 	case ExprType::BinaryNot:
 		file << dotLabel(this->_id, this->getName());
-		file << dotConnection(this->_id, this->_left->_id);
-		file << dotConnection(this->_id, this->_right->_id);
+		file << dotConnectionWithLabel(this->_id, this->_left->_id, "left");
+		file << dotConnectionWithLabel(this->_id, this->_right->_id, "right");
 		this->_left->generateDot(file);
 		this->_right->generateDot(file);
 		break;
@@ -562,6 +565,59 @@ SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 		auto newExpr = ExprNode::createFuncCall(FuncCallNode::createFuncCall(RTLHelper::_floatC, args));
 		newExpr->setIsAlreadyTransformed(true);
 		return newExpr;
+	}
+	else if (this->_type == ExprType::LogAnd)
+	{
+		this->_left = _left->semanticsTransform(stack)->typecast<ExprNode>();
+		this->_right = _right->semanticsTransform(stack)->typecast<ExprNode>();
+		
+		// find first up stmtlist
+		auto stmtList = stack.getClosest<StmtListNode>();
+		if (stmtList == nullptr)
+			throw std::runtime_error("Can't use logical and outside of a statement list!");
+
+		//my stmt
+		auto myStmt = stack.getClosest<StmtNode>();
+
+		//Create var decl if not exist
+		if (!stmtList->_isLogAndBufInitialized)
+		{
+			auto varDeclList = VarDeclarationListNode::createListNode(
+				VarDeclarationNode::createFromType("$logAndBuf", TypeNode::createIdType(RTLHelper::_boolC))
+			);
+			varDeclList->semanticsTransform(stack);
+			auto varDeclStmt = StmtNode::createStmtVarDeclaration(varDeclList);
+
+			stmtList->appendNodeAtIndex(varDeclStmt, 0);
+
+			stmtList->_isLogAndBufInitialized = true;
+		}
+
+		//create first assignment
+		auto firstAssignment = StmtNode::createStmtAssignment(ExprNode::createId("$logAndBuf"), this->_left);
+		firstAssignment->semanticsTransform(stack);
+		stmtList->appendNodeBeforeNode(firstAssignment, myStmt);
+
+		// Create if
+		auto args = FuncCallArgListNode::createListNode(
+				FuncCallArgNode::createFromExpr(ExprNode::createId("$logAndBuf")))->
+				appendNode(FuncCallArgNode::createFromExpr(ExprNode::createBool(true))
+			);
+		auto newFunc = FuncCallNode::createFuncCall(binaryExprTypeToTransform[this->_type], args);
+		newFunc->setAsExprAccess(ExprNode::createId(RTLHelper::_internalOpClassName));
+		auto condition = ExprListNode::createListNode(ExprNode::createFuncCall(newFunc));
+		auto ifTrue = StmtNode::createStmtAssignment(ExprNode::createId("$logAndBuf"), this->_right);
+		StmtListNode* ifTrueList = StmtListNode::createListNode(ifTrue);
+		auto ifnode = IfElseNode::createSimple(
+			condition,
+			StmtListNode::createListNode(ifTrue),
+			nullptr
+		);
+		auto ifNodeStmt = StmtNode::createStmtIfElse(ifnode);
+		ifNodeStmt->semanticsTransform(stack);
+		stmtList->appendNodeBeforeNode(ifNodeStmt, myStmt);
+
+		return ExprNode::createId("$logAndBuf");
 	}
 	else if (binaryExprTypeToTransform.count(this->_type) != 0)
 	{
