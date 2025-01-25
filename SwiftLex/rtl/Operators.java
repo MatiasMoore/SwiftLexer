@@ -76,10 +76,11 @@ public class Operators {
 
     // Float
 
-    public static Integer unaryFloat(Integer a)
+    public static Float unaryMinus(Float a)
     {
-        return new Integer(-a._value);
+        return new Float(-a._value);
     }
+
     public static Float sum(Float a, Float b)
     {
         return new Float(a._value + b._value);
