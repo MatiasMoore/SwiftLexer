@@ -1,5 +1,6 @@
 #include "ClassTable.h"
 #include "../ExceptionHelper.h"
+#include "../generation/generationHelpers.h"
 
 bool ClassTable::isClassDerivedFromClass(std::string derivedName, std::string parentName)
 {
@@ -116,4 +117,21 @@ std::vector<InternalClass*> ClassTable::getInternalClasses()
 			internalClasses.push_back(internalClass);
 	}
 	return internalClasses;
+}
+
+std::vector<std::string> ClassTable::getAllBaseClassesForClass(std::string className, std::set<std::string> ignoreNames)
+{
+	std::vector<std::string> baseClasses = {};
+
+	auto thisClass = this->findClass(className);
+
+	if (thisClass == nullptr)
+		return baseClasses;
+
+	if (!thisClass->getBaseClassName().empty() && ignoreNames.count(thisClass->getBaseClassName()) == 0)
+		baseClasses.push_back(thisClass->getBaseClassName());
+
+	appendVecToVec(baseClasses, this->getAllBaseClassesForClass(thisClass->getBaseClassName(), ignoreNames));
+
+	return baseClasses;
 }

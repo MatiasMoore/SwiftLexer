@@ -12,6 +12,8 @@ std::vector<char> doubleToFloatByteVector(int num);
 
 void appendVecToVec(std::vector<char>& vecA, const std::vector<char>& vecB);
 
+void appendVecToVec(std::vector<std::string>& vecA, const std::vector<std::string>& vecB);
+
 std::vector<char> generateBytesForConstantTable(class ConstantTable* table);
 
 std::vector<char> generateBytesForConstantTableItem(class ConstantTableItem* elem);

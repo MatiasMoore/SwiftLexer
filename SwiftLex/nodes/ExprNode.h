@@ -95,6 +95,8 @@ public:
 	int _arraySize;
 	int _arrayElemDesc;
 
+	std::string _arrayElemDescStr;
+
 	std::string _fieldAccessFieldName;
 	ExprNode* _fieldAccessExpr;
 

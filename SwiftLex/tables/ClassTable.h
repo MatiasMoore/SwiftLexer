@@ -5,6 +5,7 @@
 #include "InternalMethod.h"
 #include "ExternalClass.h"
 #include "InternalClass.h"
+#include <set>
 
 class ClassTable
 {
@@ -56,5 +57,7 @@ public:
 	ExternalClass* findNotInternalClass(std::string name);
 
 	std::vector<InternalClass*> getInternalClasses();
+
+	std::vector<std::string> getAllBaseClassesForClass(std::string className, std::set<std::string> ignoreNames);
 
 };

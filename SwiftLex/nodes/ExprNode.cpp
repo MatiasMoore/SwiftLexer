@@ -743,7 +743,7 @@ TypeNode* ExprNode::evaluateType(ClassTable* classTable, InternalClass* currentC
 	}
 	else if (this->_type == ExprType::ArrayCreation)
 	{
-		return TypeNode::createArrayType(this->_arrayExprList->_vec[0]->evaluateType(classTable, currentClass, currentMethod));
+		return TypeNode::createArrayType(TypeNode::createFromDescriptor(this->_arrayElemDescStr));
 	}
 	else if (this->_type == ExprType::Subscript)
 	{
@@ -878,40 +878,128 @@ void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 	{
 		this->_arrayExprList->fillTable(classTable, currentClass, currentMethod);
 
-		//All elements must be of the same type
-		auto firstElemDesc = this->_arrayExprList->_vec[0]->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
-		for (int i = 1; i < this->_arrayExprList->_vec.size(); i++)
-		{
-			auto currentElemDesc = this->_arrayExprList->_vec[i]->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
-			
-			//TODO cast ints to floats
+		bool allClasses = true;
+		bool allArrays = true;
+		std::string commonBaseClass = "";
+		int elemDimCount = 0;
 
-			//Check for base class
-			if (ExprNode::areDescTheSame(firstElemDesc, currentElemDesc, classTable) || ExprNode::areDescTheSame(currentElemDesc, firstElemDesc, classTable))
+		for (auto& elem : this->_arrayExprList->_vec)
+		{
+			auto desc = elem->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+
+			bool isClass = desc[0] == 'L';
+			bool isArray = desc[0] == '[';
+
+			allClasses = allClasses && isClass;
+			allArrays = allArrays && isArray;
+		}
+
+		if (!allClasses && !allArrays)
+			throw std::runtime_error("Arrays of primitive types are not supported!" + LINE_AND_FILE);
+
+		std::set<std::string> ignoreClassForCommonBaseClass = {"java/lang/Object"};
+
+		//If only one element
+		if (this->_arrayExprList->_vec.size() == 1)
+			commonBaseClass = classnameFromDescriptor(this->_arrayExprList->_vec[0]->evaluateType(classTable, currentClass, currentMethod)->toDescriptor());
+
+		//Try to find common base class
+		for (int i = 0; i < this->_arrayExprList->_vec.size() - 1; i++)
+		{
+			auto currentElem = this->_arrayExprList->_vec[i];
+			auto nextElem = this->_arrayExprList->_vec[i + 1];
+
+			auto currentElemDesc = currentElem->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+			auto nextElemDesc = nextElem->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+
+			auto currentElemClassName = classnameFromDescriptor(currentElemDesc);
+			auto nextElemClassName = classnameFromDescriptor(nextElemDesc);
+
+			auto currentElemClasses = classTable->getAllBaseClassesForClass(currentElemClassName, ignoreClassForCommonBaseClass);
+			currentElemClasses.insert(currentElemClasses.begin(), currentElemClassName);
+			auto nextElemClasses = classTable->getAllBaseClassesForClass(nextElemClassName, ignoreClassForCommonBaseClass);
+			nextElemClasses.insert(nextElemClasses.begin(), nextElemClassName);
+
+			std::vector<std::string> currentCommonBaseClasses = {};
+			for (auto& className : nextElemClasses)
 			{
-				break;
+				bool foundCommonClass = std::find(currentElemClasses.cbegin(), currentElemClasses.cend(), className) != currentElemClasses.cend();
+				if (foundCommonClass)
+				{
+					currentCommonBaseClasses.push_back(className);
+				}					
 			}
 
-			if (firstElemDesc != currentElemDesc)
-				throw std::runtime_error("All array elements must be of the same type! Elem at index " + std::to_string(i) + 
-					" has descriptor \"" + currentElemDesc + "\" but previous elements have descriptor \"" + firstElemDesc + "\"!" + LINE_AND_FILE);
+			if (currentCommonBaseClasses.empty())
+				throw std::runtime_error("All elements of an array must have a common base class!" + LINE_AND_FILE);
+
+			if (commonBaseClass.empty() || commonBaseClass == currentCommonBaseClasses[0])
+				commonBaseClass = currentCommonBaseClasses[0];
+			else
+			{
+				auto latestCommonClassBaseClasses = classTable->getAllBaseClassesForClass(commonBaseClass, ignoreClassForCommonBaseClass);
+				latestCommonClassBaseClasses.insert(latestCommonClassBaseClasses.begin(), commonBaseClass);
+				bool foundCommon = false;
+				for (auto& latestCommonClassBaseClass : latestCommonClassBaseClasses)
+				{
+					for (auto& currentCommonBaseClass : currentCommonBaseClasses)
+					{
+						if (latestCommonClassBaseClass == currentCommonBaseClass)
+						{
+							commonBaseClass = currentCommonBaseClass;
+							foundCommon = true;
+						}
+					}
+				}
+
+				if (!foundCommon)
+					throw std::runtime_error("All elements of an array must have a common base class!" + LINE_AND_FILE);
+			}
 		}
 
-		this->_arraySize = this->_arrayExprList->_vec.size();
-		int nameRef;
-		if (firstElemDesc[0] == 'L')
+		if (allArrays)
 		{
-			nameRef = currentClass->getConstTable()->findOrAddUTF8(classnameFromDescriptor(firstElemDesc));
+			if (this->_arrayExprList->_vec.size() == 1)
+				elemDimCount = dimCountFromDescriptor(this->_arrayExprList->_vec[0]->evaluateType(classTable, currentClass, currentMethod)->toDescriptor());
+
+			//Try to find common dim count
+			for (int i = 0; i < this->_arrayExprList->_vec.size() - 1; i++)
+			{
+				auto currentElem = this->_arrayExprList->_vec[i];
+				auto nextElem = this->_arrayExprList->_vec[i + 1];
+
+				auto currentElemDesc = currentElem->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+				auto nextElemDesc = nextElem->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+
+				auto currentElemDimCount = dimCountFromDescriptor(currentElemDesc);
+				auto nextElemDimCount = dimCountFromDescriptor(nextElemDesc);
+
+				if (currentElemDimCount == nextElemDimCount)
+					elemDimCount = currentElemDimCount;
+				else
+					throw std::runtime_error("All elements of an array must have the same array dimensions!" + LINE_AND_FILE);
+			}
+		}			
+
+		this->_arrayElemDescStr = "";
+
+		if (allClasses)
+		{
+			this->_arrayElemDescStr = TypeNode::createIdType(commonBaseClass)->toDescriptor();
 		}
-		else if (firstElemDesc[0] == '[')
+		else if (allArrays)
 		{
-			nameRef = currentClass->getConstTable()->findOrAddUTF8(firstElemDesc);
+			std::string arrPrefix = "";
+			for (int i = 0; i < elemDimCount; i++)
+				arrPrefix += '[';
+			this->_arrayElemDescStr = arrPrefix + TypeNode::createIdType(commonBaseClass)->toDescriptor();
 		}
 		else
-		{
 			throw std::runtime_error("Only arrays of references are supported!" + LINE_AND_FILE);
-		}
 
+
+		this->_arraySize = this->_arrayExprList->_vec.size();
+		int nameRef = currentClass->getConstTable()->findOrAddUTF8(this->_arrayElemDescStr);
 		this->_arrayElemDesc = currentClass->getConstTable()->findOrAddClassRef(nameRef);
 	}
 		break;

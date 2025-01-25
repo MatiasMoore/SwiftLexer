@@ -43,6 +43,14 @@ void appendVecToVec(std::vector<char>& vecA, const std::vector<char>& vecB)
 	}
 }
 
+void appendVecToVec(std::vector<std::string>& vecA, const std::vector<std::string>& vecB)
+{
+	for (auto& byte : vecB)
+	{
+		vecA.push_back(byte);
+	}
+}
+
 std::vector<char> generateBytesForConstantTable(class ConstantTable* table)
 {
 	std::vector <char> res;
