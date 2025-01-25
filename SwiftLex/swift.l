@@ -35,8 +35,8 @@ using namespace std;
 	// FUNCTIONS
 void removeChar(std::string& str, char charToRemove);
 bool isSubsciptActive = false;
-	//#define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno;	//not thoroughly tested change
-#define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno; if (isSubsciptActive) {isSubsciptActive = false; BEGIN(INITIAL);}
+#define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno;	
+//#define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno; if (isSubsciptActive) {isSubsciptActive = false; BEGIN(INITIAL);} //not thoroughly tested change
 
 void switchStateToSubscript();
 yytokentype getPrefixOperatorFromString(string str);
