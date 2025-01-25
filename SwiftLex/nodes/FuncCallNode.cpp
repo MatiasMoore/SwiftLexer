@@ -227,6 +227,13 @@ ExternalMethod* FuncCallNode::findMethodWithTypeCasting(ExternalClass* classWith
 				break;
 			}
 
+			// This is only allowd if our arg value is a literal
+			if (ourArg->_value->_type == ExprType::Id)
+			{
+				allGood = false;
+				break;
+			}
+
 			// Required arg must be a class since we'll be looking for a constructor
 			if (!isRequiredClass)
 			{

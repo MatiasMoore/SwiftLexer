@@ -1,0 +1,17 @@
+var intVar = 4
+var floatVar = 5.1234
+
+print(floatVar + 5)
+print(floatVar - 5)
+print(floatVar * 5)
+print(floatVar / 5)
+
+print(intVar + 0.147)
+print(intVar - 0.147)
+print(intVar * 0.147)
+print(intVar / 0.147)
+
+print(floatVar + intVar)
+print(floatVar - intVar)
+print(floatVar * intVar)
+print(floatVar / intVar)
