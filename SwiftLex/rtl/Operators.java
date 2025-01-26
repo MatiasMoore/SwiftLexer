@@ -132,4 +132,24 @@ public class Operators {
         return new String(a._value + b._value);
     }
 
+    public static String sum(Integer a, String b)
+    {
+        return new String(new String(a) + b._value);
+    }
+
+    public static String sum(String a, Integer b)
+    {
+        return new String(a._value + new String(b));
+    }
+
+    public static String sum(Float a, String b)
+    {
+        return new String(new String(a) + b._value);
+    }
+
+    public static String sum(String a, Float b)
+    {
+        return new String(a._value + new String(b));
+    }
+
 }
