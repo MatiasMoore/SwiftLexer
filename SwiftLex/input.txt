@@ -1,21 +1,27 @@
-func bubbleSort(_ arr: [Int])
+print("How many elements will be in your array?")
+var n = readLine().toInt()
+var arr = 0..<n
+print("Enter array of " + n + " ints please!")
+for index in 0..<arr.count
 {
-    let n = arr.count
+    arr[index] = readLine().toInt()
+}
 
-    for i in 0..<n {
-        for j in 0..<n-i-1 {
-            if arr[j] > arr[j+1] {
-                let temp = arr[j]
-                arr[j] = arr[j+1]
-                arr[j+1] = temp
-            }
+for i in 0..<n {
+    for j in 0..<n - i - 1 {
+        if arr[j] > arr[j + 1] {
+            let temp = arr[j]
+            arr[j] = arr[j + 1]
+            arr[j + 1] = temp
         }
     }
 }
 
-var arr = [5, 2, 3, 1, 4]
-bubbleSort(arr)
+var arrStr = ""
+
 for num in arr
 {
-    print(num)
+    arrStr = arrStr + " " + num
 }
+print("Sorted array:")
+print(arrStr)

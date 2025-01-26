@@ -1,11 +1,11 @@
-var arr = 0..<5
-print("Enter array of 5 ints please!")
+print("How many elements will be in your array?")
+var n = readLine().toInt()
+var arr = 0..<n
+print("Enter array of " + n + " ints please!")
 for index in 0..<arr.count
 {
     arr[index] = readLine().toInt()
 }
-
-let n = arr.count
 
 for i in 0..<n {
     for j in 0..<n - i - 1 {
