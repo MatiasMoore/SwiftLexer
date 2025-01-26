@@ -18,6 +18,11 @@ public class Operators {
         return new Boolean(!a._value);
     }
 
+    public static Boolean eq(Boolean a, Boolean b)
+    {
+        return new Boolean(a._value == b._value);
+    }
+
     // Integer
 
     public static Integer unaryMinus(Integer a)
