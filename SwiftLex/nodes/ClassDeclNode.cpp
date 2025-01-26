@@ -80,7 +80,7 @@ void ClassDeclNode::generateDot(std::ofstream& file)
 
 }
 
-void ClassDeclNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, bool initialScan)
+void ClassDeclNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, VariableScope* currentScope, bool initialScan)
 {
     if (initialScan)
     {
@@ -91,7 +91,7 @@ void ClassDeclNode::fillTable(ClassTable* classTable, InternalClass* currentClas
 
         this->_scannedClass = currentClass;
 
-        this->_body->fillTable(classTable, currentClass, currentMethod, initialScan);
+        this->_body->fillTable(classTable, currentClass, currentMethod, currentScope, initialScan);
     }
     else
     {
@@ -103,7 +103,7 @@ void ClassDeclNode::fillTable(ClassTable* classTable, InternalClass* currentClas
 
         currentClass = this->_scannedClass;
 
-        this->_body->fillTable(classTable, currentClass, currentMethod, initialScan);
+        this->_body->fillTable(classTable, currentClass, currentMethod, currentScope, initialScan);
     }    
 }
 

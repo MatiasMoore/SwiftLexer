@@ -71,7 +71,7 @@ public:
 
 	SemanticsBase* semanticsTransform(SemanticsStack stack) override;
 
-	void fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
+	void fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, VariableScope* currentScope);
 };
 
 class ExprNode : public Dottable, public SemanticsBase
@@ -107,6 +107,8 @@ public:
 
 	bool _isStaticFieldAccess;
 	int _fieldRef;
+
+	LocalVariableElement* _idLocalVar = nullptr;
 
 	static bool areDescTheSame(std::string leftDesc, std::string rightDesc, ClassTable* classTable);
 
@@ -148,9 +150,9 @@ public:
 
 	SemanticsBase* semanticsTransform(SemanticsStack stack) override;
 
-	TypeNode* evaluateType(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
+	TypeNode* evaluateType(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, VariableScope* currentScope);
 
-	void fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
+	void fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, VariableScope* currentScope);
 
 	std::vector<char> generateCode(InternalClass* currentClass, InternalMethod* currentMethod);
 };

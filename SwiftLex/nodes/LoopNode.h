@@ -25,6 +25,8 @@ public:
 	StmtListNode* _body;
 	ExprListNode* _conditions;
 
+	VariableScope* _createdScope;
+
 	static LoopNode* createForLoop(std::string id, ExprNode* iterable, StmtListNode* body);
 
 	static LoopNode* createForLoopNoBody(std::string id, ExprNode* iterable);
@@ -41,7 +43,7 @@ public:
 
 	SemanticsBase* semanticsTransform(SemanticsStack stack) override;
 
-	void fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
+	void fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, VariableScope* currentScope);
 
 	std::vector<char> generateCode(InternalClass* currentClass, InternalMethod* currentMethod);
 };

@@ -166,7 +166,7 @@ SemanticsBase* ConstructorDeclNode::semanticsTransform(SemanticsStack stack)
 	return this;
 }
 
-void ConstructorDeclNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, bool initialScan)
+void ConstructorDeclNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, VariableScope* currentScope, bool initialScan)
 {
 	if (currentClass == nullptr)
 		throw std::runtime_error("Constructor decl must be associated with a class!");
@@ -191,19 +191,21 @@ void ConstructorDeclNode::fillTable(ClassTable* classTable, InternalClass* curre
 			throw std::runtime_error("Constructor decl for class \"" + currentClass->getClassName() + "\" must have access modifiers!");
 
 		currentMethod = currentClass->addInternalMethodToConstantTable("<init>", strDesc, this->_modifiers->getMethodAccessFlags(), this->_body);
+		currentScope = currentMethod->getVarTable()->createRootVariableScope();
 
 		//Default local var for constructors
-		currentMethod->getVarTable()->addLocalVar("self", TypeNode::createIdType(currentClass->getClassName())->toDescriptor(), true);
+		currentScope->addLocalVar("self", TypeNode::createIdType(currentClass->getClassName())->toDescriptor(), true);
 
 		if (this->_hasArgs)
 		{
 			for (auto& arg : this->_argList->_vec)
 			{
-				currentMethod->getVarTable()->addLocalVar(arg->_argName, arg->_argType->toDescriptor(), true);
+				currentScope->addLocalVar(arg->_argName, arg->_argType->toDescriptor(), true);
 			}
 		}
 
 		this->_scannedConstructor = currentMethod;
+		this->_scannedScope = currentScope;
 	}
 	else
 	{
@@ -214,7 +216,8 @@ void ConstructorDeclNode::fillTable(ClassTable* classTable, InternalClass* curre
 			throw std::runtime_error("Critical error! Initial scan failed for constructor of class \"" + currentClass->getClassName() + "\"!" + LINE_AND_FILE);
 
 		currentMethod = this->_scannedConstructor;
+		currentScope = this->_scannedScope;
 
-		this->_body->fillTable(classTable, currentClass, currentMethod, initialScan);
+		this->_body->fillTable(classTable, currentClass, currentMethod, currentScope, initialScan);
 	}
 }

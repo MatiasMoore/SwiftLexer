@@ -377,7 +377,7 @@ void FuncDeclNode::generateDot(std::ofstream& file)
 
 }
 
-void FuncDeclNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, bool initialScan)
+void FuncDeclNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, VariableScope* currentScope, bool initialScan)
 {
 	if (currentClass == nullptr)
 		throw std::runtime_error("Func decl must be associated with a class!");
@@ -466,20 +466,23 @@ void FuncDeclNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 			currentMethod = currentClass->addInternalMethodToConstantTable(funcName, fullDesc, accessFlags, this->_body);
 		}
 
+		currentScope = currentMethod->getVarTable()->createRootVariableScope();
+
 		if (!isStatic)
 		{
-			currentMethod->getVarTable()->addLocalVar("self", TypeNode::createIdType(currentClass->getClassName())->toDescriptor(), true);
+			currentScope->addLocalVar("self", TypeNode::createIdType(currentClass->getClassName())->toDescriptor(), true);
 		}
 
 		if (this->_hasArgs)
 		{
 			for (auto& arg : this->_argList->_vec)
 			{
-				currentMethod->getVarTable()->addLocalVar(arg->_argName, arg->_argType->toDescriptor(), true);
+				currentScope->addLocalVar(arg->_argName, arg->_argType->toDescriptor(), true);
 			}
 		}
 
 		this->_scannedMethod = currentMethod;
+		this->_scannedScope = currentScope;
 	}
 	else
 	{
@@ -506,8 +509,8 @@ void FuncDeclNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 		}
 		
 		currentMethod = this->_scannedMethod;
-
-		this->_body->fillTable(classTable, currentClass, currentMethod, initialScan);
+		currentScope = this->_scannedScope;
+		this->_body->fillTable(classTable, currentClass, currentMethod, currentScope, initialScan);
 	}
 }
 

@@ -18,9 +18,9 @@ enum FuncCallScopeType
 class FuncCallNode : public Dottable, public SemanticsBase
 {
 private:
-	ExternalMethod* findMethodForCall(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
-	ExternalMethod* findMethodWithTypeCasting(ExternalClass* classWithMethod, std::string methodName, bool shouldBeStatic, ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
-	std::string getArgsDescriptor(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
+	ExternalMethod* findMethodForCall(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, VariableScope* currentScope);
+	ExternalMethod* findMethodWithTypeCasting(ExternalClass* classWithMethod, std::string methodName, bool shouldBeStatic, ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, VariableScope* currentScope);
+	std::string getArgsDescriptor(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, VariableScope* currentScope);
 
 public:
 	bool _hasArgs;
@@ -51,9 +51,9 @@ public:
 
 	SemanticsBase* semanticsTransform(SemanticsStack stack) override;
 
-	TypeNode* evaluateType(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
+	TypeNode* evaluateType(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, VariableScope* currentScope);
 
-	void fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod);
+	void fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, VariableScope* currentScope);
 
 	std::vector<char> generateCode(InternalClass* currentClass, InternalMethod* currentMethod);
 };

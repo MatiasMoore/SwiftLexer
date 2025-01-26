@@ -2,17 +2,28 @@
 #include <map>
 #include <string>
 #include "ConstantTable.h"
+#include <vector>
+
+class VariableScope;
 
 /*! \brief Таблица локальных переменных. */
 class LocalVariableTable
 {
+private:
+    int _newLocalId = 0;
+    int getNewLocalId();
+    std::vector<VariableScope*> _variableScopes = {};
 public:
-    /// Контейнер элементов.
-    std::map<std::string, class LocalVariableElement*> items = {};
 
-    LocalVariableElement* addLocalVar(std::string name, std::string descriptor, bool isConst);
+    VariableScope* getRootScope();
 
-    LocalVariableElement* findLocalVar(std::string name);
+    VariableScope* createRootVariableScope();
+
+    VariableScope* createVariableScope(VariableScope* parent);
+
+    int getTotalVarCount();
+
+    friend class VariableScope;
 };
 
 class LocalVariableElement

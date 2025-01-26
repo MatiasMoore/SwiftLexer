@@ -37,7 +37,7 @@ public:
 
 	void generateDot(std::ofstream& file);
 
-	void fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, bool initialScan = false);
+	void fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, VariableScope* currentScope, bool initialScan = false);
 
 	SemanticsBase* semanticsTransform(SemanticsStack stack) override;
 };
