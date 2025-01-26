@@ -4,47 +4,63 @@ func dfs(_ array: [[Int]], _ row: Int, _ col: Int, _ rows: Int, _ cols: Int, _ s
 
     // Проверка границ массива
     if row < 0 || row >= rows || col < 0 || col >= cols {
-        return newArray
+        return newArray // Выход из рекурсии при выходе за границы
     }
 
     // Проверка цвета
     if newArray[row][col] != startColor {
-        return newArray
+        return newArray // Выход из рекурсии, если цвет не совпадает
     }
 
     // Замена цвета
     newArray[row][col] = newColor
 
     // Рекурсивные вызовы, передавая новый массив
-    newArray = dfs(newArray, row + 1, col, rows, cols, startColor, newColor) // вниз
-    newArray = dfs(newArray, row - 1, col, rows, cols, startColor, newColor) // вверх
-    newArray = dfs(newArray, row, col + 1, rows, cols, startColor, newColor) // вправо
-    newArray = dfs(newArray, row, col - 1, rows, cols, startColor, newColor) // влево
-
-    return newArray
+    var result = dfs(newArray, row + 1, col, rows, cols, startColor, newColor) // вниз
+    result = dfs(result, row - 1, col, rows, cols, startColor, newColor) // вверх
+    result = dfs(result, row, col + 1, rows, cols, startColor, newColor) // вправо
+    result = dfs(result, row, col - 1, rows, cols, startColor, newColor) // влево
+    return result // Возвращаем обновленный массив после всех рекурсивных вызовов
 }
 
-func floodFill(_ array: [[Int]], _ x: Int, _ y: Int, _ newColor: Int, _ rows: Int, _ cols: Int) -> [[Int]] {
+func floodFill(_ array: [[Int]], _ x: Int, _ y: Int, _ newColor: Int) -> [[Int]] {
+    // Получаем размеры массива динамически
+    let rows = array.count
+    let cols = array[0].count
+
+    // Проверка на корректность начальных координат
+    if x < 0 || x >= rows || y < 0 || y >= cols {
+        print("Начальные координаты за пределами массива")
+        return array
+    }
+
     let startColor = array[x][y]
 
     // Если цвет совпадает, возвращаем оригинальный массив
     if startColor == newColor {
+        print("Цвета совпадают, заливка не требуется")
         return array
     }
 
     // Запускаем DFS
-    return dfs(array, x, y, rows, cols, startColor, newColor)
+    return dfs(array, x, y, rows, cols, startColor, newColor) // Исправлено: передаем rows и cols
 }
 
 // Тестирование функции
 let field = [
-    [1, 1, 1, 0, 0],
-    [1, 1, 0, 0, 0],
-    [1, 0, 0, 1, 1],
-    [0, 0, 1, 1, 1]
-]
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,1,0,1,1,1,1,1,1,0],
+        [0,1,0,1,0,0,0,0,1,0],
+        [0,1,0,1,0,1,1,0,1,0],
+        [0,1,0,1,0,0,1,0,1,0],
+        [0,1,0,1,0,0,1,0,1,0],
+        [0,1,0,1,1,1,1,0,1,0],
+        [0,1,0,0,0,1,0,0,1,0],
+        [0,1,1,1,1,1,1,1,1,0],
+        [0,0,0,0,0,0,0,0,0,0]
+    ]
 
-print("Исходное поле:\n")
+print("currentField:\n")
 for row in field {
     for element in row {
         print(" " + element)
@@ -52,9 +68,10 @@ for row in field {
     print("\n")
 }
 
-let updatedField = floodFill(field, 1, 1, 2, 4, 5)
+// Исправленный вызов floodFill с автоматическим определением размеров массива
+let updatedField = floodFill(field, 0, 0, 2)
 
-print("\nПоле после закраски:\n")
+print("\nUpdated field:\n")
 for r in updatedField {
     for el in r {
         print(" " + el)
