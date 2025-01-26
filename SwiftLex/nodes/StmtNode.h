@@ -151,6 +151,7 @@ class StmtListNode : public GenericListNode<StmtNode, StmtListNode>, public Sema
 {
 public:
 	bool _isLogAndBufInitialized = false;
+	bool _isLogOrBufInitialized = false;
 	std::string getName() override;
 
 	SemanticsBase* semanticsTransform(SemanticsStack stack) override;
