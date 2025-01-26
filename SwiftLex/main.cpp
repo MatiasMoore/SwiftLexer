@@ -154,7 +154,7 @@ int main(int argc, const char* argv[])
 
 	try
 	{
-		_root->fillTable(&classTable, nullptr, nullptr, true);
+		_root->fillTable(&classTable, nullptr, nullptr, nullptr, true);
 	}
 	catch (std::runtime_error error)
 	{
@@ -164,7 +164,7 @@ int main(int argc, const char* argv[])
 
 	try
 	{
-		_root->fillTable(&classTable, nullptr, nullptr);
+		_root->fillTable(&classTable, nullptr, nullptr, nullptr);
 	}
 	catch (std::runtime_error error)
 	{
@@ -180,7 +180,8 @@ int main(int argc, const char* argv[])
 			continue;
 		try
 		{
-			staticConstuctor->_body->fillTable(&classTable, classElem, staticConstuctor);
+			//FIXME
+			staticConstuctor->_body->fillTable(&classTable, classElem, staticConstuctor, staticConstuctor->getVarTable()->createRootVariableScope());
 		}
 		catch (std::runtime_error error)
 		{

@@ -42,10 +42,10 @@ SemanticsBase* FuncCallArgNode::semanticsTransform(SemanticsStack stack)
     return this;
 }
 
-void FuncCallArgNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
+void FuncCallArgNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, VariableScope* currentScope)
 {
-    this->_value->fillTable(classTable, currentClass, currentMethod);
-    this->_argType = this->_value->evaluateType(classTable, currentClass, currentMethod);
+    this->_value->fillTable(classTable, currentClass, currentMethod, currentScope);
+    this->_argType = this->_value->evaluateType(classTable, currentClass, currentMethod, currentScope);
 }
 
 std::vector<char> FuncCallArgNode::generateCode(InternalClass* currentClass, InternalMethod* currentMethod)
@@ -65,11 +65,11 @@ SemanticsBase* FuncCallArgListNode::semanticsTransform(SemanticsStack stack)
     return SemanticsBase::semanticsTransformVector<FuncCallArgNode>(stack, this, _vec);
 }
 
-void FuncCallArgListNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
+void FuncCallArgListNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, VariableScope* currentScope)
 {
     for (auto& elem : _vec)
     {
-        elem->fillTable(classTable, currentClass, currentMethod);
+        elem->fillTable(classTable, currentClass, currentMethod, currentScope);
     }
 }
 

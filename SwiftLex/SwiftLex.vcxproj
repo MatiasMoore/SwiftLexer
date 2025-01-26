@@ -71,6 +71,7 @@
     <ClCompile Include="nodes\ThrowNode.cpp" />
     <ClCompile Include="nodes\TryNode.cpp" />
     <ClCompile Include="nodes\SwitchNode.cpp" />
+    <ClCompile Include="tables\VariableScope.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt" />
@@ -133,6 +134,7 @@
     <ClInclude Include="nodes\SwitchNode.h" />
     <ClInclude Include="tables\MethodAccessFlag.h" />
     <ClInclude Include="tables\tables.h" />
+    <ClInclude Include="tables\VariableScope.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

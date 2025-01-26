@@ -7,7 +7,7 @@
 #include "../GlobalSettings.h"
 #include "../RTLHelper.h"
 
-ExternalMethod* FuncCallNode::findMethodForCall(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
+ExternalMethod* FuncCallNode::findMethodForCall(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, VariableScope* currentScope)
 {
 	
 	if (this->_scopeType == normalCall)
@@ -18,11 +18,11 @@ ExternalMethod* FuncCallNode::findMethodForCall(ClassTable* classTable, Internal
 		// Constructor call
 		if (isConstructorCall)
 		{
-			auto constructorMethod = this->findMethodWithTypeCasting(classWithFuncName, "<init>", false, classTable, currentClass, currentMethod);
+			auto constructorMethod = this->findMethodWithTypeCasting(classWithFuncName, "<init>", false, classTable, currentClass, currentMethod, currentScope);
 
 			if (constructorMethod == nullptr)
 				throw std::runtime_error("Class \"" + this->_funcName + "\" has no constructor with descriptor \"" + 
-					this->getArgsDescriptor(classTable, currentClass, currentMethod) + "\"!" + LINE_AND_FILE);
+					this->getArgsDescriptor(classTable, currentClass, currentMethod, currentScope) + "\"!" + LINE_AND_FILE);
 
 			return constructorMethod;
 		}
@@ -37,14 +37,14 @@ ExternalMethod* FuncCallNode::findMethodForCall(ClassTable* classTable, Internal
 		// Static call
 		if (isCallStatic)
 		{
-			auto asExternalMethod = this->findMethodWithTypeCasting(currentClass, this->_funcName, true, classTable, currentClass, currentMethod);
+			auto asExternalMethod = this->findMethodWithTypeCasting(currentClass, this->_funcName, true, classTable, currentClass, currentMethod, currentScope);
 			auto methodInThisClass = dynamic_cast<InternalMethod*>(asExternalMethod);
 
 			if (methodInThisClass == nullptr)
 			{
 				if (!isConstructorCall)
 					throw std::runtime_error("Static method \"" + this->_funcName + "\" with descriptor\"" + 
-						this->getArgsDescriptor(classTable, currentClass, currentMethod)  + "\" is not defined in class \"" + currentClass->getClassName() + "\"" + LINE_AND_FILE);
+						this->getArgsDescriptor(classTable, currentClass, currentMethod, currentScope)  + "\" is not defined in class \"" + currentClass->getClassName() + "\"" + LINE_AND_FILE);
 			}
 
 			return methodInThisClass;
@@ -52,11 +52,11 @@ ExternalMethod* FuncCallNode::findMethodForCall(ClassTable* classTable, Internal
 		// Dynamic call
 		else
 		{
-			auto asExternalMethod = this->findMethodWithTypeCasting(currentClass, this->_funcName, false, classTable, currentClass, currentMethod);
+			auto asExternalMethod = this->findMethodWithTypeCasting(currentClass, this->_funcName, false, classTable, currentClass, currentMethod, currentScope);
 			
 			if (asExternalMethod == nullptr)
 				throw std::runtime_error("Dynamic method \"" + this->_funcName + "\" with descriptor\"" +
-					this->getArgsDescriptor(classTable, currentClass, currentMethod) + "\" is not defined in class \"" + currentClass->getClassName() + "\"" + LINE_AND_FILE);
+					this->getArgsDescriptor(classTable, currentClass, currentMethod, currentScope) + "\" is not defined in class \"" + currentClass->getClassName() + "\"" + LINE_AND_FILE);
 
 			bool methodInThisClass = asExternalMethod->getClassName() == currentClass->getClassName();
 
@@ -64,7 +64,7 @@ ExternalMethod* FuncCallNode::findMethodForCall(ClassTable* classTable, Internal
 			{
 				if (!isConstructorCall)
 					throw std::runtime_error("Dynamic method \"" + this->_funcName + "\" with descriptor\"" + 
-						this->getArgsDescriptor(classTable, currentClass, currentMethod) + "\" is not defined in class \"" + currentClass->getClassName() + "\"" + LINE_AND_FILE);
+						this->getArgsDescriptor(classTable, currentClass, currentMethod, currentScope) + "\" is not defined in class \"" + currentClass->getClassName() + "\"" + LINE_AND_FILE);
 			}
 
 			return asExternalMethod;
@@ -84,17 +84,17 @@ ExternalMethod* FuncCallNode::findMethodForCall(ClassTable* classTable, Internal
 			if (classElem == nullptr)
 				throw std::runtime_error("Unknown identifier \"" + className + "\"in function call!" + LINE_AND_FILE);
 
-			auto method = this->findMethodWithTypeCasting(classElem, this->_funcName, true, classTable, currentClass, currentMethod);
+			auto method = this->findMethodWithTypeCasting(classElem, this->_funcName, true, classTable, currentClass, currentMethod, currentScope);
 			if (method == nullptr)
 				throw std::runtime_error("Static method \"" + this->_funcName + "\" with descriptor\"" + 
-					this->getArgsDescriptor(classTable, currentClass, currentMethod) + "\" is not defined in class \"" + className + "\"!" + LINE_AND_FILE);
+					this->getArgsDescriptor(classTable, currentClass, currentMethod, currentScope) + "\" is not defined in class \"" + className + "\"!" + LINE_AND_FILE);
 
 			return method;
 		}
 		// Dynamic call
 		else
 		{
-			auto leftDesc = this->_exprAccess->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+			auto leftDesc = this->_exprAccess->evaluateType(classTable, currentClass, currentMethod, currentScope)->toDescriptor();
 			if (leftDesc[0] != 'L')
 				throw std::runtime_error("Primitive types don't have methods!" + LINE_AND_FILE);
 
@@ -104,10 +104,10 @@ ExternalMethod* FuncCallNode::findMethodForCall(ClassTable* classTable, Internal
 			if (classElem == nullptr)
 				throw std::runtime_error("Critical error! Class \"" + className + "\" is not found!" + LINE_AND_FILE);
 			
-			auto method = this->findMethodWithTypeCasting(classElem, this->_funcName, false, classTable, currentClass, currentMethod);
+			auto method = this->findMethodWithTypeCasting(classElem, this->_funcName, false, classTable, currentClass, currentMethod, currentScope);
 			if (method == nullptr)
 				throw std::runtime_error("Dynamic method \"" + this->_funcName + "\" with descriptor\"" + 
-					this->getArgsDescriptor(classTable, currentClass, currentMethod) + "\" is not defined in class \"" + className + "\"!" + LINE_AND_FILE);
+					this->getArgsDescriptor(classTable, currentClass, currentMethod, currentScope) + "\" is not defined in class \"" + className + "\"!" + LINE_AND_FILE);
 
 			return method;
 		}
@@ -118,24 +118,24 @@ ExternalMethod* FuncCallNode::findMethodForCall(ClassTable* classTable, Internal
 	}
 }
 
-std::string FuncCallNode::getArgsDescriptor(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
+std::string FuncCallNode::getArgsDescriptor(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, VariableScope* currentScope)
 {
 	std::string funcCallArgDescriptor = "(";
 	if (this->_hasArgs) {
 		for (auto arg : this->_funcArgs->_vec)
 		{
-			funcCallArgDescriptor += arg->_value->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+			funcCallArgDescriptor += arg->_value->evaluateType(classTable, currentClass, currentMethod, currentScope)->toDescriptor();
 		}
 	}
 	funcCallArgDescriptor += ")";
 	return funcCallArgDescriptor;
 }
 
-ExternalMethod* FuncCallNode::findMethodWithTypeCasting(ExternalClass* classWithMethod, std::string methodName, bool shouldBeStatic, ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
+ExternalMethod* FuncCallNode::findMethodWithTypeCasting(ExternalClass* classWithMethod, std::string methodName, bool shouldBeStatic, ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, VariableScope* currentScope)
 {
 	ExternalMethod* method = nullptr;
 
-	auto funcCallArgDescriptor = this->getArgsDescriptor(classTable, currentClass, currentMethod);
+	auto funcCallArgDescriptor = this->getArgsDescriptor(classTable, currentClass, currentMethod, currentScope);
 
 	// Just use a perfectly matching method if it's found
 	auto perfectMatch = classWithMethod->findMethod(methodName, funcCallArgDescriptor, shouldBeStatic);
@@ -172,7 +172,7 @@ ExternalMethod* FuncCallNode::findMethodWithTypeCasting(ExternalClass* classWith
 		{
 			auto ourArg = this->_funcArgs->_vec[argNum];
 			auto requiredDesc = potentialMethodArgs[argNum];
-			auto ourArgDesc = ourArg->_value->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+			auto ourArgDesc = ourArg->_value->evaluateType(classTable, currentClass, currentMethod, currentScope)->toDescriptor();
 
 			// This arg matches perfectly
 			if (requiredDesc == ourArgDesc)
@@ -394,9 +394,9 @@ SemanticsBase* FuncCallNode::semanticsTransform(SemanticsStack stack)
 	}
 }
 
-TypeNode* FuncCallNode::evaluateType(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
+TypeNode* FuncCallNode::evaluateType(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, VariableScope* currentScope)
 {
-	auto method = this->findMethodForCall(classTable, currentClass, currentMethod);
+	auto method = this->findMethodForCall(classTable, currentClass, currentMethod, currentScope);
 	bool isConstructor = method->getMethodName() == "<init>";
 	if (isConstructor)
 	{
@@ -409,7 +409,7 @@ TypeNode* FuncCallNode::evaluateType(ClassTable* classTable, InternalClass* curr
 	}
 }
 
-void FuncCallNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
+void FuncCallNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, VariableScope* currentScope)
 {
 	if (currentClass == nullptr)
 		throw std::runtime_error("Function call must be associated with a class!");
@@ -418,12 +418,12 @@ void FuncCallNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 		throw std::runtime_error("Function call must be inside a method!");
 
 	if (this->_scopeType == FuncCallScopeType::exprAccessCall)
-		this->_exprAccess->fillTable(classTable, currentClass, currentMethod);
+		this->_exprAccess->fillTable(classTable, currentClass, currentMethod, currentScope);
 
 	if (this->_hasArgs)
-		this->_funcArgs->fillTable(classTable, currentClass, currentMethod);
+		this->_funcArgs->fillTable(classTable, currentClass, currentMethod, currentScope);
 
-	auto method = this->findMethodForCall(classTable, currentClass, currentMethod);
+	auto method = this->findMethodForCall(classTable, currentClass, currentMethod, currentScope);
 
 	//Check for permission to call method
 	bool isMethodFromOurClass = method->getClassName() == currentClass->getClassName() 
@@ -436,7 +436,7 @@ void FuncCallNode::fillTable(ClassTable* classTable, InternalClass* currentClass
 			+ currentClass->getClassName() + "\"!" + LINE_AND_FILE);
 
 	if (this->_newFuncArgs != nullptr)
-		this->_newFuncArgs->fillTable(classTable, currentClass, currentMethod);
+		this->_newFuncArgs->fillTable(classTable, currentClass, currentMethod, currentScope);
 
 	this->_methodRef = currentClass->getMethodRefForExternalMethod(method);
 	bool isContructor = method->getMethodName() == "<init>";

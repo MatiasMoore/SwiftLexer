@@ -685,7 +685,7 @@ SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 	return this;
 }
 
-TypeNode* ExprNode::evaluateType(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
+TypeNode* ExprNode::evaluateType(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, VariableScope* currentScope)
 {
 	if (this->_type == ExprType::String)
 	{
@@ -709,11 +709,11 @@ TypeNode* ExprNode::evaluateType(ClassTable* classTable, InternalClass* currentC
 
 		if (currentMethod == nullptr)
 			throw std::runtime_error("This id \"" + this->_stringValue + "\" can't be used in this context!" + LINE_AND_FILE);
-		auto localVar = currentMethod->getVarTable()->findLocalVar(this->_stringValue);
+		auto localVar = currentScope->findLocalVar(this->_stringValue);
 		auto nonStaticClassfield = currentClass->findField(this->_stringValue, false);
 
 		if (isSuper)
-			localVar = currentMethod->getVarTable()->findLocalVar("self");
+			localVar = currentScope->findLocalVar("self");
 
 		bool isLocalVar = localVar != nullptr;
 		if (isLocalVar)
@@ -739,12 +739,12 @@ TypeNode* ExprNode::evaluateType(ClassTable* classTable, InternalClass* currentC
 		std::string classId = "";
 
 		bool isLeftSideComplex = this->_fieldAccessExpr->_type != ExprType::Id;
-		bool isLocalVar = !isLeftSideComplex && currentMethod != nullptr && currentMethod->getVarTable()->items.count(this->_fieldAccessExpr->_stringValue);
+		bool isLocalVar = !isLeftSideComplex && currentMethod != nullptr && currentScope != nullptr && currentScope->findLocalVar(this->_fieldAccessExpr->_stringValue) != nullptr;
 		bool isStatic = !isLeftSideComplex && !isLocalVar;
 
 		if (isLeftSideComplex)
 		{
-			auto leftSideType = this->_fieldAccessExpr->evaluateType(classTable, currentClass, currentMethod);
+			auto leftSideType = this->_fieldAccessExpr->evaluateType(classTable, currentClass, currentMethod, currentScope);
 			if (leftSideType->_type != TypeType::IdT)
 				throw std::runtime_error("Left side of a complex field access expects id, but got type with enum " + std::to_string(leftSideType->_type) + "!");
 
@@ -773,7 +773,7 @@ TypeNode* ExprNode::evaluateType(ClassTable* classTable, InternalClass* currentC
 			if (currentMethod == nullptr)
 				throw std::runtime_error("Can't use field access with field \"" + this->_fieldAccessFieldName + "\" in this context" + LINE_AND_FILE);
 
-			auto localVar = currentMethod->getVarTable()->findLocalVar(this->_fieldAccessExpr->_stringValue);
+			auto localVar = currentScope->findLocalVar(this->_fieldAccessExpr->_stringValue);
 			if (localVar->_descriptor.size() == 1)
 				throw std::runtime_error("Primitive types can't be used with field access!");
 
@@ -795,7 +795,7 @@ TypeNode* ExprNode::evaluateType(ClassTable* classTable, InternalClass* currentC
 	}
 	else if (this->_type == ExprType::FuncCall)
 	{
-		return this->_funcCall->evaluateType(classTable, currentClass, currentMethod);
+		return this->_funcCall->evaluateType(classTable, currentClass, currentMethod, currentScope);
 	}
 	else if (this->_type == ExprType::ArrayCreation)
 	{
@@ -803,7 +803,7 @@ TypeNode* ExprNode::evaluateType(ClassTable* classTable, InternalClass* currentC
 	}
 	else if (this->_type == ExprType::Subscript)
 	{
-		auto arrayType = this->_left->evaluateType(classTable, currentClass, currentMethod);
+		auto arrayType = this->_left->evaluateType(classTable, currentClass, currentMethod, currentScope);
 		if (arrayType->_type != TypeType::ArrayT)
 			throw std::runtime_error("Can't evaluate type for subcript because the left expresion in not an array!" + LINE_AND_FILE);
 
@@ -815,7 +815,7 @@ TypeNode* ExprNode::evaluateType(ClassTable* classTable, InternalClass* currentC
 	}
 }
 
-void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
+void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, VariableScope* currentScope)
 {
 	if (currentClass == nullptr)
 		throw std::runtime_error("Expression must be associated with a class!");
@@ -823,12 +823,12 @@ void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 	switch (this->_type)
 	{
 	case ExprType::FuncCall:
-		this->_funcCall->fillTable(classTable, currentClass, currentMethod);
+		this->_funcCall->fillTable(classTable, currentClass, currentMethod, currentScope);
 		break;
 
 	case ExprType::FieldAccess:
 	{
-		this->_fieldAccessExpr->fillTable(classTable, currentClass, currentMethod);
+		this->_fieldAccessExpr->fillTable(classTable, currentClass, currentMethod, currentScope);
 
 		bool isStatic = this->_fieldAccessExpr->_type == ExprType::Id && classTable->findClass(this->_fieldAccessExpr->_stringValue) != nullptr;
 
@@ -850,7 +850,7 @@ void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 		// Dynamic access
 		else
 		{
-			auto leftDesc = this->_fieldAccessExpr->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+			auto leftDesc = this->_fieldAccessExpr->evaluateType(classTable, currentClass, currentMethod, currentScope)->toDescriptor();
 			if (leftDesc[0] != 'L')
 				throw std::runtime_error("Primitive types don't have methods!" + LINE_AND_FILE);
 
@@ -898,9 +898,16 @@ void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 	{
 		bool isSelf = this->_stringValue == "self";
 		bool isSuper = this->_stringValue == "super";
-		if (isSelf)
+		bool isClassField = currentClass->findField(this->_stringValue, false) != nullptr && currentMethod != nullptr && currentScope != nullptr && currentScope->findLocalVar(_stringValue) == nullptr;
+
+		if (isClassField)
 		{
-			auto selfLocalVar = currentMethod->getVarTable()->findLocalVar("self");
+			auto field = currentClass->findField(this->_stringValue, false);
+			_fieldRef = currentClass->getFieldRefForExternalField(field);
+		}
+		else if (isSelf)
+		{
+			auto selfLocalVar = currentScope->findLocalVar("self");
 			if (selfLocalVar == nullptr)
 				throw std::runtime_error("Keyword \"self\" is only allowed inside non-static methods!");
 
@@ -914,25 +921,28 @@ void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 			bool isCurrentMethodStatic = currentMethod->containsFlag(MethodAccessFlag::M_ACC_STATIC);
 			if (isCurrentMethodStatic)
 				throw std::runtime_error("Critical error! Static methods can't have a \"self\" variable defined!" + LINE_AND_FILE);
+
+			this->_idLocalVar = selfLocalVar;
 		}
 		else if (isSuper)
 		{
-			auto selfLocalVar = currentMethod->getVarTable()->findLocalVar("self");
+			auto selfLocalVar = currentScope->findLocalVar("self");
 			if (selfLocalVar == nullptr)
 				throw std::runtime_error("Keyword \"super\" is only allowed inside non-static methods!");
+
+			this->_idLocalVar = selfLocalVar;
 		}
-		bool isClassField = currentClass->findField(this->_stringValue, false) != nullptr && currentMethod != nullptr && currentMethod->getVarTable()->findLocalVar(_stringValue) == nullptr;
-		if (isClassField)
+		else
 		{
-			auto field = currentClass->findField(this->_stringValue, false);
-			_fieldRef = currentClass->getFieldRefForExternalField(field);
+			this->_idLocalVar = currentScope->findLocalVar(this->_stringValue);
 		}
+		
 	}
 		//Do nothing
 		break;
 	case ExprType::ArrayCreation:
 	{
-		this->_arrayExprList->fillTable(classTable, currentClass, currentMethod);
+		this->_arrayExprList->fillTable(classTable, currentClass, currentMethod, currentScope);
 
 		bool allClasses = true;
 		bool allArrays = true;
@@ -941,7 +951,7 @@ void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 
 		for (auto& elem : this->_arrayExprList->_vec)
 		{
-			auto desc = elem->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+			auto desc = elem->evaluateType(classTable, currentClass, currentMethod, currentScope)->toDescriptor();
 
 			bool isClass = desc[0] == 'L';
 			bool isArray = desc[0] == '[';
@@ -957,7 +967,7 @@ void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 
 		//If only one element
 		if (this->_arrayExprList->_vec.size() == 1)
-			commonBaseClass = classnameFromDescriptor(this->_arrayExprList->_vec[0]->evaluateType(classTable, currentClass, currentMethod)->toDescriptor());
+			commonBaseClass = classnameFromDescriptor(this->_arrayExprList->_vec[0]->evaluateType(classTable, currentClass, currentMethod, currentScope)->toDescriptor());
 
 		//Try to find common base class
 		for (int i = 0; i < this->_arrayExprList->_vec.size() - 1; i++)
@@ -965,8 +975,8 @@ void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 			auto currentElem = this->_arrayExprList->_vec[i];
 			auto nextElem = this->_arrayExprList->_vec[i + 1];
 
-			auto currentElemDesc = currentElem->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
-			auto nextElemDesc = nextElem->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+			auto currentElemDesc = currentElem->evaluateType(classTable, currentClass, currentMethod, currentScope)->toDescriptor();
+			auto nextElemDesc = nextElem->evaluateType(classTable, currentClass, currentMethod, currentScope)->toDescriptor();
 
 			auto currentElemClassName = classnameFromDescriptor(currentElemDesc);
 			auto nextElemClassName = classnameFromDescriptor(nextElemDesc);
@@ -1016,7 +1026,7 @@ void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 		if (allArrays)
 		{
 			if (this->_arrayExprList->_vec.size() == 1)
-				elemDimCount = dimCountFromDescriptor(this->_arrayExprList->_vec[0]->evaluateType(classTable, currentClass, currentMethod)->toDescriptor());
+				elemDimCount = dimCountFromDescriptor(this->_arrayExprList->_vec[0]->evaluateType(classTable, currentClass, currentMethod, currentScope)->toDescriptor());
 
 			//Try to find common dim count
 			for (int i = 0; i < this->_arrayExprList->_vec.size() - 1; i++)
@@ -1024,8 +1034,8 @@ void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 				auto currentElem = this->_arrayExprList->_vec[i];
 				auto nextElem = this->_arrayExprList->_vec[i + 1];
 
-				auto currentElemDesc = currentElem->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
-				auto nextElemDesc = nextElem->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+				auto currentElemDesc = currentElem->evaluateType(classTable, currentClass, currentMethod, currentScope)->toDescriptor();
+				auto nextElemDesc = nextElem->evaluateType(classTable, currentClass, currentMethod, currentScope)->toDescriptor();
 
 				auto currentElemDimCount = dimCountFromDescriptor(currentElemDesc);
 				auto nextElemDimCount = dimCountFromDescriptor(nextElemDesc);
@@ -1061,9 +1071,9 @@ void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 		break;
 	case ExprType::Subscript:
 	{
-		this->_left->fillTable(classTable, currentClass, currentMethod);
+		this->_left->fillTable(classTable, currentClass, currentMethod, currentScope);
 
-		auto leftDesc = this->_left->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+		auto leftDesc = this->_left->evaluateType(classTable, currentClass, currentMethod, currentScope)->toDescriptor();
 
 		if (leftDesc[0] != '[')
 			throw std::runtime_error("Subcript can only be used on array expressions but got expression with descriptor \"" + leftDesc + "\"!" + LINE_AND_FILE);
@@ -1071,7 +1081,7 @@ void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 		if (leftDesc[1] != 'L' && leftDesc[1] != '[')
 			throw std::runtime_error("Can only subscript from reference arrays!" + LINE_AND_FILE);
 
-		auto rightDesc = this->_right->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+		auto rightDesc = this->_right->evaluateType(classTable, currentClass, currentMethod, currentScope)->toDescriptor();
 
 		if (rightDesc != "I")
 		{
@@ -1084,7 +1094,7 @@ void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 			this->_right = newRight;
 		}
 
-		this->_right->fillTable(classTable, currentClass, currentMethod);
+		this->_right->fillTable(classTable, currentClass, currentMethod, currentScope);
 	}
 	break;
 	default:
@@ -1115,10 +1125,7 @@ std::vector<char> ExprNode::generateCode(InternalClass* currentClass, InternalMe
 		break;
 	case ExprType::Id:
 	{
-		bool isSuper = this->_stringValue == "super";
-		LocalVariableElement*  localVar = currentMethod->getVarTable()->findLocalVar(this->_stringValue);
-		if (isSuper)
-			localVar = currentMethod->getVarTable()->findLocalVar("self");
+		LocalVariableElement* localVar = this->_idLocalVar;
 		ExternalField* nonStaticClassfield = currentClass->findField(this->_stringValue, false);
 		if (localVar == nullptr && nonStaticClassfield == nullptr)
 			throw std::runtime_error("Critical error! Local var \"" + this->_stringValue + "\" is not defined!" + LINE_AND_FILE);
@@ -1209,10 +1216,10 @@ SemanticsBase* ExprListNode::semanticsTransform(SemanticsStack stack)
 	return SemanticsBase::semanticsTransformVector<ExprNode>(stack, this, _vec);
 }
 
-void ExprListNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
+void ExprListNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, VariableScope* currentScope)
 {
 	for (auto& elem : _vec)
 	{
-		elem->fillTable(classTable, currentClass, currentMethod);
+		elem->fillTable(classTable, currentClass, currentMethod, currentScope);
 	}
 }

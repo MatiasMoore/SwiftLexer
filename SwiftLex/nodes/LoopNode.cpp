@@ -209,7 +209,7 @@ SemanticsBase* LoopNode::semanticsTransform(SemanticsStack stack)
 	return this;
 }
 
-void LoopNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
+void LoopNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, VariableScope* currentScope)
 {
 	if (this->_conditions->_vec.size() == 0)
 		throw std::runtime_error("Loops must have an expression inside brackets!" + LINE_AND_FILE);
@@ -219,7 +219,7 @@ void LoopNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 
 	auto condition = this->_conditions->_vec[0];
 
-	auto conditionDesc = condition->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+	auto conditionDesc = condition->evaluateType(classTable, currentClass, currentMethod, currentScope)->toDescriptor();
 
 	//Cast to bool 
 	if (conditionDesc != "Z")
@@ -231,21 +231,23 @@ void LoopNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 		condition = newCondition;
 	}
 
-	condition->fillTable(classTable, currentClass, currentMethod);
+	condition->fillTable(classTable, currentClass, currentMethod, currentScope);
 
+	currentScope = currentMethod->getVarTable()->createVariableScope(currentScope);
+	this->_createdScope = currentScope;
 
 	if (this->_type == LoopNodeType::whileLoop)
 	{
 		if (this->_hasBody)
 		{
-			this->_body->fillTable(classTable, currentClass, currentMethod);
+			this->_body->fillTable(classTable, currentClass, currentMethod, currentScope);
 		}
 	}
 	else if (this->_type == LoopNodeType::repeatWhileLoop)
 	{
 		if (this->_hasBody)
 		{
-			this->_body->fillTable(classTable, currentClass, currentMethod);
+			this->_body->fillTable(classTable, currentClass, currentMethod, currentScope);
 		}
 	}
 	else
