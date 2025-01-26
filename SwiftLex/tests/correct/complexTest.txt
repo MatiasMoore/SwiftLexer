@@ -1,0 +1,240 @@
+// Класс для представления точки на плоскости
+class Point {
+    public var x: Int
+    public var y: Int
+    
+    init(x: Int, y: Int) {
+        self.x = x
+        self.y = y
+    }
+    
+    public static func +(lhs: Point, rhs: Point) -> Point {
+        return Point(lhs.x + rhs.x, lhs.y + rhs.y)
+    }
+    
+    public func description() -> String {
+        return "(" + x + ", " + y + ")"
+    }
+}
+    
+// Простая функция
+func addTwoNumbers(a: Int, b: Int) -> Int {
+	return a + b
+}
+
+
+    // Объявление переменных
+    var count: Int = 10
+    let name: String = "Alice"
+    var price: Float = 99.99
+    var isOn: Bool = true
+
+
+    // Использование операторов
+    var sum = 10 + 5
+    var isEqual = 5 == 5
+        
+    // Использование диапазонов
+    var range = 1...5
+    var notInRange = 1..<5
+    print(" ")     
+    // Использование условных операторов
+    if count > 5 {
+        print("count > 5")
+    } else {
+        print("count <= 5")
+    }
+    print(" ") 
+    // Цикл for
+    for i in range {
+        print("For cycle " + i)
+    }
+    print(" ")
+    // Цикл while
+    while count > 0 {
+        print("While cycle count = " + count)
+        count = count - 1
+    }
+    print(" ")
+    // Цикл repeat-while
+    count = 10
+    repeat {
+        print("repeat-while count = " + count)
+        count = count - 1
+    } while count > 0
+        
+    print(" ")
+    // Использование класса Point
+    let point1 = Point(1, 2)
+    print("Create point1: " + point1.description())
+    let point2 = Point(3, 4)
+    print("Create point2: " + point2.description())
+    let sumPoint = point1 + point2
+    print("result of sum: " + sumPoint.description())
+
+    // Пример работы с массивом
+    var numbers: [Int] = [1, 2, 3, 4, 5]
+    print("first array element: " + numbers[0])
+
+    var arrayCount = numbers.count
+    while arrayCount > 0 {
+		print("Array element: " + numbers[arrayCount - 1])
+		arrayCount = arrayCount - 1
+	}
+
+    // Печать данных
+    print("name: " + name)
+    print("Price: " + price)
+    print("osOn: " + isOn)
+		
+	// Простой пример использования функции
+	let result = addTwoNumbers(5, 3)
+	print("Function result: " + result)
+
+print(4 + 5)
+print(4 - 5)
+print(4 * 5)
+print(4 / 5)
+
+print(5.789 + 0.147)
+print(5.789 - 0.147)
+print(5.789 * 0.147)
+print(5.789 / 0.147)
+
+print(4 + 0.147)
+print(4 - 0.147)
+print(4 * 0.147)
+print(4 / 0.147)
+
+print(5.789 + 4)
+print(5.789 - 4)
+print(5.789 * 4)
+print(5.789 / 4)
+
+var intVar = 4
+var floatVar = 5.1234
+
+print(intVar + 5)
+print(intVar - 5)
+print(intVar * 5)
+print(intVar / 5)
+
+print(floatVar + 0.147)
+print(floatVar - 0.147)
+print(floatVar * 0.147)
+print(floatVar / 0.147)
+
+print(1.7976931348623157e+308 + 1.7976931348623157e+308)
+
+class Parent{
+	public var a = 199
+
+	public func parentFuncToOverride() {
+		print("Parent Func to override!")
+	}
+
+}
+
+class Child : Parent{
+	override public func parentFuncToOverride() {
+		print("Child 1 overriden Func!")
+	}
+}
+
+class Child2 : Parent{
+
+	override public func parentFuncToOverride() {
+		super.parentFuncToOverride()
+		print("Child 2 overriden Func!")
+	}
+}
+
+
+var arr : [Parent] = [Parent(), Child(), Child2()]
+
+for elem in arr
+{
+	print("New elem:")
+	elem.parentFuncToOverride();
+}
+
+func dfs(_ array: [[Int]], _ row: Int, _ col: Int, _ rows: Int, _ cols: Int, _ startColor: Int, _ newColor: Int) -> [[Int]] {
+    // Создаём копию массива для работы
+    var newArray = array
+
+    // Проверка границ массива
+    if row < 0 || row >= rows || col < 0 || col >= cols {
+        return newArray // Выход из рекурсии при выходе за границы
+    }
+
+    // Проверка цвета
+    if newArray[row][col] != startColor {
+        return newArray // Выход из рекурсии, если цвет не совпадает
+    }
+
+    // Замена цвета
+    newArray[row][col] = newColor
+
+    // Рекурсивные вызовы, передавая новый массив
+    var result = dfs(newArray, row + 1, col, rows, cols, startColor, newColor) // вниз
+    result = dfs(result, row - 1, col, rows, cols, startColor, newColor) // вверх
+    result = dfs(result, row, col + 1, rows, cols, startColor, newColor) // вправо
+    result = dfs(result, row, col - 1, rows, cols, startColor, newColor) // влево
+    return result // Возвращаем обновленный массив после всех рекурсивных вызовов
+}
+
+func floodFill(_ array: [[Int]], _ x: Int, _ y: Int, _ newColor: Int) -> [[Int]] {
+    // Получаем размеры массива динамически
+    let rows = array.count
+    let cols = array[0].count
+
+    // Проверка на корректность начальных координат
+    if x < 0 || x >= rows || y < 0 || y >= cols {
+        print("Начальные координаты за пределами массива")
+        return array
+    }
+
+    let startColor = array[x][y]
+
+    // Если цвет совпадает, возвращаем оригинальный массив
+    if startColor == newColor {
+        print("Цвета совпадают, заливка не требуется")
+        return array
+    }
+
+    // Запускаем DFS
+    return dfs(array, x, y, rows, cols, startColor, newColor) // Исправлено: передаем rows и cols
+}
+
+// Тестирование функции
+let field = [
+        [0,0,0,0,0,0,0,0,0,0],
+        [0,1,0,1,1,1,1,1,1,0],
+        [0,1,0,1,0,0,0,0,1,0],
+        [0,1,0,1,0,1,1,0,1,0],
+        [0,1,0,1,0,0,1,0,1,0],
+        [0,1,0,1,0,0,1,0,1,0],
+        [0,1,0,1,1,1,1,0,1,0],
+        [0,1,0,0,0,1,0,0,1,0],
+        [0,1,1,1,1,1,1,1,1,0],
+        [0,0,0,0,0,0,0,0,0,0]
+    ]
+
+print("currentField:\n")
+for row in field {
+    for element in row {
+        print(" " + element)
+    }
+    print("\n")
+}
+
+// Исправленный вызов floodFill с автоматическим определением размеров массива
+let updatedField = floodFill(field, 0, 0, 2)
+
+print("\nUpdated field:\n")
+for r in updatedField {
+    for el in r {
+        print(" " + el)
+    }
+    print("\n")
+}
