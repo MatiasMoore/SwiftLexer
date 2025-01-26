@@ -212,7 +212,7 @@ ExternalMethod* FuncCallNode::findMethodWithTypeCasting(ExternalClass* classWith
 			// If this is not enabled, stop here
 			const std::set<std::string> alwaysCastTheseClasses = {
 				RTLHelper::_arrayC, RTLHelper::_baseC, RTLHelper::_floatC, RTLHelper::_boolC, 
-				RTLHelper::_intC, RTLHelper::_IOC, RTLHelper::_rangeC, RTLHelper::_strC
+				RTLHelper::_intC, RTLHelper::_IOC, RTLHelper::_rangeC
 			};
 			bool shouldAlwaysCastTheseClasses = 
 				isRequiredClass
