@@ -18,6 +18,11 @@ public class String {
         _value = java.lang.String.valueOf(f._value);
     }
 
+    public String(Boolean f)
+    {
+        _value = f._value ? "true" : "false";
+    }
+
     public Integer toInt()
     {
         return new Integer(java.lang.Integer.parseInt(this._value));
