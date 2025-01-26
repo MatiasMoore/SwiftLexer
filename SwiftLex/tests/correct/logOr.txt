@@ -1,0 +1,54 @@
+func trueFunc() -> Bool
+{
+	print("Hello from TRUE func!")
+	return true
+}
+
+func falseFunc() -> Bool
+{
+	print("Hello from FALSE func!")
+	return false
+}
+
+
+print("Only one print")
+if (trueFunc() || trueFunc() || falseFunc() || trueFunc())
+{
+	print("true")
+}
+else
+{
+	print("false")
+}
+
+print("\nOnly one print")
+if (trueFunc() || falseFunc() || trueFunc() || trueFunc())
+{
+	print("true")
+}
+else
+{
+	print("false")
+}
+
+
+print("\nTwo prints")
+if (falseFunc() || trueFunc() || falseFunc() || falseFunc() || falseFunc() || trueFunc() || falseFunc() || falseFunc() || falseFunc())
+{
+	print("true")
+}
+else
+{
+	print("false")
+}
+
+
+print("\nAll prints")
+if (falseFunc() || falseFunc() || falseFunc() || falseFunc())
+{
+	print("true")
+}
+else
+{
+	print("false")
+}
