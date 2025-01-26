@@ -416,7 +416,7 @@ SemanticsBase* StmtNode::semanticsTransform(SemanticsStack stack)
 	return this;
 }
 
-void StmtNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, bool initialScan)
+void StmtNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, VariableScope* currentScope, bool initialScan)
 {
 	std::set<StmtType> allowedOnInitialScan = { StmtType::ClassDecl, StmtType::ConstructorDecl, StmtType::FuncDecl, StmtType::VarDeclarationList };
 
@@ -432,7 +432,7 @@ void StmtNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 		if (currentClass == nullptr)
 			throw std::runtime_error("Methods must be inside a class!");
 
-		this->_funcDecl->fillTable(classTable, currentClass, currentMethod, initialScan);
+		this->_funcDecl->fillTable(classTable, currentClass, currentMethod, currentScope, initialScan);
 		break;
 	case StmtType::ConstructorDecl:
 		if (currentMethod != nullptr)
@@ -441,7 +441,7 @@ void StmtNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 		if (currentClass == nullptr)
 			throw std::runtime_error("Constructor must be inside the class!");
 
-		this->_constructorDecl->fillTable(classTable, currentClass, currentMethod, initialScan);
+		this->_constructorDecl->fillTable(classTable, currentClass, currentMethod, currentScope, initialScan);
 		break;
 	case StmtType::ClassDecl:
 		if (currentClass != nullptr)
@@ -450,7 +450,7 @@ void StmtNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 		if (currentMethod != nullptr)
 			throw std::runtime_error("Class declaration inside methods is not supported!");
 
-		this->_classDecl->fillTable(classTable, currentClass, currentMethod, initialScan);
+		this->_classDecl->fillTable(classTable, currentClass, currentMethod, currentScope, initialScan);
 		break;
 	case StmtType::Expr:
 		if (currentClass == nullptr)
@@ -459,14 +459,14 @@ void StmtNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 		if (currentMethod == nullptr)
 			throw std::runtime_error("Expr stmt must be inside a method!");
 
-		this->_expr->fillTable(classTable, currentClass, currentMethod);
+		this->_expr->fillTable(classTable, currentClass, currentMethod, currentScope);
 		break;
 	case StmtType::VarDeclarationList:
 		if (currentClass == nullptr)
 			throw std::runtime_error("Expr stmt must be associated with a class!");
 
 		// if currentMethod == null - it is class field
-		this->_varDeclList->fillTable(classTable, currentClass, currentMethod, initialScan);
+		this->_varDeclList->fillTable(classTable, currentClass, currentMethod, currentScope, initialScan);
 		break;
 	case StmtType::Assignment:
 		{
@@ -486,7 +486,7 @@ void StmtNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 
 				if (this->_assignArray->_type == ExprType::Id)
 				{
-					auto localVar = currentMethod->getVarTable()->findLocalVar(this->_assignArray->_stringValue);
+					auto localVar = currentScope->findLocalVar(this->_assignArray->_stringValue);
 					if (localVar == nullptr)
 						throw std::runtime_error("Can't find local var array \"" + this->_assignArray->_stringValue + "\"!" + LINE_AND_FILE);
 
@@ -496,12 +496,12 @@ void StmtNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 						throw std::runtime_error("Can't assign elem of local var array \"" + this->_assignArray->_stringValue + "\" as it's a const variable!" + LINE_AND_FILE);
 				}
 
-				auto assignArrayDesc = this->_assignArray->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+				auto assignArrayDesc = this->_assignArray->evaluateType(classTable, currentClass, currentMethod, currentScope)->toDescriptor();
 				if (assignArrayDesc[0] != '[')
 					throw std::runtime_error("Can't do array assignment for type with descriptor \"" + assignArrayDesc + "\"!" + LINE_AND_FILE);
 
 				this->_assignArrayIndex = this->_assignLeft->_right;
-				auto assignIndexDesc = this->_assignArrayIndex->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+				auto assignIndexDesc = this->_assignArrayIndex->evaluateType(classTable, currentClass, currentMethod, currentScope)->toDescriptor();
 
 				if (assignIndexDesc != "I")
 				{
@@ -514,7 +514,7 @@ void StmtNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 					this->_assignArrayIndex = newRight;
 				}
 
-				auto rightDesc = _assignRight->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+				auto rightDesc = _assignRight->evaluateType(classTable, currentClass, currentMethod, currentScope)->toDescriptor();
 
 				auto arrayElemDesc = assignArrayDesc.substr(1);
 
@@ -522,9 +522,9 @@ void StmtNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 					throw std::runtime_error("Can't assign expr with descriptor \"" + 
 						rightDesc + "\" to array element with descriptor \"" + arrayElemDesc + "\"!" + LINE_AND_FILE);
 
-				this->_assignArray->fillTable(classTable, currentClass, currentMethod);
-				this->_assignArrayIndex->fillTable(classTable, currentClass, currentMethod);
-				this->_assignRight->fillTable(classTable, currentClass, currentMethod);
+				this->_assignArray->fillTable(classTable, currentClass, currentMethod, currentScope);
+				this->_assignArrayIndex->fillTable(classTable, currentClass, currentMethod, currentScope);
+				this->_assignRight->fillTable(classTable, currentClass, currentMethod, currentScope);
 			}
 			else
 			{
@@ -549,7 +549,7 @@ void StmtNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 					if (currentMethod == nullptr)
 						throw std::runtime_error("Assignment can't be used outside of a method!" + LINE_AND_FILE);
 
-					auto leftLocalVar = currentMethod->getVarTable()->findLocalVar(this->_assignLeft->_stringValue);
+					auto leftLocalVar = currentScope->findLocalVar(this->_assignLeft->_stringValue);
 
 					if (leftLocalVar == nullptr)
 						throw std::runtime_error("Variable \"" + this->_assignLeft->_stringValue + "\" not found!" + LINE_AND_FILE);
@@ -560,11 +560,11 @@ void StmtNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 						throw std::runtime_error("Variable \"" + this->_assignLeft->_stringValue + "\" is a constant!" + LINE_AND_FILE);
 				}				
 
-				this->_assignLeft->fillTable(classTable, currentClass, currentMethod);
-				this->_assignRight->fillTable(classTable, currentClass, currentMethod);
+				this->_assignLeft->fillTable(classTable, currentClass, currentMethod, currentScope);
+				this->_assignRight->fillTable(classTable, currentClass, currentMethod, currentScope);
 
-				auto leftDesc = this->_assignLeft->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
-				auto rightDesc = _assignRight->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+				auto leftDesc = this->_assignLeft->evaluateType(classTable, currentClass, currentMethod, currentScope)->toDescriptor();
+				auto rightDesc = _assignRight->evaluateType(classTable, currentClass, currentMethod, currentScope)->toDescriptor();
 
 				if (leftDesc != rightDesc)
 				{
@@ -620,13 +620,13 @@ void StmtNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 	}
 		break;
 	case StmtType::Return:
-		this->_return->fillTable(classTable, currentClass, currentMethod);
+		this->_return->fillTable(classTable, currentClass, currentMethod, currentScope);
 		break;
 	case StmtType::IfElse:
-		this->_ifElse->fillTable(classTable, currentClass, currentMethod);
+		this->_ifElse->fillTable(classTable, currentClass, currentMethod, currentScope);
 		break;
 	case StmtType::Loop:
-		this->_loop->fillTable(classTable, currentClass, currentMethod);
+		this->_loop->fillTable(classTable, currentClass, currentMethod, currentScope);
 		break;
 	default:
 		throw std::runtime_error("Unsupported stmnt with enum type " + std::to_string(this->_type) + "!");
@@ -662,7 +662,7 @@ std::vector<char> StmtNode::generateCode(InternalClass* currentClass, InternalMe
 		{
 			if (this->_assignLeft->_type == ExprType::Id) {
 				appendVecToVec(code, this->_assignRight->generateCode(currentClass, currentMethod));
-				int varNum = currentMethod->getVarTable()->findLocalVar(this->_assignLeft->_stringValue)->localId;
+				int varNum = this->_assignLeft->_idLocalVar->localId;
 				if (this->_assignDesc == "I")
 				{
 					appendVecToVec(code, jvm::istore(varNum));
@@ -732,11 +732,11 @@ SemanticsBase* StmtListNode::semanticsTransform(SemanticsStack stack)
 	return SemanticsBase::semanticsTransformVector<StmtNode>(stack, this, _vec);
 }
 
-void StmtListNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, bool initialScan)
+void StmtListNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, VariableScope* currentScope, bool initialScan)
 {
 	for (auto& elem : _vec)
 	{
-		elem->fillTable(classTable, currentClass, currentMethod, initialScan);
+		elem->fillTable(classTable, currentClass, currentMethod, currentScope, initialScan);
 	}
 }
 

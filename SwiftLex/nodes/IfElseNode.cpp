@@ -76,7 +76,7 @@ SemanticsBase* IfElseNode::semanticsTransform(SemanticsStack stack)
 	return this;
 }
 
-void IfElseNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
+void IfElseNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, VariableScope* currentScope)
 {
 	if (this->_conditions->_vec.size() == 0)
 		throw std::runtime_error("If must have an expression inside brackets!" + LINE_AND_FILE);
@@ -86,7 +86,7 @@ void IfElseNode::fillTable(ClassTable* classTable, InternalClass* currentClass, 
 
 	auto condition = this->_conditions->_vec[0];
 
-	auto conditionDesc = condition->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+	auto conditionDesc = condition->evaluateType(classTable, currentClass, currentMethod, currentScope)->toDescriptor();
 
 	//Cast to bool 
 	if (conditionDesc != "Z")
@@ -101,17 +101,21 @@ void IfElseNode::fillTable(ClassTable* classTable, InternalClass* currentClass, 
 		//throw std::runtime_error("Condition inside if else must have a descriptor \"Z\" but got \"" + conditionDesc + "\"!" + LINE_AND_FILE);
 	}
 
-	condition->fillTable(classTable, currentClass, currentMethod);
+	condition->fillTable(classTable, currentClass, currentMethod, currentScope);
 
+
+	this->_createdTrueScope = currentMethod->getVarTable()->createVariableScope(currentScope);;
 
 	if (this->_hasIfTrue)
 	{
-		this->_ifTrue->fillTable(classTable, currentClass, currentMethod);
+		this->_ifTrue->fillTable(classTable, currentClass, currentMethod, this->_createdTrueScope);
 	}
+
+	this->_createdElseScope = currentMethod->getVarTable()->createVariableScope(currentScope);
 
 	if (this->_hasElse)
 	{
-		this->_else->fillTable(classTable, currentClass, currentMethod);
+		this->_else->fillTable(classTable, currentClass, currentMethod, this->_createdElseScope);
 	}
 }
 

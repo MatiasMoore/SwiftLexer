@@ -45,12 +45,12 @@ SemanticsBase* ReturnNode::semanticsTransform(SemanticsStack stack)
     return this;
 }
 
-void ReturnNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod)
+void ReturnNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, VariableScope* currentScope)
 {
     if (this->_type == ReturnNodeType::ExprReturn)
     {
-        this->_expr->fillTable(classTable, currentClass, currentMethod);
-        this->_exprDesc = this->_expr->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+        this->_expr->fillTable(classTable, currentClass, currentMethod, currentScope);
+        this->_exprDesc = this->_expr->evaluateType(classTable, currentClass, currentMethod, currentScope)->toDescriptor();
     }
     else
     {

@@ -76,7 +76,7 @@ void VarDeclarationNode::generateDot(std::ofstream& file)
 	}
 }
 
-void VarDeclarationNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, bool initialScan)
+void VarDeclarationNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, VariableScope* currentScope, bool initialScan)
 {
 	if (initialScan)
 	{
@@ -140,7 +140,7 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, InternalClass* curren
 			{
 
 				// Get type from assignable value
-				this->_typeNode = this->_valueNode->evaluateType(classTable, currentClass, currentMethod);
+				this->_typeNode = this->_valueNode->evaluateType(classTable, currentClass, currentMethod, currentScope);
 				auto varTypeDescriptor = this->_typeNode->toDescriptor();
 
 					// Create field
@@ -182,14 +182,14 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, InternalClass* curren
 			{
 			case ValueAndTypeKnown:
 			{
-				currentMethod->getVarTable()->addLocalVar(this->_varName, this->_typeNode->toDescriptor(), this->_isConst);
+				currentScope->addLocalVar(this->_varName, this->_typeNode->toDescriptor(), this->_isConst);
 
 				//FIXME not sure if this must be called before evaluate type
-				this->_valueNode->fillTable(classTable, currentClass, currentMethod);
+				this->_valueNode->fillTable(classTable, currentClass, currentMethod, currentScope);
 
 				//Check if types are the same
 				auto typeDesc = this->_typeNode->toDescriptor();
-				auto exprDesc = this->_valueNode->evaluateType(classTable, currentClass, currentMethod)->toDescriptor();
+				auto exprDesc = this->_valueNode->evaluateType(classTable, currentClass, currentMethod, currentScope)->toDescriptor();
 
 				if (typeDesc != exprDesc)
 				{
@@ -232,15 +232,15 @@ void VarDeclarationNode::fillTable(ClassTable* classTable, InternalClass* curren
 			}
 				break;
 			case TypeKnown:
-				currentMethod->getVarTable()->addLocalVar(this->_varName, this->_typeNode->toDescriptor(), this->_isConst);
+				currentScope->addLocalVar(this->_varName, this->_typeNode->toDescriptor(), this->_isConst);
 				break;
 			case ValueKnown:
 			{
 				//FIXME not sure if this must be called before evaluate type
-				this->_valueNode->fillTable(classTable, currentClass, currentMethod);
+				this->_valueNode->fillTable(classTable, currentClass, currentMethod, currentScope);
 
-				auto evaluatedType = this->_valueNode->evaluateType(classTable, currentClass, currentMethod);
-				currentMethod->getVarTable()->addLocalVar(this->_varName, evaluatedType->toDescriptor(), this->_isConst);
+				auto evaluatedType = this->_valueNode->evaluateType(classTable, currentClass, currentMethod, currentScope);
+				currentScope->addLocalVar(this->_varName, evaluatedType->toDescriptor(), this->_isConst);
 				this->_typeNode = evaluatedType;
 				this->_type = VarDeclType::TypeKnown;
 			}
@@ -435,11 +435,11 @@ VarDeclarationListNode* VarDeclarationListNode::setAsConst(bool flag)
 	return this;
 }
 
-void VarDeclarationListNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, bool initialScan)
+void VarDeclarationListNode::fillTable(ClassTable* classTable, InternalClass* currentClass, InternalMethod* currentMethod, VariableScope* currentScope, bool initialScan)
 {
 	for (auto& elem : _vec)
 	{
-		elem->fillTable(classTable, currentClass, currentMethod, initialScan);
+		elem->fillTable(classTable, currentClass, currentMethod, currentScope, initialScan);
 	}
 }
 
