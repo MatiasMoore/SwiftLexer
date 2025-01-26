@@ -1004,6 +1004,9 @@ void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 		std::string commonBaseClass = "";
 		int elemDimCount = 0;
 
+		int intCount = 0;
+		int floatCount = 0;
+
 		for (auto& elem : this->_arrayExprList->_vec)
 		{
 			auto desc = elem->evaluateType(classTable, currentClass, currentMethod, currentScope)->toDescriptor();
@@ -1011,12 +1014,30 @@ void ExprNode::fillTable(ClassTable* classTable, InternalClass* currentClass, In
 			bool isClass = desc[0] == 'L';
 			bool isArray = desc[0] == '[';
 
+			if (isClass)
+			{
+				auto className = classnameFromDescriptor(desc);
+				if (className == RTLHelper::_intC)
+					intCount++;
+				else if (className == RTLHelper::_floatC)
+					floatCount++;
+			}
+
 			allClasses = allClasses && isClass;
 			allArrays = allArrays && isArray;
 		}
 
 		if (!allClasses && !allArrays)
 			throw std::runtime_error("Arrays of primitive types are not supported!" + LINE_AND_FILE);
+
+		//Cast ints to floats
+		if (floatCount > 0 && this->_arrayExprList->_vec.size() == intCount + floatCount)
+		{
+			for (auto& elem : this->_arrayExprList->_vec)
+			{
+				elem->_funcCall->_funcName = RTLHelper::_floatC;
+			}
+		}
 
 		std::set<std::string> ignoreClassForCommonBaseClass = {"java/lang/Object"};
 

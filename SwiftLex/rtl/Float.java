@@ -7,6 +7,11 @@ public class Float {
     {
         _value = i._value;
     }
+
+    public Float(int i)
+    {
+        _value = i;
+    }
     public Float(float value)
     {
         _value = value;
