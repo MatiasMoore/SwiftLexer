@@ -53,7 +53,7 @@ InternalClass* ClassTable::addInternalClass(std::string name, std::string baseNa
 	auto newClass = new InternalClass(name, baseName);
 	auto baseClass = this->findClass(baseName);
 	if (baseClass == nullptr)
-		std::runtime_error("Error adding class \"" + name + "\"! It's base class \"" + baseName + "\" doesn't exist!");
+		throw std::runtime_error("Error adding class \"" + name + "\"! It's base class \"" + baseName + "\" doesn't exist!");
 
 	for (auto& baseClassMethod : baseClass->getMethods())
 	{
