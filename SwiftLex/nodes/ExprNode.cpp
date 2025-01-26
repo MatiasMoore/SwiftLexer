@@ -570,7 +570,8 @@ SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 	{
 		this->_left = _left->semanticsTransform(stack)->typecast<ExprNode>();
 		this->_right = _right->semanticsTransform(stack)->typecast<ExprNode>();
-		
+		std::string buf = "$logAndBuf";
+
 		// find first up stmtlist
 		auto stmtList = stack.getClosest<StmtListNode>();
 		if (stmtList == nullptr)
@@ -583,7 +584,7 @@ SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 		if (!stmtList->_isLogAndBufInitialized)
 		{
 			auto varDeclList = VarDeclarationListNode::createListNode(
-				VarDeclarationNode::createFromType("$logAndBuf", TypeNode::createIdType(RTLHelper::_boolC))
+				VarDeclarationNode::createFromType(buf, TypeNode::createIdType(RTLHelper::_boolC))
 			);
 			varDeclList->semanticsTransform(stack);
 			auto varDeclStmt = StmtNode::createStmtVarDeclaration(varDeclList);
@@ -594,19 +595,19 @@ SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 		}
 
 		//create first assignment
-		auto firstAssignment = StmtNode::createStmtAssignment(ExprNode::createId("$logAndBuf"), this->_left);
+		auto firstAssignment = StmtNode::createStmtAssignment(ExprNode::createId(buf), this->_left);
 		firstAssignment->semanticsTransform(stack);
 		stmtList->appendNodeBeforeNode(firstAssignment, myStmt);
 
 		// Create if
 		auto args = FuncCallArgListNode::createListNode(
-				FuncCallArgNode::createFromExpr(ExprNode::createId("$logAndBuf")))->
+				FuncCallArgNode::createFromExpr(ExprNode::createId(buf)))->
 				appendNode(FuncCallArgNode::createFromExpr(ExprNode::createBool(true))
 			);
-		auto newFunc = FuncCallNode::createFuncCall(binaryExprTypeToTransform[this->_type], args);
+		auto newFunc = FuncCallNode::createFuncCall(RTLHelper::_eq, args);
 		newFunc->setAsExprAccess(ExprNode::createId(RTLHelper::_internalOpClassName));
 		auto condition = ExprListNode::createListNode(ExprNode::createFuncCall(newFunc));
-		auto ifTrue = StmtNode::createStmtAssignment(ExprNode::createId("$logAndBuf"), this->_right);
+		auto ifTrue = StmtNode::createStmtAssignment(ExprNode::createId(buf), this->_right);
 		StmtListNode* ifTrueList = StmtListNode::createListNode(ifTrue);
 		auto ifnode = IfElseNode::createSimple(
 			condition,
@@ -617,7 +618,7 @@ SemanticsBase* ExprNode::semanticsTransform(SemanticsStack stack)
 		ifNodeStmt->semanticsTransform(stack);
 		stmtList->appendNodeBeforeNode(ifNodeStmt, myStmt);
 
-		return ExprNode::createId("$logAndBuf");
+		return ExprNode::createId(buf);
 	}
 	else if (this->_type == ExprType::LogOr)
 	{
