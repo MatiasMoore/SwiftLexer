@@ -20,7 +20,7 @@ NOT_WHITESPACES [^ \n	]
 AFTER_NO_WHITESPACE_BINARY [^ \n	;)]
 OPERATORS [-+/*%!]|\&\&|\|\|
 AFTER_PREFIX [^*/ \n	>=-]
-BEFORE_PREFIX [(; \n	]
+BEFORE_PREFIX [[(; \n	]
 AFTER_POSTFIX [ \n	;)]
 
 %{
@@ -500,7 +500,18 @@ _ { cout << "Underscore" << endl; return '_';}
 		tokenQueue.push_back(getPrefixOperatorFromString(str));
 		cout << "send ;" << endl;
 		return ';';
-	};
+	} else if (str.find('[') != string::npos) {
+		cout << "Added operator to queue, ";
+		tokenQueue.push_back(getPrefixOperatorFromString(str));
+		if (isSubsciptActive) {
+			BEGIN(INITIAL);
+			cout << "send SUBSCRIPT_SQUARE_BRACKET bracket" << endl;
+			return SUBSCRIPT_SQUARE_BRACKET;
+		} else {
+			cout << "send [" << endl;
+			return '[';
+		};
+	}
 
 	return getPrefixOperatorFromString(str);
 }
