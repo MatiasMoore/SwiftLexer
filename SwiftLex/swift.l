@@ -119,7 +119,7 @@ fallthrough {cout << "Keyword fallthrough: " << yytext << endl; return FALLTHROU
 for {cout << "Keyword for: " << yytext << endl; return FOR;}
 guard {cout << "Keyword guard: " << yytext << endl; return GUARD;}
 if {cout << "Keyword if: " << yytext << endl; return IF;}
-in {cout << "Keyword in: " << yytext << endl; return IN;}
+in {cout << "Keyword in: " << yytext << endl; isSubsciptActive = false; BEGIN(INITIAL); return IN;}
 repeat {cout << "Keyword repeat: " << yytext << endl; return REPEAT;}
 return {cout << "Keyword return: " << yytext << endl; return RETURN;}
 throw {cout << "Keyword throw: " << yytext << endl; return THROW;}
