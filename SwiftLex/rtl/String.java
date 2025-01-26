@@ -33,4 +33,19 @@ public class String {
         return new Float(java.lang.Float.parseFloat(this._value));
     }
 
+    public Boolean isEmpty()
+    {
+        return new Boolean(this._value.isEmpty());
+    }
+
+    public Boolean hasSuffix(String other)
+    {
+        return new Boolean(_value.endsWith(other._value));
+    }
+
+    public Boolean hasPrefix(String other)
+    {
+        return new Boolean(_value.startsWith(other._value));
+    }
+
 }
